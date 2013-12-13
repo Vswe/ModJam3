@@ -1,5 +1,6 @@
 package vswe.stevesjam.blocks;
 
+import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import vswe.stevesjam.components.ComponentType;
 import vswe.stevesjam.components.ConnectionSet;
@@ -24,5 +25,22 @@ public class TileEntityJam extends TileEntity {
 
     public List<FlowComponent> getFlowItems() {
         return items;
+    }
+
+    public List<TileEntity> getConnectedInventories() {
+        List<TileEntity> inventories = new ArrayList<>();
+
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    TileEntity tileEntity = worldObj.getBlockTileEntity(x + xCoord, y + yCoord, z + zCoord);
+                    if (tileEntity != null && tileEntity instanceof IInventory) {
+                        inventories.add(tileEntity);
+                    }
+                }
+            }
+        }
+
+        return  inventories;
     }
 }
