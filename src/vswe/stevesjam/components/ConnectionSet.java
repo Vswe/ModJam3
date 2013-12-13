@@ -1,9 +1,6 @@
 package vswe.stevesjam.components;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 public enum ConnectionSet {
     STANDARD("Standard", ConnectionOption.STANDARD_INPUT, ConnectionOption.STANDARD_OUTPUT),
     FAIL_CHECK("Result Based", ConnectionOption.STANDARD_INPUT, ConnectionOption.SUCCESS, ConnectionOption.FAILURE);
@@ -25,7 +22,7 @@ public enum ConnectionSet {
             }
         }
 
-
+        this.name = name;
     }
 
 

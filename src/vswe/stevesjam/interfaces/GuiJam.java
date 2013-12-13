@@ -1,6 +1,7 @@
 package vswe.stevesjam.interfaces;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -139,7 +140,7 @@ public class GuiJam extends GuiContainer {
     @Override
     protected void keyTyped(char c, int k) {
         for (FlowComponent itemBase : jam.getFlowItems()) {
-            if (itemBase.onKeyStroke(c, k) && k != 1) {
+            if (itemBase.onKeyStroke(this, c, k) && k != 1) {
                 return;
             }
         }
@@ -149,5 +150,14 @@ public class GuiJam extends GuiContainer {
 
     public void drawCenteredString(String str, int x, int y, float mult, int width, int color) {
         drawString(str, x + (width - (int)(getStringWidth(str) * mult)) / 2, y, mult, color);
+    }
+
+    public void drawCursor(int x, int y, int z, int color) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(0, 0, z);
+        x += guiLeft;
+        y += guiTop;
+        Gui.drawRect(x , y + 1 , x + 1, y + 10, color);
+        GL11.glPopMatrix();
     }
 }

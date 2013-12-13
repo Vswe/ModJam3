@@ -54,6 +54,7 @@ public class FlowComponent {
     public FlowComponent(int x, int y, ComponentType type, ConnectionSet connectionSet) {
         this.x = x;
         this.y = y;
+        this.connectionSet = connectionSet;
 
         menus = new ArrayList<>();
         for (Class<? extends ComponentMenu> componentMenuClass : type.getClasses()) {
@@ -69,7 +70,7 @@ public class FlowComponent {
         }
 
         openMenuId = -1;
-        this.connectionSet = connectionSet;
+
     }
 
     private int x;
@@ -98,6 +99,13 @@ public class FlowComponent {
         this.y = y;
     }
 
+    public ConnectionSet getConnectionSet() {
+        return connectionSet;
+    }
+
+    public void setConnectionSet(ConnectionSet connectionSet) {
+        this.connectionSet = connectionSet;
+    }
 
     public void draw(GuiJam gui, int mX, int mY) {
         gui.drawTexture(x, y, isLarge ? COMPONENT_SRC_LARGE_X : COMPONENT_SRC_X, COMPONENT_SRC_Y, getComponentWidth(), getComponentHeight());
@@ -324,9 +332,9 @@ public class FlowComponent {
         return  y + getMenuItemY(i) + MENU_ITEM_SIZE_H;
     }
 
-    public boolean onKeyStroke(char c, int k) {
+    public boolean onKeyStroke(GuiJam gui, char c, int k) {
         if (isLarge && openMenuId != -1) {
-            return menus.get(openMenuId).onKeyStroke(c, k);
+            return menus.get(openMenuId).onKeyStroke(gui, c, k);
         }
 
         return false;

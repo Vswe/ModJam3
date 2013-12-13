@@ -2,7 +2,7 @@ package vswe.stevesjam.components;
 
 
 public enum ComponentType {
-    INPUT(ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuInventory.class, ComponentMenuInventory.class, ComponentMenuTarget.class);
+    INPUT(ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItem.class, ComponentMenuInventory.class, ComponentMenuResult.class);
 
     private Class<? extends ComponentMenu>[] classes;
 

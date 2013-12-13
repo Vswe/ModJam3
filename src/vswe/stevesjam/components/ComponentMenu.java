@@ -21,7 +21,11 @@ public abstract class ComponentMenu {
     public abstract void onRelease(int mX, int mY);
 
 
-    public boolean onKeyStroke(char c, int k) {
+    public boolean onKeyStroke(GuiJam gui, char c, int k) {
         return false;
+    }
+
+    public FlowComponent getParent() {
+        return parent;
     }
 }

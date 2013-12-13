@@ -235,7 +235,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     @Override
-    public boolean onKeyStroke(char c, int k) {
+    public boolean onKeyStroke(GuiJam gui, char c, int k) {
         if (selectedTextBox != null && useRange(selectingRangeId)) {
 
             if (Character.isDigit(c)) {
