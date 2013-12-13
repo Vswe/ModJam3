@@ -17,6 +17,7 @@ import vswe.stevesjam.proxy.CommonProxy;
 public class StevesJam {
 
 
+    public static final String RESOURCE_LOCATION = "stevesjam";
 
     @SidedProxy(clientSide = "vswe.stevesjam.proxy.ClientProxy", serverSide = "vswe.stevesjam.proxy.CommonProxy")
     public static CommonProxy proxy;
