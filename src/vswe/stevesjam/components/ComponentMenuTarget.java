@@ -3,14 +3,14 @@ package vswe.stevesjam.components;
 
 import vswe.stevesjam.interfaces.GuiJam;
 
-public class ComponentMenuInventory extends ComponentMenu {
-    public ComponentMenuInventory(FlowComponent parent) {
+public class ComponentMenuTarget extends ComponentMenu {
+    public ComponentMenuTarget(FlowComponent parent) {
         super(parent);
     }
 
     @Override
     public String getName() {
-        return "Inventory";
+        return "Target";
     }
 
     @Override
@@ -20,6 +20,6 @@ public class ComponentMenuInventory extends ComponentMenu {
 
     @Override
     public void drawText(GuiJam gui, int renderX, int renderY) {
-        gui.drawString("This is an inventory thingy", renderX + 5, renderY + 10, 0xFF00FF);
+        gui.drawString("Cake", renderX + 5, renderY + 5, 0xFFFF00);
     }
 }

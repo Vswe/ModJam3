@@ -43,7 +43,7 @@ public class GuiJam extends GuiContainer {
             itemBase.draw(this, x, y);
         }
         for (FlowComponent itemBase : jam.getFlowItems()) {
-            itemBase.drawText(this, x, y);
+            itemBase.drawText(this);
         }
     }
 

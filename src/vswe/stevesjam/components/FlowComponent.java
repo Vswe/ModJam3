@@ -44,7 +44,13 @@ public class FlowComponent {
     private static final int MENU_ITEM_TEXT_X = 5;
     private static final int MENU_ITEM_TEXT_Y = 3;
 
-    public FlowComponent(int x, int y, ComponentType type) {
+    private static final int CONNECTION_SIZE_W = 7;
+    private static final int CONNECTION_SIZE_H = 6;
+    private static final int CONNECTION_SRC_X = 0;
+    private static final int CONNECTION_SRC_Y = 58;
+
+
+    public FlowComponent(int x, int y, ComponentType type, ConnectionSet connectionSet) {
         this.x = x;
         this.y = y;
 
@@ -62,6 +68,7 @@ public class FlowComponent {
         }
 
         openMenuId = -1;
+        this.connectionSet = connectionSet;
     }
 
     private int x;
@@ -72,6 +79,7 @@ public class FlowComponent {
     private boolean isLarge;
     private List<ComponentMenu> menus;
     private int openMenuId;
+    private ConnectionSet connectionSet;
 
     public int getX() {
         return x;
@@ -112,16 +120,55 @@ public class FlowComponent {
                 int srcItemArrowX = inMenuArrowBounds(i, internalX, internalY) ? 1 : 0;
                 int srcItemArrowY = i == openMenuId ? 1 : 0;
                 gui.drawTexture(itemX + MENU_ARROW_X, itemY + MENU_ARROW_Y, MENU_ARROW_SRC_X + MENU_ARROW_SIZE_W * srcItemArrowX, MENU_ARROW_SRC_Y + MENU_ARROW_SIZE_H * srcItemArrowY, MENU_ARROW_SIZE_W, MENU_ARROW_SIZE_H);
+
+                if (i == openMenuId) {
+                    menu.draw(gui, itemX, itemY + MENU_ITEM_SIZE_H, internalX - itemX, internalY - (itemY + MENU_ITEM_SIZE_H));
+                }
             }
+        }
+
+        int outputCount = 0;
+        int inputCount = 0;
+        for (ConnectionOption connection : connectionSet.getConnections()) {
+            int targetX;
+            int targetY;
+
+            int srcConnectionX = 0;
+            int srcConnectionY;
+            int currentCount;
+            int totalCount;
+
+            if (connection.isInput()) {
+                currentCount = inputCount;
+                totalCount = connectionSet.getInputCount();
+                inputCount++;
+                srcConnectionY = 1;
+                targetY = y - CONNECTION_SIZE_H;
+            }else{
+                currentCount = outputCount;
+                totalCount = connectionSet.getOutputCount();
+                outputCount++;
+                srcConnectionY = 0;
+                targetY = y + getComponentHeight();
+            }
+
+            targetX = x + (int)(getComponentWidth() * ((currentCount + 0.5)  / totalCount));
+            targetX -= CONNECTION_SIZE_W / 2;
+
+            gui.drawTexture(targetX, targetY, CONNECTION_SRC_X + srcConnectionX * CONNECTION_SIZE_W, CONNECTION_SRC_Y + srcConnectionY * CONNECTION_SIZE_H, CONNECTION_SIZE_W, CONNECTION_SIZE_H);
         }
     }
 
-    public void drawText(GuiJam gui, int mX, int mY) {
+    public void drawText(GuiJam gui) {
         if (isLarge) {
             for (int i = 0; i < menus.size(); i++) {
                 ComponentMenu menu = menus.get(i);
 
                 gui.drawString(menu.getName(), x + MENU_X + MENU_ITEM_TEXT_X, y + getMenuItemY(i) + MENU_ITEM_TEXT_Y, 0x404040);
+
+                if (i == openMenuId) {
+                    menu.drawText(gui, x + MENU_X, y + getMenuItemY(i) + MENU_ITEM_SIZE_H);
+                }
             }
         }
     }
