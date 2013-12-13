@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import vswe.stevesjam.StevesJam;
 
@@ -35,11 +34,6 @@ public class BlockJam extends BlockContainer {
         }
 
         return true;
-    }
-
-    @Override
-    public Icon getIcon(int par1, int par2) {
-        return super.getIcon(par1, par2);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     @Override
