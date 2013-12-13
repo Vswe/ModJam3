@@ -323,4 +323,12 @@ public class FlowComponent {
     private int getMenuAreaY(int i) {
         return  y + getMenuItemY(i) + MENU_ITEM_SIZE_H;
     }
+
+    public boolean onKeyStroke(char c, int k) {
+        if (isLarge && openMenuId != -1) {
+            return menus.get(openMenuId).onKeyStroke(c, k);
+        }
+
+        return false;
+    }
 }

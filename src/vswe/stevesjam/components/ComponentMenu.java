@@ -21,4 +21,7 @@ public abstract class ComponentMenu {
     public abstract void onRelease(int mX, int mY);
 
 
+    public boolean onKeyStroke(char c, int k) {
+        return false;
+    }
 }

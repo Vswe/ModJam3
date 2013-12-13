@@ -104,10 +104,18 @@ public class GuiJam extends GuiContainer {
         return jam;
     }
 
-    public void drawString(String str, int x, int y, int color) {
-        fontRenderer.drawString(str, x + guiLeft, y + guiTop, color);
+    public void drawString(String str, int x, int y, float mult, int color) {
+        GL11.glPushMatrix();
+        GL11.glScalef(mult, mult, 1F);
+        fontRenderer.drawString(str, (int)((x + guiLeft) / mult), (int)((y + guiTop) / mult), color);
         bindTexture(COMPONENTS);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+        GL11.glPopMatrix();
+    }
+
+    public void drawString(String str, int x, int y, int color) {
+        drawString(str, x, y, 1F, color);
     }
 
     public void drawMouseOver(String str, int x, int y) {
@@ -122,5 +130,24 @@ public class GuiJam extends GuiContainer {
 
     public static boolean inBounds(int leftX, int topY, int width, int height, int mX, int mY) {
         return leftX <= mX && mX <= leftX + width && topY <= mY && mY <= topY + height;
+    }
+
+    public int getStringWidth(String str) {
+        return fontRenderer.getStringWidth(str);
+    }
+
+    @Override
+    protected void keyTyped(char c, int k) {
+        for (FlowComponent itemBase : jam.getFlowItems()) {
+            if (itemBase.onKeyStroke(c, k) && k != 1) {
+                return;
+            }
+        }
+
+        super.keyTyped(c, k);
+    }
+
+    public void drawCenteredString(String str, int x, int y, float mult, int width, int color) {
+        drawString(str, x + (width - (int)(getStringWidth(str) * mult)) / 2, y, mult, color);
     }
 }
