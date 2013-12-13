@@ -2,14 +2,12 @@ package vswe.stevesjam.interfaces;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.resources.ResourceManager;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import vswe.stevesjam.StevesJam;
 import vswe.stevesjam.blocks.TileEntityJam;
-import vswe.stevesjam.components.FlowItemBase;
+import vswe.stevesjam.components.FlowComponent;
 
 
 public class GuiJam extends GuiContainer {
@@ -41,8 +39,11 @@ public class GuiJam extends GuiContainer {
         y -= guiTop;
 
         bindTexture(COMPONENTS);
-        for (FlowItemBase itemBase : jam.getFlowItems()) {
+        for (FlowComponent itemBase : jam.getFlowItems()) {
             itemBase.draw(this, x, y);
+        }
+        for (FlowComponent itemBase : jam.getFlowItems()) {
+            itemBase.drawText(this, x, y);
         }
     }
 
@@ -53,7 +54,7 @@ public class GuiJam extends GuiContainer {
         x -= guiLeft;
         y -= guiTop;
 
-        for (FlowItemBase itemBase : jam.getFlowItems()) {
+        for (FlowComponent itemBase : jam.getFlowItems()) {
             itemBase.onClick(x, y);
         }
     }
@@ -63,7 +64,7 @@ public class GuiJam extends GuiContainer {
         x -= guiLeft;
         y -= guiTop;
 
-        for (FlowItemBase itemBase : jam.getFlowItems()) {
+        for (FlowComponent itemBase : jam.getFlowItems()) {
             itemBase.onDrag(x, y);
         }
     }
@@ -73,7 +74,7 @@ public class GuiJam extends GuiContainer {
         x -= guiLeft;
         y -= guiTop;
 
-        for (FlowItemBase itemBase : jam.getFlowItems()) {
+        for (FlowComponent itemBase : jam.getFlowItems()) {
             itemBase.onRelease(x, y);
         }
     }
@@ -92,4 +93,8 @@ public class GuiJam extends GuiContainer {
     }
 
     private TileEntityJam jam;
+
+    public void drawString(String str, int x, int y, int color) {
+        fontRenderer.drawString(str, x + guiLeft, y + guiTop, color);
+    }
 }

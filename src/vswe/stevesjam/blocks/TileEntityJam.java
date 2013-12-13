@@ -1,7 +1,8 @@
 package vswe.stevesjam.blocks;
 
 import net.minecraft.tileentity.TileEntity;
-import vswe.stevesjam.components.FlowItemBase;
+import vswe.stevesjam.components.ComponentType;
+import vswe.stevesjam.components.FlowComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,18 +10,18 @@ import java.util.List;
 
 public class TileEntityJam extends TileEntity {
 
-    private List<FlowItemBase> items;
+    private List<FlowComponent> items;
 
     public TileEntityJam() {
-        items = new ArrayList<FlowItemBase>();
+        items = new ArrayList<>();
 
-        items.add(new FlowItemBase(30, 30));
-        items.add(new FlowItemBase(200, 30));
-        items.add(new FlowItemBase(200, 80));
+        items.add(new FlowComponent(30, 30, ComponentType.INPUT));
+        items.add(new FlowComponent(200, 30, ComponentType.INPUT));
+        items.add(new FlowComponent(200, 80, ComponentType.INPUT));
     }
 
 
-    public List<FlowItemBase> getFlowItems() {
+    public List<FlowComponent> getFlowItems() {
         return items;
     }
 }
