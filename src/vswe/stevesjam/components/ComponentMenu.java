@@ -16,7 +16,7 @@ public abstract class ComponentMenu {
     public abstract void draw(GuiJam gui, int mX, int mY);
     public abstract void drawMouseOver(GuiJam gui, int mX, int mY);
 
-    public abstract void onClick(int mX, int mY);
+    public abstract void onClick(int mX, int mY, int button);
     public abstract void onDrag(int mX, int mY);
     public abstract void onRelease(int mX, int mY);
 

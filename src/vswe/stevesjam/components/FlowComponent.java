@@ -189,7 +189,7 @@ public class FlowComponent {
         }
     }
 
-    public void onClick(int mX, int mY) {
+    public void onClick(int mX, int mY, int button) {
         if (GuiJam.inBounds(x, y, getComponentWidth(), getComponentHeight(), mX, mY)) {
            int internalX = mX - x;
            int internalY = mY - y;
@@ -215,7 +215,7 @@ public class FlowComponent {
                         return;
                     }
 
-                    menu.onClick(mX - getMenuAreaX(), mY - getMenuAreaY(i));
+                    menu.onClick(mX - getMenuAreaX(), mY - getMenuAreaY(i), button);
                 }
 
             }
@@ -280,13 +280,16 @@ public class FlowComponent {
     private int getMenuItemY(int i) {
         int ret = MENU_Y + i * (MENU_ITEM_SIZE_H - 1);
         if (openMenuId != -1 && openMenuId < i) {
-            ret += MENU_SIZE_H - (MENU_ITEM_CAPACITY * (MENU_ITEM_SIZE_H - 1) + 1);
+            ret += getMenuOpenSize() - 1;
         }
 
         return ret;
     }
 
 
+    public static int getMenuOpenSize() {
+        return MENU_SIZE_H - MENU_ITEM_CAPACITY * (MENU_ITEM_SIZE_H - 1);
+    }
 
 
     private int getComponentWidth() {

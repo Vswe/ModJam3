@@ -115,7 +115,7 @@ public class ComponentMenuInventory extends ComponentMenu {
 
     private void drawArrow(GuiJam gui, boolean right, int mX, int mY) {
         int srcArrowX = right ? 1 : 0;
-        int srcArrowY = canScroll ? inArrowBounds(right, mX, mY) ? clicked ? 2 : 1 : 0 : 3;
+        int srcArrowY = canScroll ? clicked && right == (dir == -1) ? 2 : inArrowBounds(right, mX, mY) ? 1 : 0 : 3;
 
         gui.drawTexture(right ? ARROW_X_RIGHT : ARROW_X_LEFT, ARROW_Y, ARROW_SRC_X + srcArrowX * ARROW_SIZE_W, ARROW_SRC_Y + srcArrowY * ARROW_SIZE_H, ARROW_SIZE_W, ARROW_SIZE_H);
     }
@@ -125,7 +125,7 @@ public class ComponentMenuInventory extends ComponentMenu {
     }
 
     @Override
-    public void onClick(int mX, int mY) {
+    public void onClick(int mX, int mY, int button) {
         if (canScroll) {
             if (inArrowBounds(true, mX, mY)) {
                 clicked = true;

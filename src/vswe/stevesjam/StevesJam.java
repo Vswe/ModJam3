@@ -13,11 +13,12 @@ import vswe.stevesjam.network.PacketHandler;
 import vswe.stevesjam.proxy.CommonProxy;
 
 @Mod(modid = "StevesJam", name = "Steve's Jam", version = "Pancakes")
-@NetworkMod(channels = {"Jam"}, clientSideRequired = true, serverSideRequired = false, packetHandler = PacketHandler.class)
+@NetworkMod(channels = {StevesJam.CHANNEL}, clientSideRequired = true, serverSideRequired = false, packetHandler = PacketHandler.class)
 public class StevesJam {
 
 
     public static final String RESOURCE_LOCATION = "stevesjam";
+    public static final String CHANNEL = "Jam";
 
     @SidedProxy(clientSide = "vswe.stevesjam.proxy.ClientProxy", serverSide = "vswe.stevesjam.proxy.CommonProxy")
     public static CommonProxy proxy;

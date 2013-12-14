@@ -57,7 +57,7 @@ public class ComponentMenuResult extends ComponentMenu {
     }
 
     @Override
-    public void onClick(int mX, int mY) {
+    public void onClick(int mX, int mY, int button) {
         for (int i = 0; i < sets.length; i++) {
             if (GuiJam.inBounds(RADIO_X, RADIO_Y + i * (RADIO_SIZE + RADIO_MARGIN), RADIO_SIZE, RADIO_SIZE, mX, mY)) {
                 selectedOption = i;

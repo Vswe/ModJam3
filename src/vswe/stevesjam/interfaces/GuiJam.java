@@ -3,11 +3,13 @@ package vswe.stevesjam.interfaces;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import vswe.stevesjam.StevesJam;
 import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.components.FlowComponent;
@@ -62,7 +64,7 @@ public class GuiJam extends GuiContainer {
         y -= guiTop;
 
         for (FlowComponent itemBase : jam.getFlowItems()) {
-            itemBase.onClick(x, y);
+            itemBase.onClick(x, y, button);
         }
     }
 
@@ -120,13 +122,41 @@ public class GuiJam extends GuiContainer {
     }
 
     public void drawMouseOver(String str, int x, int y) {
-        drawHoveringText(Arrays.asList(str.split("\n")), x + guiLeft, y + guiTop, fontRenderer);
+       drawMouseOver(Arrays.asList(str.split("\n")), x, y);
+    }
+
+    public void drawMouseOver(List lst, int x, int y) {
+        drawHoveringText(lst, x + guiLeft, y + guiTop, fontRenderer);
     }
 
     public void drawItemStack(ItemStack itemstack, int x, int y) {
-        itemRenderer.renderItemAndEffectIntoGUI(this.fontRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
-        bindTexture(COMPONENTS);
+        GL11.glPushMatrix();
+
+        RenderHelper.enableGUIStandardItemLighting();
         GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
+        GL11.glEnable(GL11.GL_LIGHTING);
+
+        itemRenderer.zLevel = 100.0F;
+        try {
+            itemRenderer.renderItemAndEffectIntoGUI(this.fontRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
+        }catch (Exception ex) {
+            if (itemstack.getItemDamage() != 0) {
+                ItemStack newStack = itemstack.copy();
+                newStack.setItemDamage(0);
+                drawItemStack(newStack, x, y);
+            }
+        }finally {
+            itemRenderer.zLevel = 0F;
+
+            bindTexture(COMPONENTS);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glDisable(GL11.GL_LIGHTING);
+
+            GL11.glPopMatrix();
+        }
+
     }
 
     public static boolean inBounds(int leftX, int topY, int width, int height, int mX, int mY) {

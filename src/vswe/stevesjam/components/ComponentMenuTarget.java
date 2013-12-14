@@ -12,6 +12,9 @@ public class ComponentMenuTarget extends ComponentMenu {
         super(parent);
 
         selectingRangeId = -1;
+        textBoxes = new TextBoxNumberList();
+        textBoxes.addTextBox(new TextBoxNumber(39 ,49, 2, false));
+        textBoxes.addTextBox(new TextBoxNumber(60 ,49, 2, false));
     }
 
     private static final int DIRECTION_SIZE_W = 31;
@@ -32,12 +35,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     private static final int BUTTON_X = 39;
     private static final int BUTTON_TEXT_Y = 5;
 
-    private static final int TEXT_BOX_SIZE_W = 21;
-    private static final int TEXT_BOX_SIZE_H = 12;
-    private static final int TEXT_BOX_SRC_X = 0;
-    private static final int TEXT_BOX_SRC_Y = 130;
-    private static final int TEXT_BOX_Y = 49;
-    private static final int TEXT_Y = 3;
+
 
     private Button[] buttons = {new Button(5) {
         @Override
@@ -72,7 +70,7 @@ public class ComponentMenuTarget extends ComponentMenu {
         }
     }};
 
-    private TextBox[] textBoxes = {new TextBox(39), new TextBox(60)};
+    private TextBoxNumberList textBoxes;
 
     @Override
     public String getName() {
@@ -85,7 +83,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     private int selectingRangeId;
     private byte activatedDirections;
     private byte useRangeForDirections;
-    private TextBox selectedTextBox;
+
 
 
     @Override
@@ -118,13 +116,7 @@ public class ComponentMenuTarget extends ComponentMenu {
             }
 
             if (useRange(selectingRangeId)) {
-                for (TextBox textBox : textBoxes) {
-                    int srcTextBoxX = textBox.equals(selectedTextBox) ? 1 : 0;
-
-                    gui.drawTexture(textBox.x, TEXT_BOX_Y, TEXT_BOX_SRC_X + srcTextBoxX * TEXT_BOX_SIZE_W, TEXT_BOX_SRC_Y, TEXT_BOX_SIZE_W, TEXT_BOX_SIZE_H);
-                    String str = String.valueOf(textBox.number);
-                    gui.drawString(str, textBox.x + (TEXT_BOX_SIZE_W - gui.getStringWidth(str)) / 2, TEXT_BOX_Y + TEXT_Y, 0xFFFFFF);
-                }
+                textBoxes.draw(gui, mX, mY);
             }
         }
     }
@@ -167,7 +159,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     @Override
-    public void onClick(int mX, int mY) {
+    public void onClick(int mX, int mY, int button) {
         for (int i = 0; i < directions.length; i++) {
             if (GuiJam.inBounds(getDirectionX(i), getDirectionY(i), DIRECTION_SIZE_W, DIRECTION_SIZE_H, mX, mY)) {
                 if (selectingRangeId == i) {
@@ -180,25 +172,15 @@ public class ComponentMenuTarget extends ComponentMenu {
             }
         }
 
-        for (Button button : buttons) {
-            if (GuiJam.inBounds(BUTTON_X, button.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
-                button.onClicked();
+        for (Button optionButton : buttons) {
+            if (GuiJam.inBounds(BUTTON_X, optionButton.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
+                optionButton.onClicked();
                 break;
             }
         }
 
         if (useRange(selectingRangeId)) {
-            for (TextBox textBox : textBoxes) {
-                if (GuiJam.inBounds(textBox.x, TEXT_BOX_Y, TEXT_BOX_SIZE_W, TEXT_BOX_SIZE_H, mX, mY)) {
-                    if (textBox.equals(selectedTextBox)) {
-                        selectedTextBox = null;
-                    }else{
-                        selectedTextBox = textBox;
-                    }
-
-                    break;
-                }
-            }
+            textBoxes.onClick(mX, mY, button);
         }
     }
 
@@ -224,43 +206,11 @@ public class ComponentMenuTarget extends ComponentMenu {
         protected abstract void onClicked();
     }
 
-    private class TextBox {
-        private int x;
-        private int number;
-
-        private TextBox(int x) {
-            this.x = x;
-            number = 0;
-        }
-    }
 
     @Override
     public boolean onKeyStroke(GuiJam gui, char c, int k) {
-        if (selectedTextBox != null && useRange(selectingRangeId)) {
-
-            if (Character.isDigit(c)) {
-                int number = Integer.parseInt(String.valueOf(c));
-                if (selectedTextBox.number < 10){
-                    selectedTextBox.number *= 10;
-                    selectedTextBox.number += number;
-                }
-                return true;
-            }else if(k == 14){
-                selectedTextBox.number /= 10;
-                return true;
-            }else if(k == 15){
-                for (int i = 0; i < textBoxes.length; i++) {
-                    TextBox textBox = textBoxes[i];
-
-                    if (textBox.equals(selectedTextBox)) {
-                        int nextId = (i + 1) % textBoxes.length;
-                        selectedTextBox = textBoxes[nextId];
-                        break;
-                    }
-                }
-                return true;
-            }
-
+        if (useRange(selectingRangeId)) {
+            return textBoxes.onKeyStroke(gui, c, k);
         }
 
 
