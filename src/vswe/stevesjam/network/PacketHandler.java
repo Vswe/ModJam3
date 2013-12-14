@@ -1,19 +1,19 @@
 package vswe.stevesjam.network;
 
 import cpw.mods.fml.common.network.IPacketHandler;
-import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
-import vswe.stevesjam.StevesJam;
 import vswe.stevesjam.blocks.TileEntityJam;
+import vswe.stevesjam.components.ComponentMenu;
+import vswe.stevesjam.components.ComponentType;
+import vswe.stevesjam.components.FlowComponent;
 import vswe.stevesjam.interfaces.ContainerJam;
-
-import java.io.*;
 
 
 public class PacketHandler implements IPacketHandler {
@@ -23,44 +23,149 @@ public class PacketHandler implements IPacketHandler {
         DataReader dr = new DataReader(packet.data);
 
 
-        int containerId = dr.readByte();
-        Container container = ((EntityPlayer)player).openContainer;
 
-        if (container != null && container.windowId == containerId && container instanceof ContainerJam) {
-            readData(dr, ((ContainerJam)container).getJam());
-        }
+            int containerId = dr.readByte();
+            Container container = ((EntityPlayer)player).openContainer;
+
+            if (container != null && container.windowId == containerId && container instanceof ContainerJam) {
+                if (player instanceof EntityPlayerMP) {
+                    readServerComponentPacketFromDataReader(dr, ((ContainerJam) container).getJam());
+                }else if (dr.readBoolean()) {
+                    //readSpecificData(dr, ((ContainerJam) container).getJam());
+                }else{
+                    readAllData(dr, ((ContainerJam) container).getJam());
+                }
+            }
+
 
         dr.close();
     }
-    public static void sendAllData(Container container, ICrafting crafting, TileEntityJam jam) {
+    public static void sendDataToPlayer(ICrafting crafting, DataWriter dw) {
         if (crafting instanceof Player) {
             Player player = (Player)crafting;
-            DataWriter dw = new DataWriter();
 
-            dw.writeByte(container.windowId);
-            writeData(dw, jam);
-            dw.sendPacket(player);
+            dw.sendPlayerPacket(player);
             dw.close();
         }
     }
 
 
 
-    private static void writeData(DataWriter dw, TileEntityJam jam){
-        dw.writeData(0b11, 2);
-        dw.writeData(0b10101, 5);
-        dw.writeData(30000, 15);
-        dw.writeData(0b0, 1);
-        dw.writeData(0b1, 1);
-        dw.writeData(0b10101, 5);
+    public static void sendDataToServer(DataWriter dw) {
+        dw.sendServerPacket();
+        dw.close();
     }
 
-    private static void readData(DataReader dr, TileEntityJam jam){
-        dr.readData(2);
-        dr.readData(5);
-        dr.readData(15);
-        dr.readData(1);
-        dr.readData(1);
-        dr.readData(5);
+
+    public static void sendAllData(Container container, ICrafting crafting, TileEntityJam jam) {
+        DataWriter dw = new DataWriter();
+
+        dw.writeByte(container.windowId);
+        dw.writeBoolean(false);
+        writeAllData(dw, jam);
+
+        sendDataToPlayer(crafting, dw);
+    }
+
+    public static DataWriter getWriterForSpecificData(Container container) {
+        DataWriter dw = new DataWriter();
+
+        dw.writeByte(container.windowId);
+        dw.writeBoolean(true);
+
+
+        return dw;
+    }
+
+    public static DataWriter getWriterForServerPacket() {
+        Container container = Minecraft.getMinecraft().thePlayer.openContainer;
+
+        if (container != null) {
+            DataWriter dw = new DataWriter();
+
+            dw.writeByte(container.windowId);
+
+            return dw;
+        }else{
+            return null;
+        }
+    }
+
+    public static DataWriter getWriterForServerComponentPacket(FlowComponent component, ComponentMenu menu) {
+        DataWriter dw = PacketHandler.getWriterForServerPacket();
+
+        dw.writeBoolean(true); //this is a packet for a specific FlowComponent
+        for (int i = 0; i < component.getJam().getFlowItems().size(); i++) {
+            if (component.getJam().getFlowItems().get(i).equals(component)) {
+                dw.writeData(i, DataBitHelper.FLOW_CONTROL_COUNT);
+                break;
+            }
+        }
+
+        if (menu != null) {
+            dw.writeBoolean(true); //this is packet for a specific menu
+            for (int i = 0; i < component.getMenus().size(); i++) {
+                if (component.getMenus().get(i).equals(menu)) {
+                    dw.writeData(i, DataBitHelper.FLOW_CONTROL_MENU_COUNT);
+                    break;
+                }
+            }
+        }else{
+            dw.writeBoolean(false); //this is a packet that has nothing to do with a menu
+        }
+
+        return dw;
+    }
+
+    public static void readServerComponentPacketFromDataReader(DataReader dr, TileEntityJam jam) {
+        boolean isSpecificComponent = dr.readBoolean();
+
+        int componentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+        if (componentId >= 0 && componentId < jam.getFlowItems().size()) {
+            FlowComponent component = jam.getFlowItems().get(componentId);
+
+            if (dr.readBoolean()) {
+                int menuId = dr.readData(DataBitHelper.FLOW_CONTROL_MENU_COUNT);
+                if (menuId >= 0 && menuId < component.getMenus().size()) {
+                    ComponentMenu menu = component.getMenus().get(menuId);
+
+                    menu.readDataOnServer(dr);
+                }
+            }else{
+                component.readDataOnServer(dr);
+            }
+        }
+    }
+
+
+    private static void writeAllData(DataWriter dw, TileEntityJam jam){
+       dw.writeData(jam.getFlowItems().size(), DataBitHelper.FLOW_CONTROL_COUNT);
+        for (FlowComponent flowComponent : jam.getFlowItems()) {
+            dw.writeData(flowComponent.getX(), DataBitHelper.FLOW_CONTROL_X);
+            dw.writeData(flowComponent.getY(), DataBitHelper.FLOW_CONTROL_Y);
+            dw.writeData(flowComponent.getType().getId(), DataBitHelper.FLOW_CONTROL_TYPE_ID);
+
+            for (ComponentMenu menu : flowComponent.getMenus()) {
+                menu.writeData(dw, jam);
+            }
+        }
+    }
+
+    private static void readAllData(DataReader dr, TileEntityJam jam){
+        int flowControlCount = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+        jam.getFlowItems().clear();
+        for (int i = 0; i < flowControlCount; i++) {
+            int x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
+            int y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+            int id = dr.readData(DataBitHelper.FLOW_CONTROL_TYPE_ID);
+
+            FlowComponent flowComponent = new FlowComponent(jam, x, y, ComponentType.getTypeFromId(id));
+
+            for (ComponentMenu menu : flowComponent.getMenus()) {
+                menu.readData(dr, jam);
+            }
+
+            jam.getFlowItems().add(flowComponent);
+        }
     }
 }

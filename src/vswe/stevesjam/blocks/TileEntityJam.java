@@ -1,6 +1,7 @@
 package vswe.stevesjam.blocks;
 
 import net.minecraft.inventory.IInventory;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import vswe.stevesjam.components.ComponentType;
 import vswe.stevesjam.components.ConnectionSet;
@@ -17,11 +18,16 @@ public class TileEntityJam extends TileEntity {
     public TileEntityJam() {
         items = new ArrayList<>();
 
-        items.add(new FlowComponent(30, 30, ComponentType.INPUT, ConnectionSet.STANDARD));
-        items.add(new FlowComponent(200, 30, ComponentType.INPUT, ConnectionSet.FAIL_CHECK));
-        items.add(new FlowComponent(200, 80, ComponentType.INPUT, ConnectionSet.FAIL_CHECK));
     }
 
+    @Override
+    public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
+        super.readFromNBT(par1NBTTagCompound);
+
+        items.add(new FlowComponent(this, 30, 30, ComponentType.INPUT));
+        items.add(new FlowComponent(this, 200, 30, ComponentType.INPUT));
+        items.add(new FlowComponent(this, 200, 80, ComponentType.INPUT));
+    }
 
     public List<FlowComponent> getFlowItems() {
         return items;

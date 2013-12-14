@@ -1,7 +1,11 @@
 package vswe.stevesjam.components;
 
 
+import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.network.DataBitHelper;
+import vswe.stevesjam.network.DataReader;
+import vswe.stevesjam.network.DataWriter;
 
 public class ComponentMenuResult extends ComponentMenu {
 
@@ -77,6 +81,20 @@ public class ComponentMenuResult extends ComponentMenu {
 
     }
 
+    @Override
+    public void writeData(DataWriter dw, TileEntityJam jam) {
+        dw.writeData(getParent().getConnectionSet().getId(), DataBitHelper.MENU_CONNECTION_TYPE_ID);
+    }
+
+    @Override
+    public void readData(DataReader dr, TileEntityJam jam) {
+        getParent().setConnectionSet(ConnectionSet.getTypeFromId(dr.readData(DataBitHelper.MENU_CONNECTION_TYPE_ID)));
+    }
+
+    @Override
+    public void readDataOnServer(DataReader dr) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
 
 }

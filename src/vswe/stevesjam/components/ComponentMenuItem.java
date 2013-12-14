@@ -6,7 +6,11 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatAllowedCharacters;
+import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.network.DataBitHelper;
+import vswe.stevesjam.network.DataReader;
+import vswe.stevesjam.network.DataWriter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,7 +26,7 @@ public class ComponentMenuItem extends ComponentMenu {
         text = "";
         result = new ArrayList<>();
         settings = new ArrayList<>();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 30; i++) {
             settings.add(new ItemSetting());
         }
         numberTextBoxes = new TextBoxNumberList();
@@ -246,7 +250,7 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     private boolean inDeleteBounds(int mX, int mY) {
-        return GuiJam.inBounds(DELETE_X, DELETE_Y, DELETE_SIZE_W, DELETE_SIZE_W, mX, mY);
+        return GuiJam.inBounds(DELETE_X, DELETE_Y, DELETE_SIZE_W, DELETE_SIZE_H, mX, mY);
     }
 
     private boolean isScrollingVisible() {
@@ -355,9 +359,7 @@ public class ComponentMenuItem extends ComponentMenu {
             numberTextBoxes.onClick(mX, mY, button);
 
             if (inDeleteBounds(mX, mY)) {
-                selectedSetting.item = null;
-                selectedSetting.isFuzzy = false;
-                selectedSetting.isLimitedByAmount = false;
+                selectedSetting.clear();
                 selectedSetting = null;
                 updateScrolling();
             }
@@ -453,6 +455,49 @@ public class ComponentMenuItem extends ComponentMenu {
         }else{
             return false;
         }
+    }
+
+    @Override
+    public void writeData(DataWriter dw, TileEntityJam jam) {
+        for (ItemSetting setting : settings) {
+            dw.writeBoolean(setting.item != null);
+            if (setting.item != null) {
+                dw.writeData(setting.item.itemID, DataBitHelper.MENU_ITEM_ID);
+                dw.writeBoolean(setting.isFuzzy);
+                dw.writeData(setting.item.getItemDamage(), DataBitHelper.MENU_ITEM_META);
+                dw.writeBoolean(setting.isLimitedByAmount);
+                if (setting.isLimitedByAmount) {
+                    dw.writeData(setting.item.stackSize, DataBitHelper.MENU_ITEM_AMOUNT);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void readData(DataReader dr, TileEntityJam jam) {
+        for (ItemSetting setting : settings) {
+            if (!dr.readBoolean()) {
+                setting.clear();
+            }else{
+                int id = dr.readData(DataBitHelper.MENU_ITEM_ID);
+                setting.isFuzzy = dr.readBoolean();
+                int meta = dr.readData(DataBitHelper.MENU_ITEM_META);
+                setting.isLimitedByAmount = dr.readBoolean();
+                int amount;
+                if (setting.isLimitedByAmount) {
+                    amount = dr.readData(DataBitHelper.MENU_ITEM_AMOUNT);
+                }else{
+                    amount = 1;
+                }
+
+                setting.item = new ItemStack(id, amount, meta);
+            }
+        }
+    }
+
+    @Override
+    public void readDataOnServer(DataReader dr) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private void addText(GuiJam gui, String str) {
@@ -561,6 +606,12 @@ public class ComponentMenuItem extends ComponentMenu {
             }
 
             return ret;
+        }
+
+        public void clear() {
+            item = null;
+            isFuzzy = false;
+            isLimitedByAmount = false;
         }
     }
 

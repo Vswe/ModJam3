@@ -5,6 +5,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import vswe.stevesjam.blocks.TileEntityJam;
+import vswe.stevesjam.components.FlowComponent;
 import vswe.stevesjam.network.PacketHandler;
 
 
@@ -24,7 +25,6 @@ public class ContainerJam extends Container {
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
-
 
     }
 

@@ -5,7 +5,12 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
+import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.network.DataBitHelper;
+import vswe.stevesjam.network.DataReader;
+import vswe.stevesjam.network.DataWriter;
+import vswe.stevesjam.network.PacketHandler;
 
 import java.util.List;
 
@@ -29,7 +34,8 @@ public class ComponentMenuInventory extends ComponentMenu {
     private static final int INVENTORY_SRC_Y = 20;
 
 
-
+    private int selectedInventory = -1;
+    private List<TileEntity> inventories;
 
     public ComponentMenuInventory(FlowComponent parent) {
         super(parent);
@@ -42,7 +48,7 @@ public class ComponentMenuInventory extends ComponentMenu {
 
     @Override
     public void draw(GuiJam gui, int mX, int mY) {
-        List<TileEntity> inventories = gui.getJam().getConnectedInventories();
+        inventories = gui.getJam().getConnectedInventories();
 
         canScroll = inventories.size() > MAX_INVENTORIES;
 
@@ -57,7 +63,7 @@ public class ComponentMenuInventory extends ComponentMenu {
             if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
 
 
-                int srcInventoryX = i == 2 ? 1 : 0;
+                int srcInventoryX = i == selectedInventory ? 1 : 0;
                 int srcInventoryY = GuiJam.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY) ? 1 : 0;
 
                 gui.drawTexture(x, INVENTORY_Y, INVENTORY_SRC_X + srcInventoryX * INVENTORY_SIZE, INVENTORY_SRC_Y + srcInventoryY * INVENTORY_SIZE, INVENTORY_SIZE, INVENTORY_SIZE);
@@ -83,7 +89,6 @@ public class ComponentMenuInventory extends ComponentMenu {
 
     @Override
     public void drawMouseOver(GuiJam gui, int mX, int mY) {
-        List<TileEntity> inventories = gui.getJam().getConnectedInventories();
 
         for (int i = 0; i < inventories.size(); i++) {
             TileEntity te = inventories.get(i);
@@ -130,11 +135,35 @@ public class ComponentMenuInventory extends ComponentMenu {
             if (inArrowBounds(true, mX, mY)) {
                 clicked = true;
                 dir = -1;
+                DataWriter dw = new DataWriter();
+                dw.writeBoolean(true);
+                PacketHandler.sendDataToServer(dw);
             }else if (inArrowBounds(false, mX, mY)) {
                 clicked = true;
                 dir = 1;
             }
         }
+
+        if (inventories != null) {
+            for (int i = 0; i < inventories.size(); i++) {
+                TileEntity te = inventories.get(i);
+                int x = getInventoryPosition(i);
+
+                if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
+                    if (GuiJam.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
+                        int temp;
+                        if (selectedInventory == i){
+                            setSelectedInventory(-1);
+                        }else{
+                            setSelectedInventory(i);
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
@@ -145,6 +174,27 @@ public class ComponentMenuInventory extends ComponentMenu {
     @Override
     public void onRelease(int mX, int mY) {
         clicked = false;
+    }
+
+    @Override
+    public void writeData(DataWriter dw, TileEntityJam jam) {
+        dw.writeData(selectedInventory + 1, DataBitHelper.MENU_INVENTORY_SELECTION);
+    }
+
+    @Override
+    public void readData(DataReader dr, TileEntityJam jam) {
+       selectedInventory = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION) - 1;
+    }
+
+    @Override
+    public void readDataOnServer(DataReader dr) {
+        selectedInventory = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION) - 1;
+    }
+
+    private void setSelectedInventory(int val) {
+        DataWriter dw = getWriterForServerComponentPacket();
+        dw.writeData(val + 1, DataBitHelper.MENU_INVENTORY_SELECTION);
+        PacketHandler.sendDataToServer(dw);
     }
 
     private int getInventoryPosition(int i) {

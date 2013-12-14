@@ -1,8 +1,14 @@
 package vswe.stevesjam.components;
 
 
+import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
+import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.network.DataBitHelper;
+import vswe.stevesjam.network.DataReader;
+import vswe.stevesjam.network.DataWriter;
+import vswe.stevesjam.network.PacketHandler;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -51,10 +57,12 @@ public class FlowComponent {
     private static final int CONNECTION_SRC_Y = 58;
 
 
-    public FlowComponent(int x, int y, ComponentType type, ConnectionSet connectionSet) {
+    public FlowComponent(TileEntityJam jam, int x, int y, ComponentType type) {
         this.x = x;
         this.y = y;
-        this.connectionSet = connectionSet;
+        this.connectionSet = ConnectionSet.STANDARD;
+        this.type = type;
+        this.jam = jam;
 
         menus = new ArrayList<>();
         for (Class<? extends ComponentMenu> componentMenuClass : type.getClasses()) {
@@ -82,6 +90,8 @@ public class FlowComponent {
     private List<ComponentMenu> menus;
     private int openMenuId;
     private ConnectionSet connectionSet;
+    private ComponentType type;
+    private TileEntityJam jam;
 
     public int getX() {
         return x;
@@ -341,5 +351,22 @@ public class FlowComponent {
         }
 
         return false;
+    }
+
+    public ComponentType getType() {
+        return type;
+    }
+
+    public List<ComponentMenu> getMenus() {
+        return menus;
+    }
+
+
+    public TileEntityJam getJam() {
+        return jam;
+    }
+
+    public void readDataOnServer(DataReader dr) {
+        //To change body of created methods use File | Settings | File Templates.
     }
 }

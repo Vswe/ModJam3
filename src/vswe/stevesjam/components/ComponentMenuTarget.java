@@ -3,7 +3,11 @@ package vswe.stevesjam.components;
 
 import net.minecraftforge.common.ForgeDirection;
 import org.lwjgl.opengl.GL11;
+import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.network.DataBitHelper;
+import vswe.stevesjam.network.DataReader;
+import vswe.stevesjam.network.DataWriter;
 
 public class ComponentMenuTarget extends ComponentMenu {
 
@@ -13,8 +17,26 @@ public class ComponentMenuTarget extends ComponentMenu {
 
         selectingRangeId = -1;
         textBoxes = new TextBoxNumberList();
-        textBoxes.addTextBox(new TextBoxNumber(39 ,49, 2, false));
-        textBoxes.addTextBox(new TextBoxNumber(60 ,49, 2, false));
+        textBoxes.addTextBox(startTextBox = new TextBoxNumber(39 ,49, 2, false) {
+            @Override
+            public void setNumber(int number) {
+                super.setNumber(number);
+
+                if (selectingRangeId != -1) {
+                    startRange[selectingRangeId] = number;
+                }
+            }
+        });
+        textBoxes.addTextBox(endTextBox = new TextBoxNumber(60 ,49, 2, false) {
+            @Override
+            public void setNumber(int number) {
+                super.setNumber(number);
+
+                if (selectingRangeId != -1) {
+                    endRange[selectingRangeId] = number;
+                }
+            }
+        });
     }
 
     private static final int DIRECTION_SIZE_W = 31;
@@ -67,10 +89,15 @@ public class ComponentMenuTarget extends ComponentMenu {
         @Override
         protected void onClicked() {
             swapRangeUsage(selectingRangeId);
+            if (useRange(selectingRangeId)) {
+                refreshTextBoxes();
+            }
         }
     }};
 
     private TextBoxNumberList textBoxes;
+    private TextBoxNumber startTextBox;
+    private TextBoxNumber endTextBox;
 
     @Override
     public String getName() {
@@ -81,8 +108,10 @@ public class ComponentMenuTarget extends ComponentMenu {
     private static ForgeDirection[] directions = {ForgeDirection.DOWN, ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST};
 
     private int selectingRangeId;
-    private byte activatedDirections;
-    private byte useRangeForDirections;
+    private boolean[] activatedDirections = new boolean[directions.length];
+    private boolean[] useRangeForDirections = new boolean[directions.length];
+    private int[] startRange = new int[directions.length];
+    private int[] endRange = new int[directions.length];
 
 
 
@@ -122,11 +151,11 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     private boolean isActive(int i) {
-        return (activatedDirections & (1 << i)) != 0;
+        return activatedDirections[i];
     }
 
     private void swapActiveness(int i) {
-        activatedDirections ^= 1 << i;
+        activatedDirections[i] = !activatedDirections[i];
     }
 
     private int getDirectionX(int i) {
@@ -134,12 +163,17 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     private void swapRangeUsage(int i) {
-        useRangeForDirections ^= 1 << i;
+        useRangeForDirections[i] = !useRangeForDirections[i];
     }
 
 
     private boolean useRange(int i) {
-        return (useRangeForDirections & (1 << i)) != 0;
+        return useRangeForDirections[i];
+    }
+
+    private void refreshTextBoxes() {
+        startTextBox.setNumber(startRange[selectingRangeId]);
+        endTextBox.setNumber(endRange[selectingRangeId]);
     }
 
 
@@ -166,21 +200,24 @@ public class ComponentMenuTarget extends ComponentMenu {
                     selectingRangeId = -1;
                 }else if (selectingRangeId == -1) {
                     selectingRangeId = i;
+                    refreshTextBoxes();
                 }
 
                 break;
             }
         }
 
-        for (Button optionButton : buttons) {
-            if (GuiJam.inBounds(BUTTON_X, optionButton.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
-                optionButton.onClicked();
-                break;
+        if (selectingRangeId != -1) {
+            for (Button optionButton : buttons) {
+                if (GuiJam.inBounds(BUTTON_X, optionButton.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
+                    optionButton.onClicked();
+                    break;
+                }
             }
-        }
 
-        if (useRange(selectingRangeId)) {
-            textBoxes.onClick(mX, mY, button);
+            if (useRange(selectingRangeId)) {
+                textBoxes.onClick(mX, mY, button);
+            }
         }
     }
 
@@ -209,11 +246,49 @@ public class ComponentMenuTarget extends ComponentMenu {
 
     @Override
     public boolean onKeyStroke(GuiJam gui, char c, int k) {
-        if (useRange(selectingRangeId)) {
+        if (selectingRangeId != -1 && useRange(selectingRangeId)) {
             return textBoxes.onKeyStroke(gui, c, k);
         }
 
 
         return false;
     }
+
+    @Override
+    public void writeData(DataWriter dw, TileEntityJam jam) {
+        for (int i = 0; i < directions.length; i++) {
+            dw.writeBoolean(isActive(i));
+            dw.writeBoolean(useRange(i));
+            if (useRange(i)) {
+                dw.writeData(startRange[i], DataBitHelper.MENU_TARGET_RANGE);
+                dw.writeData(endRange[i], DataBitHelper.MENU_TARGET_RANGE);
+            }
+
+        }
+    }
+
+    @Override
+    public void readData(DataReader dr, TileEntityJam jam) {
+        for (int i = 0; i < directions.length; i++) {
+
+            activatedDirections[i] = dr.readBoolean();
+            useRangeForDirections[i] = dr.readBoolean();
+            if (useRange(i)) {
+                startRange[i] = dr.readData(DataBitHelper.MENU_TARGET_RANGE);
+                endRange[i] = dr.readData(DataBitHelper.MENU_TARGET_RANGE);
+            }else{
+                startRange[i] = 0;
+                endRange[i] = 0;
+            }
+
+
+        }
+    }
+
+    @Override
+    public void readDataOnServer(DataReader dr) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
 }

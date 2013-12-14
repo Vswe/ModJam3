@@ -21,14 +21,18 @@ public class DataWriter {
         writeData(data, 8);
     }
 
+    public void writeBoolean(boolean data) {
+        writeData(data ? 1 : 0, 1);
+    }
 
+    public void writeData(int data, DataBitHelper bitCount) {
+        writeData(data, bitCount.getBitCount());
+    }
 
     public void writeData(int data, int bitCount) {
         int mask = (int)Math.pow(2, bitCount) - 1;
 
         data &= mask;
-
-        System.out.println("Writing " + bitCount + " bits: " + data);
 
         while (true) {
             if (bitCountBuffer + bitCount >= 8) {
@@ -53,12 +57,20 @@ public class DataWriter {
     }
 
 
-    public void sendPacket(Player player){
+    public void sendPlayerPacket(Player player){
         if (bitCountBuffer > 0) {
             stream.write(byteBuffer);
         }
 
         PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesJam.CHANNEL, stream.toByteArray()), player);
+    }
+
+    public void sendServerPacket() {
+        if (bitCountBuffer > 0) {
+            stream.write(byteBuffer);
+        }
+
+        PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(StevesJam.CHANNEL, stream.toByteArray()));
     }
 
     public void close() {
@@ -68,4 +80,6 @@ public class DataWriter {
             e.printStackTrace();
         }
     }
+
+
 }

@@ -19,6 +19,14 @@ public class DataReader {
         return readData(8);
     }
 
+    public boolean readBoolean() {
+        return readData(1) != 0;
+    }
+
+    public int readData(DataBitHelper bitCount) {
+        return readData(bitCount.getBitCount());
+    }
+
     public int readData(int bitCount) {
         int data = 0;
         int readBits = 0;
@@ -39,8 +47,6 @@ public class DataReader {
                 bitCountBuffer = 8;
             }
         }
-
-        System.out.println("Read " + bitCount + " bits: " + data);
 
         return data;
     }
