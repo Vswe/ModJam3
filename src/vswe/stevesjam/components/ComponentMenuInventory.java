@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import vswe.stevesjam.blocks.TileEntityJam;
+import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
 import vswe.stevesjam.network.DataReader;
@@ -178,22 +179,48 @@ public class ComponentMenuInventory extends ComponentMenu {
 
     @Override
     public void writeData(DataWriter dw, TileEntityJam jam) {
-        dw.writeData(selectedInventory + 1, DataBitHelper.MENU_INVENTORY_SELECTION);
+        writeData(dw, selectedInventory);
     }
 
     @Override
     public void readData(DataReader dr, TileEntityJam jam) {
-       selectedInventory = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION) - 1;
+        readData(dr);
     }
 
     @Override
-    public void readDataOnServer(DataReader dr) {
+    public void copyFrom(ComponentMenu menu) {
+        selectedInventory = ((ComponentMenuInventory)menu).selectedInventory;
+    }
+
+    @Override
+    public void refreshData(ContainerJam container, ComponentMenu newData) {
+        ComponentMenuInventory newDataInv = ((ComponentMenuInventory)newData);
+
+        if (selectedInventory != newDataInv.selectedInventory) {
+            selectedInventory = newDataInv.selectedInventory;
+
+            DataWriter dw = getWriterForClientComponentPacket(container);
+            writeData(dw, selectedInventory);
+            PacketHandler.sendDataToListeningClients(container, dw);
+        }
+    }
+
+    @Override
+    public void readNetworkComponent(DataReader dr) {
+        readData(dr);
+    }
+
+    private void readData(DataReader dr) {
         selectedInventory = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION) - 1;
+    }
+
+    private void writeData(DataWriter dw, int val) {
+        dw.writeData(val + 1, DataBitHelper.MENU_INVENTORY_SELECTION);
     }
 
     private void setSelectedInventory(int val) {
         DataWriter dw = getWriterForServerComponentPacket();
-        dw.writeData(val + 1, DataBitHelper.MENU_INVENTORY_SELECTION);
+        writeData(dw, val);
         PacketHandler.sendDataToServer(dw);
     }
 

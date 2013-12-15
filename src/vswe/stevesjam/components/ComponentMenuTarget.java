@@ -4,10 +4,12 @@ package vswe.stevesjam.components;
 import net.minecraftforge.common.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 import vswe.stevesjam.blocks.TileEntityJam;
+import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
 import vswe.stevesjam.network.DataReader;
 import vswe.stevesjam.network.DataWriter;
+import vswe.stevesjam.network.PacketHandler;
 
 public class ComponentMenuTarget extends ComponentMenu {
 
@@ -15,25 +17,21 @@ public class ComponentMenuTarget extends ComponentMenu {
     public ComponentMenuTarget(FlowComponent parent) {
         super(parent);
 
-        selectingRangeId = -1;
+        selectedDirectionId = -1;
         textBoxes = new TextBoxNumberList();
         textBoxes.addTextBox(startTextBox = new TextBoxNumber(39 ,49, 2, false) {
             @Override
-            public void setNumber(int number) {
-                super.setNumber(number);
-
-                if (selectingRangeId != -1) {
-                    startRange[selectingRangeId] = number;
+            public void onNumberChanged() {
+                if (selectedDirectionId != -1 && getParent().getJam().worldObj.isRemote) {
+                    writeData(DataTypeHeader.START, getNumber());
                 }
             }
         });
         textBoxes.addTextBox(endTextBox = new TextBoxNumber(60 ,49, 2, false) {
             @Override
-            public void setNumber(int number) {
-                super.setNumber(number);
-
-                if (selectingRangeId != -1) {
-                    endRange[selectingRangeId] = number;
+            public void onNumberChanged() {
+                if (selectedDirectionId != -1 && getParent().getJam().worldObj.isRemote) {
+                    writeData(DataTypeHeader.END, getNumber());
                 }
             }
         });
@@ -62,36 +60,33 @@ public class ComponentMenuTarget extends ComponentMenu {
     private Button[] buttons = {new Button(5) {
         @Override
         protected String getLabel() {
-            return isActive(selectingRangeId) ? "Deactivate" : "Activate";
+            return isActive(selectedDirectionId) ? "Deactivate" : "Activate";
         }
 
         @Override
         protected String getMouseOverText() {
-            return isActive(selectingRangeId) ? "Click to prevent this side from being used" : "Click to use this side";
+            return isActive(selectedDirectionId) ? "Click to prevent this side from being used" : "Click to use this side";
         }
 
         @Override
         protected void onClicked() {
-            swapActiveness(selectingRangeId);
+            writeData(DataTypeHeader.ACTIVATE, isActive(selectedDirectionId) ? 0 : 1);
         }
     },
     new Button(27) {
         @Override
         protected String getLabel() {
-            return useRange(selectingRangeId) ? "Use all slots" : "Use id range";
+            return useRange(selectedDirectionId) ? "Use all slots" : "Use id range";
         }
 
         @Override
         protected String getMouseOverText() {
-            return useRange(selectingRangeId) ? "Click to use all slots for this side instead" : "Click to use a slot id range for this specific side";
+            return useRange(selectedDirectionId) ? "Click to use all slots for this side instead" : "Click to use a slot id range for this specific side";
         }
 
         @Override
         protected void onClicked() {
-            swapRangeUsage(selectingRangeId);
-            if (useRange(selectingRangeId)) {
-                refreshTextBoxes();
-            }
+            writeData(DataTypeHeader.USE_RANGE, useRange(selectedDirectionId) ? 0 : 1);
         }
     }};
 
@@ -107,7 +102,7 @@ public class ComponentMenuTarget extends ComponentMenu {
 
     private static ForgeDirection[] directions = {ForgeDirection.DOWN, ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST};
 
-    private int selectingRangeId;
+    private int selectedDirectionId;
     private boolean[] activatedDirections = new boolean[directions.length];
     private boolean[] useRangeForDirections = new boolean[directions.length];
     private int[] startRange = new int[directions.length];
@@ -124,19 +119,19 @@ public class ComponentMenuTarget extends ComponentMenu {
             int y = getDirectionY(i);
 
             int srcDirectionX = isActive(i) ? 1 : 0;
-            int srcDirectionY = selectingRangeId != -1 && selectingRangeId != i ? 2 : GuiJam.inBounds(x, y, DIRECTION_SIZE_W, DIRECTION_SIZE_H, mX, mY) ? 1 : 0;
+            int srcDirectionY = selectedDirectionId != -1 && selectedDirectionId != i ? 2 : GuiJam.inBounds(x, y, DIRECTION_SIZE_W, DIRECTION_SIZE_H, mX, mY) ? 1 : 0;
 
 
             gui.drawTexture(x, y, DIRECTION_SRC_X + srcDirectionX * DIRECTION_SIZE_W, DIRECTION_SRC_Y + srcDirectionY * DIRECTION_SIZE_H, DIRECTION_SIZE_W, DIRECTION_SIZE_H);
 
             GL11.glPushMatrix();
             GL11.glEnable(GL11.GL_BLEND);
-            int color =  selectingRangeId != -1 && selectingRangeId != i ? 0x70404040 : 0x404040;
+            int color =  selectedDirectionId != -1 && selectedDirectionId != i ? 0x70404040 : 0x404040;
             gui.drawString(direction.toString().charAt(0) + direction.toString().substring(1).toLowerCase(), x + DIRECTION_TEXT_X, y + DIRECTION_TEXT_Y, color);
             GL11.glPopMatrix();
         }
 
-        if (selectingRangeId != -1) {
+        if (selectedDirectionId != -1) {
             for (Button button : buttons) {
                 int srcButtonY = GuiJam.inBounds(BUTTON_X, button.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY) ? 1 : 0;
 
@@ -144,7 +139,7 @@ public class ComponentMenuTarget extends ComponentMenu {
                 gui.drawCenteredString(button.getLabel(), BUTTON_X, button.y + BUTTON_TEXT_Y, 0.5F, BUTTON_SIZE_W, 0x404040);
             }
 
-            if (useRange(selectingRangeId)) {
+            if (useRange(selectedDirectionId)) {
                 textBoxes.draw(gui, mX, mY);
             }
         }
@@ -172,8 +167,10 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     private void refreshTextBoxes() {
-        startTextBox.setNumber(startRange[selectingRangeId]);
-        endTextBox.setNumber(endRange[selectingRangeId]);
+        if (selectedDirectionId != -1) {
+            startTextBox.setNumber(startRange[selectedDirectionId]);
+            endTextBox.setNumber(endRange[selectedDirectionId]);
+        }
     }
 
 
@@ -183,7 +180,7 @@ public class ComponentMenuTarget extends ComponentMenu {
 
     @Override
     public void drawMouseOver(GuiJam gui, int mX, int mY) {
-        if (selectingRangeId != -1) {
+        if (selectedDirectionId != -1) {
             for (Button button : buttons) {
                 if (GuiJam.inBounds(BUTTON_X, button.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
                     gui.drawMouseOver(button.getMouseOverText(), mX, mY);
@@ -196,10 +193,10 @@ public class ComponentMenuTarget extends ComponentMenu {
     public void onClick(int mX, int mY, int button) {
         for (int i = 0; i < directions.length; i++) {
             if (GuiJam.inBounds(getDirectionX(i), getDirectionY(i), DIRECTION_SIZE_W, DIRECTION_SIZE_H, mX, mY)) {
-                if (selectingRangeId == i) {
-                    selectingRangeId = -1;
-                }else if (selectingRangeId == -1) {
-                    selectingRangeId = i;
+                if (selectedDirectionId == i) {
+                    selectedDirectionId = -1;
+                }else if (selectedDirectionId == -1) {
+                    selectedDirectionId = i;
                     refreshTextBoxes();
                 }
 
@@ -207,7 +204,7 @@ public class ComponentMenuTarget extends ComponentMenu {
             }
         }
 
-        if (selectingRangeId != -1) {
+        if (selectedDirectionId != -1) {
             for (Button optionButton : buttons) {
                 if (GuiJam.inBounds(BUTTON_X, optionButton.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
                     optionButton.onClicked();
@@ -215,7 +212,7 @@ public class ComponentMenuTarget extends ComponentMenu {
                 }
             }
 
-            if (useRange(selectingRangeId)) {
+            if (useRange(selectedDirectionId)) {
                 textBoxes.onClick(mX, mY, button);
             }
         }
@@ -246,7 +243,7 @@ public class ComponentMenuTarget extends ComponentMenu {
 
     @Override
     public boolean onKeyStroke(GuiJam gui, char c, int k) {
-        if (selectingRangeId != -1 && useRange(selectingRangeId)) {
+        if (selectedDirectionId != -1 && useRange(selectedDirectionId)) {
             return textBoxes.onKeyStroke(gui, c, k);
         }
 
@@ -286,9 +283,114 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     @Override
-    public void readDataOnServer(DataReader dr) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void copyFrom(ComponentMenu menu) {
+        ComponentMenuTarget menuTarget = (ComponentMenuTarget)menu;
+
+        for (int i = 0; i < directions.length; i++) {
+            activatedDirections[i] = menuTarget.activatedDirections[i];
+            useRangeForDirections[i] = menuTarget.useRangeForDirections[i];
+            startRange[i] = menuTarget.startRange[i];
+            endRange[i] = menuTarget.endRange[i];
+        }
     }
 
+    @Override
+    public void refreshData(ContainerJam container, ComponentMenu newData) {
+        ComponentMenuTarget newDataTarget = (ComponentMenuTarget)newData;
 
+        for (int i = 0; i < directions.length; i++) {
+            if (activatedDirections[i] != newDataTarget.activatedDirections[i]) {
+                activatedDirections[i] =  newDataTarget.activatedDirections[i];
+
+                writeUpdatedData(container, i, DataTypeHeader.ACTIVATE, activatedDirections[i] ? 1 : 0);
+            }
+
+            if (useRangeForDirections[i] != newDataTarget.useRangeForDirections[i]) {
+                useRangeForDirections[i] =  newDataTarget.useRangeForDirections[i];
+
+                writeUpdatedData(container, i, DataTypeHeader.USE_RANGE, useRangeForDirections[i] ? 1 : 0);
+            }
+
+            if (startRange[i] != newDataTarget.startRange[i]) {
+                startRange[i] =  newDataTarget.startRange[i];
+
+                writeUpdatedData(container, i, DataTypeHeader.START, startRange[i]);
+            }
+
+            if (endRange[i] != newDataTarget.endRange[i]) {
+                endRange[i] =  newDataTarget.endRange[i];
+
+                writeUpdatedData(container, i, DataTypeHeader.END, endRange[i]);
+            }
+        }
+    }
+
+    private void writeUpdatedData(ContainerJam container, int id, DataTypeHeader header, int data) {
+        DataWriter dw = getWriterForClientComponentPacket(container);
+        writeData(dw, id, header, data);
+        PacketHandler.sendDataToListeningClients(container, dw);
+    }
+
+    @Override
+    public void readNetworkComponent(DataReader dr) {
+       int direction = dr.readData(DataBitHelper.MENU_TARGET_DIRECTION_ID);
+       int headerId = dr.readData(DataBitHelper.MENU_TARGET_TYPE_HEADER);
+       DataTypeHeader header = getHeaderFromId(headerId);
+       int data = dr.readData(header.bits);
+
+       switch (header) {
+           case ACTIVATE:
+               activatedDirections[direction] = data != 0;
+               break;
+           case USE_RANGE:
+               useRangeForDirections[direction] = data != 0;
+               if (!useRange(direction)) {
+                   startRange[direction] =  endRange[direction] = 0;
+               }
+               break;
+           case START:
+               startRange[direction] = data;
+               refreshTextBoxes();
+               break;
+           case END:
+               endRange[direction] = data;
+               refreshTextBoxes();
+       }
+    }
+
+    private void writeData(DataTypeHeader header, int data) {
+        DataWriter dw = getWriterForServerComponentPacket();
+        writeData(dw, selectedDirectionId, header, data);
+        PacketHandler.sendDataToServer(dw);
+    }
+
+    private void writeData(DataWriter dw, int id, DataTypeHeader header, int data) {
+        dw.writeData(id, DataBitHelper.MENU_TARGET_DIRECTION_ID);
+        dw.writeData(header.id, DataBitHelper.MENU_TARGET_TYPE_HEADER);
+        dw.writeData(data, header.bits);
+    }
+
+    private enum DataTypeHeader {
+        ACTIVATE(0, DataBitHelper.BOOLEAN),
+        USE_RANGE(1, DataBitHelper.BOOLEAN),
+        START(2, DataBitHelper.MENU_TARGET_RANGE),
+        END(3, DataBitHelper.MENU_TARGET_RANGE);
+
+        private int id;
+        private DataBitHelper bits;
+
+        private DataTypeHeader(int header, DataBitHelper bits) {
+            this.id = header;
+            this.bits = bits;
+        }
+    }
+
+    private DataTypeHeader getHeaderFromId(int id) {
+        for (DataTypeHeader header : DataTypeHeader.values()) {
+            if (id == header.id) {
+                return header;
+            }
+        }
+        return  null;
+    }
 }

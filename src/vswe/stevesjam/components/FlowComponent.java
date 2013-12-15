@@ -1,21 +1,20 @@
 package vswe.stevesjam.components;
 
 
+import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 import vswe.stevesjam.blocks.TileEntityJam;
+import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
-import vswe.stevesjam.network.DataBitHelper;
-import vswe.stevesjam.network.DataReader;
-import vswe.stevesjam.network.DataWriter;
-import vswe.stevesjam.network.PacketHandler;
+import vswe.stevesjam.network.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlowComponent {
+public class FlowComponent implements IComponentNetworkReader {
     private static final int COMPONENT_SRC_X = 0;
     private static final int COMPONENT_SRC_Y = 0;
     private static final int COMPONENT_SIZE_W = 64;
@@ -63,6 +62,7 @@ public class FlowComponent {
         this.connectionSet = ConnectionSet.STANDARD;
         this.type = type;
         this.jam = jam;
+        this.id = jam.getFlowItems().size();
 
         menus = new ArrayList<>();
         for (Class<? extends ComponentMenu> componentMenuClass : type.getClasses()) {
@@ -92,6 +92,7 @@ public class FlowComponent {
     private ConnectionSet connectionSet;
     private ComponentType type;
     private TileEntityJam jam;
+    private int id;
 
     public int getX() {
         return x;
@@ -259,6 +260,9 @@ public class FlowComponent {
 
     public void onRelease(int mX, int mY) {
         followMouse(mX, mY);
+        if (isDragging) {
+            writeLocationData();
+        }
         isDragging = false;
 
         for (int i = 0; i < menus.size(); i++) {
@@ -366,7 +370,54 @@ public class FlowComponent {
         return jam;
     }
 
-    public void readDataOnServer(DataReader dr) {
-        //To change body of created methods use File | Settings | File Templates.
+    @Override
+    public void readNetworkComponent(DataReader dr) {
+        x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
+        y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+    }
+
+
+    private void writeLocationData() {
+        DataWriter dw = PacketHandler.getWriterForServerComponentPacket(this, null);
+
+        dw.writeData(x, DataBitHelper.FLOW_CONTROL_X);
+        dw.writeData(y, DataBitHelper.FLOW_CONTROL_Y);
+
+        PacketHandler.sendDataToServer(dw);
+    }
+
+    public FlowComponent copy() {
+        FlowComponent copy = new FlowComponent(jam, x, y, type);
+        copy.id = id;
+
+        for (int i = 0; i < menus.size(); i++) {
+            ComponentMenu menu = menus.get(i);
+
+            copy.menus.get(i).copyFrom(menu);
+        }
+
+        return copy;
+    }
+
+    public void refreshData(ContainerJam container, FlowComponent newData) {
+        if (x != newData.x || y != newData.y) {
+            x = newData.x;
+            y = newData.y;
+
+            DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null);
+
+            dw.writeData(x, DataBitHelper.FLOW_CONTROL_X);
+            dw.writeData(y, DataBitHelper.FLOW_CONTROL_Y);
+
+            PacketHandler.sendDataToListeningClients(container, dw);
+        }
+
+        for (int i = 0; i < menus.size(); i++) {
+            menus.get(i).refreshData(container, newData.menus.get(i));
+        }
+    }
+
+    public int getId() {
+        return id;
     }
 }

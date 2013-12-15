@@ -43,4 +43,6 @@ public class TextBoxNumber {
     public boolean isWide() {
         return wide;
     }
+
+    public void onNumberChanged() {};
 }

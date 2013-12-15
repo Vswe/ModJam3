@@ -2,10 +2,12 @@ package vswe.stevesjam.components;
 
 
 import vswe.stevesjam.blocks.TileEntityJam;
+import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
 import vswe.stevesjam.network.DataReader;
 import vswe.stevesjam.network.DataWriter;
+import vswe.stevesjam.network.PacketHandler;
 
 public class ComponentMenuResult extends ComponentMenu {
 
@@ -64,8 +66,7 @@ public class ComponentMenuResult extends ComponentMenu {
     public void onClick(int mX, int mY, int button) {
         for (int i = 0; i < sets.length; i++) {
             if (GuiJam.inBounds(RADIO_X, RADIO_Y + i * (RADIO_SIZE + RADIO_MARGIN), RADIO_SIZE, RADIO_SIZE, mX, mY)) {
-                selectedOption = i;
-                getParent().setConnectionSet(sets[i]);
+                setSelectedOption(i);
                 break;
             }
         }
@@ -83,17 +84,51 @@ public class ComponentMenuResult extends ComponentMenu {
 
     @Override
     public void writeData(DataWriter dw, TileEntityJam jam) {
-        dw.writeData(getParent().getConnectionSet().getId(), DataBitHelper.MENU_CONNECTION_TYPE_ID);
+        writeData(dw, getParent().getConnectionSet().getId());
     }
 
     @Override
     public void readData(DataReader dr, TileEntityJam jam) {
-        getParent().setConnectionSet(ConnectionSet.getTypeFromId(dr.readData(DataBitHelper.MENU_CONNECTION_TYPE_ID)));
+        readData(dr);
     }
 
     @Override
-    public void readDataOnServer(DataReader dr) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void copyFrom(ComponentMenu menu) {
+        selectedOption = ((ComponentMenuResult)menu).selectedOption;
+        getParent().setConnectionSet(menu.getParent().getConnectionSet());
+    }
+
+    @Override
+    public void refreshData(ContainerJam container, ComponentMenu newData) {
+        ComponentMenuResult newDataResult =  ((ComponentMenuResult)newData);
+
+        if (selectedOption != newDataResult.selectedOption) {
+            selectedOption = newDataResult.selectedOption;
+
+            DataWriter dw = getWriterForClientComponentPacket(container);
+            writeData(dw, selectedOption);
+            PacketHandler.sendDataToListeningClients(container, dw);
+        }
+    }
+
+    @Override
+    public void readNetworkComponent(DataReader dr) {
+        readData(dr);
+    }
+
+    private void readData(DataReader dr) {
+        selectedOption = dr.readData(DataBitHelper.MENU_CONNECTION_TYPE_ID);
+        getParent().setConnectionSet(ConnectionSet.getTypeFromId(selectedOption));
+    }
+
+    private  void setSelectedOption(int val) {
+        DataWriter dw = getWriterForServerComponentPacket();
+        writeData(dw, val);
+        PacketHandler.sendDataToServer(dw);
+    }
+
+    private void writeData(DataWriter dw, int val) {
+        dw.writeData(val, DataBitHelper.MENU_CONNECTION_TYPE_ID);
     }
 
 

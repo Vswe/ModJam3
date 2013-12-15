@@ -29,9 +29,9 @@ public class PacketHandler implements IPacketHandler {
 
             if (container != null && container.windowId == containerId && container instanceof ContainerJam) {
                 if (player instanceof EntityPlayerMP) {
-                    readServerComponentPacketFromDataReader(dr, ((ContainerJam) container).getJam());
+                    readComponentPacketFromDataReader(dr, ((ContainerJam) container).getJam());
                 }else if (dr.readBoolean()) {
-                    //readSpecificData(dr, ((ContainerJam) container).getJam());
+                    readComponentPacketFromDataReader(dr, ((ContainerJam) container).getJam());
                 }else{
                     readAllData(dr, ((ContainerJam) container).getJam());
                 }
@@ -40,6 +40,7 @@ public class PacketHandler implements IPacketHandler {
 
         dr.close();
     }
+
     public static void sendDataToPlayer(ICrafting crafting, DataWriter dw) {
         if (crafting instanceof Player) {
             Player player = (Player)crafting;
@@ -56,6 +57,11 @@ public class PacketHandler implements IPacketHandler {
         dw.close();
     }
 
+    public static void sendDataToListeningClients(ContainerJam container, DataWriter dw) {
+        dw.sendPlayerPackets(container);
+        dw.close();
+    }
+
 
     public static void sendAllData(Container container, ICrafting crafting, TileEntityJam jam) {
         DataWriter dw = new DataWriter();
@@ -67,17 +73,16 @@ public class PacketHandler implements IPacketHandler {
         sendDataToPlayer(crafting, dw);
     }
 
-    public static DataWriter getWriterForSpecificData(Container container) {
+    private static DataWriter getWriterForSpecificData(Container container) {
         DataWriter dw = new DataWriter();
 
         dw.writeByte(container.windowId);
         dw.writeBoolean(true);
 
-
         return dw;
     }
 
-    public static DataWriter getWriterForServerPacket() {
+    private static DataWriter getWriterForServerPacket() {
         Container container = Minecraft.getMinecraft().thePlayer.openContainer;
 
         if (container != null) {
@@ -91,33 +96,40 @@ public class PacketHandler implements IPacketHandler {
         }
     }
 
-    public static DataWriter getWriterForServerComponentPacket(FlowComponent component, ComponentMenu menu) {
-        DataWriter dw = PacketHandler.getWriterForServerPacket();
-
+    private static void createComponentPacket(DataWriter dw, FlowComponent component, ComponentMenu menu) {
         dw.writeBoolean(true); //this is a packet for a specific FlowComponent
-        for (int i = 0; i < component.getJam().getFlowItems().size(); i++) {
-            if (component.getJam().getFlowItems().get(i).equals(component)) {
-                dw.writeData(i, DataBitHelper.FLOW_CONTROL_COUNT);
-                break;
-            }
-        }
+        dw.writeData(component.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
 
         if (menu != null) {
             dw.writeBoolean(true); //this is packet for a specific menu
-            for (int i = 0; i < component.getMenus().size(); i++) {
-                if (component.getMenus().get(i).equals(menu)) {
-                    dw.writeData(i, DataBitHelper.FLOW_CONTROL_MENU_COUNT);
-                    break;
-                }
-            }
+            dw.writeData(menu.getId(), DataBitHelper.FLOW_CONTROL_MENU_COUNT);
         }else{
             dw.writeBoolean(false); //this is a packet that has nothing to do with a menu
         }
+    }
 
+    public static DataWriter getWriterForServerComponentPacket(FlowComponent component, ComponentMenu menu) {
+        DataWriter dw = PacketHandler.getWriterForServerPacket();
+        createComponentPacket(dw, component, menu);
         return dw;
     }
 
-    public static void readServerComponentPacketFromDataReader(DataReader dr, TileEntityJam jam) {
+    public static DataWriter getWriterForClientComponentPacket(ContainerJam container, FlowComponent component, ComponentMenu menu) {
+        DataWriter dw = PacketHandler.getWriterForSpecificData(container);
+        createComponentPacket(dw, component, menu);
+        return dw;
+    }
+
+    public static void readComponentPacketFromDataReader(DataReader dr, TileEntityJam jam) {
+        IComponentNetworkReader nr = getNetworkReaderForComponentPacket(dr, jam);
+
+        if (nr != null) {
+            nr.readNetworkComponent(dr);
+        }
+    }
+
+
+    private static IComponentNetworkReader getNetworkReaderForComponentPacket(DataReader dr, TileEntityJam jam) {
         boolean isSpecificComponent = dr.readBoolean();
 
         int componentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
@@ -127,15 +139,16 @@ public class PacketHandler implements IPacketHandler {
             if (dr.readBoolean()) {
                 int menuId = dr.readData(DataBitHelper.FLOW_CONTROL_MENU_COUNT);
                 if (menuId >= 0 && menuId < component.getMenus().size()) {
-                    ComponentMenu menu = component.getMenus().get(menuId);
-
-                    menu.readDataOnServer(dr);
+                    return component.getMenus().get(menuId);
                 }
             }else{
-                component.readDataOnServer(dr);
+                 return component;
             }
         }
+
+        return null;
     }
+
 
 
     private static void writeAllData(DataWriter dw, TileEntityJam jam){

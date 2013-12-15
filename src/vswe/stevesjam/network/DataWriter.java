@@ -3,7 +3,10 @@ package vswe.stevesjam.network;
 
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ICrafting;
 import vswe.stevesjam.StevesJam;
+import vswe.stevesjam.interfaces.ContainerJam;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,7 +25,7 @@ public class DataWriter {
     }
 
     public void writeBoolean(boolean data) {
-        writeData(data ? 1 : 0, 1);
+        writeData(data ? 1 : 0, DataBitHelper.BOOLEAN);
     }
 
     public void writeData(int data, DataBitHelper bitCount) {
@@ -71,6 +74,22 @@ public class DataWriter {
         }
 
         PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(StevesJam.CHANNEL, stream.toByteArray()));
+    }
+    
+    public void sendPlayerPackets(ContainerJam container) {
+        if (bitCountBuffer > 0) {
+            stream.write(byteBuffer);
+        }
+
+        for (ICrafting crafting : container.getCrafters()) {
+            int temp = 0;
+            if (crafting instanceof Player) {
+                Player player = (Player)crafting;
+                PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesJam.CHANNEL, stream.toByteArray()), player);
+                temp++;
+            }
+            System.out.println("Sent packet to " + temp + " players");
+        }
     }
 
     public void close() {

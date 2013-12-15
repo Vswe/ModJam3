@@ -55,10 +55,12 @@ public class TextBoxNumberList {
                 int number = Integer.parseInt(String.valueOf(c));
                 if (selectedTextBox.getNumber() < Math.pow(10, selectedTextBox.getLength() - 1)){
                    selectedTextBox.setNumber(selectedTextBox.getNumber() * 10 + number);
+                   selectedTextBox.onNumberChanged();
                 }
                 return true;
             }else if(k == 14){
                 selectedTextBox.setNumber(selectedTextBox.getNumber() / 10);
+                selectedTextBox.onNumberChanged();
                 return true;
             }else if(k == 15){
                 for (int i = 0; i < textBoxes.size(); i++) {

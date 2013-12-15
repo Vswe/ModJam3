@@ -20,7 +20,7 @@ public class DataReader {
     }
 
     public boolean readBoolean() {
-        return readData(1) != 0;
+        return readData(DataBitHelper.BOOLEAN) != 0;
     }
 
     public int readData(DataBitHelper bitCount) {

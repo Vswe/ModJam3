@@ -8,6 +8,9 @@ import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.components.FlowComponent;
 import vswe.stevesjam.network.PacketHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ContainerJam extends Container {
 
@@ -26,6 +29,12 @@ public class ContainerJam extends Container {
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
 
+
+        if (oldComponents != null) {
+            for (int i = 0; i < jam.getFlowItems().size(); i++) {
+                oldComponents.get(i).refreshData(this, jam.getFlowItems().get(i));
+            }
+        }
     }
 
     @Override
@@ -33,9 +42,18 @@ public class ContainerJam extends Container {
         super.addCraftingToCrafters(player);
 
         PacketHandler.sendAllData(this, player, jam);
+        oldComponents = new ArrayList<>();
+        for (FlowComponent component : jam.getFlowItems()) {
+            oldComponents.add(component.copy());
+        }
     }
 
     public TileEntityJam getJam() {
         return jam;
+    }
+
+    private List<FlowComponent> oldComponents;
+    public List<ICrafting> getCrafters() {
+        return crafters;
     }
 }
