@@ -183,6 +183,8 @@ public class FlowComponent implements IComponentNetworkReader {
 
             gui.drawTexture(location[0], location[1], CONNECTION_SRC_X +  srcConnectionX * CONNECTION_SIZE_W, location[2], CONNECTION_SIZE_W, CONNECTION_SIZE_H);
         }
+
+        gui.drawString(getType().toString().charAt(0) + getType().toString().substring(1).toLowerCase(), x + 10, y + 10, 0.7F, 0x404040);
     }
 
     private int[] getConnectionLocationFromId(int id) {
@@ -536,5 +538,10 @@ public class FlowComponent implements IComponentNetworkReader {
 
     public int getId() {
         return id;
+    }
+
+
+    public Connection getConnection(int i) {
+        return connections.get(i);
     }
 }

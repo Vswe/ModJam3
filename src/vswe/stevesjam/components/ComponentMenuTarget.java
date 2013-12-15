@@ -100,7 +100,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
 
-    private static ForgeDirection[] directions = {ForgeDirection.DOWN, ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST};
+    public static ForgeDirection[] directions = ForgeDirection.VALID_DIRECTIONS;
 
     private int selectedDirectionId;
     private boolean[] activatedDirections = new boolean[directions.length];
@@ -145,25 +145,25 @@ public class ComponentMenuTarget extends ComponentMenu {
         }
     }
 
-    private boolean isActive(int i) {
+    public boolean isActive(int i) {
         return activatedDirections[i];
-    }
-
-    private void swapActiveness(int i) {
-        activatedDirections[i] = !activatedDirections[i];
     }
 
     private int getDirectionX(int i) {
         return i % 2 == 0 ? DIRECTION_X_LEFT : DIRECTION_X_RIGHT;
     }
 
-    private void swapRangeUsage(int i) {
-        useRangeForDirections[i] = !useRangeForDirections[i];
+
+    public boolean useRange(int i) {
+        return useRangeForDirections[i];
     }
 
+    public int getStart(int i) {
+        return startRange[i];
+    }
 
-    private boolean useRange(int i) {
-        return useRangeForDirections[i];
+    public int getEnd(int i) {
+        return endRange[i];
     }
 
     private void refreshTextBoxes() {

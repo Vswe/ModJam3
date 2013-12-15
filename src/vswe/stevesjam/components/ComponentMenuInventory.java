@@ -227,4 +227,8 @@ public class ComponentMenuInventory extends ComponentMenu {
     private int getInventoryPosition(int i) {
         return INVENTORY_X + i * INVENTORY_SIZE_W_WITH_MARGIN + offset;
     }
+
+    public int getSelectedInventory() {
+        return selectedInventory;
+    }
 }

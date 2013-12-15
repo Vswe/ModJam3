@@ -5,7 +5,10 @@ public enum ComponentType {
     INPUT(0,
             new ConnectionSet[]{ConnectionSet.STANDARD, ConnectionSet.FAIL_CHECK},
             ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItem.class, ComponentMenuResult.class),
-    TRIGGER(1,
+    OUTPUT(1,
+            new ConnectionSet[]{ConnectionSet.STANDARD, ConnectionSet.FAIL_CHECK},
+            ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuResult.class),
+    TRIGGER(2,
             new ConnectionSet[] {ConnectionSet.TICK},
             ComponentMenuResult.class);
 

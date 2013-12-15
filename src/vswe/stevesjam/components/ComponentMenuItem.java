@@ -35,24 +35,24 @@ public class ComponentMenuItem extends ComponentMenu {
         numberTextBoxes.addTextBox(amountTextBox = new TextBoxNumber(80 ,24, 3, true) {
             @Override
             public boolean isVisible() {
-                return selectedSetting.isLimitedByAmount;
+                return selectedSetting.isLimitedByAmount();
             }
 
             @Override
             public void onNumberChanged() {
-                selectedSetting.item.stackSize = getNumber();
+                selectedSetting.getItem().stackSize = getNumber();
                 writeServerData(DataTypeHeader.AMOUNT);
             }
         });
         numberTextBoxes.addTextBox(damageValueTextBox = new TextBoxNumber(70 ,52, 5, true) {
             @Override
             public boolean isVisible() {
-                return !selectedSetting.isFuzzy;
+                return !selectedSetting.isFuzzy();
             }
 
             @Override
             public void onNumberChanged() {
-                selectedSetting.item.setItemDamage(getNumber());
+                selectedSetting.getItem().setItemDamage(getNumber());
                 writeServerData(DataTypeHeader.META);
             }
         });
@@ -140,12 +140,12 @@ public class ComponentMenuItem extends ComponentMenu {
     private CheckBox[] checkBoxes = {new CheckBox("Specify amount?", 5, 25) {
         @Override
         public void setValue(boolean val) {
-            selectedSetting.isLimitedByAmount = val;
+            selectedSetting.setLimitedByAmount(val);;
         }
 
         @Override
         public boolean getValue() {
-            return selectedSetting.isLimitedByAmount;
+            return selectedSetting.isLimitedByAmount();
         }
 
         @Override
@@ -156,12 +156,12 @@ public class ComponentMenuItem extends ComponentMenu {
     new CheckBox("Is detection fuzzy?", 5, 40) {
         @Override
         public void setValue(boolean val) {
-            selectedSetting.isFuzzy = val;
+            selectedSetting.setFuzzy(val);
         }
 
         @Override
         public boolean getValue() {
-            return selectedSetting.isFuzzy;
+            return selectedSetting.isFuzzy();
         }
 
         @Override
@@ -179,7 +179,7 @@ public class ComponentMenuItem extends ComponentMenu {
     @Override
     public void draw(GuiJam gui, int mX, int mY) {
         if (isEditing()) {
-            gui.drawItemStack(selectedSetting.item, EDIT_ITEM_X, EDIT_ITEM_Y);
+            gui.drawItemStack(selectedSetting.getItem(), EDIT_ITEM_X, EDIT_ITEM_Y);
 
             for (CheckBox checkBox : checkBoxes) {
                 int srcCheckBoxX = checkBox.getValue() ? 1 : 0;
@@ -189,7 +189,7 @@ public class ComponentMenuItem extends ComponentMenu {
                 gui.drawString(checkBox.name, checkBox.x + CHECK_BOX_TEXT_X, checkBox.y + CHECK_BOX_TEXT_Y, 0.7F, 0x404040);
             }
 
-            if (!selectedSetting.isFuzzy) {
+            if (!selectedSetting.isFuzzy()) {
                 gui.drawString("Damage value", DMG_VAL_TEXT_X, DMG_VAL_TEXT_Y, 0.7F, 0x404040);
             }
             numberTextBoxes.draw(gui, mX, mY);
@@ -222,12 +222,12 @@ public class ComponentMenuItem extends ComponentMenu {
             for (Point point : points) {
                 ItemSetting setting = settings.get(point.id);
 
-                int srcSettingX = setting.item == null ? 1 : 0;
+                int srcSettingX = setting.getItem() == null ? 1 : 0;
                 int srcSettingY = GuiJam.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY) ? 1 : 0;
 
                 gui.drawTexture(point.x, point.y, SETTING_SRC_X + srcSettingX * ITEM_SIZE, SETTING_SRC_Y + srcSettingY * ITEM_SIZE, ITEM_SIZE, ITEM_SIZE);
-                if (setting.item != null) {
-                    gui.drawItemStack(setting.item, point.x, point.y);
+                if (setting.getItem() != null) {
+                    gui.drawItemStack(setting.getItem(), point.x, point.y);
                 }
             }
 
@@ -312,7 +312,7 @@ public class ComponentMenuItem extends ComponentMenu {
     public void drawMouseOver(GuiJam gui, int mX, int mY) {
         if (isEditing()) {
             if (GuiJam.inBounds(EDIT_ITEM_X, EDIT_ITEM_Y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                gui.drawMouseOver(getToolTip(selectedSetting.item), mX, mY);
+                gui.drawMouseOver(getToolTip(selectedSetting.getItem()), mX, mY);
             }else if(inDeleteBounds(mX, mY)) {
                 gui.drawMouseOver("Delete this item selection", mX, mY);
             }
@@ -385,7 +385,7 @@ public class ComponentMenuItem extends ComponentMenu {
             List<Point> points = getItemCoordinates();
             for (Point point : points) {
                 if (GuiJam.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    selectedSetting.item = result.get(point.id).copy();
+                    selectedSetting.setItem(result.get(point.id).copy());
                     writeServerData(DataTypeHeader.SET_ITEM);
                     selectedSetting = null;
                     updateScrolling();
@@ -400,13 +400,13 @@ public class ComponentMenuItem extends ComponentMenu {
                     editSetting = button == 1;
 
 
-                    if (editSetting && selectedSetting.item == null) {
+                    if (editSetting && selectedSetting.getItem() == null) {
                         selectedSetting = null;
                         editSetting = false;
                     }else{
                         if (editSetting) {
-                            amountTextBox.setNumber(selectedSetting.item.stackSize);
-                            damageValueTextBox.setNumber(selectedSetting.item.getItemDamage());
+                            amountTextBox.setNumber(selectedSetting.getItem().stackSize);
+                            damageValueTextBox.setNumber(selectedSetting.getItem().getItemDamage());
                         }
                         updateScrolling();
                     }
@@ -475,14 +475,14 @@ public class ComponentMenuItem extends ComponentMenu {
     @Override
     public void writeData(DataWriter dw, TileEntityJam jam) {
         for (ItemSetting setting : settings) {
-            dw.writeBoolean(setting.item != null);
-            if (setting.item != null) {
-                dw.writeData(setting.item.itemID, DataBitHelper.MENU_ITEM_ID);
-                dw.writeBoolean(setting.isFuzzy);
-                dw.writeData(setting.item.getItemDamage(), DataBitHelper.MENU_ITEM_META);
-                dw.writeBoolean(setting.isLimitedByAmount);
-                if (setting.isLimitedByAmount) {
-                    dw.writeData(setting.item.stackSize, DataBitHelper.MENU_ITEM_AMOUNT);
+            dw.writeBoolean(setting.getItem() != null);
+            if (setting.getItem() != null) {
+                dw.writeData(setting.getItem().itemID, DataBitHelper.MENU_ITEM_ID);
+                dw.writeBoolean(setting.isFuzzy());
+                dw.writeData(setting.getItem().getItemDamage(), DataBitHelper.MENU_ITEM_META);
+                dw.writeBoolean(setting.isLimitedByAmount());
+                if (setting.isLimitedByAmount()) {
+                    dw.writeData(setting.getItem().stackSize, DataBitHelper.MENU_ITEM_AMOUNT);
                 }
             }
         }
@@ -495,17 +495,17 @@ public class ComponentMenuItem extends ComponentMenu {
                 setting.clear();
             }else{
                 int id = dr.readData(DataBitHelper.MENU_ITEM_ID);
-                setting.isFuzzy = dr.readBoolean();
+                setting.setFuzzy(dr.readBoolean());
                 int meta = dr.readData(DataBitHelper.MENU_ITEM_META);
-                setting.isLimitedByAmount = dr.readBoolean();
+                setting.setLimitedByAmount(dr.readBoolean());
                 int amount;
-                if (setting.isLimitedByAmount) {
+                if (setting.isLimitedByAmount()) {
                     amount = dr.readData(DataBitHelper.MENU_ITEM_AMOUNT);
                 }else{
                     amount = 1;
                 }
 
-                setting.item = new ItemStack(id, amount, meta);
+                setting.setItem(new ItemStack(id, amount, meta));
             }
         }
     }
@@ -515,12 +515,12 @@ public class ComponentMenuItem extends ComponentMenu {
         ComponentMenuItem menuItem = (ComponentMenuItem)menu;
 
         for (int i = 0; i < settings.size(); i++) {
-            if (menuItem.settings.get(i).item == null) {
+            if (menuItem.settings.get(i).getItem() == null) {
                 settings.get(i).clear();
             }else{
-                settings.get(i).item = menuItem.settings.get(i).item.copy();
-                settings.get(i).isFuzzy = menuItem.settings.get(i).isFuzzy;
-                settings.get(i).isLimitedByAmount = menuItem.settings.get(i).isLimitedByAmount;
+                settings.get(i).setItem(menuItem.settings.get(i).getItem().copy());
+                settings.get(i).setFuzzy(menuItem.settings.get(i).isFuzzy());
+                settings.get(i).setLimitedByAmount(menuItem.settings.get(i).isLimitedByAmount());
             }
         }
     }
@@ -531,34 +531,34 @@ public class ComponentMenuItem extends ComponentMenu {
             ItemSetting setting = settings.get(i);
             ItemSetting newSetting = ((ComponentMenuItem)newData).settings.get(i);
 
-            if (newSetting.item == null && setting.item != null) {
-                setting.item = null;
+            if (newSetting.getItem() == null && setting.getItem() != null) {
+                setting.setItem(null);
                 writeClientData(container, DataTypeHeader.CLEAR, setting);
             }
 
-            if (newSetting.item != null && (setting.item == null || setting.item.itemID != newSetting.item.itemID)) {
-                setting.item = newSetting.item.copy();
+            if (newSetting.getItem() != null && (setting.getItem() == null || setting.getItem().itemID != newSetting.getItem().itemID)) {
+                setting.setItem(newSetting.getItem().copy());
                 writeClientData(container, DataTypeHeader.SET_ITEM, setting);
             }
 
-            if (newSetting.isLimitedByAmount != setting.isLimitedByAmount) {
-                setting.isLimitedByAmount = newSetting.isLimitedByAmount;
+            if (newSetting.isLimitedByAmount() != setting.isLimitedByAmount()) {
+                setting.setLimitedByAmount(newSetting.isLimitedByAmount());
                 writeClientData(container, DataTypeHeader.USE_AMOUNT, setting);
             }
 
-            if (newSetting.isFuzzy != setting.isFuzzy) {
-                setting.isFuzzy = newSetting.isFuzzy;
+            if (newSetting.isFuzzy() != setting.isFuzzy()) {
+                setting.setFuzzy(newSetting.isFuzzy());
                 writeClientData(container, DataTypeHeader.USE_FUZZY, setting);
             }
 
-            if (newSetting.item != null && setting.item != null) {
-                if (newSetting.item.stackSize != setting.item.stackSize) {
-                    setting.item.stackSize = newSetting.item.stackSize;
+            if (newSetting.getItem() != null && setting.getItem() != null) {
+                if (newSetting.getItem().stackSize != setting.getItem().stackSize) {
+                    setting.getItem().stackSize = newSetting.getItem().stackSize;
                     writeClientData(container, DataTypeHeader.AMOUNT, setting);
                 }
 
-                if (newSetting.item.getItemDamage() != setting.item.getItemDamage()) {
-                    setting.item.setItemDamage(newSetting.item.getItemDamage());
+                if (newSetting.getItem().getItemDamage() != setting.getItem().getItemDamage()) {
+                    setting.getItem().setItemDamage(newSetting.getItem().getItemDamage());
                     writeClientData(container, DataTypeHeader.META, setting);
                 }
             }
@@ -581,35 +581,35 @@ public class ComponentMenuItem extends ComponentMenu {
                 int id = dr.readData(DataBitHelper.MENU_ITEM_ID);
                 int dmg =  dr.readData(DataBitHelper.MENU_ITEM_META);
 
-                setting.item = new ItemStack(id, 1, dmg);
+                setting.setItem(new ItemStack(id, 1, dmg));
 
                 if (isEditing()) {
-                    damageValueTextBox.setNumber(setting.item.getItemDamage());
+                    damageValueTextBox.setNumber(setting.getItem().getItemDamage());
                 }
 
                 break;
             case USE_AMOUNT:
-                setting.isLimitedByAmount = dr.readBoolean();
-                if (!setting.isLimitedByAmount && setting.item != null) {
-                    setting.item.stackSize = 1;
+                setting.setLimitedByAmount(dr.readBoolean());
+                if (!setting.isLimitedByAmount() && setting.getItem() != null) {
+                    setting.getItem().stackSize = 1;
                 }
                 break;
             case USE_FUZZY:
-                setting.isFuzzy = dr.readBoolean();
+                setting.setFuzzy(dr.readBoolean());
                 break;
             case AMOUNT:
-                if (setting.item != null) {
-                    setting.item.stackSize = dr.readData(DataBitHelper.MENU_ITEM_AMOUNT);
+                if (setting.getItem() != null) {
+                    setting.getItem().stackSize = dr.readData(DataBitHelper.MENU_ITEM_AMOUNT);
                     if (isEditing()) {
-                        amountTextBox.setNumber(setting.item.stackSize);
+                        amountTextBox.setNumber(setting.getItem().stackSize);
                     }
                 }
                 break;
             case META:
-                if (setting.item != null) {
-                    setting.item.setItemDamage(dr.readData(DataBitHelper.MENU_ITEM_META));
+                if (setting.getItem() != null) {
+                    setting.getItem().setItemDamage(dr.readData(DataBitHelper.MENU_ITEM_META));
                     if (isEditing()) {
-                        damageValueTextBox.setNumber(setting.item.getItemDamage());
+                        damageValueTextBox.setNumber(setting.getItem().getItemDamage());
                     }
                 }
 
@@ -629,30 +629,34 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     private void writeData(DataWriter dw, DataTypeHeader header, ItemSetting setting) {
-        dw.writeData(setting.id, DataBitHelper.MENU_ITEM_SETTING_ID);
+        dw.writeData(setting.getId(), DataBitHelper.MENU_ITEM_SETTING_ID);
         dw.writeData(header.id, DataBitHelper.MENU_ITEM_TYPE_HEADER);
 
         switch (header) {
             case CLEAR:
                 break;
             case SET_ITEM:
-                dw.writeData(setting.item.itemID, DataBitHelper.MENU_ITEM_ID);
-                dw.writeData(setting.item.getItemDamage(), DataBitHelper.MENU_ITEM_META);
+                dw.writeData(setting.getItem().itemID, DataBitHelper.MENU_ITEM_ID);
+                dw.writeData(setting.getItem().getItemDamage(), DataBitHelper.MENU_ITEM_META);
                 break;
             case USE_AMOUNT:
-                dw.writeBoolean(setting.isLimitedByAmount);
+                dw.writeBoolean(setting.isLimitedByAmount());
                 break;
             case USE_FUZZY:
-                dw.writeBoolean(setting.isFuzzy);
+                dw.writeBoolean(setting.isFuzzy());
                 break;
             case AMOUNT:
-                dw.writeData(setting.item.stackSize, DataBitHelper.MENU_ITEM_AMOUNT);
+                dw.writeData(setting.getItem().stackSize, DataBitHelper.MENU_ITEM_AMOUNT);
                 break;
             case META:
-                dw.writeData(setting.item.getItemDamage(), DataBitHelper.MENU_ITEM_META);
+                dw.writeData(setting.getItem().getItemDamage(), DataBitHelper.MENU_ITEM_META);
 
         }
 
+    }
+
+    public List<ItemSetting> getSettings() {
+        return settings;
     }
 
     private enum DataTypeHeader {
@@ -758,45 +762,7 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
 
-    private class ItemSetting {
-        private int id;
-        private ItemStack item;
-        private boolean isFuzzy;
-        private boolean isLimitedByAmount;
 
-        private ItemSetting(int id) {
-            this.id = id;
-        }
-
-        public List<String> getMouseOver() {
-            if (item != null && GuiScreen.isShiftKeyDown()) {
-                return getToolTip(item);
-            }
-
-            List<String> ret = new ArrayList<>();
-
-            if (item == null) {
-                ret.add("[No item selected]");
-            }else{
-                ret.add(getDisplayName(item));
-            }
-
-            ret.add("");
-            ret.add("Left click to change item");
-            if (item != null) {
-                ret.add("Right click to edit settings");
-                ret.add("Hold shift to see the item's full description");
-            }
-
-            return ret;
-        }
-
-        public void clear() {
-            item = null;
-            isFuzzy = false;
-            isLimitedByAmount = false;
-        }
-    }
 
     private class Point {
         int id, x, y;
@@ -823,7 +789,7 @@ public class ComponentMenuItem extends ComponentMenu {
         public abstract void onUpdate();
     }
 
-    public List<String> getToolTip(ItemStack itemStack) {
+    public static List<String> getToolTip(ItemStack itemStack) {
         try {
             return itemStack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
         }catch (Exception ex) {
@@ -837,7 +803,7 @@ public class ComponentMenuItem extends ComponentMenu {
         }
     }
 
-    public String getDisplayName(ItemStack itemStack) {
+    public static String getDisplayName(ItemStack itemStack) {
         try {
             return itemStack.getDisplayName();
         }catch (Exception ex) {
