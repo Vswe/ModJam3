@@ -12,7 +12,9 @@ import vswe.stevesjam.network.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FlowComponent implements IComponentNetworkReader {
     private static final int COMPONENT_SRC_X = 0;
@@ -59,7 +61,7 @@ public class FlowComponent implements IComponentNetworkReader {
     public FlowComponent(TileEntityJam jam, int x, int y, ComponentType type) {
         this.x = x;
         this.y = y;
-        this.connectionSet = ConnectionSet.STANDARD;
+        this.connectionSet = type.getSets()[0];
         this.type = type;
         this.jam = jam;
         this.id = jam.getFlowItems().size();
@@ -78,7 +80,7 @@ public class FlowComponent implements IComponentNetworkReader {
         }
 
         openMenuId = -1;
-
+        connections = new HashMap<>();
     }
 
     private int x;
@@ -93,6 +95,7 @@ public class FlowComponent implements IComponentNetworkReader {
     private ComponentType type;
     private TileEntityJam jam;
     private int id;
+    private Map<Integer, Connection> connections;
 
     public int getX() {
         return x;
@@ -154,7 +157,9 @@ public class FlowComponent implements IComponentNetworkReader {
 
         int outputCount = 0;
         int inputCount = 0;
-        for (ConnectionOption connection : connectionSet.getConnections()) {
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            ConnectionOption connection = connectionSet.getConnections()[i];
+
             int[] location = getConnectionLocation(connection, inputCount, outputCount);
             if (connection.isInput()) {
                 inputCount++;
@@ -164,8 +169,39 @@ public class FlowComponent implements IComponentNetworkReader {
 
             int srcConnectionX = (GuiJam.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) ? 1 : 0;
 
+            Connection current = jam.getCurrentlyConnecting();
+            if (current != null && current.getComponentId() == id && current.getConnectionId() == i) {
+                gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, mX, mY);
+            }
+
+            Connection connectedConnection = connections.get(i);
+            if (connectedConnection != null && id < connectedConnection.getComponentId()) {
+                int[] otherLocation = jam.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
+
+                gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, otherLocation[0] + CONNECTION_SIZE_W / 2, otherLocation[1] + CONNECTION_SIZE_H / 2);
+            }
+
             gui.drawTexture(location[0], location[1], CONNECTION_SRC_X +  srcConnectionX * CONNECTION_SIZE_W, location[2], CONNECTION_SIZE_W, CONNECTION_SIZE_H);
         }
+    }
+
+    private int[] getConnectionLocationFromId(int id) {
+        int outputCount = 0;
+        int inputCount = 0;
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            ConnectionOption connection = connectionSet.getConnections()[i];
+
+            int[] location = getConnectionLocation(connection, inputCount, outputCount);
+            if (id == i) {
+                return location;
+            }
+            if (connection.isInput()) {
+                inputCount++;
+            }else{
+                outputCount++;
+            }
+        }
+        return null;
     }
 
 
@@ -233,7 +269,9 @@ public class FlowComponent implements IComponentNetworkReader {
         }else{
             int outputCount = 0;
             int inputCount = 0;
-            for (ConnectionOption connection : connectionSet.getConnections()) {
+            for (int i = 0; i < connectionSet.getConnections().length; i++) {
+                ConnectionOption connection = connectionSet.getConnections()[i];
+
                 int[] location = getConnectionLocation(connection, inputCount, outputCount);
                 if (connection.isInput()) {
                     inputCount++;
@@ -242,12 +280,50 @@ public class FlowComponent implements IComponentNetworkReader {
                 }
 
                 if (GuiJam.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) {
-                    System.out.println("Connection");
+                    Connection current = jam.getCurrentlyConnecting();
+                    if (current == null) {
+                        if (connections.get(i) != null) {
+                            removeConnection(i);
+                        }
+                        jam.setCurrentlyConnecting(new Connection(id, i));
+                    }else if (current.getComponentId() == this.id && current.getConnectionId() == i) {
+                        jam.setCurrentlyConnecting(null);
+                    }else if (current.getComponentId() != id){
+                        FlowComponent connectTo = jam.getFlowItems().get(current.getComponentId());
+                        ConnectionOption connectToOption = connectTo.connectionSet.getConnections()[current.getConnectionId()];
+                        if (connectToOption.isInput() != connection.isInput()) {
+                            if (connections.get(i) != null) {
+                                removeConnection(i);
+                            }
+
+                            Connection thisConnection = new Connection(id, i);
+                            connectTo.addConnection(current.getConnectionId(), thisConnection);
+                            addConnection(i, jam.getCurrentlyConnecting());
+                            jam.setCurrentlyConnecting(null);
+                        }
+                    }
                 }
             }
         }
     }
 
+    private void addConnection(int id, Connection connection) {
+        DataWriter dw = PacketHandler.getWriterForServerComponentPacket(this, null);
+        if (connection != null) {
+            writeConnectionData(dw, id, true, connection.getComponentId(), connection.getConnectionId());
+        }else{
+            writeConnectionData(dw, id, false, 0, 0);
+        }
+
+        PacketHandler.sendDataToServer(dw);
+    }
+
+    private void removeConnection(int id) {
+        Connection connection = connections.get(id);
+
+        addConnection(id, null);
+        jam.getFlowItems().get(connection.getComponentId()).addConnection(connection.getConnectionId(), null);
+    }
 
     public void onDrag(int mX, int mY) {
         followMouse(mX, mY);
@@ -372,18 +448,36 @@ public class FlowComponent implements IComponentNetworkReader {
 
     @Override
     public void readNetworkComponent(DataReader dr) {
-        x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
-        y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+        if (dr.readBoolean()) {
+            x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
+            y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+        }else {
+            int connectionId = dr.readData(DataBitHelper.CONNECTION_ID);
+            Connection connection;
+            if (dr.readBoolean()) {
+                int targetComponentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+                int targetConnectionId = dr.readData(DataBitHelper.CONNECTION_ID);
+
+                connection = new Connection(targetComponentId, targetConnectionId);
+            }else{
+                connection = null;
+            }
+
+            connections.put(connectionId, connection);
+        }
     }
 
 
     private void writeLocationData() {
         DataWriter dw = PacketHandler.getWriterForServerComponentPacket(this, null);
+        writeLocationData(dw);
+        PacketHandler.sendDataToServer(dw);
+    }
 
+    private void writeLocationData(DataWriter dw) {
+        dw.writeBoolean(true);
         dw.writeData(x, DataBitHelper.FLOW_CONTROL_X);
         dw.writeData(y, DataBitHelper.FLOW_CONTROL_Y);
-
-        PacketHandler.sendDataToServer(dw);
     }
 
     public FlowComponent copy() {
@@ -399,17 +493,40 @@ public class FlowComponent implements IComponentNetworkReader {
         return copy;
     }
 
+    private void writeConnectionData(DataWriter dw, int i, boolean target, int targetComponent, int targetConnection) {
+        dw.writeBoolean(false);
+        dw.writeData(i, DataBitHelper.CONNECTION_ID);
+        dw.writeBoolean(target);
+        if (target) {
+            dw.writeData(targetComponent, DataBitHelper.FLOW_CONTROL_COUNT);
+            dw.writeData(targetConnection, DataBitHelper.CONNECTION_ID);
+        }
+    }
+
     public void refreshData(ContainerJam container, FlowComponent newData) {
         if (x != newData.x || y != newData.y) {
             x = newData.x;
             y = newData.y;
 
             DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null);
-
-            dw.writeData(x, DataBitHelper.FLOW_CONTROL_X);
-            dw.writeData(y, DataBitHelper.FLOW_CONTROL_Y);
-
+            writeLocationData(dw);
             PacketHandler.sendDataToListeningClients(container, dw);
+        }
+
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            if (newData.connections.get(i) == null && connections.get(i) != null) {
+                connections.put(i, null);
+                DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null);
+                writeConnectionData(dw, i, false, 0, 0);
+                PacketHandler.sendDataToListeningClients(container, dw);
+            }
+
+            if (newData.connections.get(i) != null && (connections.get(i) == null || newData.connections.get(i).getComponentId() != connections.get(i).getComponentId() || newData.connections.get(i).getConnectionId() != connections.get(i).getConnectionId())) {
+                connections.put(i, newData.connections.get(i));
+                DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null);
+                writeConnectionData(dw, i, true, connections.get(i).getComponentId(), connections.get(i).getConnectionId());
+                PacketHandler.sendDataToListeningClients(container, dw);
+            }
         }
 
         for (int i = 0; i < menus.size(); i++) {

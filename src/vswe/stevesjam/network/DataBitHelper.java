@@ -19,7 +19,9 @@ public enum DataBitHelper {
     BOOLEAN(1),
     EMPTY(0),
     MENU_ITEM_SETTING_ID(5),
-    MENU_ITEM_TYPE_HEADER(3);
+    MENU_ITEM_TYPE_HEADER(3),
+
+    CONNECTION_ID(3);
 
 
 

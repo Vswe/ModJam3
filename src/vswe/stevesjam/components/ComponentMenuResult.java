@@ -14,6 +14,8 @@ public class ComponentMenuResult extends ComponentMenu {
     public ComponentMenuResult(FlowComponent parent) {
         super(parent);
 
+        sets = parent.getType().getSets();
+
         for (int i = 0; i < sets.length; i++) {
             ConnectionSet set = sets[i];
 
@@ -33,7 +35,7 @@ public class ComponentMenuResult extends ComponentMenu {
     private static final int RADIO_TEXT_X = 12;
     private static final int RADIO_TEXT_Y = 2;
 
-    private ConnectionSet[] sets = {ConnectionSet.STANDARD, ConnectionSet.FAIL_CHECK};
+    private ConnectionSet[] sets;
 
     private int selectedOption;
 
@@ -84,7 +86,7 @@ public class ComponentMenuResult extends ComponentMenu {
 
     @Override
     public void writeData(DataWriter dw, TileEntityJam jam) {
-        writeData(dw, getParent().getConnectionSet().getId());
+        writeData(dw, selectedOption);
     }
 
     @Override
@@ -118,7 +120,7 @@ public class ComponentMenuResult extends ComponentMenu {
 
     private void readData(DataReader dr) {
         selectedOption = dr.readData(DataBitHelper.MENU_CONNECTION_TYPE_ID);
-        getParent().setConnectionSet(ConnectionSet.getTypeFromId(selectedOption));
+        getParent().setConnectionSet(sets[selectedOption]);
     }
 
     private  void setSelectedOption(int val) {

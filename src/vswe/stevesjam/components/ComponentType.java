@@ -2,14 +2,21 @@ package vswe.stevesjam.components;
 
 
 public enum ComponentType {
-    INPUT(0, ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItem.class, ComponentMenuResult.class);
+    INPUT(0,
+            new ConnectionSet[]{ConnectionSet.STANDARD, ConnectionSet.FAIL_CHECK},
+            ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItem.class, ComponentMenuResult.class),
+    TRIGGER(1,
+            new ConnectionSet[] {ConnectionSet.TICK},
+            ComponentMenuResult.class);
 
     private Class<? extends ComponentMenu>[] classes;
     private int id;
+    private ConnectionSet[] sets;
 
-    private ComponentType(int id, Class<? extends ComponentMenu> ... classes) {
+    private ComponentType(int id, ConnectionSet[] sets, Class<? extends ComponentMenu> ... classes) {
         this.classes = classes;
         this.id = id;
+        this.sets = sets;
     }
 
     public Class<? extends ComponentMenu>[] getClasses() {
@@ -27,5 +34,9 @@ public enum ComponentType {
             }
         }
         return  null;
+    }
+
+    public ConnectionSet[] getSets() {
+        return sets;
     }
 }

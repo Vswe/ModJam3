@@ -5,7 +5,8 @@ public enum ConnectionOption {
     STANDARD_INPUT("Input", true),
     STANDARD_OUTPUT("Output", false),
     SUCCESS("Success", false),
-    FAILURE("Failure", false);
+    FAILURE("Failure", false),
+    TICK_OUTPUT("On tick", false);
 
     private String name;
     private boolean isInput;

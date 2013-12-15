@@ -190,4 +190,25 @@ public class GuiJam extends GuiContainer {
         Gui.drawRect(x , y + 1 , x + 1, y + 10, color);
         GL11.glPopMatrix();
     }
+
+
+    public void drawLine(int x1, int y1, int x2, int y2) {
+        GL11.glPushMatrix();
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glColor4f(0.4F, 0.4F, 0.4F, 1F);
+
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
+        GL11.glLineWidth(5);
+
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glVertex2i(guiLeft + x1, guiTop + y1);
+        GL11.glVertex2i(guiLeft + x2, guiTop + y2);
+        GL11.glEnd();
+
+        GL11.glColor4f(1F, 1F, 1F, 1F);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glPopMatrix();
+    }
 }
