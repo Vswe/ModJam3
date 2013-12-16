@@ -264,7 +264,9 @@ public class FlowComponent implements IComponentNetworkReader {
                         return;
                     }
 
-                    menu.onClick(mX - getMenuAreaX(), mY - getMenuAreaY(i), button);
+                    if (i == openMenuId) {
+                        menu.onClick(mX - getMenuAreaX(), mY - getMenuAreaY(i), button);
+                    }
                 }
 
             }
