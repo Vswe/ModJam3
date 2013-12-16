@@ -1,11 +1,9 @@
 package vswe.stevesjam.components;
 
 
-import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
-import vswe.stevesjam.blocks.TileEntityJam;
-import vswe.stevesjam.interfaces.ContainerJam;
-import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.interfaces.ContainerManager;
+import vswe.stevesjam.interfaces.GuiManager;
 import vswe.stevesjam.network.DataReader;
 import vswe.stevesjam.network.DataWriter;
 import vswe.stevesjam.network.IComponentNetworkReader;
@@ -23,15 +21,15 @@ public abstract class ComponentMenu implements IComponentNetworkReader {
     }
 
     public abstract String getName();
-    public abstract void draw(GuiJam gui, int mX, int mY);
-    public abstract void drawMouseOver(GuiJam gui, int mX, int mY);
+    public abstract void draw(GuiManager gui, int mX, int mY);
+    public abstract void drawMouseOver(GuiManager gui, int mX, int mY);
 
     public abstract void onClick(int mX, int mY, int button);
     public abstract void onDrag(int mX, int mY);
     public abstract void onRelease(int mX, int mY);
 
 
-    public boolean onKeyStroke(GuiJam gui, char c, int k) {
+    public boolean onKeyStroke(GuiManager gui, char c, int k) {
         return false;
     }
 
@@ -46,12 +44,12 @@ public abstract class ComponentMenu implements IComponentNetworkReader {
         return PacketHandler.getWriterForServerComponentPacket(getParent(), this);
     }
 
-    protected DataWriter getWriterForClientComponentPacket(ContainerJam container) {
+    protected DataWriter getWriterForClientComponentPacket(ContainerManager container) {
         return PacketHandler.getWriterForClientComponentPacket(container, getParent(), this);
     }
 
     public abstract void copyFrom(ComponentMenu menu);
-    public abstract void refreshData(ContainerJam container, ComponentMenu newData);
+    public abstract void refreshData(ContainerManager container, ComponentMenu newData);
 
     public int getId() {
         return id;

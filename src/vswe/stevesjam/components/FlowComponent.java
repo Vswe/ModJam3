@@ -1,14 +1,12 @@
 package vswe.stevesjam.components;
 
 
-import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
-import vswe.stevesjam.blocks.TileEntityJam;
-import vswe.stevesjam.interfaces.ContainerJam;
-import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.blocks.TileEntityManager;
+import vswe.stevesjam.interfaces.ContainerManager;
+import vswe.stevesjam.interfaces.GuiManager;
 import vswe.stevesjam.network.*;
 
 import java.lang.reflect.Constructor;
@@ -60,13 +58,13 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final int CONNECTION_SRC_Y = 58;
 
 
-    public FlowComponent(TileEntityJam jam, int x, int y, ComponentType type) {
+    public FlowComponent(TileEntityManager manager, int x, int y, ComponentType type) {
         this.x = x;
         this.y = y;
         this.connectionSet = type.getSets()[0];
         this.type = type;
-        this.jam = jam;
-        this.id = jam.getFlowItems().size();
+        this.manager = manager;
+        this.id = manager.getFlowItems().size();
 
         menus = new ArrayList<>();
         for (Class<? extends ComponentMenu> componentMenuClass : type.getClasses()) {
@@ -95,7 +93,7 @@ public class FlowComponent implements IComponentNetworkReader {
     private int openMenuId;
     private ConnectionSet connectionSet;
     private ComponentType type;
-    private TileEntityJam jam;
+    private TileEntityManager manager;
     private int id;
     private Map<Integer, Connection> connections;
     private int currentInterval;
@@ -132,7 +130,7 @@ public class FlowComponent implements IComponentNetworkReader {
         this.connectionSet = connectionSet;
     }
 
-    public void draw(GuiJam gui, int mX, int mY) {
+    public void draw(GuiManager gui, int mX, int mY) {
         gui.drawTexture(x, y, isLarge ? COMPONENT_SRC_LARGE_X : COMPONENT_SRC_X, COMPONENT_SRC_Y, getComponentWidth(), getComponentHeight());
 
         int internalX = mX - x;
@@ -178,16 +176,16 @@ public class FlowComponent implements IComponentNetworkReader {
                 outputCount++;
             }
 
-            int srcConnectionX = (GuiJam.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) ? 1 : 0;
+            int srcConnectionX = (GuiManager.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) ? 1 : 0;
 
-            Connection current = jam.getCurrentlyConnecting();
+            Connection current = manager.getCurrentlyConnecting();
             if (current != null && current.getComponentId() == id && current.getConnectionId() == i) {
                 gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, mX, mY);
             }
 
             Connection connectedConnection = connections.get(i);
             if (connectedConnection != null && id < connectedConnection.getComponentId()) {
-                int[] otherLocation = jam.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
+                int[] otherLocation = manager.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
 
                 gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, otherLocation[0] + CONNECTION_SIZE_W / 2, otherLocation[1] + CONNECTION_SIZE_H / 2);
             }
@@ -219,7 +217,7 @@ public class FlowComponent implements IComponentNetworkReader {
 
 
 
-    public void drawMouseOver(GuiJam gui, int mX, int mY) {
+    public void drawMouseOver(GuiManager gui, int mX, int mY) {
         if (isLarge) {
             for (int i = 0; i < menus.size(); i++) {
                 ComponentMenu menu = menus.get(i);
@@ -243,14 +241,14 @@ public class FlowComponent implements IComponentNetworkReader {
                 outputCount++;
             }
 
-            if (GuiJam.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) {
+            if (GuiManager.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) {
                 gui.drawMouseOver(connection.toString(), mX, mY);
             }
         }
     }
 
     public void onClick(int mX, int mY, int button) {
-        if (GuiJam.inBounds(x, y, getComponentWidth(), getComponentHeight(), mX, mY)) {
+        if (GuiManager.inBounds(x, y, getComponentWidth(), getComponentHeight(), mX, mY)) {
            int internalX = mX - x;
            int internalY = mY - y;
 
@@ -294,17 +292,17 @@ public class FlowComponent implements IComponentNetworkReader {
                     outputCount++;
                 }
 
-                if (GuiJam.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) {
-                    Connection current = jam.getCurrentlyConnecting();
+                if (GuiManager.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) {
+                    Connection current = manager.getCurrentlyConnecting();
                     if (current == null) {
                         if (connections.get(i) != null) {
                             removeConnection(i);
                         }
-                        jam.setCurrentlyConnecting(new Connection(id, i));
+                        manager.setCurrentlyConnecting(new Connection(id, i));
                     }else if (current.getComponentId() == this.id && current.getConnectionId() == i) {
-                        jam.setCurrentlyConnecting(null);
+                        manager.setCurrentlyConnecting(null);
                     }else if (current.getComponentId() != id){
-                        FlowComponent connectTo = jam.getFlowItems().get(current.getComponentId());
+                        FlowComponent connectTo = manager.getFlowItems().get(current.getComponentId());
                         ConnectionOption connectToOption = connectTo.connectionSet.getConnections()[current.getConnectionId()];
                         if (connectToOption.isInput() != connection.isInput()) {
                             if (connections.get(i) != null) {
@@ -313,8 +311,8 @@ public class FlowComponent implements IComponentNetworkReader {
 
                             Connection thisConnection = new Connection(id, i);
                             connectTo.addConnection(current.getConnectionId(), thisConnection);
-                            addConnection(i, jam.getCurrentlyConnecting());
-                            jam.setCurrentlyConnecting(null);
+                            addConnection(i, manager.getCurrentlyConnecting());
+                            manager.setCurrentlyConnecting(null);
                         }
                     }
                 }
@@ -337,7 +335,7 @@ public class FlowComponent implements IComponentNetworkReader {
         Connection connection = connections.get(id);
 
         addConnection(id, null);
-        jam.getFlowItems().get(connection.getComponentId()).addConnection(connection.getConnectionId(), null);
+        manager.getFlowItems().get(connection.getComponentId()).addConnection(connection.getConnectionId(), null);
     }
 
     public void onDrag(int mX, int mY) {
@@ -374,12 +372,12 @@ public class FlowComponent implements IComponentNetworkReader {
 
 
     private boolean inArrowBounds(int internalX, int internalY) {
-        return GuiJam.inBounds(getComponentWidth() + ARROW_X, ARROW_Y, ARROW_SIZE_W, ARROW_SIZE_H, internalX, internalY);
+        return GuiManager.inBounds(getComponentWidth() + ARROW_X, ARROW_Y, ARROW_SIZE_W, ARROW_SIZE_H, internalX, internalY);
     }
 
 
     private boolean inMenuArrowBounds(int i, int internalX, int internalY) {
-        return GuiJam.inBounds(MENU_X + MENU_ARROW_X, getMenuItemY(i) + MENU_ARROW_Y, MENU_ARROW_SIZE_W, MENU_ARROW_SIZE_H, internalX, internalY);
+        return GuiManager.inBounds(MENU_X + MENU_ARROW_X, getMenuItemY(i) + MENU_ARROW_Y, MENU_ARROW_SIZE_W, MENU_ARROW_SIZE_H, internalX, internalY);
     }
 
     private int getMenuItemY(int i) {
@@ -440,7 +438,7 @@ public class FlowComponent implements IComponentNetworkReader {
         return  y + getMenuItemY(i) + MENU_ITEM_SIZE_H;
     }
 
-    public boolean onKeyStroke(GuiJam gui, char c, int k) {
+    public boolean onKeyStroke(GuiManager gui, char c, int k) {
         if (isLarge && openMenuId != -1) {
             return menus.get(openMenuId).onKeyStroke(gui, c, k);
         }
@@ -457,8 +455,8 @@ public class FlowComponent implements IComponentNetworkReader {
     }
 
 
-    public TileEntityJam getJam() {
-        return jam;
+    public TileEntityManager getManager() {
+        return manager;
     }
 
     @Override
@@ -496,7 +494,7 @@ public class FlowComponent implements IComponentNetworkReader {
     }
 
     public FlowComponent copy() {
-        FlowComponent copy = new FlowComponent(jam, x, y, type);
+        FlowComponent copy = new FlowComponent(manager, x, y, type);
         copy.id = id;
 
         for (int i = 0; i < menus.size(); i++) {
@@ -518,7 +516,7 @@ public class FlowComponent implements IComponentNetworkReader {
         }
     }
 
-    public void refreshData(ContainerJam container, FlowComponent newData) {
+    public void refreshData(ContainerManager container, FlowComponent newData) {
         if (x != newData.x || y != newData.y) {
             x = newData.x;
             y = newData.y;
@@ -584,7 +582,7 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final String NBT_INTERVAL = "Interval";
     private static final String NBT_MENUS = "Menus";
 
-    public static FlowComponent readFromNBT(TileEntityJam jam, NBTTagCompound nbtTagCompound) {
+    public static FlowComponent readFromNBT(TileEntityManager jam, NBTTagCompound nbtTagCompound) {
         int x = nbtTagCompound.getShort(NBT_POS_X);
         int y = nbtTagCompound.getShort(NBT_POS_Y);
         int typeId = nbtTagCompound.getByte(NBT_TYPE);
@@ -633,7 +631,7 @@ public class FlowComponent implements IComponentNetworkReader {
         nbtTagCompound.setTag(NBT_CONNECTION, connections);
 
         if (type == ComponentType.TRIGGER) {
-            nbtTagCompound.setShort(NBT_INTERVAL, (short)currentInterval);
+            nbtTagCompound.setShort(NBT_INTERVAL, (short) currentInterval);
         }
 
         NBTTagList menuTagList = new NBTTagList();

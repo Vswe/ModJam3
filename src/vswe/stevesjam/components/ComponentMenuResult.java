@@ -2,8 +2,8 @@ package vswe.stevesjam.components;
 
 
 import net.minecraft.nbt.NBTTagCompound;
-import vswe.stevesjam.interfaces.ContainerJam;
-import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.interfaces.ContainerManager;
+import vswe.stevesjam.interfaces.GuiManager;
 import vswe.stevesjam.network.DataBitHelper;
 import vswe.stevesjam.network.DataReader;
 import vswe.stevesjam.network.DataWriter;
@@ -52,12 +52,12 @@ public class ComponentMenuResult extends ComponentMenu {
     }
 
     @Override
-    public void draw(GuiJam gui, int mX, int mY) {
+    public void draw(GuiManager gui, int mX, int mY) {
         radioButtons.draw(gui, mX, mY);
     }
 
     @Override
-    public void drawMouseOver(GuiJam gui, int mX, int mY) {
+    public void drawMouseOver(GuiManager gui, int mX, int mY) {
 
     }
 
@@ -93,7 +93,7 @@ public class ComponentMenuResult extends ComponentMenu {
     }
 
     @Override
-    public void refreshData(ContainerJam container, ComponentMenu newData) {
+    public void refreshData(ContainerManager container, ComponentMenu newData) {
         ComponentMenuResult newDataResult =  ((ComponentMenuResult)newData);
 
         if (radioButtons.getSelectedOption() != newDataResult.radioButtons.getSelectedOption()) {

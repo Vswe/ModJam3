@@ -5,8 +5,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.ForgeDirection;
 import org.lwjgl.opengl.GL11;
-import vswe.stevesjam.interfaces.ContainerJam;
-import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.interfaces.ContainerManager;
+import vswe.stevesjam.interfaces.GuiManager;
 import vswe.stevesjam.network.DataBitHelper;
 import vswe.stevesjam.network.DataReader;
 import vswe.stevesjam.network.DataWriter;
@@ -23,7 +23,7 @@ public class ComponentMenuTarget extends ComponentMenu {
         textBoxes.addTextBox(startTextBox = new TextBoxNumber(39 ,49, 2, false) {
             @Override
             public void onNumberChanged() {
-                if (selectedDirectionId != -1 && getParent().getJam().worldObj.isRemote) {
+                if (selectedDirectionId != -1 && getParent().getManager().worldObj.isRemote) {
                     writeData(DataTypeHeader.START, getNumber());
                 }
             }
@@ -31,7 +31,7 @@ public class ComponentMenuTarget extends ComponentMenu {
         textBoxes.addTextBox(endTextBox = new TextBoxNumber(60 ,49, 2, false) {
             @Override
             public void onNumberChanged() {
-                if (selectedDirectionId != -1 && getParent().getJam().worldObj.isRemote) {
+                if (selectedDirectionId != -1 && getParent().getManager().worldObj.isRemote) {
                     writeData(DataTypeHeader.END, getNumber());
                 }
             }
@@ -112,7 +112,7 @@ public class ComponentMenuTarget extends ComponentMenu {
 
 
     @Override
-    public void draw(GuiJam gui, int mX, int mY) {
+    public void draw(GuiManager gui, int mX, int mY) {
         for (int i = 0; i < directions.length; i++) {
             ForgeDirection direction = directions[i];
 
@@ -120,7 +120,7 @@ public class ComponentMenuTarget extends ComponentMenu {
             int y = getDirectionY(i);
 
             int srcDirectionX = isActive(i) ? 1 : 0;
-            int srcDirectionY = selectedDirectionId != -1 && selectedDirectionId != i ? 2 : GuiJam.inBounds(x, y, DIRECTION_SIZE_W, DIRECTION_SIZE_H, mX, mY) ? 1 : 0;
+            int srcDirectionY = selectedDirectionId != -1 && selectedDirectionId != i ? 2 : GuiManager.inBounds(x, y, DIRECTION_SIZE_W, DIRECTION_SIZE_H, mX, mY) ? 1 : 0;
 
 
             gui.drawTexture(x, y, DIRECTION_SRC_X + srcDirectionX * DIRECTION_SIZE_W, DIRECTION_SRC_Y + srcDirectionY * DIRECTION_SIZE_H, DIRECTION_SIZE_W, DIRECTION_SIZE_H);
@@ -134,7 +134,7 @@ public class ComponentMenuTarget extends ComponentMenu {
 
         if (selectedDirectionId != -1) {
             for (Button button : buttons) {
-                int srcButtonY = GuiJam.inBounds(BUTTON_X, button.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY) ? 1 : 0;
+                int srcButtonY = GuiManager.inBounds(BUTTON_X, button.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY) ? 1 : 0;
 
                 gui.drawTexture(BUTTON_X, button.y, BUTTON_SRC_X, BUTTON_SRC_Y + srcButtonY * BUTTON_SIZE_H, BUTTON_SIZE_W, BUTTON_SIZE_H);
                 gui.drawCenteredString(button.getLabel(), BUTTON_X, button.y + BUTTON_TEXT_Y, 0.5F, BUTTON_SIZE_W, 0x404040);
@@ -180,10 +180,10 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     @Override
-    public void drawMouseOver(GuiJam gui, int mX, int mY) {
+    public void drawMouseOver(GuiManager gui, int mX, int mY) {
         if (selectedDirectionId != -1) {
             for (Button button : buttons) {
-                if (GuiJam.inBounds(BUTTON_X, button.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
+                if (GuiManager.inBounds(BUTTON_X, button.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
                     gui.drawMouseOver(button.getMouseOverText(), mX, mY);
                 }
             }
@@ -193,7 +193,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     @Override
     public void onClick(int mX, int mY, int button) {
         for (int i = 0; i < directions.length; i++) {
-            if (GuiJam.inBounds(getDirectionX(i), getDirectionY(i), DIRECTION_SIZE_W, DIRECTION_SIZE_H, mX, mY)) {
+            if (GuiManager.inBounds(getDirectionX(i), getDirectionY(i), DIRECTION_SIZE_W, DIRECTION_SIZE_H, mX, mY)) {
                 if (selectedDirectionId == i) {
                     selectedDirectionId = -1;
                 }else if (selectedDirectionId == -1) {
@@ -207,7 +207,7 @@ public class ComponentMenuTarget extends ComponentMenu {
 
         if (selectedDirectionId != -1) {
             for (Button optionButton : buttons) {
-                if (GuiJam.inBounds(BUTTON_X, optionButton.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
+                if (GuiManager.inBounds(BUTTON_X, optionButton.y, BUTTON_SIZE_W, BUTTON_SIZE_H, mX, mY)) {
                     optionButton.onClicked();
                     break;
                 }
@@ -243,7 +243,7 @@ public class ComponentMenuTarget extends ComponentMenu {
 
 
     @Override
-    public boolean onKeyStroke(GuiJam gui, char c, int k) {
+    public boolean onKeyStroke(GuiManager gui, char c, int k) {
         if (selectedDirectionId != -1 && useRange(selectedDirectionId)) {
             return textBoxes.onKeyStroke(gui, c, k);
         }
@@ -296,7 +296,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     @Override
-    public void refreshData(ContainerJam container, ComponentMenu newData) {
+    public void refreshData(ContainerManager container, ComponentMenu newData) {
         ComponentMenuTarget newDataTarget = (ComponentMenuTarget)newData;
 
         for (int i = 0; i < directions.length; i++) {
@@ -327,7 +327,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
 
-    private void writeUpdatedData(ContainerJam container, int id, DataTypeHeader header, int data) {
+    private void writeUpdatedData(ContainerManager container, int id, DataTypeHeader header, int data) {
         DataWriter dw = getWriterForClientComponentPacket(container);
         writeData(dw, id, header, data);
         PacketHandler.sendDataToListeningClients(container, dw);

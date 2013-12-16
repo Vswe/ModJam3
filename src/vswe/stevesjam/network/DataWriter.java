@@ -3,10 +3,9 @@ package vswe.stevesjam.network;
 
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import vswe.stevesjam.StevesJam;
-import vswe.stevesjam.interfaces.ContainerJam;
+import vswe.stevesjam.interfaces.ContainerManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -76,7 +75,7 @@ public class DataWriter {
         PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(StevesJam.CHANNEL, stream.toByteArray()));
     }
     
-    public void sendPlayerPackets(ContainerJam container) {
+    public void sendPlayerPackets(ContainerManager container) {
         if (bitCountBuffer > 0) {
             stream.write(byteBuffer);
         }

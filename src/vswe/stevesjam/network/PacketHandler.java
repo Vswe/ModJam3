@@ -9,11 +9,11 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
-import vswe.stevesjam.blocks.TileEntityJam;
+import vswe.stevesjam.blocks.TileEntityManager;
 import vswe.stevesjam.components.ComponentMenu;
 import vswe.stevesjam.components.ComponentType;
 import vswe.stevesjam.components.FlowComponent;
-import vswe.stevesjam.interfaces.ContainerJam;
+import vswe.stevesjam.interfaces.ContainerManager;
 
 
 public class PacketHandler implements IPacketHandler {
@@ -27,20 +27,20 @@ public class PacketHandler implements IPacketHandler {
 
             Container container = ((EntityPlayer)player).openContainer;
 
-            if (container != null && container.windowId == containerId && container instanceof ContainerJam) {
+            if (container != null && container.windowId == containerId && container instanceof ContainerManager) {
                 if (player instanceof EntityPlayerMP) {
-                    readComponentPacketFromDataReader(dr, ((ContainerJam) container).getJam());
+                    readComponentPacketFromDataReader(dr, ((ContainerManager) container).getJam());
                 }else {
                     ClientPacketHeader header = getHeaderFromId(dr.readData(DataBitHelper.CLIENT_HEADER));
                     switch (header) {
                         case ALL:
-                            readAllData(dr, ((ContainerJam) container).getJam());
+                            readAllData(dr, ((ContainerManager) container).getJam());
                             break;
                         case SPECIFIC:
-                            readComponentPacketFromDataReader(dr, ((ContainerJam) container).getJam());
+                            readComponentPacketFromDataReader(dr, ((ContainerManager) container).getJam());
                             break;
                         case NEW:
-                            readAllComponentData(dr, ((ContainerJam) container).getJam());
+                            readAllComponentData(dr, ((ContainerManager) container).getJam());
                     }
 
                 }
@@ -66,13 +66,13 @@ public class PacketHandler implements IPacketHandler {
         dw.close();
     }
 
-    public static void sendDataToListeningClients(ContainerJam container, DataWriter dw) {
+    public static void sendDataToListeningClients(ContainerManager container, DataWriter dw) {
         dw.sendPlayerPackets(container);
         dw.close();
     }
 
 
-    public static void sendAllData(Container container, ICrafting crafting, TileEntityJam jam) {
+    public static void sendAllData(Container container, ICrafting crafting, TileEntityManager jam) {
         DataWriter dw = new DataWriter();
 
         dw.writeByte(container.windowId);
@@ -134,7 +134,7 @@ public class PacketHandler implements IPacketHandler {
         }
     }
 
-    public static void sendUpdateInventoryPacket(ContainerJam container) {
+    public static void sendUpdateInventoryPacket(ContainerManager container) {
         DataWriter dw = PacketHandler.getWriterForSpecificData(container);
         createNonComponentPacket(dw);
         dw.writeBoolean(true);
@@ -147,13 +147,13 @@ public class PacketHandler implements IPacketHandler {
         return dw;
     }
 
-    public static DataWriter getWriterForClientComponentPacket(ContainerJam container, FlowComponent component, ComponentMenu menu) {
+    public static DataWriter getWriterForClientComponentPacket(ContainerManager container, FlowComponent component, ComponentMenu menu) {
         DataWriter dw = PacketHandler.getWriterForSpecificData(container);
         createComponentPacket(dw, component, menu);
         return dw;
     }
 
-    public static void readComponentPacketFromDataReader(DataReader dr, TileEntityJam jam) {
+    public static void readComponentPacketFromDataReader(DataReader dr, TileEntityManager jam) {
         boolean isSpecificComponent = dr.readBoolean();
         if (isSpecificComponent) {
 
@@ -168,7 +168,7 @@ public class PacketHandler implements IPacketHandler {
     }
 
 
-    private static IComponentNetworkReader getNetworkReaderForComponentPacket(DataReader dr, TileEntityJam jam) {
+    private static IComponentNetworkReader getNetworkReaderForComponentPacket(DataReader dr, TileEntityManager jam) {
         int componentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
         if (componentId >= 0 && componentId < jam.getFlowItems().size()) {
             FlowComponent component = jam.getFlowItems().get(componentId);
@@ -188,7 +188,7 @@ public class PacketHandler implements IPacketHandler {
 
 
 
-    private static void writeAllData(DataWriter dw, TileEntityJam jam){
+    private static void writeAllData(DataWriter dw, TileEntityManager jam){
        dw.writeData(jam.getFlowItems().size(), DataBitHelper.FLOW_CONTROL_COUNT);
         for (FlowComponent flowComponent : jam.getFlowItems()) {
             writeAllComponentData(dw, flowComponent);
@@ -205,7 +205,7 @@ public class PacketHandler implements IPacketHandler {
         }
     }
 
-    private static void readAllData(DataReader dr, TileEntityJam jam){
+    private static void readAllData(DataReader dr, TileEntityManager jam){
         jam.updateInventories();
         int flowControlCount = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
         jam.getFlowItems().clear();
@@ -214,7 +214,7 @@ public class PacketHandler implements IPacketHandler {
         }
     }
 
-    private static void readAllComponentData(DataReader dr, TileEntityJam jam) {
+    private static void readAllComponentData(DataReader dr, TileEntityManager jam) {
         int x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
         int y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
         int id = dr.readData(DataBitHelper.FLOW_CONTROL_TYPE_ID);
@@ -234,7 +234,7 @@ public class PacketHandler implements IPacketHandler {
         return dw;
     }
 
-    public static void sendNewFlowComponent(ContainerJam container, FlowComponent component) {
+    public static void sendNewFlowComponent(ContainerManager container, FlowComponent component) {
         DataWriter dw = new DataWriter();
 
         dw.writeByte(container.windowId);
@@ -244,7 +244,7 @@ public class PacketHandler implements IPacketHandler {
         PacketHandler.sendDataToListeningClients(container, dw);
     }
 
-    public static void sendRemovalPacket(ContainerJam container, int idToRemove) {
+    public static void sendRemovalPacket(ContainerManager container, int idToRemove) {
         DataWriter dw = PacketHandler.getWriterForSpecificData(container);
         createNonComponentPacket(dw);
         dw.writeBoolean(false);

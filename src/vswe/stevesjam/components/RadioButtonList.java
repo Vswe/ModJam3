@@ -1,7 +1,7 @@
 package vswe.stevesjam.components;
 
 
-import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.interfaces.GuiManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +22,12 @@ public abstract class RadioButtonList {
 
     }
 
-    public void draw(GuiJam gui, int mX, int mY) {
+    public void draw(GuiManager gui, int mX, int mY) {
         for (int i = 0; i < radioButtonList.size(); i++) {
             RadioButton radioButton = radioButtonList.get(i);
 
             int srcRadioX = selectedOption == i ? 1 : 0;
-            int srcRadioY = GuiJam.inBounds(radioButton.getX(), radioButton.getY(), RADIO_SIZE, RADIO_SIZE, mX, mY) ? 1 : 0;
+            int srcRadioY = GuiManager.inBounds(radioButton.getX(), radioButton.getY(), RADIO_SIZE, RADIO_SIZE, mX, mY) ? 1 : 0;
 
             gui.drawTexture(radioButton.getX(), radioButton.getY(), RADIO_SRC_X + srcRadioX * RADIO_SIZE, RADIO_SRC_Y + srcRadioY * RADIO_SIZE, RADIO_SIZE, RADIO_SIZE);
             gui.drawString(radioButton.getText(), radioButton.getX() + RADIO_TEXT_X, radioButton.getY() + RADIO_TEXT_Y, 0.7F, 0x404040);
@@ -38,7 +38,7 @@ public abstract class RadioButtonList {
         for (int i = 0; i < radioButtonList.size(); i++) {
             RadioButton radioButton = radioButtonList.get(i);
 
-            if (GuiJam.inBounds(radioButton.getX(), radioButton.getY(), RADIO_SIZE, RADIO_SIZE, mX, mY)) {
+            if (GuiManager.inBounds(radioButton.getX(), radioButton.getY(), RADIO_SIZE, RADIO_SIZE, mX, mY)) {
                 updateSelectedOption(i);
                 break;
             }

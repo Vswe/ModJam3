@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import vswe.stevesjam.StevesJam;
@@ -69,14 +68,14 @@ public class BlockCable extends Block {
 
                             if (!visited.contains(target)) {
                                 visited.add(target);
-                                if (element.getDepth() < TileEntityJam.MAX_CABLE_LENGTH){
+                                if (element.getDepth() < TileEntityManager.MAX_CABLE_LENGTH){
                                     int id = world.getBlockId(target.getX(), target.getY(), target.getZ());
-                                    if (id == Blocks.blockJam.blockID){
+                                    if (id == Blocks.blockManager.blockID){
                                         TileEntity tileEntity = world.getBlockTileEntity(target.getX(), target.getY(), target.getZ());
-                                        if (tileEntity != null && tileEntity instanceof TileEntityJam) {
-                                            ((TileEntityJam)tileEntity).updateInventories();
+                                        if (tileEntity != null && tileEntity instanceof TileEntityManager) {
+                                            ((TileEntityManager)tileEntity).updateInventories();
                                         }
-                                    }else if (id == Blocks.blockCable.blockID && target.getDepth() < TileEntityJam.MAX_CABLE_LENGTH) {
+                                    }else if (id == Blocks.blockCable.blockID && target.getDepth() < TileEntityManager.MAX_CABLE_LENGTH) {
                                         queue.add(target);
                                     }
                                 }

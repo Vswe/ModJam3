@@ -1,7 +1,7 @@
 package vswe.stevesjam.components;
 
 
-import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.interfaces.GuiManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class TextBoxNumberList {
         textBoxes = new ArrayList<>();
     }
 
-    public void draw(GuiJam gui, int mX, int mY) {
+    public void draw(GuiManager gui, int mX, int mY) {
         for (TextBoxNumber textBox : textBoxes) {
             if (textBox.isVisible()) {
                 int srcTextBoxX = textBox.equals(selectedTextBox) ? 1 : 0;
@@ -36,7 +36,7 @@ public class TextBoxNumberList {
 
     public void onClick(int mX, int mY, int button) {
         for (TextBoxNumber textBox : textBoxes) {
-            if (textBox.isVisible() && GuiJam.inBounds(textBox.getX(), textBox.getY(), getWidth(textBox.isWide()), TEXT_BOX_SIZE_H, mX, mY)) {
+            if (textBox.isVisible() && GuiManager.inBounds(textBox.getX(), textBox.getY(), getWidth(textBox.isWide()), TEXT_BOX_SIZE_H, mX, mY)) {
                 if (textBox.equals(selectedTextBox)) {
                     selectedTextBox = null;
                 }else{
@@ -48,7 +48,7 @@ public class TextBoxNumberList {
         }
     }
 
-    public boolean onKeyStroke(GuiJam gui, char c, int k) {
+    public boolean onKeyStroke(GuiManager gui, char c, int k) {
         if (selectedTextBox != null && selectedTextBox.isVisible()) {
 
             if (Character.isDigit(c)) {

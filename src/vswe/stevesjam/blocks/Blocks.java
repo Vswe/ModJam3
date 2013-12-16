@@ -3,7 +3,6 @@ package vswe.stevesjam.blocks;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
-import net.minecraft.block.Block;
 
 public final class Blocks {
 
@@ -18,14 +17,14 @@ public final class Blocks {
     public static final String CABLE_LOCALIZED_NAME = "Cable";
     public static final int CABLE_DEFAULT_ID = 1312;
 
-    public static BlockJam blockJam;
+    public static BlockManager blockManager;
     public static BlockCable blockCable;
 
     public static void init() {
-        blockJam = new BlockJam(JAM_ID);
+        blockManager = new BlockManager(JAM_ID);
 
-        GameRegistry.registerBlock(blockJam, JAM_NAME_TAG);
-        GameRegistry.registerTileEntity(TileEntityJam.class, JAM_TILE_ENTITY_TAG);
+        GameRegistry.registerBlock(blockManager, JAM_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityManager.class, JAM_TILE_ENTITY_TAG);
 
         blockCable = new BlockCable(CABLE_ID);
 
@@ -33,7 +32,7 @@ public final class Blocks {
     }
 
     public static void addNames() {
-        LanguageRegistry.addName(blockJam, JAM_LOCALIZED_NAME);
+        LanguageRegistry.addName(blockManager, JAM_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCable, CABLE_LOCALIZED_NAME);
     }
 

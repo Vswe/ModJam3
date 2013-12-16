@@ -6,8 +6,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
-import vswe.stevesjam.interfaces.ContainerJam;
-import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.interfaces.ContainerManager;
+import vswe.stevesjam.interfaces.GuiManager;
 import vswe.stevesjam.network.DataBitHelper;
 import vswe.stevesjam.network.DataReader;
 import vswe.stevesjam.network.DataWriter;
@@ -48,8 +48,8 @@ public class ComponentMenuInventory extends ComponentMenu {
     }
 
     @Override
-    public void draw(GuiJam gui, int mX, int mY) {
-        inventories = gui.getJam().getConnectedInventories();
+    public void draw(GuiManager gui, int mX, int mY) {
+        inventories = gui.getManager().getConnectedInventories();
 
         canScroll = inventories.size() > MAX_INVENTORIES;
 
@@ -65,7 +65,7 @@ public class ComponentMenuInventory extends ComponentMenu {
 
 
                 int srcInventoryX = i == selectedInventory ? 1 : 0;
-                int srcInventoryY = GuiJam.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY) ? 1 : 0;
+                int srcInventoryY = GuiManager.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY) ? 1 : 0;
 
                 gui.drawTexture(x, INVENTORY_Y, INVENTORY_SRC_X + srcInventoryX * INVENTORY_SIZE, INVENTORY_SRC_Y + srcInventoryY * INVENTORY_SIZE, INVENTORY_SIZE, INVENTORY_SIZE);
                 gui.drawItemStack(new ItemStack(te.getBlockType(), 1, te.getBlockMetadata()), x, INVENTORY_Y);
@@ -89,14 +89,14 @@ public class ComponentMenuInventory extends ComponentMenu {
     }
 
     @Override
-    public void drawMouseOver(GuiJam gui, int mX, int mY) {
+    public void drawMouseOver(GuiManager gui, int mX, int mY) {
 
         for (int i = 0; i < inventories.size(); i++) {
             TileEntity te = inventories.get(i);
             int x = getInventoryPosition(i);
 
             if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
-                if (GuiJam.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
+                if (GuiManager.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
                     String name = ((IInventory)te).getInvName();
 
                     if (!((IInventory)te).isInvNameLocalized()) {
@@ -105,7 +105,7 @@ public class ComponentMenuInventory extends ComponentMenu {
 
                     String str = name;
                     str += "\nX: " + te.xCoord + " Y: " + te.yCoord + " Z: " + te.zCoord;
-                    str += "\n" + gui.getJam().getDistanceFrom(te.xCoord + 0.5, te.yCoord + 0.5, te.zCoord + 0.5) + " block(s) way";
+                    str += "\n" + gui.getManager().getDistanceFrom(te.xCoord + 0.5, te.yCoord + 0.5, te.zCoord + 0.5) + " block(s) way";
 
 
                     gui.drawMouseOver(str, mX, mY);
@@ -119,7 +119,7 @@ public class ComponentMenuInventory extends ComponentMenu {
     private int offset;
     private boolean canScroll;
 
-    private void drawArrow(GuiJam gui, boolean right, int mX, int mY) {
+    private void drawArrow(GuiManager gui, boolean right, int mX, int mY) {
         int srcArrowX = right ? 1 : 0;
         int srcArrowY = canScroll ? clicked && right == (dir == -1) ? 2 : inArrowBounds(right, mX, mY) ? 1 : 0 : 3;
 
@@ -127,7 +127,7 @@ public class ComponentMenuInventory extends ComponentMenu {
     }
 
     private boolean inArrowBounds(boolean right, int mX, int mY) {
-        return GuiJam.inBounds(right ? ARROW_X_RIGHT : ARROW_X_LEFT, ARROW_Y, ARROW_SIZE_W, ARROW_SIZE_H, mX, mY);
+        return GuiManager.inBounds(right ? ARROW_X_RIGHT : ARROW_X_LEFT, ARROW_Y, ARROW_SIZE_W, ARROW_SIZE_H, mX, mY);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class ComponentMenuInventory extends ComponentMenu {
                 int x = getInventoryPosition(i);
 
                 if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
-                    if (GuiJam.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
+                    if (GuiManager.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
                         int temp;
                         if (selectedInventory == i){
                             setSelectedInventoryAndSync(-1);
@@ -193,7 +193,7 @@ public class ComponentMenuInventory extends ComponentMenu {
     }
 
     @Override
-    public void refreshData(ContainerJam container, ComponentMenu newData) {
+    public void refreshData(ContainerManager container, ComponentMenu newData) {
         ComponentMenuInventory newDataInv = ((ComponentMenuInventory)newData);
 
         if (selectedInventory != newDataInv.selectedInventory) {

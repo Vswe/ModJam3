@@ -2,8 +2,8 @@ package vswe.stevesjam.components;
 
 
 import net.minecraft.nbt.NBTTagCompound;
-import vswe.stevesjam.interfaces.ContainerJam;
-import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.interfaces.ContainerManager;
+import vswe.stevesjam.interfaces.GuiManager;
 import vswe.stevesjam.network.DataBitHelper;
 import vswe.stevesjam.network.DataReader;
 import vswe.stevesjam.network.DataWriter;
@@ -44,7 +44,7 @@ public class ComponentMenuInterval extends ComponentMenu {
     private TextBoxNumber interval;
 
     @Override
-    public void draw(GuiJam gui, int mX, int mY) {
+    public void draw(GuiManager gui, int mX, int mY) {
         gui.drawString("Time between this command",TEXT_X, TEXT_Y, 0.7F, 0x404040);
         gui.drawString("is triggered",TEXT_X, TEXT_Y2, 0.7F, 0x404040);
         gui.drawString("second(s)",TEXT_SECONDS_X, TEXT_SECOND_Y, 0.7F, 0x404040);
@@ -52,7 +52,7 @@ public class ComponentMenuInterval extends ComponentMenu {
     }
 
     @Override
-    public void drawMouseOver(GuiJam gui, int mX, int mY) {
+    public void drawMouseOver(GuiManager gui, int mX, int mY) {
 
     }
 
@@ -62,7 +62,7 @@ public class ComponentMenuInterval extends ComponentMenu {
     }
 
     @Override
-    public boolean onKeyStroke(GuiJam gui, char c, int k) {
+    public boolean onKeyStroke(GuiManager gui, char c, int k) {
         return textBoxes.onKeyStroke(gui, c, k);
     }
 
@@ -97,7 +97,7 @@ public class ComponentMenuInterval extends ComponentMenu {
     }
 
     @Override
-    public void refreshData(ContainerJam container, ComponentMenu newData) {
+    public void refreshData(ContainerManager container, ComponentMenu newData) {
         ComponentMenuInterval newDataInterval = (ComponentMenuInterval)newData;
 
         if (newDataInterval.getInterval() != getInterval()) {

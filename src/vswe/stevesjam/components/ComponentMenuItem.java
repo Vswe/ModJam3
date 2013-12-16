@@ -7,8 +7,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ChatAllowedCharacters;
-import vswe.stevesjam.interfaces.ContainerJam;
-import vswe.stevesjam.interfaces.GuiJam;
+import vswe.stevesjam.interfaces.ContainerManager;
+import vswe.stevesjam.interfaces.GuiManager;
 import vswe.stevesjam.network.DataBitHelper;
 import vswe.stevesjam.network.DataReader;
 import vswe.stevesjam.network.DataWriter;
@@ -199,13 +199,13 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     @Override
-    public void draw(GuiJam gui, int mX, int mY) {
+    public void draw(GuiManager gui, int mX, int mY) {
         if (isEditing()) {
             gui.drawItemStack(selectedSetting.getItem(), EDIT_ITEM_X, EDIT_ITEM_Y);
 
             for (CheckBox checkBox : checkBoxes) {
                 int srcCheckBoxX = checkBox.getValue() ? 1 : 0;
-                int srcCheckBoxY = GuiJam.inBounds(checkBox.x, checkBox.y, CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY) ? 1 : 0;
+                int srcCheckBoxY = GuiManager.inBounds(checkBox.x, checkBox.y, CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY) ? 1 : 0;
 
                 gui.drawTexture(checkBox.x, checkBox.y, CHECK_BOX_SRC_X + srcCheckBoxX * CHECK_BOX_SIZE, CHECK_BOX_SRC_Y + srcCheckBoxY * CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE);
                 gui.drawString(checkBox.name, checkBox.x + CHECK_BOX_TEXT_X, checkBox.y + CHECK_BOX_TEXT_Y, 0.7F, 0x404040);
@@ -247,7 +247,7 @@ public class ComponentMenuItem extends ComponentMenu {
                 ItemSetting setting = settings.get(point.id);
 
                 int srcSettingX = setting.getItem() == null ? 1 : 0;
-                int srcSettingY = GuiJam.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY) ? 1 : 0;
+                int srcSettingY = GuiManager.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY) ? 1 : 0;
 
                 gui.drawTexture(point.x, point.y, SETTING_SRC_X + srcSettingX * ITEM_SIZE, SETTING_SRC_Y + srcSettingY * ITEM_SIZE, ITEM_SIZE, ITEM_SIZE);
                 if (setting.getItem() != null) {
@@ -282,11 +282,11 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     private boolean inBackBounds(int mX, int mY) {
-        return GuiJam.inBounds(BACK_X, BACK_Y, BACK_SIZE_W, BACK_SIZE_H, mX, mY);
+        return GuiManager.inBounds(BACK_X, BACK_Y, BACK_SIZE_W, BACK_SIZE_H, mX, mY);
     }
 
     private boolean inDeleteBounds(int mX, int mY) {
-        return GuiJam.inBounds(DELETE_X, DELETE_Y, DELETE_SIZE_W, DELETE_SIZE_H, mX, mY);
+        return GuiManager.inBounds(DELETE_X, DELETE_Y, DELETE_SIZE_W, DELETE_SIZE_H, mX, mY);
     }
 
     private boolean isScrollingVisible() {
@@ -320,7 +320,7 @@ public class ComponentMenuItem extends ComponentMenu {
         return (TEXT_BOX_Y + TEXT_BOX_SIZE_H + getOffset() - ITEM_Y) / ITEM_SIZE_WITH_MARGIN;
     }
 
-    private void drawArrow(GuiJam gui, boolean down, int mX, int mY) {
+    private void drawArrow(GuiManager gui, boolean down, int mX, int mY) {
         int srcArrowX = canScroll ? clicked && down == (dir == 1) ? 2 : inArrowBounds(down, mX, mY) ? 1 : 0 : 3;
         int srcArrowY = down ? 1 : 0;
 
@@ -328,14 +328,14 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     private boolean inArrowBounds(boolean down, int mX, int mY) {
-        return GuiJam.inBounds(ARROW_X, down ? ARROW_Y_DOWN : ARROW_Y_UP, ARROW_SIZE_W, ARROW_SIZE_H, mX, mY);
+        return GuiManager.inBounds(ARROW_X, down ? ARROW_Y_DOWN : ARROW_Y_UP, ARROW_SIZE_W, ARROW_SIZE_H, mX, mY);
     }
 
 
     @Override
-    public void drawMouseOver(GuiJam gui, int mX, int mY) {
+    public void drawMouseOver(GuiManager gui, int mX, int mY) {
         if (isEditing()) {
-            if (GuiJam.inBounds(EDIT_ITEM_X, EDIT_ITEM_Y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
+            if (GuiManager.inBounds(EDIT_ITEM_X, EDIT_ITEM_Y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 gui.drawMouseOver(getToolTip(selectedSetting.getItem()), mX, mY);
             }else if(inDeleteBounds(mX, mY)) {
                 gui.drawMouseOver("Delete this item selection", mX, mY);
@@ -345,7 +345,7 @@ public class ComponentMenuItem extends ComponentMenu {
         if (isScrollingVisible()) {
             List<Point> points = getItemCoordinates();
             for (Point point : points) {
-                if (GuiJam.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
+                if (GuiManager.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (isSearching()) {
                         gui.drawMouseOver(getToolTip(result.get(point.id)), mX, mY);
                     }else{
@@ -386,7 +386,7 @@ public class ComponentMenuItem extends ComponentMenu {
     public void onClick(int mX, int mY, int button) {
         if (isEditing()) {
             for (CheckBox checkBox : checkBoxes) {
-                if (GuiJam.inBounds(checkBox.x, checkBox.y, CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY)) {
+                if (GuiManager.inBounds(checkBox.x, checkBox.y, CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY)) {
                     checkBox.setValue(!checkBox.getValue());
                     checkBox.onUpdate();
                     break;
@@ -402,13 +402,13 @@ public class ComponentMenuItem extends ComponentMenu {
                 updateScrolling();
             }
         }else if (isSearching()) {
-            if (GuiJam.inBounds(TEXT_BOX_X, TEXT_BOX_Y, TEXT_BOX_SIZE_W, TEXT_BOX_SIZE_H, mX, mY)) {
+            if (GuiManager.inBounds(TEXT_BOX_X, TEXT_BOX_Y, TEXT_BOX_SIZE_W, TEXT_BOX_SIZE_H, mX, mY)) {
                 selected = !selected;
             }
 
             List<Point> points = getItemCoordinates();
             for (Point point : points) {
-                if (GuiJam.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
+                if (GuiManager.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     selectedSetting.setItem(result.get(point.id).copy());
                     writeServerData(DataTypeHeader.SET_ITEM);
                     selectedSetting = null;
@@ -421,7 +421,7 @@ public class ComponentMenuItem extends ComponentMenu {
 
             List<Point> points = getItemCoordinates();
             for (Point point : points) {
-                if (GuiJam.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
+                if (GuiManager.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     selectedSetting = settings.get(point.id);
                     editSetting = button == 1;
 
@@ -476,7 +476,7 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     @Override
-    public boolean onKeyStroke(GuiJam gui, char c, int k) {
+    public boolean onKeyStroke(GuiManager gui, char c, int k) {
         if (selected && isSearching()) {
             if (k == 203) {
                 moveCursor(gui, -1);
@@ -556,7 +556,7 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     @Override
-    public void refreshData(ContainerJam container, ComponentMenu newData) {
+    public void refreshData(ContainerManager container, ComponentMenu newData) {
         if (((ComponentMenuItem)newData).isFirstRadioButtonSelected() != isFirstRadioButtonSelected()) {
             setFirstRadioButtonSelected(((ComponentMenuItem) newData).isFirstRadioButtonSelected());
 
@@ -661,7 +661,7 @@ public class ComponentMenuItem extends ComponentMenu {
         }
     }
 
-    private void writeClientData(ContainerJam container, DataTypeHeader header, ItemSetting setting) {
+    private void writeClientData(ContainerManager container, DataTypeHeader header, ItemSetting setting) {
         DataWriter dw = getWriterForClientComponentPacket(container);
         writeData(dw, header, setting);
         PacketHandler.sendDataToListeningClients(container, dw);
@@ -728,14 +728,14 @@ public class ComponentMenuItem extends ComponentMenu {
         return  null;
     }
 
-    private void addText(GuiJam gui, String str) {
+    private void addText(GuiManager gui, String str) {
         text = text.substring(0, cursor) + str + text.substring(cursor);
 
         moveCursor(gui, str.length());
         textChanged();
     }
 
-    private void deleteText(GuiJam gui, int direction) {
+    private void deleteText(GuiManager gui, int direction) {
         if (cursor + direction >= 0 && cursor + direction <= text.length()) {
             if (direction > 0) {
                 text = text.substring(0, cursor) + text.substring(cursor + 1);
@@ -747,7 +747,7 @@ public class ComponentMenuItem extends ComponentMenu {
         }
     }
 
-    private void moveCursor(GuiJam gui, int steps) {
+    private void moveCursor(GuiManager gui, int steps) {
         cursor += steps;
 
         if (cursor < 0) {

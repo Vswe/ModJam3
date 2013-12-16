@@ -5,18 +5,18 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import vswe.stevesjam.blocks.TileEntityJam;
+import vswe.stevesjam.blocks.TileEntityManager;
 
 
 import java.util.*;
 
 public class CommandExecutor {
 
-    private TileEntityJam jar;
+    private TileEntityManager manager;
     private List<ItemBufferElement> itemBuffer;
 
-    public CommandExecutor(TileEntityJam jar) {
-        this.jar = jar;
+    public CommandExecutor(TileEntityManager manager) {
+        this.manager = manager;
         itemBuffer = new ArrayList<>();
     }
 
@@ -25,7 +25,7 @@ public class CommandExecutor {
             Connection connection = command.getConnection(i);
             ConnectionOption option = command.getConnectionSet().getConnections()[i];
             if (connection != null && !option.isInput() && validTriggerOutputs.contains(option)) {
-                executeCommand(jar.getFlowItems().get(connection.getComponentId()));
+                executeCommand(manager.getFlowItems().get(connection.getComponentId()));
             }
         }
     }
@@ -67,7 +67,7 @@ public class CommandExecutor {
     private IInventory getInventory(ComponentMenu componentMenu) {
         ComponentMenuInventory menuInventory = (ComponentMenuInventory)componentMenu;
 
-        List<TileEntity> inventories = jar.getConnectedInventories();
+        List<TileEntity> inventories = manager.getConnectedInventories();
         int selected = menuInventory.getSelectedInventory();
 
 
