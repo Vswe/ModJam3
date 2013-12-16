@@ -24,8 +24,6 @@ public class CommandExecutor {
     public void executeCommand(FlowComponent command) {
         switch (command.getType()) {
             case TRIGGER:
-                System.out.println();
-                System.out.println("START");
                 break;
 
             case INPUT:
