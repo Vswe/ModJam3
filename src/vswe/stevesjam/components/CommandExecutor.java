@@ -47,15 +47,21 @@ public class CommandExecutor {
                     insertItems(command.getMenus().get(2), outputInventory, validSlots);
                 }
                 break;
+            case CONDITION:
+                IInventory conditionInventory = getInventory(command.getMenus().get(0));
+                if (conditionInventory != null) {
+                    Map<Integer, SlotSideTarget> validSlots = getValidSlots(command.getMenus().get(1), conditionInventory);
+                    if (searchForItems(command.getMenus().get(2), conditionInventory, validSlots)) {
+                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
+                    }else{
+                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                    }
+                }
+                return;
         }
 
-        for (int i = 0; i < command.getConnectionSet().getConnections().length; i++) {
-            Connection connection = command.getConnection(i);
-            if (connection != null && !command.getConnectionSet().getConnections()[i].isInput()) {
-                executeCommand(jar.getFlowItems().get(connection.getComponentId()));
-            }
-        }
 
+        executeTriggerCommand(command, EnumSet.allOf(ConnectionOption.class));
     }
 
     private IInventory getInventory(ComponentMenu componentMenu) {
@@ -212,10 +218,8 @@ public class CommandExecutor {
                 ItemSetting setting = isItemValid(componentMenu, itemStack);
 
                 if ((menuItem.useWhiteList() == (setting == null)) &&  (setting == null || !setting.isLimitedByAmount())) {
-                    System.out.println("Invalid: " + itemStack.toString());
                     continue;
                 }
-                System.out.println("Valid: " + itemStack.toString());
 
                 OutputItemCounter outputItemCounter = null;
                 for (OutputItemCounter e : outputCounters) {
@@ -279,6 +283,45 @@ public class CommandExecutor {
 
     private void removeItemFromBuffer(SlotStackInventoryHolder holder) {
         holder.getInventory().setInventorySlotContents(holder.getSlot(), null);
+    }
+
+    private boolean searchForItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
+        ComponentMenuItemCondition menuItem = (ComponentMenuItemCondition)componentMenu;
+
+        Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<>();
+
+        for (SlotSideTarget slot : validSlots.values()) {
+            ItemStack itemStack = inventory.getStackInSlot(slot.getSlot());
+
+            if (!isSlotValid(inventory, itemStack, slot, true)) {
+                continue;
+            }
+
+            ItemSetting setting = isItemValid(componentMenu, itemStack);
+            if (setting != null) {
+                ConditionSettingChecker conditionSettingChecker = conditionSettingCheckerMap.get(setting.getId());
+                if (conditionSettingChecker == null) {
+                    conditionSettingCheckerMap.put(setting.getId(), conditionSettingChecker = new ConditionSettingChecker(setting));
+                }
+                conditionSettingChecker.addCount(itemStack.stackSize);
+            }
+        }
+
+        for (ItemSetting setting : menuItem.getSettings()) {
+            if (setting.getItem() != null) {
+                ConditionSettingChecker conditionSettingChecker = conditionSettingCheckerMap.get(setting.getId());
+
+                if (conditionSettingChecker != null && conditionSettingChecker.isTrue()) {
+                    if (!menuItem.requiresAll()) {
+                        return true;
+                    }
+                }else if (menuItem.requiresAll()) {
+                    return false;
+                }
+            }
+        }
+
+        return menuItem.requiresAll();
     }
 
 }

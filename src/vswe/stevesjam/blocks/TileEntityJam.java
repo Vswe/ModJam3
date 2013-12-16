@@ -26,10 +26,10 @@ public class TileEntityJam extends TileEntity {
         items.add(new FlowComponent(this, 30, 30, ComponentType.OUTPUT));
         items.add(new FlowComponent(this, 200, 30, ComponentType.INPUT));
         items.add(new FlowComponent(this, 200, 80, ComponentType.TRIGGER));
-        items.add(new FlowComponent(this, 330, 30, ComponentType.INPUT));
+        items.add(new FlowComponent(this, 330, 30, ComponentType.CONDITION));
         items.add(new FlowComponent(this, 400, 30, ComponentType.OUTPUT));
         items.add(new FlowComponent(this, 100, 30, ComponentType.INPUT));
-        items.add(new FlowComponent(this, 100, 80, ComponentType.INPUT));
+        items.add(new FlowComponent(this, 100, 80, ComponentType.CONDITION));
         items.add(new FlowComponent(this, 400, 80, ComponentType.TRIGGER));
     }
 

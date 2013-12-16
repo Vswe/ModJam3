@@ -67,15 +67,19 @@ public class ComponentMenuItem extends ComponentMenu {
             }
         };
 
-        radioButtons.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, "White list"));
-        radioButtons.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, "Black list"));
+        initRadioButtons();
 
         updateScrolling();
     }
 
-    private static final int RADIO_BUTTON_X_LEFT = 5;
-    private static final int RADIO_BUTTON_X_RIGHT = 65;
-    private static final int RADIO_BUTTON_Y = 5;
+    protected void initRadioButtons() {
+        radioButtons.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, "White list"));
+        radioButtons.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, "Black list"));
+    }
+
+    protected static final int RADIO_BUTTON_X_LEFT = 5;
+    protected static final int RADIO_BUTTON_X_RIGHT = 65;
+    protected static final int RADIO_BUTTON_Y = 5;
 
     private static final int TEXT_BOX_SIZE_W = 64;
     private static final int TEXT_BOX_SIZE_H = 12;
@@ -153,7 +157,7 @@ public class ComponentMenuItem extends ComponentMenu {
     private TextBoxNumberList numberTextBoxes;
     private TextBoxNumber amountTextBox;
     private TextBoxNumber damageValueTextBox;
-    private RadioButtonList radioButtons;
+    protected RadioButtonList radioButtons;
 
     private CheckBox[] checkBoxes = {new CheckBox("Specify amount?", 5, 25) {
         @Override
@@ -496,7 +500,7 @@ public class ComponentMenuItem extends ComponentMenu {
 
     @Override
     public void writeData(DataWriter dw, TileEntityJam jam) {
-        dw.writeBoolean(useWhiteList());
+        dw.writeBoolean(isFirstRadioButtonSelected());
         for (ItemSetting setting : settings) {
             dw.writeBoolean(setting.getItem() != null);
             if (setting.getItem() != null) {
@@ -513,7 +517,7 @@ public class ComponentMenuItem extends ComponentMenu {
 
     @Override
     public void readData(DataReader dr, TileEntityJam jam) {
-        setWhiteList(dr.readBoolean());
+        setFirstRadioButtonSelected(dr.readBoolean());
         for (ItemSetting setting : settings) {
             if (!dr.readBoolean()) {
                 setting.clear();
@@ -538,7 +542,7 @@ public class ComponentMenuItem extends ComponentMenu {
     public void copyFrom(ComponentMenu menu) {
         ComponentMenuItem menuItem = (ComponentMenuItem)menu;
 
-        setWhiteList(menuItem.useWhiteList());
+        setFirstRadioButtonSelected(menuItem.isFirstRadioButtonSelected());
 
         for (int i = 0; i < settings.size(); i++) {
             if (menuItem.settings.get(i).getItem() == null) {
@@ -553,12 +557,12 @@ public class ComponentMenuItem extends ComponentMenu {
 
     @Override
     public void refreshData(ContainerJam container, ComponentMenu newData) {
-        if (((ComponentMenuItem)newData).useWhiteList() != useWhiteList()) {
-            setWhiteList(((ComponentMenuItem)newData).useWhiteList());
+        if (((ComponentMenuItem)newData).isFirstRadioButtonSelected() != isFirstRadioButtonSelected()) {
+            setFirstRadioButtonSelected(((ComponentMenuItem) newData).isFirstRadioButtonSelected());
 
             DataWriter dw = getWriterForClientComponentPacket(container);
             dw.writeBoolean(false); //no specific setting
-            dw.writeBoolean(useWhiteList());
+            dw.writeBoolean(isFirstRadioButtonSelected());
             PacketHandler.sendDataToListeningClients(container, dw);
         }
 
@@ -653,7 +657,7 @@ public class ComponentMenuItem extends ComponentMenu {
 
             }
         }else{
-            setWhiteList(dr.readBoolean());
+            setFirstRadioButtonSelected(dr.readBoolean());
         }
     }
 
@@ -859,11 +863,15 @@ public class ComponentMenuItem extends ComponentMenu {
         }
     }
 
-    public boolean useWhiteList() {
+    protected boolean isFirstRadioButtonSelected() {
         return radioButtons.getSelectedOption() == 0;
     }
 
-    public void setWhiteList(boolean value) {
+    protected void setFirstRadioButtonSelected(boolean value) {
         radioButtons.setSelectedOption(value ? 0 : 1);
+    }
+
+    public boolean useWhiteList() {
+        return isFirstRadioButtonSelected();
     }
 }
