@@ -154,9 +154,9 @@ public class ComponentMenuInventory extends ComponentMenu {
                     if (GuiJam.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
                         int temp;
                         if (selectedInventory == i){
-                            setSelectedInventory(-1);
+                            setSelectedInventoryAndSync(-1);
                         }else{
-                            setSelectedInventory(i);
+                            setSelectedInventoryAndSync(i);
                         }
 
                         break;
@@ -218,7 +218,7 @@ public class ComponentMenuInventory extends ComponentMenu {
         dw.writeData(val + 1, DataBitHelper.MENU_INVENTORY_SELECTION);
     }
 
-    private void setSelectedInventory(int val) {
+    private void setSelectedInventoryAndSync(int val) {
         DataWriter dw = getWriterForServerComponentPacket();
         writeData(dw, val);
         PacketHandler.sendDataToServer(dw);
@@ -230,5 +230,9 @@ public class ComponentMenuInventory extends ComponentMenu {
 
     public int getSelectedInventory() {
         return selectedInventory;
+    }
+
+    public void setSelectedInventory(int val) {
+        selectedInventory = val;
     }
 }

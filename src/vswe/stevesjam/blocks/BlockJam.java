@@ -36,8 +36,39 @@ public class BlockJam extends BlockContainer {
         return true;
     }
 
+
+
+
     @Override
     public void registerIcons(IconRegister register) {
         blockIcon = register.registerIcon(StevesJam.RESOURCE_LOCATION + ":jam");
+    }
+
+    @Override
+    public void onBlockAdded(World world, int x, int y, int z) {
+        super.onBlockAdded(world, x, y, z);
+
+        updateInventories(world, x, y, z);
+    }
+
+    @Override
+    public void onNeighborBlockChange(World world, int x, int y, int z, int id) {
+        super.onNeighborBlockChange(world, x, y, z, id);
+
+        updateInventories(world, x, y, z);
+    }
+
+    @Override
+    public void breakBlock(World world, int x, int y, int z, int id, int meta) {
+        super.breakBlock(world, x, y, z, id, meta);
+
+        updateInventories(world, x, y, z);
+    }
+
+    private void updateInventories(World world, int x, int y, int z) {
+        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        if (tileEntity != null && tileEntity instanceof TileEntityJam) {
+            ((TileEntityJam)tileEntity).updateInventories();
+        }
     }
 }

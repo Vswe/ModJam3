@@ -21,7 +21,10 @@ public enum DataBitHelper {
     MENU_ITEM_SETTING_ID(5),
     MENU_ITEM_TYPE_HEADER(3),
 
-    CONNECTION_ID(3);
+    CONNECTION_ID(3),
+
+    CLIENT_HEADER(2),
+    WORLD_COORDINATE(32);
 
 
 

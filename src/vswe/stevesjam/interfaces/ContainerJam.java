@@ -35,6 +35,11 @@ public class ContainerJam extends Container {
                 oldComponents.get(i).refreshData(this, jam.getFlowItems().get(i));
             }
         }
+
+        if (oldInventoryLength != jam.getConnectedInventories().size()) {
+            oldInventoryLength = jam.getConnectedInventories().size();
+            PacketHandler.sendUpdateInventoryPacket(this);
+        }
     }
 
     @Override
@@ -46,6 +51,8 @@ public class ContainerJam extends Container {
         for (FlowComponent component : jam.getFlowItems()) {
             oldComponents.add(component.copy());
         }
+        jam.updateInventories();
+        oldInventoryLength = jam.getConnectedInventories().size();
     }
 
     public TileEntityJam getJam() {
@@ -53,6 +60,8 @@ public class ContainerJam extends Container {
     }
 
     private List<FlowComponent> oldComponents;
+    private int oldInventoryLength;
+
     public List<ICrafting> getCrafters() {
         return crafters;
     }

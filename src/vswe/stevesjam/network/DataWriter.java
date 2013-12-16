@@ -82,14 +82,19 @@ public class DataWriter {
         }
 
         for (ICrafting crafting : container.getCrafters()) {
-            int temp = 0;
             if (crafting instanceof Player) {
                 Player player = (Player)crafting;
                 PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesJam.CHANNEL, stream.toByteArray()), player);
-                temp++;
             }
-            System.out.println("Sent packet to " + temp + " players");
         }
+    }
+
+    public void sendGlobalPlayerPacket() {
+        if (bitCountBuffer > 0) {
+            stream.write(byteBuffer);
+        }
+
+        PacketDispatcher.sendPacketToAllPlayers(PacketDispatcher.getPacket(StevesJam.CHANNEL, stream.toByteArray()));
     }
 
     public void close() {
@@ -99,6 +104,7 @@ public class DataWriter {
             e.printStackTrace();
         }
     }
+
 
 
 }
