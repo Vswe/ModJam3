@@ -4,7 +4,8 @@ package vswe.stevesjam.components;
 public enum ConnectionSet {
     STANDARD("Standard", ConnectionOption.STANDARD_INPUT, ConnectionOption.STANDARD_OUTPUT),
     FAIL_CHECK("Result Based", ConnectionOption.STANDARD_INPUT, ConnectionOption.SUCCESS, ConnectionOption.FAILURE),
-    TICK("On tick", ConnectionOption.TICK_OUTPUT);
+    CONTINUOUSLY("On interval", ConnectionOption.INTERVAL),
+    REDSTONE("Redstone controlled", ConnectionOption.REDSTONE_PULSE_HIGH, ConnectionOption.REDSTONE_HIGH, ConnectionOption.REDSTONE_LOW, ConnectionOption.REDSTONE_PULSE_LOW);
 
 
     private ConnectionOption[] connections;

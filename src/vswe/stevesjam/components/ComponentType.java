@@ -9,8 +9,8 @@ public enum ComponentType {
             new ConnectionSet[]{ConnectionSet.STANDARD, ConnectionSet.FAIL_CHECK},
             ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItemOutput.class, ComponentMenuResult.class),
     TRIGGER(2,
-            new ConnectionSet[] {ConnectionSet.TICK},
-            ComponentMenuResult.class);
+            new ConnectionSet[] {ConnectionSet.CONTINUOUSLY, ConnectionSet.REDSTONE},
+            ComponentMenuInterval.class, ComponentMenuResult.class);
 
     private Class<? extends ComponentMenu>[] classes;
     private int id;

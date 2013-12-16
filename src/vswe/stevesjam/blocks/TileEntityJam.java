@@ -1,8 +1,6 @@
 package vswe.stevesjam.blocks;
 
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import vswe.stevesjam.components.*;
@@ -14,6 +12,7 @@ public class TileEntityJam extends TileEntity {
 
     private List<FlowComponent> items;
     private Connection currentlyConnecting;
+    private boolean isPowered;
 
     public TileEntityJam() {
         items = new ArrayList<>();
@@ -134,39 +133,69 @@ public class TileEntityJam extends TileEntity {
 
     @Override
     public void updateEntity() {
-        if (timer >= 20) {
-            timer = 0;
-            if (!worldObj.isRemote) {
-                doStuff();
-            }
-        }else{
-            timer++;
-        }
-    }
+        if (!worldObj.isRemote) {
+            if (timer >= 20) {
+                timer = 0;
 
+                for (FlowComponent item : items) {
+                    if (item.getType() == ComponentType.TRIGGER) {
+                        for (ComponentMenu menu : item.getMenus()) {
+                            if (menu instanceof ComponentMenuInterval) {
+                                int interval = ((ComponentMenuInterval)menu).getInterval();
+                                item.setCurrentInterval(item.getCurrentInterval() + 1);
+                                if (item.getCurrentInterval() >= interval) {
+                                    item.setCurrentInterval(0);
 
-
-    public void doStuff() {
-        boolean hasFixedInvalid = false;
-        for (FlowComponent item : items) {
-            if (item.getType() == ComponentType.TRIGGER) {
-                if (!hasFixedInvalid) {
-                    for (TileEntity inventory : inventories) {
-                        if (inventory.isInvalid()) {
-                            updateInventories();
-                            break;
+                                    EnumSet<ConnectionOption> valid = EnumSet.of(ConnectionOption.INTERVAL);
+                                    if (isPowered) {
+                                        valid.add(ConnectionOption.REDSTONE_HIGH);
+                                    }else{
+                                        valid.add(ConnectionOption.REDSTONE_LOW);
+                                    }
+                                    activateTrigger(item, valid);
+                                }
+                            }
                         }
                     }
-                    hasFixedInvalid = true;
                 }
-                new CommandExecutor(this).executeCommand(item);
+
+
+            }else{
+                timer++;
             }
         }
     }
 
 
 
+    private void activateTriggers(EnumSet<ConnectionOption> validTriggerOutputs) {
+        for (FlowComponent item : items) {
+            if (item.getType() == ComponentType.TRIGGER) {
+                activateTrigger(item, validTriggerOutputs);
+            }
+        }
+    }
+
+    private void activateTrigger(FlowComponent component, EnumSet<ConnectionOption> validTriggerOutputs) {
+        for (TileEntity inventory : inventories) {
+            if (inventory.isInvalid()) {
+                updateInventories();
+                break;
+            }
+        }
+
+        new CommandExecutor(this).executeTriggerCommand(component, validTriggerOutputs);
+    }
 
 
+    public void triggerRedstone(boolean powered) {
+        if (powered && !this.isPowered) {
+            activateTriggers(EnumSet.of(ConnectionOption.REDSTONE_PULSE_HIGH));
+        }else if (!powered && this.isPowered) {
+            activateTriggers(EnumSet.of(ConnectionOption.REDSTONE_PULSE_LOW));
+        }
 
+
+        this.isPowered = powered;
+    }
 }

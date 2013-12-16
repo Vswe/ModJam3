@@ -20,12 +20,19 @@ public class CommandExecutor {
         itemBuffer = new ArrayList<>();
     }
 
+    public void executeTriggerCommand(FlowComponent command, EnumSet<ConnectionOption> validTriggerOutputs) {
+        for (int i = 0; i < command.getConnectionSet().getConnections().length; i++) {
+            Connection connection = command.getConnection(i);
+            ConnectionOption option = command.getConnectionSet().getConnections()[i];
+            if (connection != null && !option.isInput() && validTriggerOutputs.contains(option)) {
+                executeCommand(jar.getFlowItems().get(connection.getComponentId()));
+            }
+        }
+    }
 
-    public void executeCommand(FlowComponent command) {
+
+    private void executeCommand(FlowComponent command) {
         switch (command.getType()) {
-            case TRIGGER:
-                break;
-
             case INPUT:
                 IInventory inputInventory = getInventory(command.getMenus().get(0));
                 if (inputInventory != null) {

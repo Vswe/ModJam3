@@ -6,7 +6,11 @@ public enum ConnectionOption {
     STANDARD_OUTPUT("Output", false),
     SUCCESS("Success", false),
     FAILURE("Failure", false),
-    TICK_OUTPUT("On tick", false);
+    INTERVAL("Interval", false),
+    REDSTONE_PULSE_HIGH("On high pulse", false),
+    REDSTONE_PULSE_LOW("On low pulse", false),
+    REDSTONE_HIGH("While high signal", false),
+    REDSTONE_LOW("While low signal", false);
 
     private String name;
     private boolean isInput;

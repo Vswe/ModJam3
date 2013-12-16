@@ -48,6 +48,7 @@ public class BlockJam extends BlockContainer {
     public void onBlockAdded(World world, int x, int y, int z) {
         super.onBlockAdded(world, x, y, z);
 
+        updateRedstone(world, x, y, z);
         updateInventories(world, x, y, z);
     }
 
@@ -55,7 +56,21 @@ public class BlockJam extends BlockContainer {
     public void onNeighborBlockChange(World world, int x, int y, int z, int id) {
         super.onNeighborBlockChange(world, x, y, z, id);
 
+
+
+        updateRedstone(world, x, y, z);
         updateInventories(world, x, y, z);
+    }
+
+    private void updateRedstone(World world, int x, int y, int z) {
+        if (!world.isRemote) {
+            TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+            if (tileEntity != null && tileEntity instanceof TileEntityJam) {
+                TileEntityJam jam = (TileEntityJam)tileEntity;
+
+                jam.triggerRedstone(world.isBlockIndirectlyGettingPowered(x, y, z));
+            }
+        }
     }
 
     @Override
@@ -71,4 +86,6 @@ public class BlockJam extends BlockContainer {
             ((TileEntityJam)tileEntity).updateInventories();
         }
     }
+
+
 }

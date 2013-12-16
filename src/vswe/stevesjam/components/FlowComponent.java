@@ -96,6 +96,15 @@ public class FlowComponent implements IComponentNetworkReader {
     private TileEntityJam jam;
     private int id;
     private Map<Integer, Connection> connections;
+    private int currentInterval;
+
+    public int getCurrentInterval() {
+        return currentInterval;
+    }
+
+    public void setCurrentInterval(int currentInterval) {
+        this.currentInterval = currentInterval;
+    }
 
     public int getX() {
         return x;
