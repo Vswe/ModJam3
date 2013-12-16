@@ -150,12 +150,13 @@ public class CommandExecutor {
                 continue;
             }
 
-            boolean isItemValid = false;
+            boolean whiteList = menuItem.useWhiteList();
+            boolean isItemValid = !whiteList;
             int itemId = itemStack.itemID;
             for (ItemSetting setting : menuItem.getSettings()) {
                 if (setting.getItem() != null) {
                     if (setting.getItem().itemID == itemId && (setting.isFuzzy() || setting.getItem().getItemDamage() == itemStack.getItemDamage())) {
-                        isItemValid = true;
+                        isItemValid = whiteList;
                         break;
                     }
                 }

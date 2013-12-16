@@ -16,28 +16,35 @@ public class ComponentMenuResult extends ComponentMenu {
 
         sets = parent.getType().getSets();
 
+        radioButtons = new RadioButtonList() {
+            @Override
+            public void updateSelectedOption(int selectedOption) {
+                DataWriter dw = getWriterForServerComponentPacket();
+                writeData(dw, selectedOption);
+                PacketHandler.sendDataToServer(dw);
+            }
+        };
+
+        for (int i = 0; i < sets.length; i++) {
+            radioButtons.add(new RadioButton(RADIO_X, RADIO_Y + i * RADIO_MARGIN, sets[i].toString()));
+        }
+
         for (int i = 0; i < sets.length; i++) {
             ConnectionSet set = sets[i];
 
             if (parent.getConnectionSet().equals(set)) {
-                selectedOption = i;
+                radioButtons.setSelectedOption(i);
                 break;
             }
         }
     }
 
-    private static final int RADIO_SIZE = 8;
-    private static final int RADIO_SRC_X = 30;
-    private static final int RADIO_SRC_Y = 52;
     private static final int RADIO_X = 5;
     private static final int RADIO_Y = 5;
-    private static final int RADIO_MARGIN = 5;
-    private static final int RADIO_TEXT_X = 12;
-    private static final int RADIO_TEXT_Y = 2;
+    private static final int RADIO_MARGIN = 13;
 
     private ConnectionSet[] sets;
-
-    private int selectedOption;
+    private RadioButtonList radioButtons;
 
     @Override
     public String getName() {
@@ -46,17 +53,7 @@ public class ComponentMenuResult extends ComponentMenu {
 
     @Override
     public void draw(GuiJam gui, int mX, int mY) {
-        for (int i = 0; i < sets.length; i++) {
-            ConnectionSet set = sets[i];
-
-            int y = RADIO_Y + i * (RADIO_SIZE + RADIO_MARGIN);
-
-            int srcRadioX = selectedOption == i ? 1 : 0;
-            int srcRadioY = GuiJam.inBounds(RADIO_X, y, RADIO_SIZE, RADIO_SIZE, mX, mY) ? 1 : 0;
-
-            gui.drawTexture(RADIO_X, y, RADIO_SRC_X + srcRadioX * RADIO_SIZE, RADIO_SRC_Y + srcRadioY * RADIO_SIZE, RADIO_SIZE, RADIO_SIZE);
-            gui.drawString(set.toString(), RADIO_X + RADIO_TEXT_X, y + RADIO_TEXT_Y, 0.7F, 0x404040);
-        }
+        radioButtons.draw(gui, mX, mY);
     }
 
     @Override
@@ -66,12 +63,7 @@ public class ComponentMenuResult extends ComponentMenu {
 
     @Override
     public void onClick(int mX, int mY, int button) {
-        for (int i = 0; i < sets.length; i++) {
-            if (GuiJam.inBounds(RADIO_X, RADIO_Y + i * (RADIO_SIZE + RADIO_MARGIN), RADIO_SIZE, RADIO_SIZE, mX, mY)) {
-                setSelectedOption(i);
-                break;
-            }
-        }
+        radioButtons.onClick(mX, mY, button);
     }
 
     @Override
@@ -86,7 +78,7 @@ public class ComponentMenuResult extends ComponentMenu {
 
     @Override
     public void writeData(DataWriter dw, TileEntityJam jam) {
-        writeData(dw, selectedOption);
+        writeData(dw, radioButtons.getSelectedOption());
     }
 
     @Override
@@ -96,7 +88,7 @@ public class ComponentMenuResult extends ComponentMenu {
 
     @Override
     public void copyFrom(ComponentMenu menu) {
-        selectedOption = ((ComponentMenuResult)menu).selectedOption;
+        radioButtons.setSelectedOption(((ComponentMenuResult)menu).radioButtons.getSelectedOption());
         getParent().setConnectionSet(menu.getParent().getConnectionSet());
     }
 
@@ -104,11 +96,11 @@ public class ComponentMenuResult extends ComponentMenu {
     public void refreshData(ContainerJam container, ComponentMenu newData) {
         ComponentMenuResult newDataResult =  ((ComponentMenuResult)newData);
 
-        if (selectedOption != newDataResult.selectedOption) {
-            selectedOption = newDataResult.selectedOption;
+        if (radioButtons.getSelectedOption() != newDataResult.radioButtons.getSelectedOption()) {
+            radioButtons.setSelectedOption(newDataResult.radioButtons.getSelectedOption());
 
             DataWriter dw = getWriterForClientComponentPacket(container);
-            writeData(dw, selectedOption);
+            writeData(dw, radioButtons.getSelectedOption());
             PacketHandler.sendDataToListeningClients(container, dw);
         }
     }
@@ -119,14 +111,8 @@ public class ComponentMenuResult extends ComponentMenu {
     }
 
     private void readData(DataReader dr) {
-        selectedOption = dr.readData(DataBitHelper.MENU_CONNECTION_TYPE_ID);
-        getParent().setConnectionSet(sets[selectedOption]);
-    }
-
-    private  void setSelectedOption(int val) {
-        DataWriter dw = getWriterForServerComponentPacket();
-        writeData(dw, val);
-        PacketHandler.sendDataToServer(dw);
+        radioButtons.setSelectedOption(dr.readData(DataBitHelper.MENU_CONNECTION_TYPE_ID));
+        getParent().setConnectionSet(sets[radioButtons.getSelectedOption()]);
     }
 
     private void writeData(DataWriter dw, int val) {

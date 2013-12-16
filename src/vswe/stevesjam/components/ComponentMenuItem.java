@@ -56,9 +56,26 @@ public class ComponentMenuItem extends ComponentMenu {
                 writeServerData(DataTypeHeader.META);
             }
         });
+
+        radioButtons = new RadioButtonList() {
+            @Override
+            public void updateSelectedOption(int selectedOption) {
+                DataWriter dw = getWriterForServerComponentPacket();
+                dw.writeBoolean(false); //no specific item
+                dw.writeBoolean(selectedOption == 0);
+                PacketHandler.sendDataToServer(dw);
+            }
+        };
+
+        radioButtons.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, "White list"));
+        radioButtons.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, "Black list"));
+
         updateScrolling();
     }
 
+    private static final int RADIO_BUTTON_X_LEFT = 5;
+    private static final int RADIO_BUTTON_X_RIGHT = 65;
+    private static final int RADIO_BUTTON_Y = 5;
 
     private static final int TEXT_BOX_SIZE_W = 64;
     private static final int TEXT_BOX_SIZE_H = 12;
@@ -136,11 +153,12 @@ public class ComponentMenuItem extends ComponentMenu {
     private TextBoxNumberList numberTextBoxes;
     private TextBoxNumber amountTextBox;
     private TextBoxNumber damageValueTextBox;
+    private RadioButtonList radioButtons;
 
     private CheckBox[] checkBoxes = {new CheckBox("Specify amount?", 5, 25) {
         @Override
         public void setValue(boolean val) {
-            selectedSetting.setLimitedByAmount(val);;
+            selectedSetting.setLimitedByAmount(val);
         }
 
         @Override
@@ -217,6 +235,8 @@ public class ComponentMenuItem extends ComponentMenu {
                 }
             }
         }else{
+
+            radioButtons.draw(gui, mX, mY);
 
             List<Point> points = getItemCoordinates();
             for (Point point : points) {
@@ -393,6 +413,8 @@ public class ComponentMenuItem extends ComponentMenu {
                 }
             }
         }else{
+            radioButtons.onClick(mX, mY, button);
+
             List<Point> points = getItemCoordinates();
             for (Point point : points) {
                 if (GuiJam.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
@@ -474,6 +496,7 @@ public class ComponentMenuItem extends ComponentMenu {
 
     @Override
     public void writeData(DataWriter dw, TileEntityJam jam) {
+        dw.writeBoolean(useWhiteList());
         for (ItemSetting setting : settings) {
             dw.writeBoolean(setting.getItem() != null);
             if (setting.getItem() != null) {
@@ -490,6 +513,7 @@ public class ComponentMenuItem extends ComponentMenu {
 
     @Override
     public void readData(DataReader dr, TileEntityJam jam) {
+        setWhiteList(dr.readBoolean());
         for (ItemSetting setting : settings) {
             if (!dr.readBoolean()) {
                 setting.clear();
@@ -514,6 +538,8 @@ public class ComponentMenuItem extends ComponentMenu {
     public void copyFrom(ComponentMenu menu) {
         ComponentMenuItem menuItem = (ComponentMenuItem)menu;
 
+        setWhiteList(menuItem.useWhiteList());
+
         for (int i = 0; i < settings.size(); i++) {
             if (menuItem.settings.get(i).getItem() == null) {
                 settings.get(i).clear();
@@ -527,6 +553,15 @@ public class ComponentMenuItem extends ComponentMenu {
 
     @Override
     public void refreshData(ContainerJam container, ComponentMenu newData) {
+        if (((ComponentMenuItem)newData).useWhiteList() != useWhiteList()) {
+            setWhiteList(((ComponentMenuItem)newData).useWhiteList());
+
+            DataWriter dw = getWriterForClientComponentPacket(container);
+            dw.writeBoolean(false); //no specific setting
+            dw.writeBoolean(useWhiteList());
+            PacketHandler.sendDataToListeningClients(container, dw);
+        }
+
         for (int i = 0; i < settings.size(); i++) {
             ItemSetting setting = settings.get(i);
             ItemSetting newSetting = ((ComponentMenuItem)newData).settings.get(i);
@@ -567,52 +602,58 @@ public class ComponentMenuItem extends ComponentMenu {
 
     @Override
     public void readNetworkComponent(DataReader dr) {
-        int settingId = dr.readData(DataBitHelper.MENU_ITEM_SETTING_ID);
-        ItemSetting setting = settings.get(settingId);
-        int headerId = dr.readData(DataBitHelper.MENU_ITEM_TYPE_HEADER);
-        DataTypeHeader header = getHeaderFromId(headerId);
+        boolean useSetting = dr.readBoolean();
 
-        switch (header) {
-            case CLEAR:
-                setting.clear();
-                selectedSetting = null;
-                break;
-            case SET_ITEM:
-                int id = dr.readData(DataBitHelper.MENU_ITEM_ID);
-                int dmg =  dr.readData(DataBitHelper.MENU_ITEM_META);
+        if (useSetting) {
+            int settingId = dr.readData(DataBitHelper.MENU_ITEM_SETTING_ID);
+            ItemSetting setting = settings.get(settingId);
+            int headerId = dr.readData(DataBitHelper.MENU_ITEM_TYPE_HEADER);
+            DataTypeHeader header = getHeaderFromId(headerId);
 
-                setting.setItem(new ItemStack(id, 1, dmg));
+            switch (header) {
+                case CLEAR:
+                    setting.clear();
+                    selectedSetting = null;
+                    break;
+                case SET_ITEM:
+                    int id = dr.readData(DataBitHelper.MENU_ITEM_ID);
+                    int dmg =  dr.readData(DataBitHelper.MENU_ITEM_META);
 
-                if (isEditing()) {
-                    damageValueTextBox.setNumber(setting.getItem().getItemDamage());
-                }
+                    setting.setItem(new ItemStack(id, 1, dmg));
 
-                break;
-            case USE_AMOUNT:
-                setting.setLimitedByAmount(dr.readBoolean());
-                if (!setting.isLimitedByAmount() && setting.getItem() != null) {
-                    setting.getItem().stackSize = 1;
-                }
-                break;
-            case USE_FUZZY:
-                setting.setFuzzy(dr.readBoolean());
-                break;
-            case AMOUNT:
-                if (setting.getItem() != null) {
-                    setting.getItem().stackSize = dr.readData(DataBitHelper.MENU_ITEM_AMOUNT);
-                    if (isEditing()) {
-                        amountTextBox.setNumber(setting.getItem().stackSize);
-                    }
-                }
-                break;
-            case META:
-                if (setting.getItem() != null) {
-                    setting.getItem().setItemDamage(dr.readData(DataBitHelper.MENU_ITEM_META));
                     if (isEditing()) {
                         damageValueTextBox.setNumber(setting.getItem().getItemDamage());
                     }
-                }
 
+                    break;
+                case USE_AMOUNT:
+                    setting.setLimitedByAmount(dr.readBoolean());
+                    if (!setting.isLimitedByAmount() && setting.getItem() != null) {
+                        setting.getItem().stackSize = 1;
+                    }
+                    break;
+                case USE_FUZZY:
+                    setting.setFuzzy(dr.readBoolean());
+                    break;
+                case AMOUNT:
+                    if (setting.getItem() != null) {
+                        setting.getItem().stackSize = dr.readData(DataBitHelper.MENU_ITEM_AMOUNT);
+                        if (isEditing()) {
+                            amountTextBox.setNumber(setting.getItem().stackSize);
+                        }
+                    }
+                    break;
+                case META:
+                    if (setting.getItem() != null) {
+                        setting.getItem().setItemDamage(dr.readData(DataBitHelper.MENU_ITEM_META));
+                        if (isEditing()) {
+                            damageValueTextBox.setNumber(setting.getItem().getItemDamage());
+                        }
+                    }
+
+            }
+        }else{
+            setWhiteList(dr.readBoolean());
         }
     }
 
@@ -629,6 +670,7 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     private void writeData(DataWriter dw, DataTypeHeader header, ItemSetting setting) {
+        dw.writeBoolean(true); //specific setting is being used
         dw.writeData(setting.getId(), DataBitHelper.MENU_ITEM_SETTING_ID);
         dw.writeData(header.id, DataBitHelper.MENU_ITEM_TYPE_HEADER);
 
@@ -815,5 +857,13 @@ public class ComponentMenuItem extends ComponentMenu {
                 return getDisplayName(newItem);
             }
         }
+    }
+
+    public boolean useWhiteList() {
+        return radioButtons.getSelectedOption() == 0;
+    }
+
+    public void setWhiteList(boolean value) {
+        radioButtons.setSelectedOption(value ? 0 : 1);
     }
 }
