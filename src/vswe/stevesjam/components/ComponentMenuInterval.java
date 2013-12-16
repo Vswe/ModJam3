@@ -1,6 +1,7 @@
 package vswe.stevesjam.components;
 
 
+import net.minecraft.nbt.NBTTagCompound;
 import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
@@ -120,4 +121,17 @@ public class ComponentMenuInterval extends ComponentMenu {
     public void setInterval(int val) {
         interval.setNumber(val);
     }
+
+    private static final String NBT_INTERVAL = "Interval";
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+       setInterval(nbtTagCompound.getShort(NBT_INTERVAL));
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        nbtTagCompound.setShort(NBT_INTERVAL, (short)getInterval());
+    }
+
 }

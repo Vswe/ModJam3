@@ -2,6 +2,7 @@ package vswe.stevesjam.components;
 
 
 import net.minecraft.inventory.Container;
+import net.minecraft.nbt.NBTTagCompound;
 import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
@@ -55,4 +56,8 @@ public abstract class ComponentMenu implements IComponentNetworkReader {
     public int getId() {
         return id;
     }
+
+    public abstract void readFromNBT(NBTTagCompound nbtTagCompound);
+    public abstract void writeToNBT(NBTTagCompound nbtTagCompound);
+
 }

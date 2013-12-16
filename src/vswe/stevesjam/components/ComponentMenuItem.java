@@ -4,6 +4,8 @@ package vswe.stevesjam.components;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ChatAllowedCharacters;
 import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
@@ -872,4 +874,50 @@ public class ComponentMenuItem extends ComponentMenu {
     public boolean useWhiteList() {
         return isFirstRadioButtonSelected();
     }
+
+    private static final String NBT_RADIO_SELECTION = "FirstSelected";
+    private static final String NBT_SETTINGS = "Settings";
+    private static final String NBT_SETTING_ID = "Id";
+    private static final String NBT_SETTING_ITEM_ID = "ItemId";
+    private static final String NBT_SETTING_ITEM_DMG = "ItemDamage";
+    private static final String NBT_SETTING_ITEM_COUNT = "ItemCount";
+    private static final String NBT_SETTING_FUZZY = "Fuzzy";
+    private static final String NBT_SETTING_USE_SIZE = "SizeLimit";
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+       setFirstRadioButtonSelected(nbtTagCompound.getBoolean(NBT_RADIO_SELECTION));
+
+        NBTTagList settingTagList = nbtTagCompound.getTagList(NBT_SETTINGS);
+        for (int i = 0; i < settingTagList.tagCount(); i++) {
+            NBTTagCompound settingTag = (NBTTagCompound)settingTagList.tagAt(i);
+            ItemSetting setting = settings.get(settingTag.getByte(NBT_SETTING_ID));
+            setting.setItem(new ItemStack(settingTag.getShort(NBT_SETTING_ITEM_ID), settingTag.getShort(NBT_SETTING_ITEM_COUNT), settingTag.getShort(NBT_SETTING_ITEM_DMG)));
+            setting.setFuzzy(settingTag.getBoolean(NBT_SETTING_FUZZY));
+            setting.setLimitedByAmount(settingTag.getBoolean(NBT_SETTING_USE_SIZE));
+        }
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        nbtTagCompound.setBoolean(NBT_RADIO_SELECTION, isFirstRadioButtonSelected());
+
+        NBTTagList settingTagList = new NBTTagList();
+        for (int i = 0; i < settings.size(); i++) {
+            ItemSetting setting = settings.get(i);
+            if (setting.getItem() != null) {
+                NBTTagCompound settingTag = new NBTTagCompound();
+                settingTag.setByte(NBT_SETTING_ID, (byte)setting.getId());
+                settingTag.setShort(NBT_SETTING_ITEM_ID, (short)setting.getItem().itemID);
+                settingTag.setShort(NBT_SETTING_ITEM_DMG, (short)setting.getItem().getItemDamage());
+                settingTag.setShort(NBT_SETTING_ITEM_COUNT, (short)setting.getItem().stackSize);
+                settingTag.setBoolean(NBT_SETTING_FUZZY, setting.isFuzzy());
+                settingTag.setBoolean(NBT_SETTING_USE_SIZE, setting.isLimitedByAmount());
+                settingTagList.appendTag(settingTag);
+            }
+        }
+        nbtTagCompound.setTag(NBT_SETTINGS, settingTagList);
+    }
 }
+
+

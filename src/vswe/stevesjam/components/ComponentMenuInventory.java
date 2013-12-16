@@ -3,6 +3,7 @@ package vswe.stevesjam.components;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import vswe.stevesjam.interfaces.ContainerJam;
@@ -233,5 +234,17 @@ public class ComponentMenuInventory extends ComponentMenu {
 
     public void setSelectedInventory(int val) {
         selectedInventory = val;
+    }
+
+    private static final String NBT_SELECTION = "InventorySelection";
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+        setSelectedInventory(nbtTagCompound.getShort(NBT_SELECTION));
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+       nbtTagCompound.setShort(NBT_SELECTION, (short)getSelectedInventory());
     }
 }

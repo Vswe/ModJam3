@@ -1,6 +1,8 @@
 package vswe.stevesjam.blocks;
 
 import net.minecraft.inventory.IInventory;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import vswe.stevesjam.components.*;
 import vswe.stevesjam.network.DataBitHelper;
@@ -318,5 +320,45 @@ public class TileEntityJam extends TileEntity {
         public void onClick(DataWriter dw) {
 
         }
+    }
+
+    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 0;
+    private static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
+    private static final String NBT_POWERED = "IsPowered";
+    private static final String NBT_TIMER = "Timer";
+    private static final String NBT_COMPONENTS = "Components";
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+        super.readFromNBT(nbtTagCompound);
+
+        int version =  nbtTagCompound.getByte(NBT_PROTOCOL_VERSION);
+        isPowered = nbtTagCompound.getBoolean(NBT_POWERED);
+        timer = nbtTagCompound.getByte(NBT_TIMER);
+
+        NBTTagList components = nbtTagCompound.getTagList(NBT_COMPONENTS);
+        for (int i = 0; i < components.tagCount(); i++) {
+            NBTTagCompound component = (NBTTagCompound)components.tagAt(i);
+
+            items.add(FlowComponent.readFromNBT(this, component));
+        }
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        super.writeToNBT(nbtTagCompound);
+
+        nbtTagCompound.setByte(NBT_PROTOCOL_VERSION, NBT_CURRENT_PROTOCOL_VERSION);
+        nbtTagCompound.setBoolean(NBT_POWERED, isPowered);
+        nbtTagCompound.setByte(NBT_TIMER, (byte)timer);
+
+        NBTTagList components = new NBTTagList();
+        for (FlowComponent item : items) {
+            NBTTagCompound component = new NBTTagCompound();
+            item.writeToNBT(component);
+            components.appendTag(component);
+        }
+        nbtTagCompound.setTag(NBT_COMPONENTS, components);
+
     }
 }

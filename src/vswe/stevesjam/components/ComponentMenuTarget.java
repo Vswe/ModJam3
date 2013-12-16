@@ -1,6 +1,8 @@
 package vswe.stevesjam.components;
 
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 import vswe.stevesjam.interfaces.ContainerJam;
@@ -324,6 +326,7 @@ public class ComponentMenuTarget extends ComponentMenu {
         }
     }
 
+
     private void writeUpdatedData(ContainerJam container, int id, DataTypeHeader header, int data) {
         DataWriter dw = getWriterForClientComponentPacket(container);
         writeData(dw, id, header, data);
@@ -392,4 +395,40 @@ public class ComponentMenuTarget extends ComponentMenu {
         }
         return  null;
     }
+
+    private static final String NBT_DIRECTIONS = "Directions";
+    private static final String NBT_ACTIVE = "Active";
+    private static final String NBT_RANGE = "UseRange";
+    private static final String NBT_START = "StartRange";
+    private static final String NBT_END = "EndRange";
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+        NBTTagList directionTagList = nbtTagCompound.getTagList(NBT_DIRECTIONS);
+
+        for (int i = 0; i < directionTagList.tagCount(); i++) {
+            NBTTagCompound directionTag = (NBTTagCompound)directionTagList.tagAt(i);
+            activatedDirections[i] = directionTag.getBoolean(NBT_ACTIVE);
+            useRangeForDirections[i] = directionTag.getBoolean(NBT_RANGE);
+            startRange[i] = directionTag.getByte(NBT_START);
+            endRange[i] = directionTag.getByte(NBT_END);
+        }
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        NBTTagList directionTagList = new NBTTagList();
+
+        for (int i = 0; i < directions.length; i++)  {
+            NBTTagCompound directionTag = new NBTTagCompound();
+            directionTag.setBoolean(NBT_ACTIVE, isActive(i));
+            directionTag.setBoolean(NBT_RANGE, useRange(i));
+            directionTag.setByte(NBT_START, (byte)getStart(i));
+            directionTag.setByte(NBT_END, (byte)getEnd(i));
+            directionTagList.appendTag(directionTag);
+        }
+
+        nbtTagCompound.setTag(NBT_DIRECTIONS, directionTagList);
+    }
+
 }

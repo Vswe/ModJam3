@@ -1,6 +1,7 @@
 package vswe.stevesjam.components;
 
 
+import net.minecraft.nbt.NBTTagCompound;
 import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
@@ -118,5 +119,18 @@ public class ComponentMenuResult extends ComponentMenu {
         dw.writeData(val, DataBitHelper.MENU_CONNECTION_TYPE_ID);
     }
 
+
+    private static final String NBT_SELECTED = "SelectedOption";
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+        radioButtons.setSelectedOption(nbtTagCompound.getByte(NBT_SELECTED));
+        getParent().setConnectionSet(sets[radioButtons.getSelectedOption()]);
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        nbtTagCompound.setByte(NBT_SELECTED, (byte)radioButtons.getSelectedOption());
+    }
 
 }

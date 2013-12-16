@@ -2,6 +2,8 @@ package vswe.stevesjam.components;
 
 
 import net.minecraft.inventory.Container;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 import vswe.stevesjam.blocks.TileEntityJam;
@@ -570,5 +572,81 @@ public class FlowComponent implements IComponentNetworkReader {
                 connection.setComponentId(connection.getComponentId() - 1);
             }
         }
+    }
+
+    private static final String NBT_POS_X = "PosX";
+    private static final String NBT_POS_Y = "PosY";
+    private static final String NBT_TYPE= "Type";
+    private static final String NBT_CONNECTION = "Connection";
+    private static final String NBT_CONNECTION_POS = "ConnectionPos";
+    private static final String NBT_CONNECTION_TARGET_COMPONENT = "ConnectionComponent";
+    private static final String NBT_CONNECTION_TARGET_CONNECTION = "ConnectionConnection";
+    private static final String NBT_INTERVAL = "Interval";
+    private static final String NBT_MENUS = "Menus";
+
+    public static FlowComponent readFromNBT(TileEntityJam jam, NBTTagCompound nbtTagCompound) {
+        int x = nbtTagCompound.getShort(NBT_POS_X);
+        int y = nbtTagCompound.getShort(NBT_POS_Y);
+        int typeId = nbtTagCompound.getByte(NBT_TYPE);
+
+        FlowComponent component = new FlowComponent(jam, x, y, ComponentType.getTypeFromId(typeId));
+
+        NBTTagList connections = nbtTagCompound.getTagList(NBT_CONNECTION);
+        for (int i = 0; i < connections.tagCount(); i++) {
+            NBTTagCompound connectionTag = (NBTTagCompound)connections.tagAt(i);
+
+            Connection connection = new Connection(connectionTag.getByte(NBT_CONNECTION_TARGET_COMPONENT), connectionTag.getByte(NBT_CONNECTION_TARGET_CONNECTION));
+            component.connections.put((int)connectionTag.getByte(NBT_CONNECTION_POS), connection);
+        }
+
+        if (component.type == ComponentType.TRIGGER) {
+            component.currentInterval = nbtTagCompound.getShort(NBT_INTERVAL);
+        }
+
+        NBTTagList menuTagList = nbtTagCompound.getTagList(NBT_MENUS);
+        for (int i = 0; i < menuTagList.tagCount(); i++) {
+            NBTTagCompound menuTag = (NBTTagCompound)menuTagList.tagAt(i);
+
+            component.menus.get(i).readFromNBT(menuTag);
+        }
+
+        return component;
+    }
+
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        nbtTagCompound.setShort(NBT_POS_X, (short)x);
+        nbtTagCompound.setShort(NBT_POS_Y, (short)y);
+        nbtTagCompound.setByte(NBT_TYPE, (byte)type.getId());
+
+        NBTTagList connections = new NBTTagList();
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            Connection connection = this.connections.get(i);
+
+            if (connection != null) {
+                NBTTagCompound connectionTag = new NBTTagCompound();
+                connectionTag.setByte(NBT_CONNECTION_POS, (byte)i);
+                connectionTag.setByte(NBT_CONNECTION_TARGET_COMPONENT, (byte)connection.getComponentId());
+                connectionTag.setByte(NBT_CONNECTION_TARGET_CONNECTION, (byte)connection.getConnectionId());
+                connections.appendTag(connectionTag);
+            }
+        }
+        nbtTagCompound.setTag(NBT_CONNECTION, connections);
+
+        if (type == ComponentType.TRIGGER) {
+            nbtTagCompound.setShort(NBT_INTERVAL, (short)currentInterval);
+        }
+
+        NBTTagList menuTagList = new NBTTagList();
+        for (int i = 0; i < menus.size(); i++) {
+            ComponentMenu menu = menus.get(i);
+
+            NBTTagCompound menuTag = new NBTTagCompound();
+
+            menu.writeToNBT(menuTag);
+
+            menuTagList.appendTag(menuTag);
+
+        }
+        nbtTagCompound.setTag(NBT_MENUS, menuTagList);
     }
 }
