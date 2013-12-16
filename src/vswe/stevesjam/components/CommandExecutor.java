@@ -13,7 +13,7 @@ import java.util.*;
 public class CommandExecutor {
 
     private TileEntityJam jar;
-    private List<SlotStackInventoryHolder> itemBuffer;
+    private List<ItemBufferElement> itemBuffer;
 
     public CommandExecutor(TileEntityJam jar) {
         this.jar = jar;
@@ -141,6 +141,7 @@ public class CommandExecutor {
     }
 
     private void getItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
+        ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
         for (SlotSideTarget slot : validSlots.values()) {
             ItemStack itemStack = inventory.getStackInSlot(slot.getSlot());
 
@@ -148,68 +149,95 @@ public class CommandExecutor {
                 continue;
             }
 
-            if (isItemValid(componentMenu, itemStack)) {
-                itemBuffer.add(new SlotStackInventoryHolder(itemStack, inventory, slot.getSlot()));
+            ItemSetting setting = isItemValid(componentMenu, itemStack);
+            if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
+                FlowComponent owner = componentMenu.getParent();
+                SlotStackInventoryHolder target = new SlotStackInventoryHolder(itemStack, inventory, slot.getSlot());
+
+                boolean added = false;
+                for (ItemBufferElement itemBufferElement : itemBuffer) {
+                    if (itemBufferElement.addTarget(owner, setting, target)) {
+                        added = true;
+                        break;
+                    }
+                }
+
+                if (!added) {
+                    ItemBufferElement itemBufferElement = new ItemBufferElement(owner, setting, menuItem.useWhiteList(), target);
+                    itemBuffer.add(itemBufferElement);
+                }
+
             }
         }
     }
 
 
-    private boolean isItemValid(ComponentMenu componentMenu, ItemStack itemStack)  {
+    private ItemSetting isItemValid(ComponentMenu componentMenu, ItemStack itemStack)  {
         ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
 
-        boolean whiteList = menuItem.useWhiteList();
-        boolean isItemValid = !whiteList;
         int itemId = itemStack.itemID;
         for (ItemSetting setting : menuItem.getSettings()) {
             if (setting.getItem() != null) {
                 if (setting.getItem().itemID == itemId && (setting.isFuzzy() || setting.getItem().getItemDamage() == itemStack.getItemDamage())) {
-                    isItemValid = whiteList;
-                    break;
+                    return setting;
                 }
             }
         }
-        return isItemValid;
+
+        return null;
     }
 
     private void insertItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
+        ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
 
-        Iterator<SlotStackInventoryHolder> iterator = itemBuffer.iterator();
-        while(iterator.hasNext()) {
-            SlotStackInventoryHolder holder = iterator.next();
-            ItemStack itemStack = holder.getItemStack();
+        Iterator<ItemBufferElement> bufferIterator = itemBuffer.iterator();
+        while(bufferIterator.hasNext()) {
+            ItemBufferElement itemBufferElement = bufferIterator.next();
+            Iterator<SlotStackInventoryHolder> itemIterator = itemBufferElement.getHolders().iterator();
+            while (itemIterator.hasNext()) {
+                SlotStackInventoryHolder holder = itemIterator.next();
+                ItemStack itemStack = holder.getItemStack();
 
-            if (!isItemValid(componentMenu, itemStack)) {
-                continue;
-            }
+                ItemSetting setting = isItemValid(componentMenu, itemStack);
 
-            for (SlotSideTarget slot : validSlots.values()) {
-                if (!isSlotValid(inventory, itemStack, slot, false)) {
+                if (menuItem.useWhiteList() == (setting == null)) {
                     continue;
                 }
 
-                ItemStack itemInSlot = inventory.getStackInSlot(slot.getSlot());
 
-                if (itemInSlot == null) {
-                    if (itemStack.stackSize <= inventory.getInventoryStackLimit()) {
-                        inventory.setInventorySlotContents(slot.getSlot(), itemStack.copy());
-                        removeItemFromBuffer(holder);
-                        iterator.remove();
-                        break;
-                    }else{
-                        ItemStack temp = itemStack.copy();
-                        temp.stackSize = inventory.getInventoryStackLimit();
-                        itemStack.stackSize -= inventory.getInventoryStackLimit();
-                        inventory.setInventorySlotContents(slot.getSlot(), temp);
+                for (SlotSideTarget slot : validSlots.values()) {
+                    if (!isSlotValid(inventory, itemStack, slot, false)) {
+                        continue;
                     }
-                }else if (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable()){
-                    int moveCount = Math.min(itemStack.stackSize, Math.min(inventory.getInventoryStackLimit(), itemInSlot.getMaxStackSize()) - itemInSlot.stackSize);
-                    itemInSlot.stackSize += moveCount;
-                    itemStack.stackSize -= moveCount;
-                    if (itemStack.stackSize == 0) {
-                        removeItemFromBuffer(holder);
-                        iterator.remove();
-                        break;
+
+                    ItemStack itemInSlot = inventory.getStackInSlot(slot.getSlot());
+
+                    if (itemInSlot == null) {
+                        ItemStack temp = itemStack.copy();
+                        int moveCount = Math.min(itemStack.stackSize, inventory.getInventoryStackLimit());
+                        moveCount = itemBufferElement.retrieveItemCount(moveCount);
+                        if (moveCount > 0) {
+                            temp.stackSize = moveCount;
+                            itemStack.stackSize -= moveCount;
+                            inventory.setInventorySlotContents(slot.getSlot(), temp);
+                            if (itemStack.stackSize == 0) {
+                                removeItemFromBuffer(holder);
+                                itemIterator.remove();
+                                break;
+                            }
+                        }
+                    }else if (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable()){
+                        int moveCount = Math.min(itemStack.stackSize, Math.min(inventory.getInventoryStackLimit(), itemInSlot.getMaxStackSize()) - itemInSlot.stackSize);
+                        moveCount = itemBufferElement.retrieveItemCount(moveCount);
+                        if (moveCount > 0) {
+                            itemInSlot.stackSize += moveCount;
+                            itemStack.stackSize -= moveCount;
+                            if (itemStack.stackSize == 0) {
+                                removeItemFromBuffer(holder);
+                                itemIterator.remove();
+                                break;
+                            }
+                        }
                     }
                 }
             }
