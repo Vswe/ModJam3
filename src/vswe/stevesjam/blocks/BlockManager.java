@@ -16,7 +16,7 @@ public class BlockManager extends BlockContainer {
     public BlockManager(int id) {
         super(id, Material.iron);
 
-        setUnlocalizedName(Blocks.JAM_NAME_TAG);
+        setUnlocalizedName(Blocks.MANAGER_NAME_TAG);
         setStepSound(Block.soundMetalFootstep);
         setCreativeTab(CreativeTabs.tabRedstone);
     }

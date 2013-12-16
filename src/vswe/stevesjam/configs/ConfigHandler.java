@@ -11,7 +11,7 @@ public class ConfigHandler extends Configuration {
 
         load();
 
-        Blocks.JAM_ID = getBlock(Blocks.JAM_NAME_TAG, Blocks.JAM_DEFAULT_ID).getInt(Blocks.JAM_DEFAULT_ID);
+        Blocks.MANAGER_ID = getBlock(Blocks.MANAGER_NAME_TAG, Blocks.MANAGER_DEFAULT_ID).getInt(Blocks.MANAGER_DEFAULT_ID);
         Blocks.CABLE_ID = getBlock(Blocks.CABLE_NAME_TAG, Blocks.CABLE_DEFAULT_ID).getInt(Blocks.CABLE_DEFAULT_ID);
 
         save();
