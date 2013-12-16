@@ -7,7 +7,7 @@ public enum ComponentType {
             ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItem.class, ComponentMenuResult.class),
     OUTPUT(1,
             new ConnectionSet[]{ConnectionSet.STANDARD, ConnectionSet.FAIL_CHECK},
-            ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuResult.class),
+            ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItemOutput.class, ComponentMenuResult.class),
     TRIGGER(2,
             new ConnectionSet[] {ConnectionSet.TICK},
             ComponentMenuResult.class);

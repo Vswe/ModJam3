@@ -37,7 +37,7 @@ public class CommandExecutor {
                 IInventory outputInventory = getInventory(command.getMenus().get(0));
                 if (outputInventory != null) {
                     Map<Integer, SlotSideTarget> validSlots = getValidSlots(command.getMenus().get(1), outputInventory);
-                    insertItems(outputInventory, validSlots);
+                    insertItems(command.getMenus().get(2), outputInventory, validSlots);
                 }
                 break;
         }
@@ -141,8 +141,6 @@ public class CommandExecutor {
     }
 
     private void getItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
-        ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
-
         for (SlotSideTarget slot : validSlots.values()) {
             ItemStack itemStack = inventory.getStackInSlot(slot.getSlot());
 
@@ -150,30 +148,41 @@ public class CommandExecutor {
                 continue;
             }
 
-            boolean whiteList = menuItem.useWhiteList();
-            boolean isItemValid = !whiteList;
-            int itemId = itemStack.itemID;
-            for (ItemSetting setting : menuItem.getSettings()) {
-                if (setting.getItem() != null) {
-                    if (setting.getItem().itemID == itemId && (setting.isFuzzy() || setting.getItem().getItemDamage() == itemStack.getItemDamage())) {
-                        isItemValid = whiteList;
-                        break;
-                    }
-                }
-            }
-
-            if (isItemValid) {
+            if (isItemValid(componentMenu, itemStack)) {
                 itemBuffer.add(new SlotStackInventoryHolder(itemStack, inventory, slot.getSlot()));
             }
         }
     }
 
-    private void insertItems(IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
+
+    private boolean isItemValid(ComponentMenu componentMenu, ItemStack itemStack)  {
+        ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
+
+        boolean whiteList = menuItem.useWhiteList();
+        boolean isItemValid = !whiteList;
+        int itemId = itemStack.itemID;
+        for (ItemSetting setting : menuItem.getSettings()) {
+            if (setting.getItem() != null) {
+                if (setting.getItem().itemID == itemId && (setting.isFuzzy() || setting.getItem().getItemDamage() == itemStack.getItemDamage())) {
+                    isItemValid = whiteList;
+                    break;
+                }
+            }
+        }
+        return isItemValid;
+    }
+
+    private void insertItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
 
         Iterator<SlotStackInventoryHolder> iterator = itemBuffer.iterator();
         while(iterator.hasNext()) {
             SlotStackInventoryHolder holder = iterator.next();
             ItemStack itemStack = holder.getItemStack();
+
+            if (!isItemValid(componentMenu, itemStack)) {
+                continue;
+            }
+
             for (SlotSideTarget slot : validSlots.values()) {
                 if (!isSlotValid(inventory, itemStack, slot, false)) {
                     continue;
