@@ -21,6 +21,8 @@ import java.util.List;
 
 
 public class GuiManager extends GuiContainer {
+    private static boolean disableInBoundsCheck;
+
     public GuiManager(TileEntityManager manager, InventoryPlayer player) {
         super(new ContainerManager(manager, player));
 
@@ -43,8 +45,11 @@ public class GuiManager extends GuiContainer {
     public static final int BUTTON_INNER_SRC_X = 230;
     public static final int BUTTON_INNER_SRC_Y = 0;
 
+    private static int Z_LEVEL_COMPONENT_DIFFERENCE = 100;
+
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
+
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         bindTexture(BACKGROUND_1);
@@ -64,17 +69,34 @@ public class GuiManager extends GuiContainer {
             drawTexture(button.getX(), button.getY(), GuiManager.BUTTON_SRC_X, GuiManager.BUTTON_SRC_Y + srcButtonY * GuiManager.BUTTON_SIZE_H, GuiManager.BUTTON_SIZE_W, GuiManager.BUTTON_SIZE_H);
             drawTexture(button.getX() + 1, button.getY() + 1, GuiManager.BUTTON_INNER_SRC_X, GuiManager.BUTTON_INNER_SRC_Y + i * GuiManager.BUTTON_INNER_SIZE_H, GuiManager.BUTTON_INNER_SIZE_W, GuiManager.BUTTON_INNER_SIZE_H);
         }
-        for (FlowComponent itemBase : manager.getFlowItems()) {
+
+
+        for (int i = 0; i < manager.getZLevelRenderingList().size(); i++) {
+            FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
+            GL11.glPushMatrix();
+            GL11.glTranslatef(0, 0, (manager.getZLevelRenderingList().size() - i) * Z_LEVEL_COMPONENT_DIFFERENCE);
             itemBase.draw(this, x, y);
+            GL11.glPopMatrix();
+            if (itemBase.isBeingMoved() || inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
+                disableInBoundsCheck = true;
+            }
         }
+        disableInBoundsCheck = false;
+
         for (TileEntityManager.Button button : manager.buttons) {
             if (inBounds(button.getX(), button.getY(), BUTTON_SIZE_W, BUTTON_SIZE_H, x, y)) {
                 drawMouseOver(button.getMouseOver(), x, y);
             }
         }
-        for (FlowComponent itemBase : manager.getFlowItems()) {
+
+        for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
             itemBase.drawMouseOver(this, x, y);
+            if (itemBase.isBeingMoved() || inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
+                disableInBoundsCheck = true;
+            }
         }
+        disableInBoundsCheck = false;
+
     }
 
     @Override
@@ -84,8 +106,13 @@ public class GuiManager extends GuiContainer {
         x -= guiLeft;
         y -= guiTop;
 
-        for (FlowComponent itemBase : manager.getFlowItems()) {
-            itemBase.onClick(x, y, button);
+        for (int i = 0; i < manager.getZLevelRenderingList().size(); i++) {
+            FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
+            if (itemBase.onClick(x, y, button)) {
+                manager.getZLevelRenderingList().remove(i);
+                manager.getZLevelRenderingList().add(0, itemBase);
+                break;
+            }
         }
 
 
@@ -110,7 +137,7 @@ public class GuiManager extends GuiContainer {
         x -= guiLeft;
         y -= guiTop;
 
-        for (FlowComponent itemBase : manager.getFlowItems()) {
+        for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
             itemBase.onDrag(x, y);
         }
     }
@@ -123,7 +150,7 @@ public class GuiManager extends GuiContainer {
         onClickButtonCheck(x, y, true);
 
         if (!manager.justSentServerComponentRemovalPacket) {
-            for (FlowComponent itemBase : manager.getFlowItems()) {
+            for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
                 itemBase.onRelease(x, y);
             }
         }
@@ -171,6 +198,7 @@ public class GuiManager extends GuiContainer {
         drawHoveringText(lst, x + guiLeft, y + guiTop, fontRenderer);
     }
 
+
     public void drawItemStack(ItemStack itemstack, int x, int y) {
         GL11.glPushMatrix();
 
@@ -180,7 +208,7 @@ public class GuiManager extends GuiContainer {
         GL11.glEnable(GL11.GL_COLOR_MATERIAL);
         GL11.glEnable(GL11.GL_LIGHTING);
 
-        itemRenderer.zLevel = 100.0F;
+        itemRenderer.zLevel = 50F;
         try {
             itemRenderer.renderItemAndEffectIntoGUI(this.fontRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
         }catch (Exception ex) {
@@ -202,6 +230,9 @@ public class GuiManager extends GuiContainer {
     }
 
     public static boolean inBounds(int leftX, int topY, int width, int height, int mX, int mY) {
+        if (disableInBoundsCheck) {
+            return false;
+        }
         return leftX <= mX && mX <= leftX + width && topY <= mY && mY <= topY + height;
     }
 
@@ -240,6 +271,7 @@ public class GuiManager extends GuiContainer {
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glColor4f(0.4F, 0.4F, 0.4F, 1F);
 
+        GL11.glEnable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
         GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
         GL11.glLineWidth(5);
@@ -249,6 +281,7 @@ public class GuiManager extends GuiContainer {
         GL11.glVertex2i(guiLeft + x2, guiTop + y2);
         GL11.glEnd();
 
+        GL11.glDisable(GL11.GL_BLEND);
         GL11.glColor4f(1F, 1F, 1F, 1F);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glPopMatrix();

@@ -19,9 +19,11 @@ public class TileEntityManager extends TileEntity {
     private boolean isPowered;
     public List<Button> buttons;
     public boolean justSentServerComponentRemovalPacket;
+    private List<FlowComponent> zLevelRenderingList;
 
     public TileEntityManager() {
         items = new ArrayList<>();
+        zLevelRenderingList = new ArrayList<>();
         buttons = new ArrayList<>();
         removedIds = new ArrayList<>();
 
@@ -76,12 +78,22 @@ public class TileEntityManager extends TileEntity {
         removeFlowComponent(idToRemove, items);
         if (!worldObj.isRemote) {
             removedIds.add(idToRemove);
+        }else{
+            for (int i = 0; i < zLevelRenderingList.size(); i++) {
+                if (zLevelRenderingList.get(i).getId() == idToRemove) {
+                    zLevelRenderingList.remove(i);
+                }
+            }
         }
     }
 
 
     public List<FlowComponent> getFlowItems() {
         return items;
+    }
+
+    public List<FlowComponent> getZLevelRenderingList() {
+        return zLevelRenderingList;
     }
 
     List<TileEntity> inventories = new ArrayList<>();

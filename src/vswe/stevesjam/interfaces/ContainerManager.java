@@ -68,7 +68,7 @@ public class ContainerManager extends Container {
         oldIdIndexToRemove = jam.getRemovedIds().size();
     }
 
-    public TileEntityManager getJam() {
+    public TileEntityManager getManager() {
         return jam;
     }
 

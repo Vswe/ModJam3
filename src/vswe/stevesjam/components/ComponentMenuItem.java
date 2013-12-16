@@ -91,7 +91,7 @@ public class ComponentMenuItem extends ComponentMenu {
     private static final int TEXT_BOX_TEXT_Y = 3;
     private static final int CURSOR_X = 2;
     private static final int CURSOR_Y = 0;
-    private static final int CURSOR_Z = 200;
+    private static final int CURSOR_Z = 5;
     private static final int AMOUNT_TEXT_X = 75;
     private static final int AMOUNT_TEXT_Y = 9;
 

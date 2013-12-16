@@ -29,18 +29,18 @@ public class PacketHandler implements IPacketHandler {
 
             if (container != null && container.windowId == containerId && container instanceof ContainerManager) {
                 if (player instanceof EntityPlayerMP) {
-                    readComponentPacketFromDataReader(dr, ((ContainerManager) container).getJam());
+                    readComponentPacketFromDataReader(dr, ((ContainerManager) container).getManager());
                 }else {
                     ClientPacketHeader header = getHeaderFromId(dr.readData(DataBitHelper.CLIENT_HEADER));
                     switch (header) {
                         case ALL:
-                            readAllData(dr, ((ContainerManager) container).getJam());
+                            readAllData(dr, ((ContainerManager) container).getManager());
                             break;
                         case SPECIFIC:
-                            readComponentPacketFromDataReader(dr, ((ContainerManager) container).getJam());
+                            readComponentPacketFromDataReader(dr, ((ContainerManager) container).getManager());
                             break;
                         case NEW:
-                            readAllComponentData(dr, ((ContainerManager) container).getJam());
+                            readAllComponentData(dr, ((ContainerManager) container).getManager());
                     }
 
                 }
@@ -205,27 +205,29 @@ public class PacketHandler implements IPacketHandler {
         }
     }
 
-    private static void readAllData(DataReader dr, TileEntityManager jam){
-        jam.updateInventories();
+    private static void readAllData(DataReader dr, TileEntityManager manager){
+        manager.updateInventories();
         int flowControlCount = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
-        jam.getFlowItems().clear();
+        manager.getFlowItems().clear();
+        manager.getZLevelRenderingList().clear();
         for (int i = 0; i < flowControlCount; i++) {
-            readAllComponentData(dr, jam);
+            readAllComponentData(dr, manager);
         }
     }
 
-    private static void readAllComponentData(DataReader dr, TileEntityManager jam) {
+    private static void readAllComponentData(DataReader dr, TileEntityManager manager) {
         int x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
         int y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
         int id = dr.readData(DataBitHelper.FLOW_CONTROL_TYPE_ID);
 
-        FlowComponent flowComponent = new FlowComponent(jam, x, y, ComponentType.getTypeFromId(id));
+        FlowComponent flowComponent = new FlowComponent(manager, x, y, ComponentType.getTypeFromId(id));
 
         for (ComponentMenu menu : flowComponent.getMenus()) {
             menu.readData(dr);
         }
 
-        jam.getFlowItems().add(flowComponent);
+        manager.getFlowItems().add(flowComponent);
+        manager.getZLevelRenderingList().add(0, flowComponent);
     }
 
     public static DataWriter getButtonPacketWriter() {

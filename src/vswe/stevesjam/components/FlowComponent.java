@@ -98,6 +98,7 @@ public class FlowComponent implements IComponentNetworkReader {
     private Map<Integer, Connection> connections;
     private int currentInterval;
 
+
     public int getCurrentInterval() {
         return currentInterval;
     }
@@ -258,7 +259,7 @@ public class FlowComponent implements IComponentNetworkReader {
         }
     }
 
-    public void onClick(int mX, int mY, int button) {
+    public boolean onClick(int mX, int mY, int button) {
         if (GuiManager.inBounds(x, y, getComponentWidth(), getComponentHeight(), mX, mY)) {
            int internalX = mX - x;
            int internalY = mY - y;
@@ -281,7 +282,7 @@ public class FlowComponent implements IComponentNetworkReader {
                             openMenuId = i;
                         }
 
-                        return;
+                        return true;
                     }
 
                     if (i == openMenuId) {
@@ -290,6 +291,7 @@ public class FlowComponent implements IComponentNetworkReader {
                 }
 
             }
+            return true;
         }else{
             int outputCount = 0;
             int inputCount = 0;
@@ -326,8 +328,12 @@ public class FlowComponent implements IComponentNetworkReader {
                             manager.setCurrentlyConnecting(null);
                         }
                     }
+
+                    return true;
                 }
             }
+
+            return false;
         }
     }
 
@@ -406,11 +412,11 @@ public class FlowComponent implements IComponentNetworkReader {
     }
 
 
-    private int getComponentWidth() {
+    public int getComponentWidth() {
         return isLarge ? COMPONENT_SIZE_LARGE_W : COMPONENT_SIZE_W;
     }
 
-    private int getComponentHeight() {
+    public int getComponentHeight() {
         return isLarge ? COMPONENT_SIZE_LARGE_H : COMPONENT_SIZE_H;
     }
 
