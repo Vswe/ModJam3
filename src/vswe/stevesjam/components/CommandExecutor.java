@@ -190,9 +190,13 @@ public class CommandExecutor {
     private void insertItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
         ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
 
+        List<OutputItemCounter> outputCounters = new ArrayList<>();
+
         Iterator<ItemBufferElement> bufferIterator = itemBuffer.iterator();
         while(bufferIterator.hasNext()) {
             ItemBufferElement itemBufferElement = bufferIterator.next();
+
+
             Iterator<SlotStackInventoryHolder> itemIterator = itemBufferElement.getHolders().iterator();
             while (itemIterator.hasNext()) {
                 SlotStackInventoryHolder holder = itemIterator.next();
@@ -200,10 +204,24 @@ public class CommandExecutor {
 
                 ItemSetting setting = isItemValid(componentMenu, itemStack);
 
-                if (menuItem.useWhiteList() == (setting == null)) {
+                if ((menuItem.useWhiteList() == (setting == null)) &&  (setting == null || !setting.isLimitedByAmount())) {
+                    System.out.println("Invalid: " + itemStack.toString());
                     continue;
                 }
+                System.out.println("Valid: " + itemStack.toString());
 
+                OutputItemCounter outputItemCounter = null;
+                for (OutputItemCounter e : outputCounters) {
+                    if (e.areSettingsSame(setting)) {
+                        outputItemCounter = e;
+                        break;
+                    }
+                }
+
+                if (outputItemCounter == null) {
+                    outputItemCounter = new OutputItemCounter(itemBuffer, inventory, setting, menuItem.useWhiteList());
+                    outputCounters.add(outputItemCounter);
+                }
 
                 for (SlotSideTarget slot : validSlots.values()) {
                     if (!isSlotValid(inventory, itemStack, slot, false)) {
@@ -216,7 +234,10 @@ public class CommandExecutor {
                         ItemStack temp = itemStack.copy();
                         int moveCount = Math.min(itemStack.stackSize, inventory.getInventoryStackLimit());
                         moveCount = itemBufferElement.retrieveItemCount(moveCount);
+                        moveCount = outputItemCounter.retrieveItemCount(moveCount);
                         if (moveCount > 0) {
+                            itemBufferElement.decreaseStackSize(moveCount);
+                            outputItemCounter.modifyStackSize(moveCount);
                             temp.stackSize = moveCount;
                             itemStack.stackSize -= moveCount;
                             inventory.setInventorySlotContents(slot.getSlot(), temp);
@@ -229,7 +250,10 @@ public class CommandExecutor {
                     }else if (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable()){
                         int moveCount = Math.min(itemStack.stackSize, Math.min(inventory.getInventoryStackLimit(), itemInSlot.getMaxStackSize()) - itemInSlot.stackSize);
                         moveCount = itemBufferElement.retrieveItemCount(moveCount);
+                        moveCount = outputItemCounter.retrieveItemCount(moveCount);
                         if (moveCount > 0) {
+                            itemBufferElement.decreaseStackSize(moveCount);
+                            outputItemCounter.modifyStackSize(moveCount);
                             itemInSlot.stackSize += moveCount;
                             itemStack.stackSize -= moveCount;
                             if (itemStack.stackSize == 0) {
