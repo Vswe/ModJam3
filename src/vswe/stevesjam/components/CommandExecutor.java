@@ -24,6 +24,8 @@ public class CommandExecutor {
     public void executeCommand(FlowComponent command) {
         switch (command.getType()) {
             case TRIGGER:
+                System.out.println();
+                System.out.println("START");
                 break;
 
             case INPUT:
@@ -57,8 +59,15 @@ public class CommandExecutor {
         List<TileEntity> inventories = jar.getConnectedInventories();
         int selected = menuInventory.getSelectedInventory();
 
+
         if (selected >= 0 && selected < inventories.size()) {
-            return  (IInventory)inventories.get(selected);
+            TileEntity tileEntity = inventories.get(selected);
+
+            if (tileEntity.isInvalid()) {
+                return null;
+            }
+
+            return  (IInventory)tileEntity;
         }else{
             return null;
         }
@@ -161,6 +170,7 @@ public class CommandExecutor {
     }
 
     private void insertItems(IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
+
         Iterator<SlotStackInventoryHolder> iterator = itemBuffer.iterator();
         while(iterator.hasNext()) {
             SlotStackInventoryHolder holder = iterator.next();

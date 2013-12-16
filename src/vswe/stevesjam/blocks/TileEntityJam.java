@@ -46,6 +46,10 @@ public class TileEntityJam extends TileEntity {
     public static final int MAX_CABLE_LENGTH = 64;
 
     public void updateInventories() {
+        if (!worldObj.isRemote)    {
+        System.out.println("Updated inventories");
+        }
+
         WorldCoordinate[] oldCoordinates = new WorldCoordinate[inventories.size()];
         for (int i = 0; i < oldCoordinates.length; i++) {
             TileEntity inventory = inventories.get(i);
@@ -142,8 +146,18 @@ public class TileEntityJam extends TileEntity {
 
 
     public void doStuff() {
+        boolean hasFixedInvalid = false;
         for (FlowComponent item : items) {
             if (item.getType() == ComponentType.TRIGGER) {
+                if (!hasFixedInvalid) {
+                    for (TileEntity inventory : inventories) {
+                        if (inventory.isInvalid()) {
+                            updateInventories();
+                            break;
+                        }
+                    }
+                    hasFixedInvalid = true;
+                }
                 new CommandExecutor(this).executeCommand(item);
             }
         }
