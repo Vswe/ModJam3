@@ -1,7 +1,6 @@
 package vswe.stevesjam.components;
 
 
-import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
@@ -77,7 +76,7 @@ public class ComponentMenuInterval extends ComponentMenu {
     }
 
     @Override
-    public void writeData(DataWriter dw, TileEntityJam jam) {
+    public void writeData(DataWriter dw) {
         int val = getInterval();
         if (val == 0) {
             val = 1;
@@ -87,7 +86,7 @@ public class ComponentMenuInterval extends ComponentMenu {
     }
 
     @Override
-    public void readData(DataReader dr, TileEntityJam jam) {
+    public void readData(DataReader dr) {
         setInterval(dr.readData(DataBitHelper.MENU_INTERVAL));
     }
 

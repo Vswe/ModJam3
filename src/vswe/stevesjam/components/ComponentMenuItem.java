@@ -2,11 +2,9 @@ package vswe.stevesjam.components;
 
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatAllowedCharacters;
-import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
@@ -499,7 +497,7 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     @Override
-    public void writeData(DataWriter dw, TileEntityJam jam) {
+    public void writeData(DataWriter dw) {
         dw.writeBoolean(isFirstRadioButtonSelected());
         for (ItemSetting setting : settings) {
             dw.writeBoolean(setting.getItem() != null);
@@ -516,7 +514,7 @@ public class ComponentMenuItem extends ComponentMenu {
     }
 
     @Override
-    public void readData(DataReader dr, TileEntityJam jam) {
+    public void readData(DataReader dr) {
         setFirstRadioButtonSelected(dr.readBoolean());
         for (ItemSetting setting : settings) {
             if (!dr.readBoolean()) {

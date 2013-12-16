@@ -9,9 +9,6 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.world.World;
-import vswe.stevesjam.blocks.BlockCable;
-import vswe.stevesjam.blocks.Blocks;
 import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.components.ComponentMenu;
 import vswe.stevesjam.components.ComponentType;
@@ -26,14 +23,11 @@ public class PacketHandler implements IPacketHandler {
         DataReader dr = new DataReader(packet.data);
 
 
-            boolean useContainer = dr.readBoolean();
-            int containerId = 0;
-            if (useContainer) {
-                containerId = dr.readByte();
-            }
+            int containerId = dr.readByte();
+
             Container container = ((EntityPlayer)player).openContainer;
 
-            if (!useContainer || (container != null && container.windowId == containerId && container instanceof ContainerJam)) {
+            if (container != null && container.windowId == containerId && container instanceof ContainerJam) {
                 if (player instanceof EntityPlayerMP) {
                     readComponentPacketFromDataReader(dr, ((ContainerJam) container).getJam());
                 }else {
@@ -45,8 +39,8 @@ public class PacketHandler implements IPacketHandler {
                         case SPECIFIC:
                             readComponentPacketFromDataReader(dr, ((ContainerJam) container).getJam());
                             break;
-                        case BLOCK:
-                            //readBlockPacket(dr);
+                        case NEW:
+                            readAllComponentData(dr, ((ContainerJam) container).getJam());
                     }
 
                 }
@@ -81,7 +75,6 @@ public class PacketHandler implements IPacketHandler {
     public static void sendAllData(Container container, ICrafting crafting, TileEntityJam jam) {
         DataWriter dw = new DataWriter();
 
-        dw.writeBoolean(true);
         dw.writeByte(container.windowId);
         dw.writeData(ClientPacketHeader.ALL.id, DataBitHelper.CLIENT_HEADER);
         writeAllData(dw, jam);
@@ -89,18 +82,7 @@ public class PacketHandler implements IPacketHandler {
         sendDataToPlayer(crafting, dw);
     }
 
-    public static void sendBlockData(int x, int y, int z) {
-        DataWriter dw = new DataWriter();
 
-        dw.writeBoolean(false);
-        dw.writeData(ClientPacketHeader.BLOCK.id, DataBitHelper.CLIENT_HEADER);
-
-        dw.writeData(x, DataBitHelper.WORLD_COORDINATE);
-        dw.writeData(y, DataBitHelper.WORLD_COORDINATE);
-        dw.writeData(z, DataBitHelper.WORLD_COORDINATE);
-
-        dw.sendGlobalPlayerPacket();
-    }
 
    /* public static void readBlockPacket(DataReader dr) {
         int x = dr.readData(DataBitHelper.WORLD_COORDINATE);
@@ -116,7 +98,6 @@ public class PacketHandler implements IPacketHandler {
     private static DataWriter getWriterForSpecificData(Container container) {
         DataWriter dw = new DataWriter();
 
-        dw.writeBoolean(true);
         dw.writeByte(container.windowId);
         dw.writeData(ClientPacketHeader.SPECIFIC.id, DataBitHelper.CLIENT_HEADER);
 
@@ -129,7 +110,6 @@ public class PacketHandler implements IPacketHandler {
         if (container != null) {
             DataWriter dw = new DataWriter();
 
-            dw.writeBoolean(true);
             dw.writeByte(container.windowId);
 
             return dw;
@@ -157,6 +137,7 @@ public class PacketHandler implements IPacketHandler {
     public static void sendUpdateInventoryPacket(ContainerJam container) {
         DataWriter dw = PacketHandler.getWriterForSpecificData(container);
         createNonComponentPacket(dw);
+        dw.writeBoolean(true);
         sendDataToListeningClients(container, dw);
     }
 
@@ -182,7 +163,7 @@ public class PacketHandler implements IPacketHandler {
                 nr.readNetworkComponent(dr);
             }
         }else{
-            jam.updateInventories();
+            jam.readGenericData(dr);
         }
     }
 
@@ -210,13 +191,17 @@ public class PacketHandler implements IPacketHandler {
     private static void writeAllData(DataWriter dw, TileEntityJam jam){
        dw.writeData(jam.getFlowItems().size(), DataBitHelper.FLOW_CONTROL_COUNT);
         for (FlowComponent flowComponent : jam.getFlowItems()) {
-            dw.writeData(flowComponent.getX(), DataBitHelper.FLOW_CONTROL_X);
-            dw.writeData(flowComponent.getY(), DataBitHelper.FLOW_CONTROL_Y);
-            dw.writeData(flowComponent.getType().getId(), DataBitHelper.FLOW_CONTROL_TYPE_ID);
+            writeAllComponentData(dw, flowComponent);
+        }
+    }
 
-            for (ComponentMenu menu : flowComponent.getMenus()) {
-                menu.writeData(dw, jam);
-            }
+    private static void writeAllComponentData(DataWriter dw, FlowComponent flowComponent) {
+        dw.writeData(flowComponent.getX(), DataBitHelper.FLOW_CONTROL_X);
+        dw.writeData(flowComponent.getY(), DataBitHelper.FLOW_CONTROL_Y);
+        dw.writeData(flowComponent.getType().getId(), DataBitHelper.FLOW_CONTROL_TYPE_ID);
+
+        for (ComponentMenu menu : flowComponent.getMenus()) {
+            menu.writeData(dw);
         }
     }
 
@@ -225,24 +210,52 @@ public class PacketHandler implements IPacketHandler {
         int flowControlCount = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
         jam.getFlowItems().clear();
         for (int i = 0; i < flowControlCount; i++) {
-            int x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
-            int y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
-            int id = dr.readData(DataBitHelper.FLOW_CONTROL_TYPE_ID);
-
-            FlowComponent flowComponent = new FlowComponent(jam, x, y, ComponentType.getTypeFromId(id));
-
-            for (ComponentMenu menu : flowComponent.getMenus()) {
-                menu.readData(dr, jam);
-            }
-
-            jam.getFlowItems().add(flowComponent);
+            readAllComponentData(dr, jam);
         }
+    }
+
+    private static void readAllComponentData(DataReader dr, TileEntityJam jam) {
+        int x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
+        int y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+        int id = dr.readData(DataBitHelper.FLOW_CONTROL_TYPE_ID);
+
+        FlowComponent flowComponent = new FlowComponent(jam, x, y, ComponentType.getTypeFromId(id));
+
+        for (ComponentMenu menu : flowComponent.getMenus()) {
+            menu.readData(dr);
+        }
+
+        jam.getFlowItems().add(flowComponent);
+    }
+
+    public static DataWriter getButtonPacketWriter() {
+        DataWriter dw = getWriterForServerPacket();
+        createNonComponentPacket(dw);
+        return dw;
+    }
+
+    public static void sendNewFlowComponent(ContainerJam container, FlowComponent component) {
+        DataWriter dw = new DataWriter();
+
+        dw.writeByte(container.windowId);
+        dw.writeData(ClientPacketHeader.NEW.id, DataBitHelper.CLIENT_HEADER);
+
+        writeAllComponentData(dw, component);
+        PacketHandler.sendDataToListeningClients(container, dw);
+    }
+
+    public static void sendRemovalPacket(ContainerJam container, int idToRemove) {
+        DataWriter dw = PacketHandler.getWriterForSpecificData(container);
+        createNonComponentPacket(dw);
+        dw.writeBoolean(false);
+        dw.writeData(idToRemove, DataBitHelper.FLOW_CONTROL_COUNT);
+        sendDataToListeningClients(container, dw);
     }
 
     private enum ClientPacketHeader {
         ALL(0),
         SPECIFIC(1),
-        BLOCK(2);
+        NEW(2);
 
         private int id;
 

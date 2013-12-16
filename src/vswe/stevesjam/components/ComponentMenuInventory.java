@@ -5,7 +5,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
-import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
@@ -178,13 +177,13 @@ public class ComponentMenuInventory extends ComponentMenu {
     }
 
     @Override
-    public void writeData(DataWriter dw, TileEntityJam jam) {
+    public void writeData(DataWriter dw) {
         writeData(dw, selectedInventory);
     }
 
     @Override
-    public void readData(DataReader dr, TileEntityJam jam) {
-        readData(dr);
+    public void readData(DataReader dr) {
+        readTheData(dr);
     }
 
     @Override
@@ -207,10 +206,10 @@ public class ComponentMenuInventory extends ComponentMenu {
 
     @Override
     public void readNetworkComponent(DataReader dr) {
-        readData(dr);
+        readTheData(dr);
     }
 
-    private void readData(DataReader dr) {
+    private void readTheData(DataReader dr) {
         selectedInventory = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION) - 1;
     }
 

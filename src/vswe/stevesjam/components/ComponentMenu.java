@@ -38,8 +38,8 @@ public abstract class ComponentMenu implements IComponentNetworkReader {
         return parent;
     }
 
-    public abstract void writeData(DataWriter dw, TileEntityJam jam);
-    public abstract void readData(DataReader dr, TileEntityJam jam);
+    public abstract void writeData(DataWriter dw);
+    public abstract void readData(DataReader dr);
 
     protected DataWriter getWriterForServerComponentPacket() {
         return PacketHandler.getWriterForServerComponentPacket(getParent(), this);

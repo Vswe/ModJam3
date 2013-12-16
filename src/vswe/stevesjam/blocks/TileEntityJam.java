@@ -1,9 +1,11 @@
 package vswe.stevesjam.blocks;
 
 import net.minecraft.inventory.IInventory;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import vswe.stevesjam.components.*;
+import vswe.stevesjam.network.DataBitHelper;
+import vswe.stevesjam.network.DataReader;
+import vswe.stevesjam.network.DataWriter;
 
 import java.util.*;
 
@@ -13,25 +15,68 @@ public class TileEntityJam extends TileEntity {
     private List<FlowComponent> items;
     private Connection currentlyConnecting;
     private boolean isPowered;
+    public List<Button> buttons;
+    public boolean justSentServerComponentRemovalPacket;
 
     public TileEntityJam() {
         items = new ArrayList<>();
+        buttons = new ArrayList<>();
+        removedIds = new ArrayList<>();
+
+        for (int i = 0; i < ComponentType.values().length; i++) {
+            buttons.add(new ButtonCreate(ComponentType.values()[i]));
+        }
+
+        buttons.add(new Button("Delete [Drop command here]") {
+            @Override
+            protected void onClick(DataReader dr) {
+                int idToRemove = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+                removeFlowComponent(idToRemove);
+            }
+
+            @Override
+            public void onClick(DataWriter dw) {
+                justSentServerComponentRemovalPacket = true;
+                for (FlowComponent item : items) {
+                    if (item.isBeingMoved()) {
+                        dw.writeData(item.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public boolean activateOnRelease() {
+                return true;
+            }
+        });
+    }
+
+    private List<Integer> removedIds;
+
+    public void removeFlowComponent(int idToRemove, List<FlowComponent> items) {
+        for (int i =  items.size() - 1; i >= 0; i--) {
+            if (i == idToRemove) {
+                items.remove(i);
+            }else{
+                FlowComponent component = items.get(i);
+                if (i > idToRemove) {
+                    component.decreaseId();
+                }
+                component.updateConnectionIdsAtRemoval(idToRemove);
+            }
+        }
+
 
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
-        super.readFromNBT(par1NBTTagCompound);
-
-        items.add(new FlowComponent(this, 30, 30, ComponentType.OUTPUT));
-        items.add(new FlowComponent(this, 200, 30, ComponentType.INPUT));
-        items.add(new FlowComponent(this, 200, 80, ComponentType.TRIGGER));
-        items.add(new FlowComponent(this, 330, 30, ComponentType.CONDITION));
-        items.add(new FlowComponent(this, 400, 30, ComponentType.OUTPUT));
-        items.add(new FlowComponent(this, 100, 30, ComponentType.INPUT));
-        items.add(new FlowComponent(this, 100, 80, ComponentType.CONDITION));
-        items.add(new FlowComponent(this, 400, 80, ComponentType.TRIGGER));
+    public void removeFlowComponent(int idToRemove) {
+        removeFlowComponent(idToRemove, items);
+        if (!worldObj.isRemote) {
+            removedIds.add(idToRemove);
+        }
     }
+
 
     public List<FlowComponent> getFlowItems() {
         return items;
@@ -133,6 +178,7 @@ public class TileEntityJam extends TileEntity {
 
     @Override
     public void updateEntity() {
+        justSentServerComponentRemovalPacket = false;
         if (!worldObj.isRemote) {
             if (timer >= 20) {
                 timer = 0;
@@ -197,5 +243,80 @@ public class TileEntityJam extends TileEntity {
 
 
         this.isPowered = powered;
+    }
+
+    public void readGenericData(DataReader dr) {
+        if (worldObj.isRemote) {
+            if (dr.readBoolean()){
+                updateInventories();
+            }else{
+                removeFlowComponent(dr.readData(DataBitHelper.FLOW_CONTROL_COUNT));
+            }
+        }else{
+            int buttonId = dr.readData(DataBitHelper.GUI_BUTTON_ID);
+            if (buttonId >= 0 && buttonId < buttons.size()) {
+                buttons.get(buttonId).onClick(dr);
+            }
+        }
+    }
+
+
+
+    private TileEntityJam self = this;
+
+    public List<Integer> getRemovedIds() {
+        return removedIds;
+    }
+
+    public abstract class Button {
+        private int x;
+        private int y;
+        private String mouseOver;
+
+        protected Button(String mouseOver) {
+            this.x = 5;
+            this.y = 5 + buttons.size() * 18;
+            this.mouseOver = mouseOver;
+        }
+
+        protected abstract void onClick(DataReader dr);
+        public abstract void onClick(DataWriter dw);
+
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public String getMouseOver() {
+            return mouseOver;
+        }
+
+        public boolean activateOnRelease() {
+            return false;
+        }
+    }
+
+    private class ButtonCreate extends Button {
+
+        private ComponentType type;
+
+        protected ButtonCreate(ComponentType type) {
+            super("Create " + type.toString().charAt(0) + type.toString().toLowerCase().substring(1));
+
+            this.type = type;
+        }
+
+        @Override
+        protected void onClick(DataReader dr) {
+            getFlowItems().add(new FlowComponent(self, 50, 50, type));
+        }
+
+        @Override
+        public void onClick(DataWriter dw) {
+
+        }
     }
 }

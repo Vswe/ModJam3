@@ -555,4 +555,20 @@ public class FlowComponent implements IComponentNetworkReader {
     public Connection getConnection(int i) {
         return connections.get(i);
     }
+
+    public boolean isBeingMoved() {
+        return isDragging;
+    }
+
+    public void decreaseId() {
+        id--;
+    }
+
+    public void updateConnectionIdsAtRemoval(int idToRemove) {
+        for (Connection connection : connections.values()) {
+            if (connection.getComponentId() > idToRemove) {
+                connection.setComponentId(connection.getComponentId() - 1);
+            }
+        }
+    }
 }

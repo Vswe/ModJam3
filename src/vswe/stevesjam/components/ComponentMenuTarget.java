@@ -3,7 +3,6 @@ package vswe.stevesjam.components;
 
 import net.minecraftforge.common.ForgeDirection;
 import org.lwjgl.opengl.GL11;
-import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
@@ -252,7 +251,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     @Override
-    public void writeData(DataWriter dw, TileEntityJam jam) {
+    public void writeData(DataWriter dw) {
         for (int i = 0; i < directions.length; i++) {
             dw.writeBoolean(isActive(i));
             dw.writeBoolean(useRange(i));
@@ -265,7 +264,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
     @Override
-    public void readData(DataReader dr, TileEntityJam jam) {
+    public void readData(DataReader dr) {
         for (int i = 0; i < directions.length; i++) {
 
             activatedDirections[i] = dr.readBoolean();

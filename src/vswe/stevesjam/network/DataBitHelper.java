@@ -25,7 +25,8 @@ public enum DataBitHelper {
     CONNECTION_ID(3),
 
     CLIENT_HEADER(2),
-    WORLD_COORDINATE(32);
+    WORLD_COORDINATE(32),
+    GUI_BUTTON_ID(3);
 
 
 

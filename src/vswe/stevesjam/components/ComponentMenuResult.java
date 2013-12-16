@@ -1,7 +1,6 @@
 package vswe.stevesjam.components;
 
 
-import vswe.stevesjam.blocks.TileEntityJam;
 import vswe.stevesjam.interfaces.ContainerJam;
 import vswe.stevesjam.interfaces.GuiJam;
 import vswe.stevesjam.network.DataBitHelper;
@@ -77,13 +76,13 @@ public class ComponentMenuResult extends ComponentMenu {
     }
 
     @Override
-    public void writeData(DataWriter dw, TileEntityJam jam) {
+    public void writeData(DataWriter dw) {
         writeData(dw, radioButtons.getSelectedOption());
     }
 
     @Override
-    public void readData(DataReader dr, TileEntityJam jam) {
-        readData(dr);
+    public void readData(DataReader dr) {
+        readTheData(dr);
     }
 
     @Override
@@ -107,10 +106,10 @@ public class ComponentMenuResult extends ComponentMenu {
 
     @Override
     public void readNetworkComponent(DataReader dr) {
-        readData(dr);
+        readTheData(dr);
     }
 
-    private void readData(DataReader dr) {
+    private void readTheData(DataReader dr) {
         radioButtons.setSelectedOption(dr.readData(DataBitHelper.MENU_CONNECTION_TYPE_ID));
         getParent().setConnectionSet(sets[radioButtons.getSelectedOption()]);
     }

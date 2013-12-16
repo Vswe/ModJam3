@@ -12,7 +12,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import vswe.stevesjam.StevesJam;
 import vswe.stevesjam.blocks.TileEntityJam;
+import vswe.stevesjam.components.ComponentType;
 import vswe.stevesjam.components.FlowComponent;
+import vswe.stevesjam.network.DataBitHelper;
+import vswe.stevesjam.network.DataWriter;
+import vswe.stevesjam.network.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +38,15 @@ public class GuiJam extends GuiContainer {
     private static final ResourceLocation BACKGROUND_2 = registerTexture("Background2");
     private static final ResourceLocation COMPONENTS = registerTexture("FlowComponents");
 
+    public static final int BUTTON_SIZE_W = 14;
+    public static final int BUTTON_SIZE_H = 14;
+    public static final int BUTTON_SRC_X = 242;
+    public static final int BUTTON_SRC_Y = 0;
+    public static final int BUTTON_INNER_SIZE_W = 12;
+    public static final int BUTTON_INNER_SIZE_H = 12;
+    public static final int BUTTON_INNER_SRC_X = 230;
+    public static final int BUTTON_INNER_SRC_Y = 0;
+
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -48,8 +61,20 @@ public class GuiJam extends GuiContainer {
         y -= guiTop;
 
         bindTexture(COMPONENTS);
+        for (int i = 0; i < jam.buttons.size(); i++) {
+            TileEntityJam.Button button = jam.buttons.get(i);
+            int srcButtonY = GuiJam.inBounds(button.getX(), button.getY(), GuiJam.BUTTON_SIZE_W, GuiJam.BUTTON_SIZE_H, x, y) ? 1 : 0;
+
+            drawTexture(button.getX(), button.getY(), GuiJam.BUTTON_SRC_X, GuiJam.BUTTON_SRC_Y + srcButtonY * GuiJam.BUTTON_SIZE_H, GuiJam.BUTTON_SIZE_W, GuiJam.BUTTON_SIZE_H);
+            drawTexture(button.getX() + 1, button.getY() + 1, GuiJam.BUTTON_INNER_SRC_X, GuiJam.BUTTON_INNER_SRC_Y + i * GuiJam.BUTTON_INNER_SIZE_H, GuiJam.BUTTON_INNER_SIZE_W, GuiJam.BUTTON_INNER_SIZE_H);
+        }
         for (FlowComponent itemBase : jam.getFlowItems()) {
             itemBase.draw(this, x, y);
+        }
+        for (TileEntityJam.Button button : jam.buttons) {
+            if (inBounds(button.getX(), button.getY(), BUTTON_SIZE_W, BUTTON_SIZE_H, x, y)) {
+                drawMouseOver(button.getMouseOver(), x, y);
+            }
         }
         for (FlowComponent itemBase : jam.getFlowItems()) {
             itemBase.drawMouseOver(this, x, y);
@@ -65,6 +90,22 @@ public class GuiJam extends GuiContainer {
 
         for (FlowComponent itemBase : jam.getFlowItems()) {
             itemBase.onClick(x, y, button);
+        }
+
+
+        onClickButtonCheck(x, y, false);
+    }
+
+    private void onClickButtonCheck(int x, int y, boolean release) {
+        for (int i = 0; i < jam.buttons.size(); i++) {
+            TileEntityJam.Button guiButton = jam.buttons.get(i);
+            if (inBounds(guiButton.getX(), guiButton.getY(), BUTTON_SIZE_W, BUTTON_SIZE_H, x, y) && guiButton.activateOnRelease() == release) {
+                DataWriter dw = PacketHandler.getButtonPacketWriter();
+                dw.writeData(i, DataBitHelper.GUI_BUTTON_ID);
+                guiButton.onClick(dw);
+                PacketHandler.sendDataToServer(dw);
+                break;
+            }
         }
     }
 
@@ -83,9 +124,14 @@ public class GuiJam extends GuiContainer {
         x -= guiLeft;
         y -= guiTop;
 
-        for (FlowComponent itemBase : jam.getFlowItems()) {
-            itemBase.onRelease(x, y);
+        onClickButtonCheck(x, y, true);
+
+        if (!jam.justSentServerComponentRemovalPacket) {
+            for (FlowComponent itemBase : jam.getFlowItems()) {
+                itemBase.onRelease(x, y);
+            }
         }
+
     }
 
 
@@ -211,4 +257,6 @@ public class GuiJam extends GuiContainer {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glPopMatrix();
     }
+
+
 }

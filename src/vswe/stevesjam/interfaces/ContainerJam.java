@@ -29,16 +29,28 @@ public class ContainerJam extends Container {
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
 
-
         if (oldComponents != null) {
-            for (int i = 0; i < jam.getFlowItems().size(); i++) {
-                oldComponents.get(i).refreshData(this, jam.getFlowItems().get(i));
+            if (oldIdIndexToRemove < jam.getRemovedIds().size()) {
+                int idToRemove = jam.getRemovedIds().get(oldIdIndexToRemove);
+                oldIdIndexToRemove++;
+                jam.removeFlowComponent(idToRemove, oldComponents);
+                PacketHandler.sendRemovalPacket(this, idToRemove);
             }
-        }
 
-        if (oldInventoryLength != jam.getConnectedInventories().size()) {
-            oldInventoryLength = jam.getConnectedInventories().size();
-            PacketHandler.sendUpdateInventoryPacket(this);
+
+            for (int i = 0; i < jam.getFlowItems().size(); i++) {
+                if (i >= oldComponents.size()) {
+                    PacketHandler.sendNewFlowComponent(this, jam.getFlowItems().get(i));
+                    oldComponents.add(jam.getFlowItems().get(i).copy());
+                }else{
+                    oldComponents.get(i).refreshData(this, jam.getFlowItems().get(i));
+                }
+            }
+
+            if (oldInventoryLength != jam.getConnectedInventories().size()) {
+                oldInventoryLength = jam.getConnectedInventories().size();
+                PacketHandler.sendUpdateInventoryPacket(this);
+            }
         }
     }
 
@@ -53,6 +65,7 @@ public class ContainerJam extends Container {
         }
         jam.updateInventories();
         oldInventoryLength = jam.getConnectedInventories().size();
+        oldIdIndexToRemove = jam.getRemovedIds().size();
     }
 
     public TileEntityJam getJam() {
@@ -61,6 +74,7 @@ public class ContainerJam extends Container {
 
     private List<FlowComponent> oldComponents;
     private int oldInventoryLength;
+    private int oldIdIndexToRemove;
 
     public List<ICrafting> getCrafters() {
         return crafters;
