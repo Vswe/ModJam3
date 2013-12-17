@@ -25,4 +25,8 @@ public class Connection {
     public void setConnectionId(int connectionId) {
         this.connectionId = connectionId;
     }
+
+    public Connection copy() {
+        return new Connection(this.componentId, this.connectionId);
+    }
 }

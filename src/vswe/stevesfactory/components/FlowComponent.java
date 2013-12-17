@@ -351,6 +351,7 @@ public class FlowComponent implements IComponentNetworkReader {
         }else{
             writeConnectionData(dw, id, false, 0, 0);
         }
+        connections.put(id, connection);
 
         PacketHandler.sendDataToServer(dw);
     }
@@ -559,7 +560,7 @@ public class FlowComponent implements IComponentNetworkReader {
             }
 
             if (newData.connections.get(i) != null && (connections.get(i) == null || newData.connections.get(i).getComponentId() != connections.get(i).getComponentId() || newData.connections.get(i).getConnectionId() != connections.get(i).getConnectionId())) {
-                connections.put(i, newData.connections.get(i));
+                connections.put(i, newData.connections.get(i).copy());
                 DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null);
                 writeConnectionData(dw, i, true, connections.get(i).getComponentId(), connections.get(i).getConnectionId());
                 PacketHandler.sendDataToListeningClients(container, dw);
