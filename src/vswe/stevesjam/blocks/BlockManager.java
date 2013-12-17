@@ -20,6 +20,7 @@ public class BlockManager extends BlockContainer {
         setUnlocalizedName(Blocks.MANAGER_NAME_TAG);
         setStepSound(Block.soundMetalFootstep);
         setCreativeTab(CreativeTabs.tabRedstone);
+        setHardness(2F);
     }
 
 

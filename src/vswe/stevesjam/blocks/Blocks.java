@@ -3,6 +3,9 @@ package vswe.stevesjam.blocks;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
 public final class Blocks {
 
@@ -37,6 +40,25 @@ public final class Blocks {
     }
 
     public static void addRecipes() {
+        GameRegistry.addRecipe(new ItemStack(blockManager),
+                "III",
+                "IRI",
+                "SPS",
+                'R', Block.blockRedstone,
+                'P', Block.pistonBase,
+                'I', Item.ingotIron,
+                'S', Block.stone
+        );
+
+        GameRegistry.addRecipe(new ItemStack(blockCable, 8),
+                "GPG",
+                "IRI",
+                "GPG",
+                'R', Item.redstone,
+                'G', Block.glass,
+                'I', Item.ingotIron,
+                'P', Block.pressurePlateIron
+        );
 
     }
 

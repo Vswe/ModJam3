@@ -20,6 +20,7 @@ public class BlockCable extends Block {
         setCreativeTab(CreativeTabs.tabRedstone);
         setStepSound(soundMetalFootstep);
         setUnlocalizedName(Blocks.CABLE_NAME_TAG);
+        setHardness(0.4F);
     }
 
 
