@@ -75,7 +75,14 @@ public class GuiManager extends GuiContainer {
             FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, (manager.getZLevelRenderingList().size() - i) * Z_LEVEL_COMPONENT_DIFFERENCE);
-            itemBase.draw(this, x, y);
+            try {
+                 itemBase.draw(this, x, y);
+            }catch (Exception ex) {
+                for (FlowComponent component : manager.getZLevelRenderingList()) {
+                    System.out.println(component.getId());
+                }
+                throw ex;
+            }
             GL11.glPopMatrix();
             if (itemBase.isBeingMoved() || inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
                 disableInBoundsCheck = true;

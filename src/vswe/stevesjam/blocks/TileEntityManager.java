@@ -64,10 +64,10 @@ public class TileEntityManager extends TileEntity {
                 items.remove(i);
             }else{
                 FlowComponent component = items.get(i);
+                component.updateConnectionIdsAtRemoval(idToRemove);
                 if (i > idToRemove) {
                     component.decreaseId();
                 }
-                component.updateConnectionIdsAtRemoval(idToRemove);
             }
         }
 
@@ -82,6 +82,7 @@ public class TileEntityManager extends TileEntity {
             for (int i = 0; i < zLevelRenderingList.size(); i++) {
                 if (zLevelRenderingList.get(i).getId() == idToRemove) {
                     zLevelRenderingList.remove(i);
+                    break;
                 }
             }
         }

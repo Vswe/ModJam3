@@ -582,9 +582,14 @@ public class FlowComponent implements IComponentNetworkReader {
     }
 
     public void updateConnectionIdsAtRemoval(int idToRemove) {
-        for (Connection connection : connections.values()) {
-            if (connection.getComponentId() > idToRemove) {
-                connection.setComponentId(connection.getComponentId() - 1);
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            Connection connection   = connections.get(i);
+            if (connection != null) {
+                if (connection.getComponentId() == idToRemove) {
+                    connections.remove(i);
+                }else if (connection.getComponentId() > idToRemove) {
+                    connection.setComponentId(connection.getComponentId() - 1);
+                }
             }
         }
     }
