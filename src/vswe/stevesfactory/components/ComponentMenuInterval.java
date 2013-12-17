@@ -1,0 +1,142 @@
+package vswe.stevesfactory.components;
+
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.interfaces.ContainerManager;
+import vswe.stevesfactory.interfaces.GuiManager;
+import vswe.stevesfactory.network.DataBitHelper;
+import vswe.stevesfactory.network.DataReader;
+import vswe.stevesfactory.network.DataWriter;
+import vswe.stevesfactory.network.PacketHandler;
+
+public class ComponentMenuInterval extends ComponentMenu {
+    public ComponentMenuInterval(FlowComponent parent) {
+        super(parent);
+
+        textBoxes = new TextBoxNumberList();
+        textBoxes.addTextBox(interval = new TextBoxNumber(TEXT_BOX_X, TEXT_BOX_Y, 3, true) {
+            @Override
+            public void onNumberChanged() {
+                DataWriter dw = getWriterForServerComponentPacket();
+                dw.writeData(getNumber(), DataBitHelper.MENU_INTERVAL);
+                PacketHandler.sendDataToServer(dw);
+            }
+        });
+
+        interval.setNumber(1);
+    }
+
+    private static final int TEXT_BOX_X = 15;
+    private static final int TEXT_BOX_Y = 35;
+    private static final int TEXT_X = 5;
+    private static final int TEXT_Y = 10;
+    private static final int TEXT_Y2 = 15;
+
+    private static final int TEXT_SECONDS_X = 60;
+    private static final int TEXT_SECOND_Y = 38;
+
+    @Override
+    public String getName() {
+        return "Interval";
+    }
+
+    private TextBoxNumberList textBoxes;
+    private TextBoxNumber interval;
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void draw(GuiManager gui, int mX, int mY) {
+        gui.drawString("Time between this command",TEXT_X, TEXT_Y, 0.7F, 0x404040);
+        gui.drawString("is triggered",TEXT_X, TEXT_Y2, 0.7F, 0x404040);
+        gui.drawString("second(s)",TEXT_SECONDS_X, TEXT_SECOND_Y, 0.7F, 0x404040);
+        textBoxes.draw(gui, mX, mY);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void drawMouseOver(GuiManager gui, int mX, int mY) {
+
+    }
+
+    @Override
+    public void onClick(int mX, int mY, int button) {
+        textBoxes.onClick(mX, mY, button);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public boolean onKeyStroke(GuiManager gui, char c, int k) {
+        return textBoxes.onKeyStroke(gui, c, k);
+    }
+
+    @Override
+    public void onDrag(int mX, int mY) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onRelease(int mX, int mY) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void writeData(DataWriter dw) {
+        int val = getInterval();
+        if (val == 0) {
+            val = 1;
+        }
+
+        dw.writeData(val, DataBitHelper.MENU_INTERVAL);
+    }
+
+    @Override
+    public void readData(DataReader dr) {
+        setInterval(dr.readData(DataBitHelper.MENU_INTERVAL));
+    }
+
+    @Override
+    public void copyFrom(ComponentMenu menu) {
+       setInterval(((ComponentMenuInterval)menu).getInterval());
+    }
+
+    @Override
+    public void refreshData(ContainerManager container, ComponentMenu newData) {
+        ComponentMenuInterval newDataInterval = (ComponentMenuInterval)newData;
+
+        if (newDataInterval.getInterval() != getInterval()) {
+            setInterval(newDataInterval.getInterval());
+
+            DataWriter dw = getWriterForClientComponentPacket(container);
+            dw.writeData(getInterval(), DataBitHelper.MENU_INTERVAL);
+            PacketHandler.sendDataToListeningClients(container, dw);
+        }
+}
+
+    @Override
+    public void readNetworkComponent(DataReader dr) {
+       setInterval(dr.readData(DataBitHelper.MENU_INTERVAL));
+    }
+
+    public int getInterval() {
+        return interval.getNumber();
+    }
+
+    public void setInterval(int val) {
+        interval.setNumber(val);
+    }
+
+    private static final String NBT_INTERVAL = "Interval";
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+       setInterval(nbtTagCompound.getShort(NBT_INTERVAL));
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        nbtTagCompound.setShort(NBT_INTERVAL, (short)getInterval());
+    }
+
+}
