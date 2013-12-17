@@ -105,7 +105,7 @@ public class ComponentMenuInventory extends ComponentMenu {
 
                     String str = name;
                     str += "\nX: " + te.xCoord + " Y: " + te.yCoord + " Z: " + te.zCoord;
-                    str += "\n" + gui.getManager().getDistanceFrom(te.xCoord + 0.5, te.yCoord + 0.5, te.zCoord + 0.5) + " block(s) way";
+                    str += "\n" + (int)Math.round(Math.sqrt(gui.getManager().getDistanceFrom(te.xCoord + 0.5, te.yCoord + 0.5, te.zCoord + 0.5))) + " block(s) away";
 
 
                     gui.drawMouseOver(str, mX, mY);
