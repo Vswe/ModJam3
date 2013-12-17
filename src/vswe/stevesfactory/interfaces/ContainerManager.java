@@ -59,7 +59,7 @@ public class ContainerManager extends Container {
         super.addCraftingToCrafters(player);
 
         PacketHandler.sendAllData(this, player, jam);
-        oldComponents = new ArrayList<>();
+        oldComponents = new ArrayList<FlowComponent>();
         for (FlowComponent component : jam.getFlowItems()) {
             oldComponents.add(component.copy());
         }

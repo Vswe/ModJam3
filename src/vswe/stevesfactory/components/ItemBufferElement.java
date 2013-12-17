@@ -20,7 +20,7 @@ public class ItemBufferElement {
         this.component = owner;
         this.setting = setting;
         this.useWhiteList = useWhiteList;
-        holders = new ArrayList<>();
+        holders = new ArrayList<SlotStackInventoryHolder>();
         addTarget(target);
     }
 

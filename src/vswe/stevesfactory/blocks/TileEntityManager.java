@@ -30,10 +30,10 @@ public class TileEntityManager extends TileEntity {
     private List<FlowComponent> zLevelRenderingList;
 
     public TileEntityManager() {
-        items = new ArrayList<>();
-        zLevelRenderingList = new ArrayList<>();
-        buttons = new ArrayList<>();
-        removedIds = new ArrayList<>();
+        items = new ArrayList<FlowComponent>();
+        zLevelRenderingList = new ArrayList<FlowComponent>();
+        buttons = new ArrayList<Button>();
+        removedIds = new ArrayList<Integer>();
 
         for (int i = 0; i < ComponentType.values().length; i++) {
             buttons.add(new ButtonCreate(ComponentType.values()[i]));
@@ -105,7 +105,7 @@ public class TileEntityManager extends TileEntity {
         return zLevelRenderingList;
     }
 
-    List<TileEntity> inventories = new ArrayList<>();
+    List<TileEntity> inventories = new ArrayList<TileEntity>();
     public List<TileEntity> getConnectedInventories() {
         return inventories;
     }
@@ -120,9 +120,9 @@ public class TileEntityManager extends TileEntity {
             oldCoordinates[i] = new WorldCoordinate(inventory.xCoord, inventory.yCoord, inventory.zCoord);
         }
 
-        List<WorldCoordinate> visited = new ArrayList<>();
+        List<WorldCoordinate> visited = new ArrayList<WorldCoordinate>();
         inventories.clear();
-        Queue<WorldCoordinate> queue = new PriorityQueue<>();
+        Queue<WorldCoordinate> queue = new PriorityQueue<WorldCoordinate>();
         WorldCoordinate start = new WorldCoordinate(xCoord, yCoord, zCoord, 0);
         queue.add(start);
         visited.add(start);

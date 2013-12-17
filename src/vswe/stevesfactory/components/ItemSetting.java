@@ -22,7 +22,7 @@ public class ItemSetting {
             return ComponentMenuItem.getToolTip(item);
         }
 
-        List<String> ret = new ArrayList<>();
+        List<String> ret = new ArrayList<String>();
 
         if (item == null) {
             ret.add("[No item selected]");

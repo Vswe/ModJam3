@@ -69,7 +69,7 @@ public class FlowComponent implements IComponentNetworkReader {
         this.manager = manager;
         this.id = manager.getFlowItems().size();
 
-        menus = new ArrayList<>();
+        menus = new ArrayList<ComponentMenu>();
         for (Class<? extends ComponentMenu> componentMenuClass : type.getClasses()) {
             try {
                 Constructor<? extends ComponentMenu> constructor = componentMenuClass.getConstructor(FlowComponent.class);
@@ -77,13 +77,13 @@ public class FlowComponent implements IComponentNetworkReader {
 
 
                 menus.add((ComponentMenu)obj);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
         openMenuId = -1;
-        connections = new HashMap<>();
+        connections = new HashMap<Integer, Connection>();
     }
 
     private int x;

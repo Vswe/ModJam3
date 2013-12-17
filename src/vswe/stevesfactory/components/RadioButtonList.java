@@ -21,7 +21,7 @@ public abstract class RadioButtonList {
     private int selectedOption;
 
     public RadioButtonList() {
-        radioButtonList = new ArrayList<>();
+        radioButtonList = new ArrayList<RadioButton>();
 
     }
     @SideOnly(Side.CLIENT)

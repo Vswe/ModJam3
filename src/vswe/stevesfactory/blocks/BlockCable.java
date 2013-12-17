@@ -53,9 +53,9 @@ public class BlockCable extends Block {
     }
 
     public void updateInventories(World world, int blockX, int blockY, int blockZ) {
-        List<WorldCoordinate> visited = new ArrayList<>();
+        List<WorldCoordinate> visited = new ArrayList<WorldCoordinate>();
 
-        Queue<WorldCoordinate> queue = new PriorityQueue<>();
+        Queue<WorldCoordinate> queue = new PriorityQueue<WorldCoordinate>();
         WorldCoordinate start = new WorldCoordinate(blockX, blockY, blockZ, 0);
         queue.add(start);
         visited.add(start);

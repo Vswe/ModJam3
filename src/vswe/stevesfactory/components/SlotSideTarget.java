@@ -11,7 +11,7 @@ public class SlotSideTarget {
 
     public SlotSideTarget(int slot, int side) {
         this.slot = slot;
-        sides = new ArrayList<>();
+        sides = new ArrayList<Integer>();
         sides.add(side);
     }
 

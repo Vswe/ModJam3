@@ -21,7 +21,7 @@ public class TextBoxNumberList {
     private TextBoxNumber selectedTextBox;
 
     public TextBoxNumberList() {
-        textBoxes = new ArrayList<>();
+        textBoxes = new ArrayList<TextBoxNumber>();
     }
     @SideOnly(Side.CLIENT)
     public void draw(GuiManager gui, int mX, int mY) {

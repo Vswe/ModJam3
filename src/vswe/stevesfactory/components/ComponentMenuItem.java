@@ -29,8 +29,8 @@ public class ComponentMenuItem extends ComponentMenu {
         super(parent);
 
         text = "";
-        result = new ArrayList<>();
-        settings = new ArrayList<>();
+        result = new ArrayList<ItemStack>();
+        settings = new ArrayList<ItemSetting>();
         for (int i = 0; i < 30; i++) {
             settings.add(new ItemSetting(i));
         }
@@ -369,7 +369,7 @@ public class ComponentMenuItem extends ComponentMenu {
 
 
     private List<Point> getItemCoordinates() {
-        List<Point> points = new ArrayList<>();
+        List<Point> points = new ArrayList<Point>();
 
         int start = getFirstRow();
         for (int row = start; row < start + VISIBLE_ROWS + 1; row++) {
@@ -851,7 +851,7 @@ public class ComponentMenuItem extends ComponentMenu {
             return itemStack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
         }catch (Exception ex) {
             if (itemStack.getItemDamage() == 0) {
-                return new ArrayList<>();
+                return new ArrayList<String>();
             }else{
                 ItemStack newItem = itemStack.copy();
                 newItem.setItemDamage(0);

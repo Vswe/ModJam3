@@ -17,7 +17,7 @@ public class CommandExecutor {
 
     public CommandExecutor(TileEntityManager manager) {
         this.manager = manager;
-        itemBuffer = new ArrayList<>();
+        itemBuffer = new ArrayList<ItemBufferElement>();
     }
 
     public void executeTriggerCommand(FlowComponent command, EnumSet<ConnectionOption> validTriggerOutputs) {
@@ -87,7 +87,7 @@ public class CommandExecutor {
     private Map<Integer, SlotSideTarget> getValidSlots(ComponentMenu componentMenu, IInventory inventory) {
         ComponentMenuTarget menuTarget = (ComponentMenuTarget)componentMenu;
 
-        Map<Integer, SlotSideTarget> validSlots = new HashMap<>();
+        Map<Integer, SlotSideTarget> validSlots = new HashMap<Integer, SlotSideTarget>();
         for (int side = 0; side < ComponentMenuTarget.directions.length; side++) {
             if (menuTarget.isActive(side)) {
                 int[] inventoryValidSlots;
@@ -203,7 +203,7 @@ public class CommandExecutor {
     private void insertItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
         ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
 
-        List<OutputItemCounter> outputCounters = new ArrayList<>();
+        List<OutputItemCounter> outputCounters = new ArrayList<OutputItemCounter>();
 
         Iterator<ItemBufferElement> bufferIterator = itemBuffer.iterator();
         while(bufferIterator.hasNext()) {
@@ -288,7 +288,7 @@ public class CommandExecutor {
     private boolean searchForItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
         ComponentMenuItemCondition menuItem = (ComponentMenuItemCondition)componentMenu;
 
-        Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<>();
+        Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<Integer, ConditionSettingChecker>();
 
         for (SlotSideTarget slot : validSlots.values()) {
             ItemStack itemStack = inventory.getStackInSlot(slot.getSlot());
