@@ -103,6 +103,7 @@ public class TileEntityManager extends TileEntity {
     }
 
     public static final int MAX_CABLE_LENGTH = 64;
+    public static final int MAX_COMPONENT_AMOUNT = 127;
 
     public void updateInventories() {
         WorldCoordinate[] oldCoordinates = new WorldCoordinate[inventories.size()];
@@ -326,12 +327,23 @@ public class TileEntityManager extends TileEntity {
 
         @Override
         protected void onClick(DataReader dr) {
-            getFlowItems().add(new FlowComponent(self, 50, 50, type));
+            if (getFlowItems().size() < MAX_COMPONENT_AMOUNT) {
+                getFlowItems().add(new FlowComponent(self, 50, 50, type));
+            }
         }
 
         @Override
         public void onClick(DataWriter dw) {
 
+        }
+
+        @Override
+        public String getMouseOver() {
+            if (getFlowItems().size() == MAX_COMPONENT_AMOUNT) {
+                return "Maximum component amount reached";
+            }else{
+                return super.getMouseOver();
+            }
         }
     }
 

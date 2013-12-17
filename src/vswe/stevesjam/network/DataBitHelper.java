@@ -2,7 +2,7 @@ package vswe.stevesjam.network;
 
 
 public enum DataBitHelper {
-    FLOW_CONTROL_COUNT(6),
+    FLOW_CONTROL_COUNT(7),
     FLOW_CONTROL_X(9),
     FLOW_CONTROL_Y(8),
     FLOW_CONTROL_TYPE_ID(3),

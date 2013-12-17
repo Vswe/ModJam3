@@ -45,7 +45,7 @@ public class GuiManager extends GuiContainer {
     public static final int BUTTON_INNER_SRC_X = 230;
     public static final int BUTTON_INNER_SRC_Y = 0;
 
-    private static int Z_LEVEL_COMPONENT_DIFFERENCE = 100;
+    public static int Z_LEVEL_COMPONENT_DIFFERENCE = 100;
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
@@ -75,14 +75,9 @@ public class GuiManager extends GuiContainer {
             FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, (manager.getZLevelRenderingList().size() - i) * Z_LEVEL_COMPONENT_DIFFERENCE);
-            try {
-                 itemBase.draw(this, x, y);
-            }catch (Exception ex) {
-                for (FlowComponent component : manager.getZLevelRenderingList()) {
-                    System.out.println(component.getId());
-                }
-                throw ex;
-            }
+
+            itemBase.draw(this, x, y, i);
+
             GL11.glPopMatrix();
             if (itemBase.isBeingMoved() || inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
                 disableInBoundsCheck = true;
@@ -216,6 +211,8 @@ public class GuiManager extends GuiContainer {
         GL11.glEnable(GL11.GL_LIGHTING);
 
         itemRenderer.zLevel = 50F;
+
+
         try {
             itemRenderer.renderItemAndEffectIntoGUI(this.fontRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
         }catch (Exception ex) {
@@ -278,7 +275,8 @@ public class GuiManager extends GuiContainer {
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glColor4f(0.4F, 0.4F, 0.4F, 1F);
 
-        GL11.glEnable(GL11.GL_BLEND);
+        //GL11.glEnable(GL11.GL_BLEND);
+        //GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_DST_COLOR);
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
         GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
         GL11.glLineWidth(5);

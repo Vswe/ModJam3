@@ -142,7 +142,7 @@ public class FlowComponent implements IComponentNetworkReader {
         this.connectionSet = connectionSet;
     }
 
-    public void draw(GuiManager gui, int mX, int mY) {
+    public void draw(GuiManager gui, int mX, int mY, int zLevelIndex) {
         gui.drawTexture(x, y, isLarge ? COMPONENT_SRC_LARGE_X : COMPONENT_SRC_X, COMPONENT_SRC_Y, getComponentWidth(), getComponentHeight());
 
         int internalX = mX - x;
@@ -199,7 +199,10 @@ public class FlowComponent implements IComponentNetworkReader {
             if (connectedConnection != null && id < connectedConnection.getComponentId()) {
                 int[] otherLocation = manager.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
 
+                GL11.glPushMatrix();
+                GL11.glTranslatef(0, 0, (zLevelIndex - manager.getZLevelRenderingList().size()) * GuiManager.Z_LEVEL_COMPONENT_DIFFERENCE);
                 gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, otherLocation[0] + CONNECTION_SIZE_W / 2, otherLocation[1] + CONNECTION_SIZE_H / 2);
+                GL11.glPopMatrix();
             }
 
             gui.drawTexture(location[0], location[1], CONNECTION_SRC_X +  srcConnectionX * CONNECTION_SIZE_W, location[2], CONNECTION_SIZE_W, CONNECTION_SIZE_H);

@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import vswe.stevesjam.StevesJam;
 
@@ -37,11 +38,26 @@ public class BlockManager extends BlockContainer {
     }
 
 
-
+    private Icon sideIcon;
+    private Icon topIcon;
+    private Icon botIcon;
 
     @Override
     public void registerIcons(IconRegister register) {
-        blockIcon = register.registerIcon(StevesJam.RESOURCE_LOCATION + ":jam");
+        sideIcon = register.registerIcon(StevesJam.RESOURCE_LOCATION + ":manager_side");
+        topIcon = register.registerIcon(StevesJam.RESOURCE_LOCATION + ":manager_top");
+        botIcon = register.registerIcon(StevesJam.RESOURCE_LOCATION + ":manager_bot");
+    }
+
+    @Override
+    public Icon getIcon(int side, int meta) {
+        if (side == 0) {
+            return botIcon;
+        }else if(side == 1) {
+            return topIcon;
+        }else{
+            return sideIcon;
+        }
     }
 
     @Override
