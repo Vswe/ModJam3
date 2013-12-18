@@ -4,6 +4,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.components.*;
 import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataReader;
@@ -24,7 +25,7 @@ public class TileEntityManager extends TileEntity {
     public static final int BUTTON_INNER_SRC_Y = 0;
     private List<FlowComponent> items;
     private Connection currentlyConnecting;
-    private boolean isPowered;
+    private boolean[] isPowered;
     public List<Button> buttons;
     public boolean justSentServerComponentRemovalPacket;
     private List<FlowComponent> zLevelRenderingList;
@@ -34,6 +35,7 @@ public class TileEntityManager extends TileEntity {
         zLevelRenderingList = new ArrayList<FlowComponent>();
         buttons = new ArrayList<Button>();
         removedIds = new ArrayList<Integer>();
+        isPowered = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
 
         for (int i = 0; i < ComponentType.values().length; i++) {
             buttons.add(new ButtonCreate(ComponentType.values()[i]));
@@ -217,9 +219,10 @@ public class TileEntityManager extends TileEntity {
                                     item.setCurrentInterval(0);
 
                                     EnumSet<ConnectionOption> valid = EnumSet.of(ConnectionOption.INTERVAL);
-                                    if (isPowered) {
+                                    if (isTriggerPowered(item, true)) {
                                         valid.add(ConnectionOption.REDSTONE_HIGH);
-                                    }else{
+                                    }
+                                    if (isTriggerPowered(item, false)) {
                                         valid.add(ConnectionOption.REDSTONE_LOW);
                                     }
                                     activateTrigger(item, valid);
@@ -256,16 +259,65 @@ public class TileEntityManager extends TileEntity {
 
         new CommandExecutor(this).executeTriggerCommand(component, validTriggerOutputs);
     }
-
-
-    public void triggerRedstone(boolean powered) {
-        if (powered && !this.isPowered) {
-            activateTriggers(EnumSet.of(ConnectionOption.REDSTONE_PULSE_HIGH));
-        }else if (!powered && this.isPowered) {
-            activateTriggers(EnumSet.of(ConnectionOption.REDSTONE_PULSE_LOW));
+    private boolean isTriggerPowered(FlowComponent component, boolean high) {
+        return isTriggerPowered(component, isPowered, high);
+    }
+    private boolean isTriggerPowered(FlowComponent component, boolean[] currentPower, boolean high) {
+        ComponentMenuRedstone menuRedstone = (ComponentMenuRedstone)component.getMenus().get(1);
+        for (int i = 0; i < currentPower.length; i++) {
+            if (menuRedstone.isSideRequired(i)) {
+                if (currentPower[i] == high) {
+                    if (!menuRedstone.requireAll()) {
+                        return true;
+                    }
+                }else if (menuRedstone.requireAll()){
+                    return false;
+                }
+            }
         }
 
+        return menuRedstone.requireAll();
+    }
 
+
+    private boolean hasRedStoneFlipped(FlowComponent component, boolean[] newPower, boolean high) {
+        ComponentMenuRedstone menuRedstone = (ComponentMenuRedstone)component.getMenus().get(1);
+        for (int i = 0; i < isPowered.length; i++) {
+            if (menuRedstone.isSideRequired(i)) {
+                if ((high && !isPowered[i] && newPower[i]) || (!high && isPowered[i] && !newPower[i])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isPulseReceived(FlowComponent component, boolean[] newPower, boolean high) {
+        return hasRedStoneFlipped(component, newPower, high) && isTriggerPowered(component, newPower, high);
+    }
+
+    public void triggerRedstone() {
+        boolean[] powered = new boolean[isPowered.length];
+        for (int i = 0; i < powered.length; i++) {
+            ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[i];
+            powered[i] = worldObj.getIndirectPowerLevelTo(direction.offsetX + this.xCoord, direction.offsetY + this.yCoord, direction.offsetZ + this.zCoord, direction.getOpposite().ordinal()) > 0;
+        }
+
+        for (FlowComponent item : items) {
+            if (item.getType() == ComponentType.TRIGGER) {
+                if (isPulseReceived(item, powered, true)) {
+                    activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_HIGH));
+                }
+                if (isPulseReceived(item, powered, false)) {
+                    activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_LOW));
+                }
+            }
+        }
+
+        for (int i = 0; i < isPowered.length; i++) {
+            this.isPowered[i] = powered[i];
+        }
         this.isPowered = powered;
     }
 
@@ -355,7 +407,7 @@ public class TileEntityManager extends TileEntity {
         }
     }
 
-    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 0;
+    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 1;
     private static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
     private static final String NBT_POWERED = "IsPowered";
     private static final String NBT_TIMER = "Timer";
@@ -366,14 +418,26 @@ public class TileEntityManager extends TileEntity {
         super.readFromNBT(nbtTagCompound);
 
         int version =  nbtTagCompound.getByte(NBT_PROTOCOL_VERSION);
-        isPowered = nbtTagCompound.getBoolean(NBT_POWERED);
+
+        //there used to be just one redstone detection, not specific sides
+        if (version < 1) {
+            boolean powered = nbtTagCompound.getBoolean(NBT_POWERED);
+            for (int i = 0; i < isPowered.length; i++) {
+                isPowered[i] = powered;
+            }
+        }else{
+            byte powered = nbtTagCompound.getByte(NBT_POWERED);
+            for (int i = 0; i < isPowered.length; i++) {
+                isPowered[i] = (powered & (1 << i)) != 0;
+            }
+        }
         timer = nbtTagCompound.getByte(NBT_TIMER);
 
         NBTTagList components = nbtTagCompound.getTagList(NBT_COMPONENTS);
         for (int i = 0; i < components.tagCount(); i++) {
             NBTTagCompound component = (NBTTagCompound)components.tagAt(i);
 
-            items.add(FlowComponent.readFromNBT(this, component));
+            items.add(FlowComponent.readFromNBT(this, component, version));
         }
     }
 
@@ -382,7 +446,15 @@ public class TileEntityManager extends TileEntity {
         super.writeToNBT(nbtTagCompound);
 
         nbtTagCompound.setByte(NBT_PROTOCOL_VERSION, NBT_CURRENT_PROTOCOL_VERSION);
-        nbtTagCompound.setBoolean(NBT_POWERED, isPowered);
+
+        byte powered = 0;
+        for (int i = 0; i < isPowered.length; i++) {
+            if (isPowered[i]) {
+                powered |= 1 << i;
+            }
+        }
+        nbtTagCompound.setByte(NBT_POWERED, powered);
+
         nbtTagCompound.setByte(NBT_TIMER, (byte)timer);
 
         NBTTagList components = new NBTTagList();

@@ -1,6 +1,8 @@
 package vswe.stevesfactory.components;
 
 
+import java.util.List;
+
 public class ComponentMenuItemCondition extends ComponentMenuItem {
     public ComponentMenuItemCondition(FlowComponent parent) {
         super(parent);
@@ -15,5 +17,10 @@ public class ComponentMenuItemCondition extends ComponentMenuItem {
 
     public boolean requiresAll() {
         return isFirstRadioButtonSelected();
+    }
+
+    @Override
+    public void addErrors(List<String> errors) {
+
     }
 }

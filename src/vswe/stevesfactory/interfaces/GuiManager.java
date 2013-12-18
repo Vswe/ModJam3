@@ -181,6 +181,16 @@ public class GuiManager extends GuiContainer {
         GL11.glPopMatrix();
     }
 
+    public void drawSplitString(String str, int x, int y, int w, float mult, int color) {
+        GL11.glPushMatrix();
+        GL11.glScalef(mult, mult, 1F);
+        fontRenderer.drawSplitString(str, (int)((x + guiLeft) / mult), (int)((y + guiTop) / mult), (int)(w / mult), color);
+        bindTexture(COMPONENTS);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+        GL11.glPopMatrix();
+    }
+
     public void drawString(String str, int x, int y, int color) {
         drawString(str, x, y, 1F, color);
     }
@@ -203,11 +213,11 @@ public class GuiManager extends GuiContainer {
         GL11.glEnable(GL11.GL_COLOR_MATERIAL);
         GL11.glEnable(GL11.GL_LIGHTING);
 
-        itemRenderer.zLevel = 50F;
+        itemRenderer.zLevel = 1F;
 
 
         try {
-            itemRenderer.renderItemAndEffectIntoGUI(this.fontRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
+            ItemRenderHelper.renderItemIntoGUI(itemRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
         }catch (Exception ex) {
             if (itemstack.getItemDamage() != 0) {
                 ItemStack newStack = itemstack.copy();
@@ -277,6 +287,7 @@ public class GuiManager extends GuiContainer {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glPopMatrix();
     }
+
 
 
 }

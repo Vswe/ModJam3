@@ -17,6 +17,8 @@ public enum DataBitHelper {
 
     MENU_TARGET_DIRECTION_ID(3),
     MENU_TARGET_TYPE_HEADER(2),
+    MENU_REDSTONE_SETTING(6),
+
     BOOLEAN(1),
     EMPTY(0),
     MENU_ITEM_SETTING_ID(5),

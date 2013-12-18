@@ -4,7 +4,7 @@ package vswe.stevesfactory.components;
 public enum ComponentType {
     TRIGGER(0,
             new ConnectionSet[] {ConnectionSet.CONTINUOUSLY, ConnectionSet.REDSTONE},
-            ComponentMenuInterval.class, ComponentMenuResult.class),
+            ComponentMenuInterval.class, ComponentMenuRedstone.class, ComponentMenuResult.class),
     INPUT(1,
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItem.class, ComponentMenuResult.class),

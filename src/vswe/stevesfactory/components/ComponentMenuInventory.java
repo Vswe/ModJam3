@@ -253,4 +253,11 @@ public class ComponentMenuInventory extends ComponentMenu {
     public void writeToNBT(NBTTagCompound nbtTagCompound) {
        nbtTagCompound.setShort(NBT_SELECTION, (short)getSelectedInventory());
     }
+
+    @Override
+    public void addErrors(List<String> errors) {
+        if (selectedInventory == -1) {
+            errors.add("No inventory selected");
+        }
+    }
 }

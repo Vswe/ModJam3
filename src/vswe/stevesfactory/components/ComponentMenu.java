@@ -11,6 +11,8 @@ import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.IComponentNetworkReader;
 import vswe.stevesfactory.network.PacketHandler;
 
+import java.util.List;
+
 public abstract class ComponentMenu implements IComponentNetworkReader {
 
 
@@ -62,4 +64,9 @@ public abstract class ComponentMenu implements IComponentNetworkReader {
     public abstract void readFromNBT(NBTTagCompound nbtTagCompound);
     public abstract void writeToNBT(NBTTagCompound nbtTagCompound);
 
+    public void addErrors(List<String> errors) {}
+
+    public boolean isVisible() {
+        return true;
+    }
 }

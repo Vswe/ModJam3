@@ -72,6 +72,42 @@ public class ComponentMenuItem extends ComponentMenu {
 
         initRadioButtons();
 
+        checkBoxes = new CheckBoxList();
+
+        checkBoxes.addCheckBox(new CheckBox("Specify amount?", 5, 25) {
+            @Override
+            public void setValue(boolean val) {
+                selectedSetting.setLimitedByAmount(val);
+            }
+
+            @Override
+            public boolean getValue() {
+                return selectedSetting.isLimitedByAmount();
+            }
+
+            @Override
+            public void onUpdate() {
+                writeServerData(DataTypeHeader.USE_AMOUNT);
+            }
+        });
+
+        checkBoxes.addCheckBox(new CheckBox("Is detection fuzzy?", 5, 40) {
+                @Override
+                public void setValue(boolean val) {
+                    selectedSetting.setFuzzy(val);
+                }
+
+                @Override
+                public boolean getValue() {
+                    return selectedSetting.isFuzzy();
+                }
+
+                @Override
+                public void onUpdate() {
+                    writeServerData(DataTypeHeader.USE_FUZZY);
+                }
+         });
+
         updateScrolling();
     }
 
@@ -120,11 +156,7 @@ public class ComponentMenuItem extends ComponentMenu {
     private static final int EDIT_ITEM_X = 5;
     private static final int EDIT_ITEM_Y = 5;
 
-    private static final int CHECK_BOX_SIZE = 8;
-    private static final int CHECK_BOX_SRC_X = 42;
-    private static final int CHECK_BOX_SRC_Y = 106;
-    private static final int CHECK_BOX_TEXT_X = 12;
-    private static final int CHECK_BOX_TEXT_Y = 2;
+
 
     private static final int DMG_VAL_TEXT_X = 15;
     private static final int DMG_VAL_TEXT_Y = 55;
@@ -161,40 +193,7 @@ public class ComponentMenuItem extends ComponentMenu {
     private TextBoxNumber amountTextBox;
     private TextBoxNumber damageValueTextBox;
     protected RadioButtonList radioButtons;
-
-    private CheckBox[] checkBoxes = {new CheckBox("Specify amount?", 5, 25) {
-        @Override
-        public void setValue(boolean val) {
-            selectedSetting.setLimitedByAmount(val);
-        }
-
-        @Override
-        public boolean getValue() {
-            return selectedSetting.isLimitedByAmount();
-        }
-
-        @Override
-        public void onUpdate() {
-            writeServerData(DataTypeHeader.USE_AMOUNT);
-        }
-    },
-    new CheckBox("Is detection fuzzy?", 5, 40) {
-        @Override
-        public void setValue(boolean val) {
-            selectedSetting.setFuzzy(val);
-        }
-
-        @Override
-        public boolean getValue() {
-            return selectedSetting.isFuzzy();
-        }
-
-        @Override
-        public void onUpdate() {
-            writeServerData(DataTypeHeader.USE_FUZZY);
-        }
-    }};
-
+    private CheckBoxList checkBoxes;
 
     @Override
     public String getName() {
@@ -207,13 +206,7 @@ public class ComponentMenuItem extends ComponentMenu {
         if (isEditing()) {
             gui.drawItemStack(selectedSetting.getItem(), EDIT_ITEM_X, EDIT_ITEM_Y);
 
-            for (CheckBox checkBox : checkBoxes) {
-                int srcCheckBoxX = checkBox.getValue() ? 1 : 0;
-                int srcCheckBoxY = CollisionHelper.inBounds(checkBox.x, checkBox.y, CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY) ? 1 : 0;
-
-                gui.drawTexture(checkBox.x, checkBox.y, CHECK_BOX_SRC_X + srcCheckBoxX * CHECK_BOX_SIZE, CHECK_BOX_SRC_Y + srcCheckBoxY * CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE);
-                gui.drawString(checkBox.name, checkBox.x + CHECK_BOX_TEXT_X, checkBox.y + CHECK_BOX_TEXT_Y, 0.7F, 0x404040);
-            }
+            checkBoxes.draw(gui, mX, mY);
 
             if (!selectedSetting.isFuzzy()) {
                 gui.drawString("Damage value", DMG_VAL_TEXT_X, DMG_VAL_TEXT_Y, 0.7F, 0x404040);
@@ -390,13 +383,7 @@ public class ComponentMenuItem extends ComponentMenu {
     @Override
     public void onClick(int mX, int mY, int button) {
         if (isEditing()) {
-            for (CheckBox checkBox : checkBoxes) {
-                if (CollisionHelper.inBounds(checkBox.x, checkBox.y, CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY)) {
-                    checkBox.setValue(!checkBox.getValue());
-                    checkBox.onUpdate();
-                    break;
-                }
-            }
+            checkBoxes.onClick(mX, mY);
 
             numberTextBoxes.onClick(mX, mY, button);
 
@@ -830,20 +817,7 @@ public class ComponentMenuItem extends ComponentMenu {
         }
     }
 
-    private abstract class CheckBox {
-        int x, y;
-        String name;
 
-        private CheckBox( String name, int x, int y) {
-            this.x = x;
-            this.y = y;
-            this.name = name;
-        }
-
-        public abstract void setValue(boolean val);
-        public abstract boolean getValue();
-        public abstract void onUpdate();
-    }
 
     @SideOnly(Side.CLIENT)
     public static List<String> getToolTip(ItemStack itemStack) {
@@ -929,6 +903,18 @@ public class ComponentMenuItem extends ComponentMenu {
             }
         }
         nbtTagCompound.setTag(NBT_SETTINGS, settingTagList);
+    }
+
+    @Override
+    public void addErrors(List<String> errors) {
+        if (useWhiteList()) {
+            for (ItemSetting setting : settings) {
+                if (setting.getItem() != null) {
+                    return;
+                }
+            }
+            errors.add("The whitelist is empty");
+        }
     }
 }
 

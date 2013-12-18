@@ -15,6 +15,8 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
+import java.util.List;
+
 public class ComponentMenuTarget extends ComponentMenu {
 
 
@@ -434,4 +436,21 @@ public class ComponentMenuTarget extends ComponentMenu {
         nbtTagCompound.setTag(NBT_DIRECTIONS, directionTagList);
     }
 
+
+    @Override
+    public void addErrors(List<String> errors) {
+        for (int i = 0; i < directions.length; i++) {
+            if (isActive(i) && getStart(i) > getEnd(i)) {
+                errors.add("The " + directions[i].toString().charAt(0) + directions[i].toString().toLowerCase().substring(1) + " range is invalid");
+            }
+        }
+
+        for (int i = 0; i < directions.length; i++) {
+            if (isActive(i)) {
+                return;
+            }
+        }
+
+        errors.add("No direction is active");
+    }
 }

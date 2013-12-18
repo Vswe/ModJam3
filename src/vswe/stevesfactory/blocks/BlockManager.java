@@ -89,9 +89,9 @@ public class BlockManager extends BlockContainer {
         if (!world.isRemote) {
             TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
             if (tileEntity != null && tileEntity instanceof TileEntityManager) {
-                TileEntityManager jam = (TileEntityManager)tileEntity;
+                TileEntityManager manager = (TileEntityManager)tileEntity;
 
-                jam.triggerRedstone(world.isBlockIndirectlyGettingPowered(x, y, z));
+                manager.triggerRedstone();
             }
         }
     }

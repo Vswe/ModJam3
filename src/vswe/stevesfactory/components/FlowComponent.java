@@ -60,6 +60,12 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final int CONNECTION_SRC_X = 0;
     private static final int CONNECTION_SRC_Y = 58;
 
+    private static final int ERROR_X = 2;
+    private static final int ERROR_Y = 8;
+    private static final int ERROR_SIZE_W = 2;
+    private static final int ERROR_SIZE_H = 10;
+    private static final int ERROR_SRC_X = 62;
+    private static final int ERROR_SRC_Y = 20;
 
     public FlowComponent(TileEntityManager manager, int x, int y, ComponentType type) {
         this.x = x;
@@ -161,6 +167,14 @@ public class FlowComponent implements IComponentNetworkReader {
             for (int i = 0; i < menus.size(); i++) {
                 ComponentMenu menu = menus.get(i);
 
+                if (!menu.isVisible()) {
+                    if (openMenuId == i) {
+                        openMenuId = -1;
+                    }
+
+                    continue;
+                }
+
                 int itemX = getMenuAreaX();
                 int itemY = y + getMenuItemY(i);
                 gui.drawTexture(itemX, itemY, MENU_ITEM_SRC_X, MENU_ITEM_SRC_Y, MENU_ITEM_SIZE_W, MENU_ITEM_SIZE_H);
@@ -180,6 +194,8 @@ public class FlowComponent implements IComponentNetworkReader {
             }
         }
 
+
+        boolean hasConnection = false;
         int outputCount = 0;
         int inputCount = 0;
         for (int i = 0; i < connectionSet.getConnections().length; i++) {
@@ -200,20 +216,38 @@ public class FlowComponent implements IComponentNetworkReader {
             }
 
             Connection connectedConnection = connections.get(i);
-            if (connectedConnection != null && id < connectedConnection.getComponentId()) {
-                int[] otherLocation = manager.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
+            if (connectedConnection != null) {
+                hasConnection = true;
+                if (id < connectedConnection.getComponentId()) {
+                    int[] otherLocation = manager.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
 
-                GL11.glPushMatrix();
-                GL11.glTranslatef(0, 0, (zLevelIndex - manager.getZLevelRenderingList().size()) * GuiManager.Z_LEVEL_COMPONENT_DIFFERENCE);
-                gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, otherLocation[0] + CONNECTION_SIZE_W / 2, otherLocation[1] + CONNECTION_SIZE_H / 2);
-                GL11.glPopMatrix();
+                    GL11.glPushMatrix();
+                    GL11.glTranslatef(0, 0, (zLevelIndex - manager.getZLevelRenderingList().size()) * GuiManager.Z_LEVEL_COMPONENT_DIFFERENCE);
+                    gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, otherLocation[0] + CONNECTION_SIZE_W / 2, otherLocation[1] + CONNECTION_SIZE_H / 2);
+                    GL11.glPopMatrix();
+                }
             }
 
             gui.drawTexture(location[0], location[1], CONNECTION_SRC_X +  srcConnectionX * CONNECTION_SIZE_W, location[2], CONNECTION_SIZE_W, CONNECTION_SIZE_H);
+
+        }
+
+        errors.clear();
+        if (hasConnection) {
+            for (ComponentMenu menu : menus) {
+                menu.addErrors(errors);
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            int srcErrorY = CollisionHelper.inBounds(x + ERROR_X, y + ERROR_Y, ERROR_SIZE_W, ERROR_SIZE_H, mX, mY) ? 1 : 0;
+            gui.drawTexture(x + ERROR_X, y + ERROR_Y, ERROR_SRC_X, ERROR_SRC_Y + srcErrorY * ERROR_SIZE_H, ERROR_SIZE_W, ERROR_SIZE_H);
         }
 
         gui.drawString(getType().toString().charAt(0) + getType().toString().substring(1).toLowerCase(), x + 10, y + 10, 0.7F, 0x404040);
     }
+
+    List<String> errors = new ArrayList<String>();
 
     private int[] getConnectionLocationFromId(int id) {
         int outputCount = 0;
@@ -241,7 +275,7 @@ public class FlowComponent implements IComponentNetworkReader {
             for (int i = 0; i < menus.size(); i++) {
                 ComponentMenu menu = menus.get(i);
 
-                if (i == openMenuId) {
+                if (menu.isVisible() && i == openMenuId) {
                     GL11.glPushMatrix();
                     GL11.glTranslatef(getMenuAreaX(), getMenuAreaY(i), 0);
                     menu.drawMouseOver(gui, mX - getMenuAreaX(), mY - getMenuAreaY(i));
@@ -264,6 +298,19 @@ public class FlowComponent implements IComponentNetworkReader {
                 gui.drawMouseOver(connection.toString(), mX, mY);
             }
         }
+
+        if (!errors.isEmpty()) {
+            if (CollisionHelper.inBounds(x + ERROR_X, y + ERROR_Y, ERROR_SIZE_W, ERROR_SIZE_H, mX, mY)) {
+                String str = "";
+                for (int i = 0; i < errors.size(); i++) {
+                    if (i != 0) {
+                        str += "\n\n";
+                    }
+                    str += errors.get(i);
+                }
+                gui.drawMouseOver(str, mX, mY);
+            }
+        }
     }
 
     public boolean onClick(int mX, int mY, int button) {
@@ -282,18 +329,20 @@ public class FlowComponent implements IComponentNetworkReader {
                 for (int i = 0; i < menus.size(); i++) {
                     ComponentMenu menu = menus.get(i);
 
-                    if (inMenuArrowBounds(i, internalX, internalY)) {
-                        if (openMenuId == i) {
-                            openMenuId = -1;
-                        }else{
-                            openMenuId = i;
+                    if (menu.isVisible()) {
+                        if (inMenuArrowBounds(i, internalX, internalY)) {
+                            if (openMenuId == i) {
+                                openMenuId = -1;
+                            }else{
+                                openMenuId = i;
+                            }
+
+                            return true;
                         }
 
-                        return true;
-                    }
-
-                    if (i == openMenuId) {
-                        menu.onClick(mX - getMenuAreaX(), mY - getMenuAreaY(i), button);
+                        if (i == openMenuId) {
+                            menu.onClick(mX - getMenuAreaX(), mY - getMenuAreaY(i), button);
+                        }
                     }
                 }
 
@@ -405,11 +454,19 @@ public class FlowComponent implements IComponentNetworkReader {
         return CollisionHelper.inBounds(MENU_X + MENU_ARROW_X, getMenuItemY(i) + MENU_ARROW_Y, MENU_ARROW_SIZE_W, MENU_ARROW_SIZE_H, internalX, internalY);
     }
 
-    private int getMenuItemY(int i) {
-        int ret = MENU_Y + i * (MENU_ITEM_SIZE_H - 1);
-        if (openMenuId != -1 && openMenuId < i) {
-            ret += getMenuOpenSize() - 1;
+    private int getMenuItemY(int id) {
+
+
+        int ret = MENU_Y;
+        for (int i = 0; i < id; i++) {
+            if (menus.get(i).isVisible()) {
+                ret += MENU_ITEM_SIZE_H - 1;
+                if (openMenuId == i) {
+                    ret += getMenuOpenSize() - 1;
+                }
+            }
         }
+
 
         return ret;
     }
@@ -612,7 +669,7 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final String NBT_INTERVAL = "Interval";
     private static final String NBT_MENUS = "Menus";
 
-    public static FlowComponent readFromNBT(TileEntityManager jam, NBTTagCompound nbtTagCompound) {
+    public static FlowComponent readFromNBT(TileEntityManager jam, NBTTagCompound nbtTagCompound, int version) {
         int x = nbtTagCompound.getShort(NBT_POS_X);
         int y = nbtTagCompound.getShort(NBT_POS_Y);
         int typeId = nbtTagCompound.getByte(NBT_TYPE);
@@ -632,10 +689,17 @@ public class FlowComponent implements IComponentNetworkReader {
         }
 
         NBTTagList menuTagList = nbtTagCompound.getTagList(NBT_MENUS);
+        int menuId = 0;
         for (int i = 0; i < menuTagList.tagCount(); i++) {
             NBTTagCompound menuTag = (NBTTagCompound)menuTagList.tagAt(i);
 
-            component.menus.get(i).readFromNBT(menuTag);
+            //added an extra menu to the triggers
+            if (component.type == ComponentType.TRIGGER && i == 1 && version < 1) {
+                menuId++;
+            }
+
+            component.menus.get(menuId).readFromNBT(menuTag);
+            menuId++;
         }
 
         return component;
