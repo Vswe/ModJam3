@@ -4,8 +4,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public class GuiManager extends GuiContainer {
+public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer {
 
     public GuiManager(TileEntityManager manager, InventoryPlayer player) {
         super(new ContainerManager(manager, player));
@@ -96,6 +96,9 @@ public class GuiManager extends GuiContainer {
 
     @Override
     protected void mouseClicked(int x, int y, int button) {
+        x = scaleX(x);
+        y = scaleY(y);
+
         super.mouseClicked(x, y, button);
 
         x -= guiLeft;
@@ -129,6 +132,11 @@ public class GuiManager extends GuiContainer {
 
     @Override
     protected void mouseClickMove(int x, int y, int button, long ticks) {
+        x = scaleX(x);
+        y = scaleY(y);
+
+        super.mouseClickMove(x, y, button, ticks);
+
         x -= guiLeft;
         y -= guiTop;
 
@@ -139,6 +147,11 @@ public class GuiManager extends GuiContainer {
 
     @Override
     protected void mouseMovedOrUp(int x, int y, int button) {
+        x = scaleX(x);
+        y = scaleY(y);
+
+        super.mouseMovedOrUp(x, y, button);
+
         x -= guiLeft;
         y -= guiTop;
 
@@ -154,7 +167,33 @@ public class GuiManager extends GuiContainer {
 
 
     public void drawTexture(int x, int y, int srcX, int srcY, int w, int h) {
-        drawTexturedModalRect(guiLeft + x, guiTop + y, srcX, srcY, w, h);
+
+        float scale = getScale();
+        float fW = w / scale;
+        fW *= this.mc.displayWidth;
+        fW = (float)Math.floor(fW);
+        fW /= this.mc.displayWidth;
+        fW *= scale;
+
+        float fH = h / scale;
+        fH *= this.mc.displayHeight;
+        fH = (float)Math.floor(fH);
+        fH /= this.mc.displayHeight;
+        fH *= scale;
+
+        drawScaleFriendlyTexture(guiLeft + x, guiTop + y, srcX, srcY, fW, fH);
+    }
+
+    public void drawScaleFriendlyTexture(int x, int y, int srcX, int srcY, float w, float h) {
+        float f = 0.00390625F;
+        float f1 = 0.00390625F;
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.addVertexWithUV((double)(x + 0), (double)(y + h), (double)this.zLevel, (double)((float)(srcX + 0) * f), (double)((float)(srcY + h) * f1));
+        tessellator.addVertexWithUV((double)(x + w), (double)(y + h), (double)this.zLevel, (double)((float)(srcX + w) * f), (double)((float)(srcY + h) * f1));
+        tessellator.addVertexWithUV((double)(x + w), (double)(y + 0), (double)this.zLevel, (double)((float)(srcX + w) * f), (double)((float)(srcY + 0) * f1));
+        tessellator.addVertexWithUV((double)(x + 0), (double)(y + 0), (double)this.zLevel, (double)((float)(srcX + 0) * f), (double)((float)(srcY + 0) * f1));
+        tessellator.draw();
     }
 
     public static void bindTexture(ResourceLocation resource)  {
@@ -288,6 +327,65 @@ public class GuiManager extends GuiContainer {
         GL11.glPopMatrix();
     }
 
+    @Override
+    public void drawDefaultBackground() {
+        super.drawDefaultBackground();
 
+        startScaling();
+    }
+
+    @Override
+    public void drawScreen(int x, int y, float f) {
+
+        super.drawScreen(scaleX(x), scaleY(y), f);
+
+        stopScaling();
+    }
+
+    private void startScaling() {
+        //start scale
+        GL11.glPushMatrix();
+
+        float scale = getScale();
+
+        GL11.glScalef(scale, scale, 1);
+        GL11.glTranslatef(-guiLeft, -guiTop, 0.0F);
+        GL11.glTranslatef((this.width - this.xSize * scale) / (2 * scale), (this.height - this.ySize * scale) / (2 * scale), 0.0F);
+    }
+
+    private void stopScaling() {
+        //stop scale
+        GL11.glPopMatrix();
+    }
+
+    protected float getScale() {
+
+        net.minecraft.client.gui.ScaledResolution scaledresolution = new net.minecraft.client.gui.ScaledResolution(this.mc.gameSettings, this.mc.displayWidth, this.mc.displayHeight);
+        float w = scaledresolution.getScaledWidth() * 0.9F;
+        float h = scaledresolution.getScaledHeight() * 0.9F;
+        float multX = w / xSize;
+        float multY = h / ySize;
+        float mult = Math.min(multX, multY);
+        if (mult > 1F) {
+            mult = 1F;
+        }
+
+        return mult;
+    }
+
+    private int scaleX(float x) {
+        float scale = getScale();
+        x /= scale;
+        x += guiLeft;
+        x -= (this.width - this.xSize * scale) / (2 * scale);
+        return (int)x;
+    }
+    private int scaleY(float y) {
+        float scale = getScale();
+        y /= scale;
+        y += guiTop;
+        y -= (this.height - this.ySize * scale) / (2 * scale);
+        return (int)y;
+    }
 
 }

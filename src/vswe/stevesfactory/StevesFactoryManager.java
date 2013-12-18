@@ -12,7 +12,7 @@ import vswe.stevesfactory.configs.ConfigHandler;
 import vswe.stevesfactory.network.PacketHandler;
 import vswe.stevesfactory.proxy.CommonProxy;
 
-@Mod(modid = "StevesFactoryManager", name = "Steve's Factory Manager", version = "a3")
+@Mod(modid = "StevesFactoryManager", name = "Steve's Factory Manager", version = GeneratedInfo.version)
 @NetworkMod(channels = {StevesFactoryManager.CHANNEL}, clientSideRequired = true, serverSideRequired = false, packetHandler = PacketHandler.class)
 public class StevesFactoryManager {
 
