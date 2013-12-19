@@ -183,7 +183,7 @@ public class ComponentMenuRedstone extends ComponentMenu {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

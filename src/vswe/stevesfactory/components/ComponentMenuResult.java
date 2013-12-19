@@ -125,7 +125,7 @@ public class ComponentMenuResult extends ComponentMenu {
     private static final String NBT_SELECTED = "SelectedOption";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
         radioButtons.setSelectedOption(nbtTagCompound.getByte(NBT_SELECTED));
         getParent().setConnectionSet(sets[radioButtons.getSelectedOption()]);
     }

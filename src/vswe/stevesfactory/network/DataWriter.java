@@ -59,7 +59,7 @@ public class DataWriter {
     }
 
 
-    public void sendPlayerPacket(Player player){
+    void sendPlayerPacket(Player player){
         if (bitCountBuffer > 0) {
             stream.write(byteBuffer);
         }
@@ -67,7 +67,7 @@ public class DataWriter {
         PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()), player);
     }
 
-    public void sendServerPacket() {
+    void sendServerPacket() {
         if (bitCountBuffer > 0) {
             stream.write(byteBuffer);
         }
@@ -75,7 +75,7 @@ public class DataWriter {
         PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()));
     }
     
-    public void sendPlayerPackets(ContainerManager container) {
+    void sendPlayerPackets(ContainerManager container) {
         if (bitCountBuffer > 0) {
             stream.write(byteBuffer);
         }
@@ -88,7 +88,7 @@ public class DataWriter {
         }
     }
 
-    public void sendGlobalPlayerPacket() {
+    void sendGlobalPlayerPacket() {
         if (bitCountBuffer > 0) {
             stream.write(byteBuffer);
         }
@@ -96,7 +96,7 @@ public class DataWriter {
         PacketDispatcher.sendPacketToAllPlayers(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()));
     }
 
-    public void close() {
+    void close() {
         try {
             stream.close();
         }catch (IOException e) {

@@ -114,6 +114,9 @@ public class TileEntityManager extends TileEntity {
 
     public static final int MAX_CABLE_LENGTH = 64;
     public static final int MAX_COMPONENT_AMOUNT = 127;
+    public static final int MAX_CONNECTED_INVENTORIES = 1023;
+
+    private boolean firstInventoryUpdate = true;
 
     public void updateInventories() {
         WorldCoordinate[] oldCoordinates = new WorldCoordinate[inventories.size()];
@@ -138,7 +141,7 @@ public class TileEntityManager extends TileEntity {
                         if (Math.abs(x) + Math.abs(y) + Math.abs(z) == 1) {
                             WorldCoordinate target = new WorldCoordinate(element.getX() + x, element.getY() + y, element.getZ() + z, element.getDepth() + 1);
 
-                            if (!visited.contains(target)) {
+                            if (!visited.contains(target) && inventories.size() < MAX_CONNECTED_INVENTORIES) {
                                 visited.add(target);
                                 TileEntity tileEntity = worldObj.getBlockTileEntity(target.getX(), target.getY(), target.getZ());
                                 if (tileEntity != null && tileEntity instanceof IInventory) {
@@ -157,9 +160,11 @@ public class TileEntityManager extends TileEntity {
 
         }
 
-        if (!worldObj.isRemote) {
+        if (!worldObj.isRemote && !firstInventoryUpdate) {
             updateInventorySelection(oldCoordinates);
         }
+
+        firstInventoryUpdate = false;
     }
 
     private void updateInventorySelection(WorldCoordinate[] oldCoordinates) {
@@ -168,24 +173,30 @@ public class TileEntityManager extends TileEntity {
                 if (menu instanceof ComponentMenuInventory) {
                     ComponentMenuInventory menuInventory = (ComponentMenuInventory)menu;
 
-                    if (menuInventory.getSelectedInventory() >= 0 && menuInventory.getSelectedInventory() < oldCoordinates.length) {
-                        WorldCoordinate coordinate = oldCoordinates[menuInventory.getSelectedInventory()];
 
-                        boolean foundInventory = false;
-                        for (int i = 0; i < inventories.size(); i++) {
-                            TileEntity inventory = inventories.get(i);
-                            if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord) {
-                                foundInventory = true;
-                                menuInventory.setSelectedInventory(i);
-                                break;
+                    List<Integer> oldSelection = menuInventory.getSelectedInventories();
+                    List<Integer> newSelection = new ArrayList<Integer>();
+
+                    for (int i = 0; i < oldSelection.size(); i++) {
+                        int selection = oldSelection.get(i);
+                        if (selection >= 0 && selection < oldCoordinates.length) {
+                            WorldCoordinate coordinate = oldCoordinates[selection];
+
+                            for (int j = 0; j < inventories.size(); j++) {
+                                TileEntity inventory = inventories.get(j);
+                                if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord) {
+                                    if (!newSelection.contains(j)) {
+                                        newSelection.add(j);
+                                    }
+
+                                    break;
+                                }
                             }
-                        }
 
-                        if (!foundInventory) {
-                            menuInventory.setSelectedInventory(-1);
                         }
-
                     }
+
+                    menuInventory.setSelectedInventories(newSelection);
                 }
             }
         }
@@ -407,7 +418,7 @@ public class TileEntityManager extends TileEntity {
         }
     }
 
-    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 1;
+    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 2;
     private static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
     private static final String NBT_POWERED = "IsPowered";
     private static final String NBT_TIMER = "Timer";

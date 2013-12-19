@@ -21,6 +21,12 @@ public class ComponentMenuItemCondition extends ComponentMenuItem {
 
     @Override
     public void addErrors(List<String> errors) {
+        for (ItemSetting itemSetting : getSettings()) {
+            if (itemSetting.getItem() != null) {
+                return;
+            }
+        }
 
+        errors.add("No condition selected");
     }
 }

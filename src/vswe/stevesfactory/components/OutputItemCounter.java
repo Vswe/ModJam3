@@ -12,22 +12,32 @@ public class OutputItemCounter {
     private int currentInventoryStackSize;
     private int currentBufferStackSize;
 
-    public OutputItemCounter(List<ItemBufferElement> itemBuffer, IInventory inventory, ItemSetting setting, boolean useWhiteList) {
+    public OutputItemCounter(List<ItemBufferElement> itemBuffer, List<SlotInventoryHolder> inventories, IInventory inventory, ItemSetting setting, boolean useWhiteList) {
         this.setting = setting;
         this.useWhiteList = useWhiteList;
 
         if (setting != null && setting.getItem() != null && setting.isLimitedByAmount()) {
             if (useWhiteList) {
-                for (int i = 0; i < inventory.getSizeInventory(); i++) {
-                    ItemStack item = inventory.getStackInSlot(i);
-                    if (item != null && setting.getItem().itemID == item.itemID && (setting.isFuzzy() || setting.getItem().getItemDamage() == item.getItemDamage())) {
-                        currentInventoryStackSize += item.stackSize;
+                if (inventories.get(0).isShared()) {
+                    for (SlotInventoryHolder slotInventoryHolder : inventories) {
+                        addInventory(slotInventoryHolder.getInventory());
                     }
+                }else{
+                    addInventory(inventory);
                 }
             }else{
                 for (ItemBufferElement itemBufferElement : itemBuffer) {
                     currentBufferStackSize += itemBufferElement.getBufferSize(setting);
                 }
+            }
+        }
+    }
+
+    private void addInventory(IInventory inventory) {
+        for (int i = 0; i < inventory.getSizeInventory(); i++) {
+            ItemStack item = inventory.getStackInSlot(i);
+            if (item != null && setting.getItem().itemID == item.itemID && (setting.isFuzzy() || setting.getItem().getItemDamage() == item.getItemDamage())) {
+                currentInventoryStackSize += item.stackSize;
             }
         }
     }

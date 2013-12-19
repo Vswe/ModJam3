@@ -12,20 +12,22 @@ public class ItemBufferElement {
     private boolean useWhiteList;
     private int currentStackSize;
     private int totalStackSize;
+    private SlotInventoryHolder inventoryHolder;
 
     private List<SlotStackInventoryHolder> holders;
 
 
-    public ItemBufferElement(FlowComponent owner, ItemSetting setting, boolean useWhiteList, SlotStackInventoryHolder target) {
+    public ItemBufferElement(FlowComponent owner, ItemSetting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList, SlotStackInventoryHolder target) {
         this.component = owner;
         this.setting = setting;
+        this.inventoryHolder = inventoryHolder;
         this.useWhiteList = useWhiteList;
         holders = new ArrayList<SlotStackInventoryHolder>();
         addTarget(target);
     }
 
-    public boolean addTarget(FlowComponent owner, ItemSetting setting, SlotStackInventoryHolder target) {
-        if (component.getId() == owner.getId() && (this.setting == null || this.setting.getId() == setting.getId())) {
+    public boolean addTarget(FlowComponent owner, ItemSetting setting,  SlotInventoryHolder inventoryHolder, SlotStackInventoryHolder target) {
+        if (component.getId() == owner.getId() && (this.setting == null || this.setting.getId() == setting.getId()) && (this.inventoryHolder.isShared() || this.inventoryHolder.equals(inventoryHolder))) {
             addTarget(target);
             return true;
         }else{

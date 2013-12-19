@@ -13,7 +13,7 @@ public enum ComponentType {
             ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItemOutput.class, ComponentMenuResult.class),
     CONDITION(3,
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
-            ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItemCondition.class, ComponentMenuResult.class);
+            ComponentMenuInventoryCondition.class, ComponentMenuTarget.class, ComponentMenuItemCondition.class, ComponentMenuResult.class);
 
     private Class<? extends ComponentMenu>[] classes;
     private int id;

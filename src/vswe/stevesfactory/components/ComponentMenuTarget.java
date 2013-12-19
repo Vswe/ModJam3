@@ -408,7 +408,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     private static final String NBT_END = "EndRange";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
         NBTTagList directionTagList = nbtTagCompound.getTagList(NBT_DIRECTIONS);
 
         for (int i = 0; i < directionTagList.tagCount(); i++) {

@@ -130,7 +130,7 @@ public class ComponentMenuInterval extends ComponentMenu {
     private static final String NBT_INTERVAL = "Interval";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
        setInterval(nbtTagCompound.getShort(NBT_INTERVAL));
     }
 

@@ -19,23 +19,14 @@ public class SlotStackInventoryHolder {
         return itemStack;
     }
 
-    public void setItemStack(ItemStack itemStack) {
-        this.itemStack = itemStack;
-    }
 
     public IInventory getInventory() {
         return inventory;
     }
 
-    public void setInventory(IInventory inventory) {
-        this.inventory = inventory;
-    }
 
     public int getSlot() {
         return slot;
     }
 
-    public void setSlot(int slot) {
-        this.slot = slot;
-    }
 }

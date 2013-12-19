@@ -34,24 +34,24 @@ public class CommandExecutor {
     private void executeCommand(FlowComponent command) {
         switch (command.getType()) {
             case INPUT:
-                IInventory inputInventory = getInventory(command.getMenus().get(0));
+                List<SlotInventoryHolder> inputInventory = getInventories(command.getMenus().get(0));
                 if (inputInventory != null) {
-                    Map<Integer, SlotSideTarget> validSlots = getValidSlots(command.getMenus().get(1), inputInventory);
-                    getItems(command.getMenus().get(2), inputInventory, validSlots);
+                    getValidSlots(command.getMenus().get(1), inputInventory);
+                    getItems(command.getMenus().get(2), inputInventory);
                 }
                 break;
             case OUTPUT:
-                IInventory outputInventory = getInventory(command.getMenus().get(0));
+                List<SlotInventoryHolder> outputInventory = getInventories(command.getMenus().get(0));
                 if (outputInventory != null) {
-                    Map<Integer, SlotSideTarget> validSlots = getValidSlots(command.getMenus().get(1), outputInventory);
-                    insertItems(command.getMenus().get(2), outputInventory, validSlots);
+                    getValidSlots(command.getMenus().get(1), outputInventory);
+                    insertItems(command.getMenus().get(2), outputInventory);
                 }
                 break;
             case CONDITION:
-                IInventory conditionInventory = getInventory(command.getMenus().get(0));
+                List<SlotInventoryHolder> conditionInventory = getInventories(command.getMenus().get(0));
                 if (conditionInventory != null) {
-                    Map<Integer, SlotSideTarget> validSlots = getValidSlots(command.getMenus().get(1), conditionInventory);
-                    if (searchForItems(command.getMenus().get(2), conditionInventory, validSlots)) {
+                    getValidSlots(command.getMenus().get(1), conditionInventory);
+                    if (searchForItems(command.getMenus().get(2), conditionInventory)) {
                         executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
                     }else{
                         executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
@@ -64,70 +64,84 @@ public class CommandExecutor {
         executeTriggerCommand(command, EnumSet.allOf(ConnectionOption.class));
     }
 
-    private IInventory getInventory(ComponentMenu componentMenu) {
+    private List<SlotInventoryHolder> getInventories(ComponentMenu componentMenu) {
         ComponentMenuInventory menuInventory = (ComponentMenuInventory)componentMenu;
 
-        List<TileEntity> inventories = manager.getConnectedInventories();
-        int selected = menuInventory.getSelectedInventory();
-
-
-        if (selected >= 0 && selected < inventories.size()) {
-            TileEntity tileEntity = inventories.get(selected);
-
-            if (tileEntity.isInvalid()) {
-                return null;
-            }
-
-            return  (IInventory)tileEntity;
-        }else{
+        if (menuInventory.getSelectedInventories().size() == 0) {
             return null;
+        }
+
+        List<SlotInventoryHolder> ret = new ArrayList<SlotInventoryHolder>();
+
+        List<TileEntity> inventories = manager.getConnectedInventories();
+        for (int i = 0; i < menuInventory.getSelectedInventories().size(); i++) {
+            int selected = menuInventory.getSelectedInventories().get(i);
+
+            if (selected >= 0 && selected < inventories.size()) {
+                TileEntity tileEntity = inventories.get(selected);
+
+                if (tileEntity != null && tileEntity instanceof IInventory && !tileEntity.isInvalid()) {
+                    ret.add(new SlotInventoryHolder(tileEntity, menuInventory.getOption()));
+                }
+
+            }
+        }
+
+        if (ret.isEmpty()) {
+            return null;
+        }else{
+            return ret;
         }
     }
 
-    private Map<Integer, SlotSideTarget> getValidSlots(ComponentMenu componentMenu, IInventory inventory) {
+    private void getValidSlots(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories) {
         ComponentMenuTarget menuTarget = (ComponentMenuTarget)componentMenu;
 
-        Map<Integer, SlotSideTarget> validSlots = new HashMap<Integer, SlotSideTarget>();
-        for (int side = 0; side < ComponentMenuTarget.directions.length; side++) {
-            if (menuTarget.isActive(side)) {
-                int[] inventoryValidSlots;
-                if (inventory instanceof ISidedInventory) {
-                    inventoryValidSlots =  ((ISidedInventory) inventory).getAccessibleSlotsFromSide(side);
-                }else{
-                    inventoryValidSlots = new int[inventory.getSizeInventory()];
-                    for (int i = 0; i < inventoryValidSlots.length; i++) {
-                        inventoryValidSlots[i] = i;
+        for (int i = 0; i < inventories.size(); i++) {
+            IInventory inventory = inventories.get(i).getInventory();
+            Map<Integer, SlotSideTarget> validSlots = inventories.get(i).getValidSlots();
+
+            for (int side = 0; side < ComponentMenuTarget.directions.length; side++) {
+                if (menuTarget.isActive(side)) {
+                    int[] inventoryValidSlots;
+                    if (inventories instanceof ISidedInventory) {
+                        inventoryValidSlots =  ((ISidedInventory) inventories).getAccessibleSlotsFromSide(side);
+                    }else{
+                        inventoryValidSlots = new int[inventory.getSizeInventory()];
+                        for (int j = 0; j < inventoryValidSlots.length; j++) {
+                            inventoryValidSlots[j] = j;
+                        }
                     }
-                }
-                int start;
-                int end;
-                if (menuTarget.useRange(side)) {
-                    start = menuTarget.getStart(side);
-                    end = menuTarget.getEnd(side);
-                }else{
-                    start = 0;
-                    end = inventory.getSizeInventory();
-                }
+                    int start;
+                    int end;
+                    if (menuTarget.useRange(side)) {
+                        start = menuTarget.getStart(side);
+                        end = menuTarget.getEnd(side);
+                    }else{
+                        start = 0;
+                        end = inventory.getSizeInventory();
+                    }
 
-                if (start > end) {
-                    continue;
-                }
+                    if (start > end) {
+                        continue;
+                    }
 
 
-                for (int inventoryValidSlot : inventoryValidSlots) {
-                    if (inventoryValidSlot >= start && inventoryValidSlot <= end) {
-                        SlotSideTarget target = validSlots.get(inventoryValidSlot);
-                        if (target == null) {
-                            validSlots.put(inventoryValidSlot, new SlotSideTarget(inventoryValidSlot, side));
-                        }else{
-                            target.addSide(side);
+                    for (int inventoryValidSlot : inventoryValidSlots) {
+                        if (inventoryValidSlot >= start && inventoryValidSlot <= end) {
+                            SlotSideTarget target = validSlots.get(inventoryValidSlot);
+                            if (target == null) {
+                                validSlots.put(inventoryValidSlot, new SlotSideTarget(inventoryValidSlot, side));
+                            }else{
+                                target.addSide(side);
+                            }
                         }
                     }
                 }
             }
+
         }
 
-        return validSlots;
     }
 
     private boolean isSlotValid(IInventory inventory, ItemStack item, SlotSideTarget slot, boolean isInput) {
@@ -153,33 +167,36 @@ public class CommandExecutor {
         return isInput || inventory.isItemValidForSlot(slot.getSlot(), item);
     }
 
-    private void getItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
-        ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
-        for (SlotSideTarget slot : validSlots.values()) {
-            ItemStack itemStack = inventory.getStackInSlot(slot.getSlot());
+    private void getItems(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories) {
+        for (SlotInventoryHolder inventory : inventories) {
 
-            if (!isSlotValid(inventory, itemStack, slot, true)) {
-                continue;
-            }
+            ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
+            for (SlotSideTarget slot : inventory.getValidSlots().values()) {
+                ItemStack itemStack = inventory.getInventory().getStackInSlot(slot.getSlot());
 
-            ItemSetting setting = isItemValid(componentMenu, itemStack);
-            if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
-                FlowComponent owner = componentMenu.getParent();
-                SlotStackInventoryHolder target = new SlotStackInventoryHolder(itemStack, inventory, slot.getSlot());
+                if (!isSlotValid(inventory.getInventory(), itemStack, slot, true)) {
+                    continue;
+                }
 
-                boolean added = false;
-                for (ItemBufferElement itemBufferElement : itemBuffer) {
-                    if (itemBufferElement.addTarget(owner, setting, target)) {
-                        added = true;
-                        break;
+                ItemSetting setting = isItemValid(componentMenu, itemStack);
+                if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
+                    FlowComponent owner = componentMenu.getParent();
+                    SlotStackInventoryHolder target = new SlotStackInventoryHolder(itemStack, inventory.getInventory(), slot.getSlot());
+
+                    boolean added = false;
+                    for (ItemBufferElement itemBufferElement : itemBuffer) {
+                        if (itemBufferElement.addTarget(owner, setting, inventory, target)) {
+                            added = true;
+                            break;
+                        }
                     }
-                }
 
-                if (!added) {
-                    ItemBufferElement itemBufferElement = new ItemBufferElement(owner, setting, menuItem.useWhiteList(), target);
-                    itemBuffer.add(itemBufferElement);
-                }
+                    if (!added) {
+                        ItemBufferElement itemBufferElement = new ItemBufferElement(owner, setting, inventory, menuItem.useWhiteList(), target);
+                        itemBuffer.add(itemBufferElement);
+                    }
 
+                }
             }
         }
     }
@@ -200,81 +217,88 @@ public class CommandExecutor {
         return null;
     }
 
-    private void insertItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
+    private void insertItems(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories) {
         ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
 
         List<OutputItemCounter> outputCounters = new ArrayList<OutputItemCounter>();
+        for (SlotInventoryHolder inventoryHolder : inventories) {
+            if (!inventoryHolder.isShared()) {
+                outputCounters.clear();
+            }
 
-        Iterator<ItemBufferElement> bufferIterator = itemBuffer.iterator();
-        while(bufferIterator.hasNext()) {
-            ItemBufferElement itemBufferElement = bufferIterator.next();
+            IInventory inventory = inventoryHolder.getInventory();
+            Iterator<ItemBufferElement> bufferIterator = itemBuffer.iterator();
+            while(bufferIterator.hasNext()) {
+                ItemBufferElement itemBufferElement = bufferIterator.next();
 
 
-            Iterator<SlotStackInventoryHolder> itemIterator = itemBufferElement.getHolders().iterator();
-            while (itemIterator.hasNext()) {
-                SlotStackInventoryHolder holder = itemIterator.next();
-                ItemStack itemStack = holder.getItemStack();
+                Iterator<SlotStackInventoryHolder> itemIterator = itemBufferElement.getHolders().iterator();
+                while (itemIterator.hasNext()) {
+                    SlotStackInventoryHolder holder = itemIterator.next();
+                    ItemStack itemStack = holder.getItemStack();
 
-                ItemSetting setting = isItemValid(componentMenu, itemStack);
+                    ItemSetting setting = isItemValid(componentMenu, itemStack);
 
-                if ((menuItem.useWhiteList() == (setting == null)) &&  (setting == null || !setting.isLimitedByAmount())) {
-                    continue;
-                }
-
-                OutputItemCounter outputItemCounter = null;
-                for (OutputItemCounter e : outputCounters) {
-                    if (e.areSettingsSame(setting)) {
-                        outputItemCounter = e;
-                        break;
-                    }
-                }
-
-                if (outputItemCounter == null) {
-                    outputItemCounter = new OutputItemCounter(itemBuffer, inventory, setting, menuItem.useWhiteList());
-                    outputCounters.add(outputItemCounter);
-                }
-
-                for (SlotSideTarget slot : validSlots.values()) {
-                    if (!isSlotValid(inventory, itemStack, slot, false)) {
+                    if ((menuItem.useWhiteList() == (setting == null)) &&  (setting == null || !setting.isLimitedByAmount())) {
                         continue;
                     }
 
-                    ItemStack itemInSlot = inventory.getStackInSlot(slot.getSlot());
-
-                    if (itemInSlot == null) {
-                        ItemStack temp = itemStack.copy();
-                        int moveCount = Math.min(itemStack.stackSize, inventory.getInventoryStackLimit());
-                        moveCount = itemBufferElement.retrieveItemCount(moveCount);
-                        moveCount = outputItemCounter.retrieveItemCount(moveCount);
-                        if (moveCount > 0) {
-                            itemBufferElement.decreaseStackSize(moveCount);
-                            outputItemCounter.modifyStackSize(moveCount);
-                            temp.stackSize = moveCount;
-                            itemStack.stackSize -= moveCount;
-                            inventory.setInventorySlotContents(slot.getSlot(), temp);
-                            if (itemStack.stackSize == 0) {
-                                removeItemFromBuffer(holder);
-                                itemIterator.remove();
-                                break;
-                            }
+                    OutputItemCounter outputItemCounter = null;
+                    for (OutputItemCounter e : outputCounters) {
+                        if (e.areSettingsSame(setting)) {
+                            outputItemCounter = e;
+                            break;
                         }
-                    }else if (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable()){
-                        int moveCount = Math.min(itemStack.stackSize, Math.min(inventory.getInventoryStackLimit(), itemInSlot.getMaxStackSize()) - itemInSlot.stackSize);
-                        moveCount = itemBufferElement.retrieveItemCount(moveCount);
-                        moveCount = outputItemCounter.retrieveItemCount(moveCount);
-                        if (moveCount > 0) {
-                            itemBufferElement.decreaseStackSize(moveCount);
-                            outputItemCounter.modifyStackSize(moveCount);
-                            itemInSlot.stackSize += moveCount;
-                            itemStack.stackSize -= moveCount;
-                            if (itemStack.stackSize == 0) {
-                                removeItemFromBuffer(holder);
-                                itemIterator.remove();
-                                break;
+                    }
+
+                    if (outputItemCounter == null) {
+                        outputItemCounter = new OutputItemCounter(itemBuffer, inventories, inventory, setting, menuItem.useWhiteList());
+                        outputCounters.add(outputItemCounter);
+                    }
+
+                    for (SlotSideTarget slot : inventoryHolder.getValidSlots().values()) {
+                        if (!isSlotValid(inventory, itemStack, slot, false)) {
+                            continue;
+                        }
+
+                        ItemStack itemInSlot = inventory.getStackInSlot(slot.getSlot());
+
+                        if (itemInSlot == null) {
+                            ItemStack temp = itemStack.copy();
+                            int moveCount = Math.min(itemStack.stackSize, inventory.getInventoryStackLimit());
+                            moveCount = itemBufferElement.retrieveItemCount(moveCount);
+                            moveCount = outputItemCounter.retrieveItemCount(moveCount);
+                            if (moveCount > 0) {
+                                itemBufferElement.decreaseStackSize(moveCount);
+                                outputItemCounter.modifyStackSize(moveCount);
+                                temp.stackSize = moveCount;
+                                itemStack.stackSize -= moveCount;
+                                inventory.setInventorySlotContents(slot.getSlot(), temp);
+                                if (itemStack.stackSize == 0) {
+                                    removeItemFromBuffer(holder);
+                                    itemIterator.remove();
+                                    break;
+                                }
+                            }
+                        }else if (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable()){
+                            int moveCount = Math.min(itemStack.stackSize, Math.min(inventory.getInventoryStackLimit(), itemInSlot.getMaxStackSize()) - itemInSlot.stackSize);
+                            moveCount = itemBufferElement.retrieveItemCount(moveCount);
+                            moveCount = outputItemCounter.retrieveItemCount(moveCount);
+                            if (moveCount > 0) {
+                                itemBufferElement.decreaseStackSize(moveCount);
+                                outputItemCounter.modifyStackSize(moveCount);
+                                itemInSlot.stackSize += moveCount;
+                                itemStack.stackSize -= moveCount;
+                                if (itemStack.stackSize == 0) {
+                                    removeItemFromBuffer(holder);
+                                    itemIterator.remove();
+                                    break;
+                                }
                             }
                         }
                     }
                 }
+
             }
 
         }
@@ -285,15 +309,36 @@ public class CommandExecutor {
         holder.getInventory().setInventorySlotContents(holder.getSlot(), null);
     }
 
-    private boolean searchForItems(ComponentMenu componentMenu, IInventory inventory, Map<Integer, SlotSideTarget> validSlots) {
-        ComponentMenuItemCondition menuItem = (ComponentMenuItemCondition)componentMenu;
+    private boolean searchForItems(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories) {
+        if (inventories.get(0).isShared()) {
+            Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<Integer, ConditionSettingChecker>();
+            for (int i = 0; i < inventories.size(); i++) {
+                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap);
+            }
+            return checkConditionResult(componentMenu, conditionSettingCheckerMap);
+        }else{
+            boolean useAnd = inventories.get(0).getSharedOption() == 1;
+            for (int i = 0; i < inventories.size(); i++) {
+                Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<Integer, ConditionSettingChecker>();
+                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap);
 
-        Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<Integer, ConditionSettingChecker>();
+                if (checkConditionResult(componentMenu, conditionSettingCheckerMap)) {
+                    if (!useAnd) {
+                        return true;
+                    }
+                }else if (useAnd) {
+                    return false;
+                }
+            }
+            return useAnd;
+        }
+    }
 
-        for (SlotSideTarget slot : validSlots.values()) {
-            ItemStack itemStack = inventory.getStackInSlot(slot.getSlot());
+    private void calculateConditionData(ComponentMenu componentMenu, SlotInventoryHolder inventoryHolder, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
+        for (SlotSideTarget slot : inventoryHolder.getValidSlots().values()) {
+            ItemStack itemStack = inventoryHolder.getInventory().getStackInSlot(slot.getSlot());
 
-            if (!isSlotValid(inventory, itemStack, slot, true)) {
+            if (!isSlotValid(inventoryHolder.getInventory(), itemStack, slot, true)) {
                 continue;
             }
 
@@ -306,6 +351,10 @@ public class CommandExecutor {
                 conditionSettingChecker.addCount(itemStack.stackSize);
             }
         }
+    }
+
+    private boolean checkConditionResult(ComponentMenu componentMenu, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
+        ComponentMenuItemCondition menuItem = (ComponentMenuItemCondition)componentMenu;
 
         for (ItemSetting setting : menuItem.getSettings()) {
             if (setting.getItem() != null) {

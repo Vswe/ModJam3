@@ -13,7 +13,6 @@ import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.*;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -698,7 +697,7 @@ public class FlowComponent implements IComponentNetworkReader {
                 menuId++;
             }
 
-            component.menus.get(menuId).readFromNBT(menuTag);
+            component.menus.get(menuId).readFromNBT(menuTag, version);
             menuId++;
         }
 

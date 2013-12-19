@@ -167,32 +167,37 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
 
 
     public void drawTexture(int x, int y, int srcX, int srcY, int w, int h) {
-
         float scale = getScale();
-        float fW = w / scale;
-        fW *= this.mc.displayWidth;
-        fW = (float)Math.floor(fW);
-        fW /= this.mc.displayWidth;
-        fW *= scale;
 
-        float fH = h / scale;
-        fH *= this.mc.displayHeight;
-        fH = (float)Math.floor(fH);
-        fH /= this.mc.displayHeight;
-        fH *= scale;
-
-        drawScaleFriendlyTexture(guiLeft + x, guiTop + y, srcX, srcY, fW, fH);
+        drawScaleFriendlyTexture(
+                fixScaledCoordinate(guiLeft + x, scale, this.mc.displayWidth),
+                fixScaledCoordinate(guiTop + y, scale, this.mc.displayHeight),
+                fixScaledCoordinate(srcX, scale, 256),
+                fixScaledCoordinate(srcY, scale, 256),
+                fixScaledCoordinate(w, scale, this.mc.displayWidth),
+                fixScaledCoordinate(h, scale, this.mc.displayHeight)
+        );
     }
 
-    public void drawScaleFriendlyTexture(int x, int y, int srcX, int srcY, float w, float h) {
+    private double fixScaledCoordinate(int val, float scale, int size) {
+        double d = val / scale;
+        d *= size;
+        d = Math.floor(d);
+        d /= size;
+        d *= scale;
+
+        return d;
+    }
+
+    public void drawScaleFriendlyTexture(double x, double y, double srcX, double srcY, double w, double h) {
         float f = 0.00390625F;
         float f1 = 0.00390625F;
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)(x + 0), (double)(y + h), (double)this.zLevel, (double)((float)(srcX + 0) * f), (double)((float)(srcY + h) * f1));
-        tessellator.addVertexWithUV((double)(x + w), (double)(y + h), (double)this.zLevel, (double)((float)(srcX + w) * f), (double)((float)(srcY + h) * f1));
-        tessellator.addVertexWithUV((double)(x + w), (double)(y + 0), (double)this.zLevel, (double)((float)(srcX + w) * f), (double)((float)(srcY + 0) * f1));
-        tessellator.addVertexWithUV((double)(x + 0), (double)(y + 0), (double)this.zLevel, (double)((float)(srcX + 0) * f), (double)((float)(srcY + 0) * f1));
+        tessellator.addVertexWithUV(x + 0, y + h, (double)this.zLevel, (srcX + 0) * f, (srcY + h) * f1);
+        tessellator.addVertexWithUV(x + w, y + h, (double)this.zLevel, (srcX + w) * f, (srcY + h) * f1);
+        tessellator.addVertexWithUV(x + w, y + 0, (double)this.zLevel, (srcX + w) * f, (srcY + 0) * f1);
+        tessellator.addVertexWithUV(x + 0, y + 0, (double)this.zLevel, (srcX + 0) * f, (srcY + 0) * f1);
         tessellator.draw();
     }
 
@@ -369,6 +374,8 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
         if (mult > 1F) {
             mult = 1F;
         }
+
+       mult = (float)(Math.floor(mult * 1000)) / 1000F;
 
         return mult;
     }

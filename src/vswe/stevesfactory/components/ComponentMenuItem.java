@@ -871,7 +871,7 @@ public class ComponentMenuItem extends ComponentMenu {
     private static final String NBT_SETTING_USE_SIZE = "SizeLimit";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
        setFirstRadioButtonSelected(nbtTagCompound.getBoolean(NBT_RADIO_SELECTION));
 
         NBTTagList settingTagList = nbtTagCompound.getTagList(NBT_SETTINGS);
