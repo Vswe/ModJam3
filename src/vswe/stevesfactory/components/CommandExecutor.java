@@ -14,10 +14,13 @@ public class CommandExecutor {
 
     private TileEntityManager manager;
     private List<ItemBufferElement> itemBuffer;
+    private List<Integer> usedCommands;
+
 
     public CommandExecutor(TileEntityManager manager) {
         this.manager = manager;
         itemBuffer = new ArrayList<ItemBufferElement>();
+        usedCommands = new ArrayList<Integer>();
     }
 
     public void executeTriggerCommand(FlowComponent command, EnumSet<ConnectionOption> validTriggerOutputs) {
@@ -32,6 +35,12 @@ public class CommandExecutor {
 
 
     private void executeCommand(FlowComponent command) {
+        //a loop has occurred
+        if (usedCommands.contains(command.getId())) {
+            return;
+        }
+
+        usedCommands.add(command.getId());
         switch (command.getType()) {
             case INPUT:
                 List<SlotInventoryHolder> inputInventory = getInventories(command.getMenus().get(0));

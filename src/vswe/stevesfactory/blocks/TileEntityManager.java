@@ -391,7 +391,7 @@ public class TileEntityManager extends TileEntity {
         private ComponentType type;
 
         protected ButtonCreate(ComponentType type) {
-            super("Create " + type.toString().charAt(0) + type.toString().toLowerCase().substring(1));
+            super("Create " + type.toString());
 
             this.type = type;
         }

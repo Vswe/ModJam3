@@ -50,7 +50,7 @@ public class ComponentMenuResult extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Result";
+        return "Connections";
     }
     @SideOnly(Side.CLIENT)
     @Override

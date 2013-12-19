@@ -13,7 +13,10 @@ public enum ComponentType {
             ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItemOutput.class, ComponentMenuResult.class),
     CONDITION(3,
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
-            ComponentMenuInventoryCondition.class, ComponentMenuTarget.class, ComponentMenuItemCondition.class, ComponentMenuResult.class);
+            ComponentMenuInventoryCondition.class, ComponentMenuTarget.class, ComponentMenuItemCondition.class, ComponentMenuResult.class),
+    FLOW_CONTROL(4,
+            new ConnectionSet[]{ConnectionSet.MULTIPLE_INPUT_2, ConnectionSet.MULTIPLE_INPUT_5},
+            ComponentMenuResult.class);
 
     private Class<? extends ComponentMenu>[] classes;
     private int id;
@@ -44,5 +47,21 @@ public enum ComponentType {
 
     public ConnectionSet[] getSets() {
         return sets;
+    }
+
+
+    @Override
+    public String toString() {
+        String[] words = super.toString().split("_");
+        String ret = "";
+        for (int i = 0; i < words.length; i++) {
+            if (i != 0) {
+                ret += " ";
+            }
+
+            ret += words[i].charAt(0) + words[i].toString().toLowerCase().substring(1);
+        }
+
+        return ret;
     }
 }

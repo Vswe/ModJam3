@@ -243,7 +243,7 @@ public class FlowComponent implements IComponentNetworkReader {
             gui.drawTexture(x + ERROR_X, y + ERROR_Y, ERROR_SRC_X, ERROR_SRC_Y + srcErrorY * ERROR_SIZE_H, ERROR_SIZE_W, ERROR_SIZE_H);
         }
 
-        gui.drawString(getType().toString().charAt(0) + getType().toString().substring(1).toLowerCase(), x + 10, y + 10, 0.7F, 0x404040);
+        gui.drawString(getType().toString(), x + 10, y + 10, 0.7F, 0x404040);
     }
 
     List<String> errors = new ArrayList<String>();
@@ -372,7 +372,14 @@ public class FlowComponent implements IComponentNetworkReader {
                     }else if (current.getComponentId() != id){
                         FlowComponent connectTo = manager.getFlowItems().get(current.getComponentId());
                         ConnectionOption connectToOption = connectTo.connectionSet.getConnections()[current.getConnectionId()];
+
+
                         if (connectToOption.isInput() != connection.isInput()) {
+
+                            if (checkForLoops(i, current)) {
+                                return true;
+                            }
+
                             if (connections.get(i) != null) {
                                 removeConnection(i);
                             }
@@ -390,6 +397,40 @@ public class FlowComponent implements IComponentNetworkReader {
 
             return false;
         }
+    }
+
+    private boolean checkForLoops(int connectionId, Connection connection) {
+        List<Integer> usedComponents = new ArrayList<Integer>();
+        List<FlowComponent> queue = new ArrayList<FlowComponent>();
+        queue.add(this);
+        while (!queue.isEmpty()) {
+            FlowComponent currentComponent = queue.remove(0);
+            if (usedComponents.contains(currentComponent.getId()))  {
+                return true;
+            }
+            usedComponents.add(currentComponent.getId());
+
+            for (int i = 0; i < connectionSet.getConnections().length; i++) {
+                if (!connectionSet.getConnections()[i].isInput()) {
+                    Connection c = null;
+
+                    if (connectionId == i && currentComponent.getId() == this.id) {
+                        c = connection;
+                    }else if(connection.getComponentId() == currentComponent.getId() && connection.getConnectionId() == i) {
+                        c = new Connection(this.getId(), connectionId);
+                    }else{
+                        c = connections.get(i);
+                    }
+
+                    if (c != null) {
+                        if (c.getComponentId() >= 0 && c.getComponentId() < manager.getFlowItems().size()) {
+                            queue.add(manager.getFlowItems().get(c.getComponentId()));
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private void addConnection(int id, Connection connection) {
