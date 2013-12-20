@@ -410,16 +410,22 @@ public class FlowComponent implements IComponentNetworkReader {
             }
             usedComponents.add(currentComponent.getId());
 
-            for (int i = 0; i < connectionSet.getConnections().length; i++) {
-                if (!connectionSet.getConnections()[i].isInput()) {
+            for (int i = 0; i < currentComponent.connectionSet.getConnections().length; i++) {
+                if (!currentComponent.connectionSet.getConnections()[i].isInput()) {
                     Connection c = null;
 
                     if (connectionId == i && currentComponent.getId() == this.id) {
+                        //the new connection
                         c = connection;
                     }else if(connection.getComponentId() == currentComponent.getId() && connection.getConnectionId() == i) {
+                        //the new connection in the other direction
                         c = new Connection(this.getId(), connectionId);
                     }else{
-                        c = connections.get(i);
+                        c = currentComponent.connections.get(i);
+                        //old connection that will be replaced
+                        if (c != null && c.getComponentId() == this.id && c.getConnectionId() == connectionId) {
+                            c = null;
+                        }
                     }
 
                     if (c != null) {
