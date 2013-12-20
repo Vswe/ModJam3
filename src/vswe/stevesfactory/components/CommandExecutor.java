@@ -113,8 +113,8 @@ public class CommandExecutor {
             for (int side = 0; side < ComponentMenuTarget.directions.length; side++) {
                 if (menuTarget.isActive(side)) {
                     int[] inventoryValidSlots;
-                    if (inventories instanceof ISidedInventory) {
-                        inventoryValidSlots =  ((ISidedInventory) inventories).getAccessibleSlotsFromSide(side);
+                    if (inventory instanceof ISidedInventory) {
+                        inventoryValidSlots =  ((ISidedInventory) inventory).getAccessibleSlotsFromSide(side);
                     }else{
                         inventoryValidSlots = new int[inventory.getSizeInventory()];
                         for (int j = 0; j < inventoryValidSlots.length; j++) {
