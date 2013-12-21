@@ -38,7 +38,10 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
     private static final ResourceLocation BACKGROUND_2 = registerTexture("Background2");
     private static final ResourceLocation COMPONENTS = registerTexture("FlowComponents");
 
-    public static int Z_LEVEL_COMPONENT_DIFFERENCE = 100;
+    public static int Z_LEVEL_COMPONENT_OPEN_DIFFERENCE = 100;
+    public static int Z_LEVEL_COMPONENT_CLOSED_DIFFERENCE = 1;
+    public static int Z_LEVEL_COMPONENT_START = 750;
+    public static int Z_LEVEL_OPEN_MAXIMUM = 5;
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
@@ -63,15 +66,23 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
             drawTexture(button.getX() + 1, button.getY() + 1, TileEntityManager.BUTTON_INNER_SRC_X, TileEntityManager.BUTTON_INNER_SRC_Y + i * TileEntityManager.BUTTON_INNER_SIZE_H, TileEntityManager.BUTTON_INNER_SIZE_W, TileEntityManager.BUTTON_INNER_SIZE_H);
         }
 
-
+        int zLevel = Z_LEVEL_COMPONENT_START;
+        int openCount = 0;
         for (int i = 0; i < manager.getZLevelRenderingList().size(); i++) {
             FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
-            GL11.glPushMatrix();
-            GL11.glTranslatef(0, 0, (manager.getZLevelRenderingList().size() - i) * Z_LEVEL_COMPONENT_DIFFERENCE);
 
-            itemBase.draw(this, x, y, i);
+            if (itemBase.isOpen() && openCount == Z_LEVEL_OPEN_MAXIMUM) {
+                itemBase.close();
+            }
 
-            GL11.glPopMatrix();
+            itemBase.draw(this, x, y, zLevel);
+            if (itemBase.isOpen()) {
+                zLevel -= Z_LEVEL_COMPONENT_OPEN_DIFFERENCE;
+                openCount++;
+            }else{
+                zLevel -= Z_LEVEL_COMPONENT_CLOSED_DIFFERENCE;
+            }
+
             if (itemBase.isBeingMoved() || CollisionHelper.inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
                 CollisionHelper.disableInBoundsCheck = true;
             }

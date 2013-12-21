@@ -14,6 +14,7 @@ import vswe.stevesfactory.network.*;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,7 +152,10 @@ public class FlowComponent implements IComponentNetworkReader {
     }
 
     @SideOnly(Side.CLIENT)
-    public void draw(GuiManager gui, int mX, int mY, int zLevelIndex) {
+    public void draw(GuiManager gui, int mX, int mY, int zLevel) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(0, 0, zLevel);
+
         gui.drawTexture(x, y, isLarge ? COMPONENT_SRC_LARGE_X : COMPONENT_SRC_X, COMPONENT_SRC_Y, getComponentWidth(), getComponentHeight());
 
         int internalX = mX - x;
@@ -221,7 +225,7 @@ public class FlowComponent implements IComponentNetworkReader {
                     int[] otherLocation = manager.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
 
                     GL11.glPushMatrix();
-                    GL11.glTranslatef(0, 0, (zLevelIndex - manager.getZLevelRenderingList().size()) * GuiManager.Z_LEVEL_COMPONENT_DIFFERENCE);
+                    GL11.glTranslatef(0, 0, -zLevel);
                     gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, otherLocation[0] + CONNECTION_SIZE_W / 2, otherLocation[1] + CONNECTION_SIZE_H / 2);
                     GL11.glPopMatrix();
                 }
@@ -244,6 +248,8 @@ public class FlowComponent implements IComponentNetworkReader {
         }
 
         gui.drawString(getType().toString(), x + 10, y + 10, 0.7F, 0x404040);
+
+        GL11.glPopMatrix();
     }
 
     List<String> errors = new ArrayList<String>();
@@ -398,44 +404,45 @@ public class FlowComponent implements IComponentNetworkReader {
             return false;
         }
     }
-
     private boolean checkForLoops(int connectionId, Connection connection) {
-        List<Integer> usedComponents = new ArrayList<Integer>();
-        List<FlowComponent> queue = new ArrayList<FlowComponent>();
-        queue.add(this);
-        while (!queue.isEmpty()) {
-            FlowComponent currentComponent = queue.remove(0);
-            if (usedComponents.contains(currentComponent.getId()))  {
-                return true;
-            }
-            usedComponents.add(currentComponent.getId());
+        return checkForLoops(new ArrayList<Integer>(), this, connectionId, connection);
+    }
+    private boolean checkForLoops(List<Integer> usedComponents, FlowComponent currentComponent, int connectionId, Connection connection) {
+        if (usedComponents.contains(currentComponent.getId()))  {
+            return true;
+        }
+        usedComponents.add(currentComponent.getId());
 
-            for (int i = 0; i < currentComponent.connectionSet.getConnections().length; i++) {
-                if (!currentComponent.connectionSet.getConnections()[i].isInput()) {
-                    Connection c = null;
+        for (int i = 0; i < currentComponent.connectionSet.getConnections().length; i++) {
+            if (!currentComponent.connectionSet.getConnections()[i].isInput()) {
+                Connection c = null;
 
-                    if (connectionId == i && currentComponent.getId() == this.id) {
-                        //the new connection
-                        c = connection;
-                    }else if(connection.getComponentId() == currentComponent.getId() && connection.getConnectionId() == i) {
-                        //the new connection in the other direction
-                        c = new Connection(this.getId(), connectionId);
-                    }else{
-                        c = currentComponent.connections.get(i);
-                        //old connection that will be replaced
-                        if (c != null && c.getComponentId() == this.id && c.getConnectionId() == connectionId) {
-                            c = null;
-                        }
+                if (connectionId == i && currentComponent.getId() == this.id) {
+                    //the new connection
+                    c = connection;
+                }else if(connection.getComponentId() == currentComponent.getId() && connection.getConnectionId() == i) {
+                    //the new connection in the other direction
+                    c = new Connection(this.getId(), connectionId);
+                }else{
+                    c = currentComponent.connections.get(i);
+                    //old connection that will be replaced
+                    if (c != null && c.getComponentId() == this.id && c.getConnectionId() == connectionId) {
+                        c = null;
                     }
+                }
 
-                    if (c != null) {
-                        if (c.getComponentId() >= 0 && c.getComponentId() < manager.getFlowItems().size()) {
-                            queue.add(manager.getFlowItems().get(c.getComponentId()));
+                if (c != null) {
+                    if (c.getComponentId() >= 0 && c.getComponentId() < manager.getFlowItems().size()) {
+                        List<Integer> usedComponentsCopy = new ArrayList<Integer>(usedComponents);
+
+                        if (checkForLoops(usedComponentsCopy, manager.getFlowItems().get(c.getComponentId()), connectionId, connection)) {
+                            return true;
                         }
                     }
                 }
             }
         }
+
         return false;
     }
 
@@ -786,5 +793,13 @@ public class FlowComponent implements IComponentNetworkReader {
 
         }
         nbtTagCompound.setTag(NBT_MENUS, menuTagList);
+    }
+
+    public boolean isOpen() {
+        return isLarge;
+    }
+
+    public void close() {
+        isLarge = false;
     }
 }

@@ -71,6 +71,7 @@ public class CommandExecutor {
 
 
         executeTriggerCommand(command, EnumSet.allOf(ConnectionOption.class));
+        usedCommands.remove((Integer)command.getId());
     }
 
     private List<SlotInventoryHolder> getInventories(ComponentMenu componentMenu) {
