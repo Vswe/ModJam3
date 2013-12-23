@@ -7,16 +7,19 @@ public enum ComponentType {
             ComponentMenuInterval.class, ComponentMenuRedstone.class, ComponentMenuResult.class),
     INPUT(1,
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItem.class, ComponentMenuResult.class),
+            ComponentMenuInventory.class, ComponentMenuTargetInventory.class, ComponentMenuItem.class, ComponentMenuResult.class),
     OUTPUT(2,
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuInventory.class, ComponentMenuTarget.class, ComponentMenuItemOutput.class, ComponentMenuResult.class),
+            ComponentMenuInventory.class, ComponentMenuTargetInventory.class, ComponentMenuItemOutput.class, ComponentMenuResult.class),
     CONDITION(3,
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
-            ComponentMenuInventoryCondition.class, ComponentMenuTarget.class, ComponentMenuItemCondition.class, ComponentMenuResult.class),
+            ComponentMenuInventoryCondition.class, ComponentMenuTargetInventory.class, ComponentMenuItemCondition.class, ComponentMenuResult.class),
     FLOW_CONTROL(4,
             new ConnectionSet[]{ConnectionSet.MULTIPLE_INPUT_2, ConnectionSet.MULTIPLE_INPUT_5},
-            ComponentMenuResult.class);
+            ComponentMenuResult.class),
+    INPUT_LIQUID(5,
+            new ConnectionSet[]{ConnectionSet.STANDARD},
+            ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuItem.class, ComponentMenuResult.class);
 
     private Class<? extends ComponentMenu>[] classes;
     private int id;

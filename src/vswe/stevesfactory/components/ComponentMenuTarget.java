@@ -17,30 +17,14 @@ import vswe.stevesfactory.network.PacketHandler;
 
 import java.util.List;
 
-public class ComponentMenuTarget extends ComponentMenu {
+public abstract class ComponentMenuTarget extends ComponentMenu {
 
 
     public ComponentMenuTarget(FlowComponent parent) {
         super(parent);
 
         selectedDirectionId = -1;
-        textBoxes = new TextBoxNumberList();
-        textBoxes.addTextBox(startTextBox = new TextBoxNumber(39 ,49, 2, false) {
-            @Override
-            public void onNumberChanged() {
-                if (selectedDirectionId != -1 && getParent().getManager().worldObj.isRemote) {
-                    writeData(DataTypeHeader.START, getNumber());
-                }
-            }
-        });
-        textBoxes.addTextBox(endTextBox = new TextBoxNumber(60 ,49, 2, false) {
-            @Override
-            public void onNumberChanged() {
-                if (selectedDirectionId != -1 && getParent().getManager().worldObj.isRemote) {
-                    writeData(DataTypeHeader.END, getNumber());
-                }
-            }
-        });
+
     }
 
     private static final int DIRECTION_SIZE_W = 31;
@@ -79,26 +63,12 @@ public class ComponentMenuTarget extends ComponentMenu {
             writeData(DataTypeHeader.ACTIVATE, isActive(selectedDirectionId) ? 0 : 1);
         }
     },
-    new Button(27) {
-        @Override
-        protected String getLabel() {
-            return useRange(selectedDirectionId) ? "Use all slots" : "Use id range";
-        }
+    getSecondButton()};
 
-        @Override
-        protected String getMouseOverText() {
-            return useRange(selectedDirectionId) ? "Click to use all slots for this side instead" : "Click to use a slot id range for this specific side";
-        }
+    protected abstract Button getSecondButton();
 
-        @Override
-        protected void onClicked() {
-            writeData(DataTypeHeader.USE_RANGE, useRange(selectedDirectionId) ? 0 : 1);
-        }
-    }};
 
-    private TextBoxNumberList textBoxes;
-    private TextBoxNumber startTextBox;
-    private TextBoxNumber endTextBox;
+
 
     @Override
     public String getName() {
@@ -108,11 +78,10 @@ public class ComponentMenuTarget extends ComponentMenu {
 
     public static ForgeDirection[] directions = ForgeDirection.VALID_DIRECTIONS;
 
-    private int selectedDirectionId;
+    protected int selectedDirectionId;
     private boolean[] activatedDirections = new boolean[directions.length];
     private boolean[] useRangeForDirections = new boolean[directions.length];
-    private int[] startRange = new int[directions.length];
-    private int[] endRange = new int[directions.length];
+
 
 
     @SideOnly(Side.CLIENT)
@@ -145,11 +114,13 @@ public class ComponentMenuTarget extends ComponentMenu {
                 gui.drawCenteredString(button.getLabel(), BUTTON_X, button.y + BUTTON_TEXT_Y, 0.5F, BUTTON_SIZE_W, 0x404040);
             }
 
-            if (useRange(selectedDirectionId)) {
-                textBoxes.draw(gui, mX, mY);
+            if (useAdvancedSetting(selectedDirectionId)) {
+                drawAdvancedComponent(gui, mX, mY);
             }
         }
     }
+
+
 
     public boolean isActive(int i) {
         return activatedDirections[i];
@@ -160,24 +131,10 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
 
-    public boolean useRange(int i) {
+    public boolean useAdvancedSetting(int i) {
         return useRangeForDirections[i];
     }
 
-    public int getStart(int i) {
-        return startRange[i];
-    }
-
-    public int getEnd(int i) {
-        return endRange[i];
-    }
-
-    private void refreshTextBoxes() {
-        if (selectedDirectionId != -1) {
-            startTextBox.setNumber(startRange[selectedDirectionId]);
-            endTextBox.setNumber(endRange[selectedDirectionId]);
-        }
-    }
 
 
     private int getDirectionY(int i) {
@@ -203,7 +160,7 @@ public class ComponentMenuTarget extends ComponentMenu {
                     selectedDirectionId = -1;
                 }else if (selectedDirectionId == -1) {
                     selectedDirectionId = i;
-                    refreshTextBoxes();
+                    refreshAdvancedComponent();
                 }
 
                 break;
@@ -218,8 +175,8 @@ public class ComponentMenuTarget extends ComponentMenu {
                 }
             }
 
-            if (useRange(selectedDirectionId)) {
-                textBoxes.onClick(mX, mY, button);
+            if (useAdvancedSetting(selectedDirectionId)) {
+                onAdvancedClick(mX, mY, button);
             }
         }
     }
@@ -234,7 +191,7 @@ public class ComponentMenuTarget extends ComponentMenu {
 
     }
 
-    private abstract class Button {
+    protected abstract class Button {
         private int y;
 
         protected Button(int y) {
@@ -246,29 +203,32 @@ public class ComponentMenuTarget extends ComponentMenu {
         protected abstract void onClicked();
     }
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public boolean onKeyStroke(GuiManager gui, char c, int k) {
-        if (selectedDirectionId != -1 && useRange(selectedDirectionId)) {
-            return textBoxes.onKeyStroke(gui, c, k);
-        }
 
-
-        return false;
-    }
 
     @Override
     public void writeData(DataWriter dw) {
         for (int i = 0; i < directions.length; i++) {
             dw.writeBoolean(isActive(i));
-            dw.writeBoolean(useRange(i));
-            if (useRange(i)) {
-                dw.writeData(startRange[i], DataBitHelper.MENU_TARGET_RANGE);
-                dw.writeData(endRange[i], DataBitHelper.MENU_TARGET_RANGE);
+            dw.writeBoolean(useAdvancedSetting(i));
+            if (useAdvancedSetting(i)) {
+                writeAdvancedSetting(dw, i);
             }
 
         }
     }
+
+    @SideOnly(Side.CLIENT)
+    protected abstract void drawAdvancedComponent(GuiManager gui, int mX, int mY);
+    protected abstract void refreshAdvancedComponent();
+    protected abstract void writeAdvancedSetting(DataWriter dw, int i);
+    protected abstract void readAdvancedSetting(DataReader dr, int i);
+    protected abstract void copyAdvancedSetting(ComponentMenu menuTarget, int i);
+    protected abstract void onAdvancedClick(int mX, int mY, int button);
+    protected abstract void loadAdvancedComponent(NBTTagCompound directionTag, int i);
+    protected abstract void saveAdvancedComponent(NBTTagCompound directionTag, int i);
+    protected abstract void resetAdvancedSetting(int i);
+    protected abstract void refreshAdvancedComponentData(ContainerManager container, ComponentMenu newData, int i);
+    protected abstract void readAdvancedNetworkComponent(DataTypeHeader header, int i, int data);
 
     @Override
     public void readData(DataReader dr) {
@@ -276,14 +236,11 @@ public class ComponentMenuTarget extends ComponentMenu {
 
             activatedDirections[i] = dr.readBoolean();
             useRangeForDirections[i] = dr.readBoolean();
-            if (useRange(i)) {
-                startRange[i] = dr.readData(DataBitHelper.MENU_TARGET_RANGE);
-                endRange[i] = dr.readData(DataBitHelper.MENU_TARGET_RANGE);
+            if (useAdvancedSetting(i)) {
+                readAdvancedSetting(dr, i);
             }else{
-                startRange[i] = 0;
-                endRange[i] = 0;
+                resetAdvancedSetting(i);
             }
-
 
         }
     }
@@ -295,10 +252,10 @@ public class ComponentMenuTarget extends ComponentMenu {
         for (int i = 0; i < directions.length; i++) {
             activatedDirections[i] = menuTarget.activatedDirections[i];
             useRangeForDirections[i] = menuTarget.useRangeForDirections[i];
-            startRange[i] = menuTarget.startRange[i];
-            endRange[i] = menuTarget.endRange[i];
+            copyAdvancedSetting(menu, i);
         }
     }
+
 
     @Override
     public void refreshData(ContainerManager container, ComponentMenu newData) {
@@ -314,25 +271,17 @@ public class ComponentMenuTarget extends ComponentMenu {
             if (useRangeForDirections[i] != newDataTarget.useRangeForDirections[i]) {
                 useRangeForDirections[i] =  newDataTarget.useRangeForDirections[i];
 
-                writeUpdatedData(container, i, DataTypeHeader.USE_RANGE, useRangeForDirections[i] ? 1 : 0);
+                writeUpdatedData(container, i, DataTypeHeader.USE_ADVANCED_SETTING, useRangeForDirections[i] ? 1 : 0);
             }
 
-            if (startRange[i] != newDataTarget.startRange[i]) {
-                startRange[i] =  newDataTarget.startRange[i];
-
-                writeUpdatedData(container, i, DataTypeHeader.START, startRange[i]);
-            }
-
-            if (endRange[i] != newDataTarget.endRange[i]) {
-                endRange[i] =  newDataTarget.endRange[i];
-
-                writeUpdatedData(container, i, DataTypeHeader.END, endRange[i]);
-            }
+            refreshAdvancedComponentData(container, newData, i);
         }
     }
 
 
-    private void writeUpdatedData(ContainerManager container, int id, DataTypeHeader header, int data) {
+
+
+    protected void writeUpdatedData(ContainerManager container, int id, DataTypeHeader header, int data) {
         DataWriter dw = getWriterForClientComponentPacket(container);
         writeData(dw, id, header, data);
         PacketHandler.sendDataToListeningClients(container, dw);
@@ -349,23 +298,21 @@ public class ComponentMenuTarget extends ComponentMenu {
            case ACTIVATE:
                activatedDirections[direction] = data != 0;
                break;
-           case USE_RANGE:
+           case USE_ADVANCED_SETTING:
                useRangeForDirections[direction] = data != 0;
-               if (!useRange(direction)) {
-                   startRange[direction] =  endRange[direction] = 0;
+               if (!useAdvancedSetting(direction)) {
+                   resetAdvancedSetting(direction);
                }
                break;
-           case START:
-               startRange[direction] = data;
-               refreshTextBoxes();
-               break;
-           case END:
-               endRange[direction] = data;
-               refreshTextBoxes();
+           default:
+               readAdvancedNetworkComponent(header, direction, data);
        }
     }
 
-    private void writeData(DataTypeHeader header, int data) {
+
+
+
+    protected void writeData(DataTypeHeader header, int data) {
         DataWriter dw = getWriterForServerComponentPacket();
         writeData(dw, selectedDirectionId, header, data);
         PacketHandler.sendDataToServer(dw);
@@ -377,10 +324,10 @@ public class ComponentMenuTarget extends ComponentMenu {
         dw.writeData(data, header.bits);
     }
 
-    private enum DataTypeHeader {
+    protected enum DataTypeHeader {
         ACTIVATE(0, DataBitHelper.BOOLEAN),
-        USE_RANGE(1, DataBitHelper.BOOLEAN),
-        START(2, DataBitHelper.MENU_TARGET_RANGE),
+        USE_ADVANCED_SETTING(1, DataBitHelper.BOOLEAN),
+        START_OR_TANK_DATA(2, DataBitHelper.MENU_TARGET_RANGE),
         END(3, DataBitHelper.MENU_TARGET_RANGE);
 
         private int id;
@@ -389,6 +336,10 @@ public class ComponentMenuTarget extends ComponentMenu {
         private DataTypeHeader(int header, DataBitHelper bits) {
             this.id = header;
             this.bits = bits;
+        }
+
+        public int getId() {
+            return id;
         }
     }
 
@@ -404,8 +355,7 @@ public class ComponentMenuTarget extends ComponentMenu {
     private static final String NBT_DIRECTIONS = "Directions";
     private static final String NBT_ACTIVE = "Active";
     private static final String NBT_RANGE = "UseRange";
-    private static final String NBT_START = "StartRange";
-    private static final String NBT_END = "EndRange";
+
 
     @Override
     public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
@@ -415,10 +365,10 @@ public class ComponentMenuTarget extends ComponentMenu {
             NBTTagCompound directionTag = (NBTTagCompound)directionTagList.tagAt(i);
             activatedDirections[i] = directionTag.getBoolean(NBT_ACTIVE);
             useRangeForDirections[i] = directionTag.getBoolean(NBT_RANGE);
-            startRange[i] = directionTag.getByte(NBT_START);
-            endRange[i] = directionTag.getByte(NBT_END);
+            loadAdvancedComponent(directionTag, i);
         }
     }
+
 
     @Override
     public void writeToNBT(NBTTagCompound nbtTagCompound) {
@@ -427,9 +377,8 @@ public class ComponentMenuTarget extends ComponentMenu {
         for (int i = 0; i < directions.length; i++)  {
             NBTTagCompound directionTag = new NBTTagCompound();
             directionTag.setBoolean(NBT_ACTIVE, isActive(i));
-            directionTag.setBoolean(NBT_RANGE, useRange(i));
-            directionTag.setByte(NBT_START, (byte)getStart(i));
-            directionTag.setByte(NBT_END, (byte)getEnd(i));
+            directionTag.setBoolean(NBT_RANGE, useAdvancedSetting(i));
+            saveAdvancedComponent(directionTag, i);
             directionTagList.appendTag(directionTag);
         }
 
@@ -437,20 +386,6 @@ public class ComponentMenuTarget extends ComponentMenu {
     }
 
 
-    @Override
-    public void addErrors(List<String> errors) {
-        for (int i = 0; i < directions.length; i++) {
-            if (isActive(i) && getStart(i) > getEnd(i)) {
-                errors.add("The " + directions[i].toString().charAt(0) + directions[i].toString().toLowerCase().substring(1) + " range is invalid");
-            }
-        }
 
-        for (int i = 0; i < directions.length; i++) {
-            if (isActive(i)) {
-                return;
-            }
-        }
 
-        errors.add("No direction is active");
-    }
 }

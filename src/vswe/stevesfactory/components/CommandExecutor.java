@@ -106,7 +106,7 @@ public class CommandExecutor {
     }
 
     private void getValidSlots(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories) {
-        ComponentMenuTarget menuTarget = (ComponentMenuTarget)componentMenu;
+        ComponentMenuTargetInventory menuTarget = (ComponentMenuTargetInventory)componentMenu;
 
         for (int i = 0; i < inventories.size(); i++) {
             IInventory inventory = inventories.get(i).getInventory();
@@ -125,7 +125,7 @@ public class CommandExecutor {
                     }
                     int start;
                     int end;
-                    if (menuTarget.useRange(side)) {
+                    if (menuTarget.useAdvancedSetting(side)) {
                         start = menuTarget.getStart(side);
                         end = menuTarget.getEnd(side);
                     }else{
