@@ -5,6 +5,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.tileentity.TileEntity;
+import vswe.stevesfactory.blocks.ConnectionBlock;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.blocks.WorldCoordinate;
 import vswe.stevesfactory.components.FlowComponent;
@@ -53,7 +54,7 @@ public class ContainerManager extends Container {
 
             if (!hasInventoriesChanged) {
                 for (int i = 0; i < oldInventories.size(); i++) {
-                    TileEntity tileEntity = manager.getConnectedInventories().get(i);
+                    TileEntity tileEntity = manager.getConnectedInventories().get(i).getTileEntity();
                     if (oldInventories.get(i).equals(new WorldCoordinate(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord))) {
                         hasInventoriesChanged = true;
                         break;
@@ -65,8 +66,8 @@ public class ContainerManager extends Container {
 
             if (hasInventoriesChanged) {
                 oldInventories.clear();
-                for (TileEntity tileEntity : manager.getConnectedInventories()) {
-                    oldInventories.add(new WorldCoordinate(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord));
+                for (ConnectionBlock connection : manager.getConnectedInventories()) {
+                    oldInventories.add(new WorldCoordinate(connection.getTileEntity().xCoord, connection.getTileEntity().yCoord, connection.getTileEntity().zCoord));
                 }
                 PacketHandler.sendUpdateInventoryPacket(this);
             }
@@ -84,8 +85,8 @@ public class ContainerManager extends Container {
         }
         manager.updateInventories();
         oldInventories = new ArrayList<WorldCoordinate>();
-        for (TileEntity tileEntity : manager.getConnectedInventories()) {
-            oldInventories.add(new WorldCoordinate(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord));
+        for (ConnectionBlock connection : manager.getConnectedInventories()) {
+            oldInventories.add(new WorldCoordinate(connection.getTileEntity().xCoord, connection.getTileEntity().yCoord, connection.getTileEntity().zCoord));
         }
         oldIdIndexToRemove = manager.getRemovedIds().size();
     }

@@ -1,6 +1,5 @@
 package vswe.stevesfactory.blocks;
 
-import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
@@ -107,8 +106,8 @@ public class TileEntityManager extends TileEntity {
         return zLevelRenderingList;
     }
 
-    List<TileEntity> inventories = new ArrayList<TileEntity>();
-    public List<TileEntity> getConnectedInventories() {
+    List<ConnectionBlock> inventories = new ArrayList<ConnectionBlock>();
+    public List<ConnectionBlock> getConnectedInventories() {
         return inventories;
     }
 
@@ -121,7 +120,7 @@ public class TileEntityManager extends TileEntity {
     public void updateInventories() {
         WorldCoordinate[] oldCoordinates = new WorldCoordinate[inventories.size()];
         for (int i = 0; i < oldCoordinates.length; i++) {
-            TileEntity inventory = inventories.get(i);
+            TileEntity inventory = inventories.get(i).getTileEntity();
             oldCoordinates[i] = new WorldCoordinate(inventory.xCoord, inventory.yCoord, inventory.zCoord);
         }
 
@@ -143,9 +142,18 @@ public class TileEntityManager extends TileEntity {
 
                             if (!visited.contains(target) && inventories.size() < MAX_CONNECTED_INVENTORIES) {
                                 visited.add(target);
-                                TileEntity tileEntity = worldObj.getBlockTileEntity(target.getX(), target.getY(), target.getZ());
-                                if (tileEntity != null && tileEntity instanceof IInventory) {
-                                    inventories.add(tileEntity);
+                                ConnectionBlock connection = new ConnectionBlock(worldObj.getBlockTileEntity(target.getX(), target.getY(), target.getZ()));
+                                boolean isValidConnection = false;
+
+                                for (ConnectionBlockType connectionBlockType : ConnectionBlockType.values()) {
+                                    if (connectionBlockType.isInstance(connection.getTileEntity())) {
+                                        isValidConnection = true;
+                                        connection.addType(connectionBlockType);
+                                    }
+                                }
+
+                                if (isValidConnection) {
+                                    inventories.add(connection);
                                 }else if (element.getDepth() < MAX_CABLE_LENGTH){
                                     if (worldObj.getBlockId(target.getX(), target.getY(), target.getZ()) == Blocks.blockCable.blockID) {
                                         queue.add(target);
@@ -170,8 +178,8 @@ public class TileEntityManager extends TileEntity {
     private void updateInventorySelection(WorldCoordinate[] oldCoordinates) {
         for (FlowComponent item : items) {
             for (ComponentMenu menu : item.getMenus()) {
-                if (menu instanceof ComponentMenuInventory) {
-                    ComponentMenuInventory menuInventory = (ComponentMenuInventory)menu;
+                if (menu instanceof ComponentMenuContainer) {
+                    ComponentMenuContainer menuInventory = (ComponentMenuContainer)menu;
 
 
                     List<Integer> oldSelection = menuInventory.getSelectedInventories();
@@ -183,7 +191,7 @@ public class TileEntityManager extends TileEntity {
                             WorldCoordinate coordinate = oldCoordinates[selection];
 
                             for (int j = 0; j < inventories.size(); j++) {
-                                TileEntity inventory = inventories.get(j);
+                                TileEntity inventory = inventories.get(j).getTileEntity();
                                 if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord) {
                                     if (!newSelection.contains(j)) {
                                         newSelection.add(j);
@@ -261,8 +269,8 @@ public class TileEntityManager extends TileEntity {
     }
 
     private void activateTrigger(FlowComponent component, EnumSet<ConnectionOption> validTriggerOutputs) {
-        for (TileEntity inventory : inventories) {
-            if (inventory.isInvalid()) {
+        for (ConnectionBlock inventory : inventories) {
+            if (inventory.getTileEntity().isInvalid()) {
                 updateInventories();
                 break;
             }

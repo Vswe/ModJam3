@@ -1,24 +1,24 @@
 package vswe.stevesfactory.components;
 
-
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 
 import java.util.List;
 
-public class ComponentMenuInventory extends ComponentMenuContainer {
-    public ComponentMenuInventory(FlowComponent parent) {
-        super(parent, ConnectionBlockType.INVENTORY);
+
+public class ComponentMenuTank extends ComponentMenuContainer {
+    public ComponentMenuTank(FlowComponent parent) {
+        super(parent, ConnectionBlockType.TANK);
     }
 
     @Override
     public String getName() {
-        return "Inventories";
+        return "Tanks";
     }
 
     @Override
     public void addErrors(List<String> errors) {
         if (selectedInventories.isEmpty()) {
-            errors.add("No inventory selected");
+            errors.add("No tank selected");
         }
     }
 }

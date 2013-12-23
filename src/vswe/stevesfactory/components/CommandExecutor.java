@@ -4,7 +4,8 @@ package vswe.stevesfactory.components;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import vswe.stevesfactory.blocks.ConnectionBlock;
+import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.TileEntityManager;
 
 
@@ -75,7 +76,7 @@ public class CommandExecutor {
     }
 
     private List<SlotInventoryHolder> getInventories(ComponentMenu componentMenu) {
-        ComponentMenuInventory menuInventory = (ComponentMenuInventory)componentMenu;
+        ComponentMenuContainer menuInventory = (ComponentMenuContainer)componentMenu;
 
         if (menuInventory.getSelectedInventories().size() == 0) {
             return null;
@@ -83,15 +84,15 @@ public class CommandExecutor {
 
         List<SlotInventoryHolder> ret = new ArrayList<SlotInventoryHolder>();
 
-        List<TileEntity> inventories = manager.getConnectedInventories();
+        List<ConnectionBlock> inventories = menuInventory.getInventories(manager);
         for (int i = 0; i < menuInventory.getSelectedInventories().size(); i++) {
             int selected = menuInventory.getSelectedInventories().get(i);
 
             if (selected >= 0 && selected < inventories.size()) {
-                TileEntity tileEntity = inventories.get(selected);
+                ConnectionBlock connection = inventories.get(selected);
 
-                if (tileEntity != null && tileEntity instanceof IInventory && !tileEntity.isInvalid()) {
-                    ret.add(new SlotInventoryHolder(tileEntity, menuInventory.getOption()));
+                if (connection.isOfType(ConnectionBlockType.INVENTORY) && !connection.getTileEntity().isInvalid()) {
+                    ret.add(new SlotInventoryHolder(connection.getTileEntity(), menuInventory.getOption()));
                 }
 
             }
