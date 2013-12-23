@@ -74,15 +74,15 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
             if (itemBase.isOpen() && openCount == Z_LEVEL_OPEN_MAXIMUM) {
                 itemBase.close();
             }
-
-            itemBase.draw(this, x, y, zLevel);
+ 
             if (itemBase.isOpen()) {
                 zLevel -= Z_LEVEL_COMPONENT_OPEN_DIFFERENCE;
                 openCount++;
             }else{
                 zLevel -= Z_LEVEL_COMPONENT_CLOSED_DIFFERENCE;
             }
-
+			itemBase.draw(this, x, y, zLevel);
+			
             if (itemBase.isBeingMoved() || CollisionHelper.inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
                 CollisionHelper.disableInBoundsCheck = true;
             }
