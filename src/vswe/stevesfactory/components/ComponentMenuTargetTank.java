@@ -128,4 +128,8 @@ public class ComponentMenuTargetTank extends ComponentMenuTarget {
         onlyFull[i] = data != 0;
         refreshAdvancedComponent();
     }
+
+    public boolean requireEmpty(int side) {
+        return !onlyFull[side];
+    }
 }

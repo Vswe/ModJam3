@@ -17,9 +17,12 @@ public enum ComponentType {
     FLOW_CONTROL(4,
             new ConnectionSet[]{ConnectionSet.MULTIPLE_INPUT_2, ConnectionSet.MULTIPLE_INPUT_5},
             ComponentMenuResult.class),
-    INPUT_LIQUID(5,
+    LIQUID_INPUT(5,
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuItem.class, ComponentMenuResult.class);
+            ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuItem.class, ComponentMenuResult.class),
+    LIQUID_OUTPUT(6,
+            new ConnectionSet[]{ConnectionSet.STANDARD},
+            ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuItemOutput.class, ComponentMenuResult.class);
 
     private Class<? extends ComponentMenu>[] classes;
     private int id;

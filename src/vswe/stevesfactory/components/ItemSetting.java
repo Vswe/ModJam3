@@ -1,5 +1,7 @@
 package vswe.stevesfactory.components;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 
@@ -17,6 +19,7 @@ public class ItemSetting {
         this.id = id;
     }
 
+    @SideOnly(Side.CLIENT)
     public List<String> getMouseOver() {
         if (item != null && GuiScreen.isShiftKeyDown()) {
             return ComponentMenuItem.getToolTip(item);

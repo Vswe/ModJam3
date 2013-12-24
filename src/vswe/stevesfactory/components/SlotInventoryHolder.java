@@ -3,6 +3,7 @@ package vswe.stevesfactory.components;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fluids.IFluidHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,6 @@ public class SlotInventoryHolder {
 
     public SlotInventoryHolder(TileEntity inventory, int sharedOption) {
         this.inventory = inventory;
-        this.validSlots = new HashMap<Integer, SlotSideTarget>();
         this.sharedOption = sharedOption;
     }
 
@@ -22,7 +22,15 @@ public class SlotInventoryHolder {
         return (IInventory)inventory;
     }
 
+    public IFluidHandler getTank() {
+        return (IFluidHandler)inventory;
+    }
+
     public Map<Integer, SlotSideTarget> getValidSlots() {
+        if (validSlots == null) {
+            validSlots = new HashMap<Integer, SlotSideTarget>();
+        }
+
         return validSlots;
     }
 

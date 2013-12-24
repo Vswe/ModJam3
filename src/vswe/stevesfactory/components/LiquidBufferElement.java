@@ -2,31 +2,32 @@ package vswe.stevesfactory.components;
 
 
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemBufferElement {
+public class LiquidBufferElement {
     private ItemSetting setting;
     private FlowComponent component;
     private boolean useWhiteList;
-    private int currentStackSize;
-    private int totalStackSize;
+    private int currentTransferSize;
+    private int totalTransferSize;
     private SlotInventoryHolder inventoryHolder;
 
-    private List<SlotStackInventoryHolder> holders;
+    private List<StackTankHolder> holders;
 
 
-    public ItemBufferElement(FlowComponent owner, ItemSetting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList, SlotStackInventoryHolder target) {
+    public LiquidBufferElement(FlowComponent owner, ItemSetting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList, StackTankHolder target) {
         this.component = owner;
         this.setting = setting;
         this.inventoryHolder = inventoryHolder;
         this.useWhiteList = useWhiteList;
-        holders = new ArrayList<SlotStackInventoryHolder>();
+        holders = new ArrayList<StackTankHolder>();
         addTarget(target);
     }
 
-    public boolean addTarget(FlowComponent owner, ItemSetting setting,  SlotInventoryHolder inventoryHolder, SlotStackInventoryHolder target) {
+    public boolean addTarget(FlowComponent owner, ItemSetting setting,  SlotInventoryHolder inventoryHolder, StackTankHolder target) {
         if (component.getId() == owner.getId() && (this.setting == null || this.setting.getId() == setting.getId()) && (this.inventoryHolder.isShared() || this.inventoryHolder.equals(inventoryHolder))) {
             addTarget(target);
             return true;
@@ -35,18 +36,21 @@ public class ItemBufferElement {
         }
     }
 
-    private void addTarget(SlotStackInventoryHolder target) {
+    private void addTarget(StackTankHolder target) {
         holders.add(target);
 
-        totalStackSize += target.getItemStack().stackSize;
-        currentStackSize = totalStackSize;
+        FluidStack temp = target.getFluidStack();
+        if (temp != null) {
+            totalTransferSize += temp.amount;
+            currentTransferSize = totalTransferSize;
+        }
     }
 
     public ItemSetting getSetting() {
         return setting;
     }
 
-    public List<SlotStackInventoryHolder> getHolders() {
+    public List<StackTankHolder> getHolders() {
         return holders;
     }
 
@@ -56,10 +60,10 @@ public class ItemBufferElement {
         }else{
             int itemsAllowedToBeMoved;
             if (useWhiteList) {
-                int movedItems = totalStackSize - currentStackSize;
+                int movedItems = totalTransferSize - currentTransferSize;
                 itemsAllowedToBeMoved = setting.getItem().stackSize - movedItems;
             }else{
-                itemsAllowedToBeMoved = currentStackSize - setting.getItem().stackSize;
+                itemsAllowedToBeMoved = currentTransferSize - setting.getItem().stackSize;
             }
 
 
@@ -68,20 +72,23 @@ public class ItemBufferElement {
     }
 
     public void decreaseStackSize(int itemsToMove) {
-        currentStackSize -= itemsToMove;
+        currentTransferSize -= itemsToMove;
     }
 
     public ItemStack getItemStack() {
        if (setting != null && setting.getItem() != null) {
            return setting.getItem();
        }else{
-           return holders.get(0).getItemStack();
+           //TODO fix for liquid
+           //return holders.get(0).getItemStack();
+           return null;
        }
     }
 
     public int getBufferSize(ItemSetting outputSetting) {
         int bufferSize = 0;
-        for (SlotStackInventoryHolder holder : getHolders()) {
+        //TODO fix for liquid
+        /**for (StackTankHolder holder : getHolders()) {
             ItemStack item = holder.getItemStack();
             if (item != null && outputSetting.getItem().itemID == item.itemID && (outputSetting.isFuzzy() || outputSetting.getItem().getItemDamage() == item.getItemDamage())) {
                 bufferSize += item.stackSize;
@@ -92,10 +99,10 @@ public class ItemBufferElement {
             if (useWhiteList) {
                 maxSize = setting.getItem().stackSize;
             }else{
-                maxSize = totalStackSize - setting.getItem().stackSize;
+                maxSize = totalTransferSize - setting.getItem().stackSize;
             }
             bufferSize = Math.min(bufferSize, maxSize);
-        }
+        }**/
         return bufferSize;
     }
 }
