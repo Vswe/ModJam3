@@ -252,7 +252,7 @@ public class CommandExecutor {
     private void getItems(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories) {
         for (SlotInventoryHolder inventory : inventories) {
 
-            ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
+            ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
             for (SlotSideTarget slot : inventory.getValidSlots().values()) {
                 ItemStack itemStack = inventory.getInventory().getStackInSlot(slot.getSlot());
 
@@ -260,7 +260,7 @@ public class CommandExecutor {
                     continue;
                 }
 
-                ItemSetting setting = isItemValid(componentMenu, itemStack);
+                Setting setting = isItemValid(componentMenu, itemStack);
                 if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
                     FlowComponent owner = componentMenu.getParent();
                     SlotStackInventoryHolder target = new SlotStackInventoryHolder(itemStack, inventory.getInventory(), slot.getSlot());
@@ -286,14 +286,14 @@ public class CommandExecutor {
     private void getLiquids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
         for (SlotInventoryHolder tank : tanks) {
 
-            ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
+            ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
             for (SlotSideTarget slot : tank.getValidSlots().values()) {
 
                 for (int side : slot.getSides()) {
 
                     FluidStack fluidStack = tank.getTank().drain(ForgeDirection.VALID_DIRECTIONS[side], MAX_FLUID_TRANSFER, false);
 
-                    ItemSetting setting = isLiquidValid(componentMenu, fluidStack);
+                    Setting setting = isLiquidValid(componentMenu, fluidStack);
                     if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
                         FlowComponent owner = componentMenu.getParent();
                         StackTankHolder target = new StackTankHolder(fluidStack, tank.getTank());
@@ -318,13 +318,13 @@ public class CommandExecutor {
     }
 
 
-    private ItemSetting isItemValid(ComponentMenu componentMenu, ItemStack itemStack)  {
-        ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
+    private Setting isItemValid(ComponentMenu componentMenu, ItemStack itemStack)  {
+        ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
 
         int itemId = itemStack.itemID;
-        for (ItemSetting setting : menuItem.getSettings()) {
-            if (setting.getItem() != null) {
-                if (setting.getItem().itemID == itemId && (setting.isFuzzy() || setting.getItem().getItemDamage() == itemStack.getItemDamage())) {
+        for (Setting setting : menuItem.getSettings()) {
+            if (setting.isValid()) {
+                if (((ItemSetting)setting).getItem().itemID == itemId && (((ItemSetting)setting).isFuzzy() || ((ItemSetting)setting).getItem().getItemDamage() == itemStack.getItemDamage())) {
                     return setting;
                 }
             }
@@ -333,12 +333,12 @@ public class CommandExecutor {
         return null;
     }
 
-    private ItemSetting isLiquidValid(ComponentMenu componentMenu, FluidStack fluidStack)  {
+    private Setting isLiquidValid(ComponentMenu componentMenu, FluidStack fluidStack)  {
         return null;
     }
 
     private void insertItems(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories) {
-        ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
+        ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
 
         List<OutputItemCounter> outputCounters = new ArrayList<OutputItemCounter>();
         for (SlotInventoryHolder inventoryHolder : inventories) {
@@ -357,7 +357,7 @@ public class CommandExecutor {
                     SlotStackInventoryHolder holder = itemIterator.next();
                     ItemStack itemStack = holder.getItemStack();
 
-                    ItemSetting setting = isItemValid(componentMenu, itemStack);
+                    Setting setting = isItemValid(componentMenu, itemStack);
 
                     if ((menuItem.useWhiteList() == (setting == null)) &&  (setting == null || !setting.isLimitedByAmount())) {
                         continue;
@@ -430,7 +430,7 @@ public class CommandExecutor {
     }
 
     private void insertLiquids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
-        ComponentMenuItem menuItem = (ComponentMenuItem)componentMenu;
+        ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
 
         List<OutputLiquidCounter> outputCounters = new ArrayList<OutputLiquidCounter>();
         for (SlotInventoryHolder tankHolder : tanks) {
@@ -449,7 +449,7 @@ public class CommandExecutor {
                     StackTankHolder holder = liquidIterator.next();
                     FluidStack fluidStack = holder.getFluidStack();
 
-                    ItemSetting setting = isLiquidValid(componentMenu, fluidStack);
+                    Setting setting = isLiquidValid(componentMenu, fluidStack);
 
                     if ((menuItem.useWhiteList() == (setting == null)) &&  (setting == null || !setting.isLimitedByAmount())) {
                         continue;
@@ -531,7 +531,7 @@ public class CommandExecutor {
                 continue;
             }
 
-            ItemSetting setting = isItemValid(componentMenu, itemStack);
+            Setting setting = isItemValid(componentMenu, itemStack);
             if (setting != null) {
                 ConditionSettingChecker conditionSettingChecker = conditionSettingCheckerMap.get(setting.getId());
                 if (conditionSettingChecker == null) {
@@ -545,8 +545,8 @@ public class CommandExecutor {
     private boolean checkConditionResult(ComponentMenu componentMenu, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
         ComponentMenuItemCondition menuItem = (ComponentMenuItemCondition)componentMenu;
 
-        for (ItemSetting setting : menuItem.getSettings()) {
-            if (setting.getItem() != null) {
+        for (Setting setting : menuItem.getSettings()) {
+            if (setting.isValid()) {
                 ConditionSettingChecker conditionSettingChecker = conditionSettingCheckerMap.get(setting.getId());
 
                 if (conditionSettingChecker != null && conditionSettingChecker.isTrue()) {

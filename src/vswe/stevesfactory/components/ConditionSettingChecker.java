@@ -5,8 +5,8 @@ public class ConditionSettingChecker {
     private ItemSetting setting;
     private int itemCount;
 
-    public ConditionSettingChecker(ItemSetting setting) {
-        this.setting = setting;
+    public ConditionSettingChecker(Setting setting) {
+        this.setting = (ItemSetting)setting;
         itemCount = 0;
     }
 

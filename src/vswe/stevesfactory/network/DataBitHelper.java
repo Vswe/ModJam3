@@ -29,7 +29,10 @@ public enum DataBitHelper {
 
     CLIENT_HEADER(2),
     WORLD_COORDINATE(32),
-    GUI_BUTTON_ID(3);
+    GUI_BUTTON_ID(3),
+
+    MENU_FLUID_ID(10) //Actually an int, but I think 10 bits is too much anyways. If someone has over 1024 fluids I have a problem
+    ;
 
 
 

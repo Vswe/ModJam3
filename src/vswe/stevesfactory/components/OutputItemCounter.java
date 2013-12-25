@@ -7,16 +7,16 @@ import net.minecraft.item.ItemStack;
 import java.util.List;
 
 public class OutputItemCounter {
-    private ItemSetting setting;
+    private Setting setting;
     private boolean useWhiteList;
     private int currentInventoryStackSize;
     private int currentBufferStackSize;
 
-    public OutputItemCounter(List<ItemBufferElement> itemBuffer, List<SlotInventoryHolder> inventories, IInventory inventory, ItemSetting setting, boolean useWhiteList) {
+    public OutputItemCounter(List<ItemBufferElement> itemBuffer, List<SlotInventoryHolder> inventories, IInventory inventory, Setting setting, boolean useWhiteList) {
         this.setting = setting;
         this.useWhiteList = useWhiteList;
 
-        if (setting != null && setting.getItem() != null && setting.isLimitedByAmount()) {
+        if (setting != null && ((ItemSetting)setting).getItem() != null && setting.isLimitedByAmount()) {
             if (useWhiteList) {
                 if (inventories.get(0).isShared()) {
                     for (SlotInventoryHolder slotInventoryHolder : inventories) {
@@ -36,13 +36,13 @@ public class OutputItemCounter {
     private void addInventory(IInventory inventory) {
         for (int i = 0; i < inventory.getSizeInventory(); i++) {
             ItemStack item = inventory.getStackInSlot(i);
-            if (item != null && setting.getItem().itemID == item.itemID && (setting.isFuzzy() || setting.getItem().getItemDamage() == item.getItemDamage())) {
+            if (item != null && ((ItemSetting)setting).getItem().itemID == item.itemID && (((ItemSetting)setting).isFuzzy() || ((ItemSetting)setting).getItem().getItemDamage() == item.getItemDamage())) {
                 currentInventoryStackSize += item.stackSize;
             }
         }
     }
 
-    public boolean areSettingsSame(ItemSetting setting) {
+    public boolean areSettingsSame(Setting setting) {
         return (this.setting == null && setting == null) || (this.setting != null && setting != null && this.setting.getId() == setting.getId());
     }
 
@@ -52,9 +52,9 @@ public class OutputItemCounter {
         }else {
             int itemsAllowedToBeMoved;
             if (useWhiteList) {
-                itemsAllowedToBeMoved = setting.getItem().stackSize - currentInventoryStackSize;
+                itemsAllowedToBeMoved = ((ItemSetting)setting).getItem().stackSize - currentInventoryStackSize;
             }else{
-                itemsAllowedToBeMoved = currentBufferStackSize - setting.getItem().stackSize;
+                itemsAllowedToBeMoved = currentBufferStackSize - ((ItemSetting)setting).getItem().stackSize;
             }
 
 

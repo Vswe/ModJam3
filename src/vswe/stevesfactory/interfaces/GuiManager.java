@@ -2,13 +2,17 @@ package vswe.stevesfactory.interfaces;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import vswe.stevesfactory.CollisionHelper;
@@ -37,6 +41,7 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
     private static final ResourceLocation BACKGROUND_1 = registerTexture("Background1");
     private static final ResourceLocation BACKGROUND_2 = registerTexture("Background2");
     private static final ResourceLocation COMPONENTS = registerTexture("FlowComponents");
+    private static final ResourceLocation TERRAIN = new ResourceLocation("textures/atlas/blocks.png");
 
     public static int Z_LEVEL_COMPONENT_OPEN_DIFFERENCE = 100;
     public static int Z_LEVEL_COMPONENT_CLOSED_DIFFERENCE = 1;
@@ -406,4 +411,27 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
         return (int)y;
     }
 
+    public void drawIcon(Icon icon, int x, int y) {
+        drawTexturedModelRectFromIcon(guiLeft + x, guiTop + y, icon, 16, 16);
+    }
+
+    public void drawFluid(Fluid fluid, int x, int y) {
+
+
+        Icon icon = fluid.getIcon();
+
+        if (icon == null) {
+            if (FluidRegistry.WATER.equals(fluid)) {
+                icon = Block.waterStill.getIcon(0, 0);
+            }else if(FluidRegistry.LAVA.equals(fluid)) {
+                icon = Block.lavaStill.getIcon(0, 0);
+            }
+        }
+
+        if (icon != null) {
+            bindTexture(TERRAIN);
+            drawIcon(icon, x, y);
+            bindTexture(COMPONENTS);
+        }
+    }
 }

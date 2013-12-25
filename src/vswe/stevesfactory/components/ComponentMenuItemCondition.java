@@ -21,8 +21,8 @@ public class ComponentMenuItemCondition extends ComponentMenuItem {
 
     @Override
     public void addErrors(List<String> errors) {
-        for (ItemSetting itemSetting : getSettings()) {
-            if (itemSetting.getItem() != null) {
+        for (Setting setting : getSettings()) {
+            if (getSelectedSetting().getItem() != null) {
                 return;
             }
         }

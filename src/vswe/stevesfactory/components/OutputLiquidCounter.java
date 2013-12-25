@@ -1,8 +1,6 @@
 package vswe.stevesfactory.components;
 
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
@@ -10,16 +8,17 @@ import net.minecraftforge.fluids.IFluidHandler;
 import java.util.List;
 
 public class OutputLiquidCounter {
-    private ItemSetting setting;
+    private Setting setting;
     private boolean useWhiteList;
     private int currentTankTransferSize;
     private int currentBufferTransferSize;
 
-    public OutputLiquidCounter(List<LiquidBufferElement> liquidBuffer, List<SlotInventoryHolder> tanks, IFluidHandler tank, ItemSetting setting, boolean useWhiteList) {
+    public OutputLiquidCounter(List<LiquidBufferElement> liquidBuffer, List<SlotInventoryHolder> tanks, IFluidHandler tank, Setting setting, boolean useWhiteList) {
         this.setting = setting;
         this.useWhiteList = useWhiteList;
 
-        if (setting != null && setting.getItem() != null && setting.isLimitedByAmount()) {
+        //TODO fix
+        /*if (setting != null && setting.getItem() != null && setting.isLimitedByAmount()) {
             if (useWhiteList) {
                 if (tanks.get(0).isShared()) {
                     for (SlotInventoryHolder slotInventoryHolder : tanks) {
@@ -33,7 +32,7 @@ public class OutputLiquidCounter {
                     currentBufferTransferSize += liquidBufferElement.getBufferSize(setting);
                 }
             }
-        }
+        } */
     }
 
     private void addInventory(IFluidHandler tank) {
@@ -50,14 +49,15 @@ public class OutputLiquidCounter {
         }*/
     }
 
-    public boolean areSettingsSame(ItemSetting setting) {
+    public boolean areSettingsSame(Setting setting) {
         return (this.setting == null && setting == null) || (this.setting != null && setting != null && this.setting.getId() == setting.getId());
     }
 
+    //TODO fix
     public int retrieveItemCount(int desiredItemCount) {
-        if (setting == null || !setting.isLimitedByAmount()) {
+        //if (setting == null || !setting.isLimitedByAmount()) {
             return desiredItemCount;
-        }else {
+        /*}else {
             int itemsAllowedToBeMoved;
             if (useWhiteList) {
                 itemsAllowedToBeMoved = setting.getItem().stackSize - currentTankTransferSize;
@@ -67,7 +67,7 @@ public class OutputLiquidCounter {
 
 
             return Math.min(itemsAllowedToBeMoved, desiredItemCount);
-        }
+        }*/
     }
 
     public void modifyStackSize(int itemsToMove) {

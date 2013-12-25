@@ -17,12 +17,12 @@ public enum ComponentType {
     FLOW_CONTROL(4,
             new ConnectionSet[]{ConnectionSet.MULTIPLE_INPUT_2, ConnectionSet.MULTIPLE_INPUT_5},
             ComponentMenuResult.class),
-    LIQUID_INPUT(5,
+    LIQUID_INPUT(5,                     //TODO Add the liquid menu
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuItem.class, ComponentMenuResult.class),
+            ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuLiquid.class, ComponentMenuResult.class),
     LIQUID_OUTPUT(6,
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuItemOutput.class, ComponentMenuResult.class);
+            ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuLiquid.class, ComponentMenuResult.class);
 
     private Class<? extends ComponentMenu>[] classes;
     private int id;
@@ -65,7 +65,7 @@ public enum ComponentType {
                 ret += " ";
             }
 
-            ret += words[i].charAt(0) + words[i].toString().toLowerCase().substring(1);
+            ret += words[i].charAt(0) + words[i].toLowerCase().substring(1);
         }
 
         return ret;

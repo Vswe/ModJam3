@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LiquidBufferElement {
-    private ItemSetting setting;
+    private Setting setting;
     private FlowComponent component;
     private boolean useWhiteList;
     private int currentTransferSize;
@@ -18,7 +18,7 @@ public class LiquidBufferElement {
     private List<StackTankHolder> holders;
 
 
-    public LiquidBufferElement(FlowComponent owner, ItemSetting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList, StackTankHolder target) {
+    public LiquidBufferElement(FlowComponent owner, Setting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList, StackTankHolder target) {
         this.component = owner;
         this.setting = setting;
         this.inventoryHolder = inventoryHolder;
@@ -27,7 +27,7 @@ public class LiquidBufferElement {
         addTarget(target);
     }
 
-    public boolean addTarget(FlowComponent owner, ItemSetting setting,  SlotInventoryHolder inventoryHolder, StackTankHolder target) {
+    public boolean addTarget(FlowComponent owner, Setting setting,  SlotInventoryHolder inventoryHolder, StackTankHolder target) {
         if (component.getId() == owner.getId() && (this.setting == null || this.setting.getId() == setting.getId()) && (this.inventoryHolder.isShared() || this.inventoryHolder.equals(inventoryHolder))) {
             addTarget(target);
             return true;
@@ -46,7 +46,7 @@ public class LiquidBufferElement {
         }
     }
 
-    public ItemSetting getSetting() {
+    public Setting getSetting() {
         return setting;
     }
 
@@ -54,10 +54,11 @@ public class LiquidBufferElement {
         return holders;
     }
 
+    //TODO fix
     public int retrieveItemCount(int desiredItemCount) {
-        if (setting == null || !setting.isLimitedByAmount()) {
+        //if (setting == null || !setting.isLimitedByAmount()) {
             return desiredItemCount;
-        }else{
+        /*}else{
             int itemsAllowedToBeMoved;
             if (useWhiteList) {
                 int movedItems = totalTransferSize - currentTransferSize;
@@ -68,24 +69,25 @@ public class LiquidBufferElement {
 
 
             return Math.min(itemsAllowedToBeMoved, desiredItemCount);
-        }
+        } */
     }
 
     public void decreaseStackSize(int itemsToMove) {
         currentTransferSize -= itemsToMove;
     }
 
+    //TODO fix for liquid
     public ItemStack getItemStack() {
-       if (setting != null && setting.getItem() != null) {
+        return null;
+       /*if (setting != null && setting.getItem() != null) {
            return setting.getItem();
        }else{
-           //TODO fix for liquid
-           //return holders.get(0).getItemStack();
-           return null;
-       }
+
+           return holders.get(0).getItemStack();
+       } */
     }
 
-    public int getBufferSize(ItemSetting outputSetting) {
+    public int getBufferSize(Setting outputSetting) {
         int bufferSize = 0;
         //TODO fix for liquid
         /**for (StackTankHolder holder : getHolders()) {

@@ -17,16 +17,16 @@ public class ItemBufferElement {
     private List<SlotStackInventoryHolder> holders;
 
 
-    public ItemBufferElement(FlowComponent owner, ItemSetting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList, SlotStackInventoryHolder target) {
+    public ItemBufferElement(FlowComponent owner, Setting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList, SlotStackInventoryHolder target) {
         this.component = owner;
-        this.setting = setting;
+        this.setting = (ItemSetting)setting;
         this.inventoryHolder = inventoryHolder;
         this.useWhiteList = useWhiteList;
         holders = new ArrayList<SlotStackInventoryHolder>();
         addTarget(target);
     }
 
-    public boolean addTarget(FlowComponent owner, ItemSetting setting,  SlotInventoryHolder inventoryHolder, SlotStackInventoryHolder target) {
+    public boolean addTarget(FlowComponent owner, Setting setting,  SlotInventoryHolder inventoryHolder, SlotStackInventoryHolder target) {
         if (component.getId() == owner.getId() && (this.setting == null || this.setting.getId() == setting.getId()) && (this.inventoryHolder.isShared() || this.inventoryHolder.equals(inventoryHolder))) {
             addTarget(target);
             return true;
@@ -42,7 +42,7 @@ public class ItemBufferElement {
         currentStackSize = totalStackSize;
     }
 
-    public ItemSetting getSetting() {
+    public Setting getSetting() {
         return setting;
     }
 
@@ -79,11 +79,11 @@ public class ItemBufferElement {
        }
     }
 
-    public int getBufferSize(ItemSetting outputSetting) {
+    public int getBufferSize(Setting outputSetting) {
         int bufferSize = 0;
         for (SlotStackInventoryHolder holder : getHolders()) {
             ItemStack item = holder.getItemStack();
-            if (item != null && outputSetting.getItem().itemID == item.itemID && (outputSetting.isFuzzy() || outputSetting.getItem().getItemDamage() == item.getItemDamage())) {
+            if (item != null && ((ItemSetting)outputSetting).getItem().itemID == item.itemID && (((ItemSetting)outputSetting).isFuzzy() || ((ItemSetting)outputSetting).getItem().getItemDamage() == item.getItemDamage())) {
                 bufferSize += item.stackSize;
             }
         }
