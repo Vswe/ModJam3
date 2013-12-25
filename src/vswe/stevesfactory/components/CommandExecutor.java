@@ -307,6 +307,8 @@ public class CommandExecutor {
                             continue;
                         }
 
+                        fluidStack = fluidStack.copy();
+
                         Setting setting = isLiquidValid(componentMenu, fluidStack);
                         if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
                             FlowComponent owner = componentMenu.getParent();

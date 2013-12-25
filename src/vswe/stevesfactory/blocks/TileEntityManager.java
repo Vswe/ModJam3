@@ -175,6 +175,7 @@ public class TileEntityManager extends TileEntity {
         firstInventoryUpdate = false;
     }
 
+    //TODO make sure this works properly with multiple types of "inventories"
     private void updateInventorySelection(WorldCoordinate[] oldCoordinates) {
         for (FlowComponent item : items) {
             for (ComponentMenu menu : item.getMenus()) {
