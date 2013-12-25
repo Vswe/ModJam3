@@ -182,14 +182,19 @@ public class ComponentMenuRedstone extends ComponentMenu {
         }
     }
 
+    private static final String NBT_ACTIVE = "Selection";
+    private static final String NBT_ALL = "RequrieAll";
+
     @Override
     public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        selection = nbtTagCompound.getByte(NBT_ACTIVE);
+        setRequireAll(nbtTagCompound.getBoolean(NBT_ALL));
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbtTagCompound) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        nbtTagCompound.setByte(NBT_ACTIVE, (byte)selection);
+        nbtTagCompound.setBoolean(NBT_ALL, requireAll());
     }
 
     @Override
