@@ -426,7 +426,7 @@ public class TileEntityManager extends TileEntity {
         }
     }
 
-    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 2;
+    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 3;
     private static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
     private static final String NBT_POWERED = "IsPowered";
     private static final String NBT_TIMER = "Timer";
