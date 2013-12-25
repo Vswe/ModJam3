@@ -20,12 +20,48 @@ import java.util.Iterator;
 public class ComponentMenuLiquid extends ComponentMenuStuff {
     public ComponentMenuLiquid(FlowComponent parent) {
         super(parent, LiquidSetting.class);
+
+        numberTextBoxes.addTextBox(amountTextBoxBuckets = new TextBoxNumber(10 ,50, 3, true) {
+            @Override
+            public boolean isVisible() {
+                return selectedSetting.isLimitedByAmount();
+            }
+
+            @Override
+            public void onNumberChanged() {
+                sendAmountData();
+            }
+        });
+
+        numberTextBoxes.addTextBox(amountTextBoxMilli = new TextBoxNumber(60 ,50, 3, true) {
+            @Override
+            public boolean isVisible() {
+                return selectedSetting.isLimitedByAmount();
+            }
+
+            @Override
+            public void onNumberChanged() {
+                sendAmountData();
+            }
+        });
     }
+
+
+
+    private void sendAmountData() {
+        selectedSetting.setAmount(amountTextBoxBuckets.getNumber() * 1000 + amountTextBoxMilli.getNumber());
+        writeServerData(DataTypeHeader.AMOUNT);
+    }
+    private TextBoxNumber amountTextBoxBuckets;
+    private TextBoxNumber amountTextBoxMilli;
 
     @SideOnly(Side.CLIENT)
     @Override
     protected void drawInfoMenuContent(GuiManager gui, int mX, int mY) {
-
+        if (selectedSetting.isLimitedByAmount()) {
+            gui.drawCenteredString("Buckets", amountTextBoxBuckets.getX(), amountTextBoxBuckets.getY() - 7, 0.7F, amountTextBoxBuckets.getWidth(), 0x404040);
+            gui.drawCenteredString("Milli Buckets", amountTextBoxMilli.getX(), amountTextBoxMilli.getY() - 7, 0.55F, amountTextBoxMilli.getWidth(), 0x404040);
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -38,6 +74,28 @@ public class ComponentMenuLiquid extends ComponentMenuStuff {
     @Override
     protected void drawSettingObject(GuiManager gui, Setting setting, int x, int y) {
         drawResultObject(gui,((LiquidSetting)setting).getFluid(), x, y);
+    }
+
+    @Override
+    protected void drawResultObjectMouseOver(GuiManager gui, Object obj, int x, int y) {
+        gui.drawMouseOver(getDisplayName((Fluid) obj), x, y);
+    }
+
+    @Override
+    protected void drawSettingObjectMouseOver(GuiManager gui, Setting setting, int x, int y) {
+        drawResultObjectMouseOver(gui, ((LiquidSetting)setting).getFluid(), x, y);
+    }
+
+    @Override
+    protected void updateTextBoxes() {
+        int amount = selectedSetting.getAmount();
+        amountTextBoxBuckets.setNumber(amount / 1000);
+        amountTextBoxMilli.setNumber(amount % 1000);
+    }
+
+    @Override
+    protected DataBitHelper getAmountBitLength() {
+        return DataBitHelper.MENU_LIQUID_AMOUNT;
     }
 
     @Override
@@ -62,9 +120,10 @@ public class ComponentMenuLiquid extends ComponentMenuStuff {
         switch (header) {
             case SET_ITEM:
                 dw.writeData(liquidSetting.getLiquidId(), DataBitHelper.MENU_FLUID_ID);
-                break;
         }
     }
+
+
 
     @Override
     public String getName() {
@@ -88,12 +147,22 @@ public class ComponentMenuLiquid extends ComponentMenuStuff {
 
                 Fluid fluid = itemIterator.next();
 
-                if (!fluid.getLocalizedName().contains(searchString)) {
+                if (!getDisplayName(fluid).toLowerCase().contains(searchString)) {
                     itemIterator.remove();
                 }
             }
         }
 
         updateScrolling();
+    }
+
+    public static String getDisplayName(Fluid fluid) {
+        //different mods store the name in different ways apparently
+        String name = fluid.getLocalizedName();
+        if (name.indexOf(".") != -1) {
+            name = FluidRegistry.getFluidName(fluid.getID());
+        }
+
+        return name;
     }
 }

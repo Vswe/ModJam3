@@ -12,12 +12,26 @@ import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class ComponentMenuItem extends ComponentMenuStuff {
     public ComponentMenuItem(FlowComponent parent) {
         super(parent, ItemSetting.class);
 
+        numberTextBoxes.addTextBox(amountTextBox = new TextBoxNumber(80 ,24, 3, true) {
+            @Override
+            public boolean isVisible() {
+                return selectedSetting.isLimitedByAmount();
+            }
+
+            @Override
+            public void onNumberChanged() {
+                selectedSetting.setAmount(getNumber());
+                writeServerData(DataTypeHeader.AMOUNT);
+            }
+        });
 
         numberTextBoxes.addTextBox(damageValueTextBox = new TextBoxNumber(70 ,52, 5, true) {
             @Override
@@ -54,6 +68,7 @@ public class ComponentMenuItem extends ComponentMenuStuff {
     private static final int DMG_VAL_TEXT_Y = 55;
 
     private TextBoxNumber damageValueTextBox;
+    private TextBoxNumber amountTextBox;
 
     protected ItemSetting getSelectedSetting() {
         return (ItemSetting)selectedSetting;
@@ -84,9 +99,21 @@ public class ComponentMenuItem extends ComponentMenuStuff {
         drawResultObject(gui,((ItemSetting)setting).getItem(), x, y);
     }
 
+    @SideOnly(Side.CLIENT)
+    @Override
+    protected void drawResultObjectMouseOver(GuiManager gui, Object obj, int x, int y) {
+        gui.drawMouseOver(getToolTip((ItemStack)obj), x, y);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    protected void drawSettingObjectMouseOver(GuiManager gui, Setting setting, int x, int y) {
+        drawResultObjectMouseOver(gui, ((ItemSetting)setting).getItem(), x, y);
+    }
+
     @Override
     protected void updateTextBoxes() {
-        super.updateTextBoxes();
+        amountTextBox.setNumber(selectedSetting.getAmount());
         damageValueTextBox.setNumber(getSelectedSetting().getItem().getItemDamage());
     }
 
@@ -108,6 +135,11 @@ public class ComponentMenuItem extends ComponentMenuStuff {
                 }
             }
         }
+    }
+
+    @Override
+    protected DataBitHelper getAmountBitLength() {
+        return DataBitHelper.MENU_ITEM_AMOUNT;
     }
 
     @Override
@@ -198,5 +230,35 @@ public class ComponentMenuItem extends ComponentMenuStuff {
         }
 
         updateScrolling();
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static List<String> getToolTip(ItemStack itemStack) {
+        try {
+            return itemStack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+        }catch (Exception ex) {
+            if (itemStack.getItemDamage() == 0) {
+                return new ArrayList<String>();
+            }else{
+                ItemStack newItem = itemStack.copy();
+                newItem.setItemDamage(0);
+                return getToolTip(newItem);
+            }
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static String getDisplayName(ItemStack itemStack) {
+        try {
+            return itemStack.getDisplayName();
+        }catch (Exception ex) {
+            if (itemStack.getItemDamage() == 0) {
+                return "";
+            }else{
+                ItemStack newItem = itemStack.copy();
+                newItem.setItemDamage(0);
+                return getDisplayName(newItem);
+            }
+        }
     }
 }

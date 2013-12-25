@@ -54,57 +54,45 @@ public class LiquidBufferElement {
         return holders;
     }
 
-    //TODO fix
     public int retrieveItemCount(int desiredItemCount) {
-        //if (setting == null || !setting.isLimitedByAmount()) {
+        if (setting == null || !setting.isLimitedByAmount()) {
             return desiredItemCount;
-        /*}else{
+        }else{
             int itemsAllowedToBeMoved;
             if (useWhiteList) {
                 int movedItems = totalTransferSize - currentTransferSize;
-                itemsAllowedToBeMoved = setting.getItem().stackSize - movedItems;
+                itemsAllowedToBeMoved = setting.getAmount() - movedItems;
             }else{
-                itemsAllowedToBeMoved = currentTransferSize - setting.getItem().stackSize;
+                itemsAllowedToBeMoved = currentTransferSize - setting.getAmount();
             }
 
 
             return Math.min(itemsAllowedToBeMoved, desiredItemCount);
-        } */
+        }
     }
 
     public void decreaseStackSize(int itemsToMove) {
         currentTransferSize -= itemsToMove;
     }
 
-    //TODO fix for liquid
-    public ItemStack getItemStack() {
-        return null;
-       /*if (setting != null && setting.getItem() != null) {
-           return setting.getItem();
-       }else{
-
-           return holders.get(0).getItemStack();
-       } */
-    }
-
     public int getBufferSize(Setting outputSetting) {
         int bufferSize = 0;
-        //TODO fix for liquid
-        /**for (StackTankHolder holder : getHolders()) {
-            ItemStack item = holder.getItemStack();
-            if (item != null && outputSetting.getItem().itemID == item.itemID && (outputSetting.isFuzzy() || outputSetting.getItem().getItemDamage() == item.getItemDamage())) {
-                bufferSize += item.stackSize;
+
+        for (StackTankHolder holder : getHolders()) {
+            FluidStack fluidStack = holder.getFluidStack();
+            if (fluidStack != null && fluidStack.fluidID == ((LiquidSetting)outputSetting).getLiquidId()) {
+                bufferSize += fluidStack.amount;
             }
         }
         if (setting != null && setting.isLimitedByAmount()){
             int maxSize;
             if (useWhiteList) {
-                maxSize = setting.getItem().stackSize;
+                maxSize = setting.getAmount();
             }else{
-                maxSize = totalTransferSize - setting.getItem().stackSize;
+                maxSize = totalTransferSize - setting.getAmount();
             }
             bufferSize = Math.min(bufferSize, maxSize);
-        }**/
+        }
         return bufferSize;
     }
 }

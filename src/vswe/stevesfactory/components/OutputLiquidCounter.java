@@ -3,7 +3,6 @@ package vswe.stevesfactory.components;
 
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidHandler;
 
 import java.util.List;
 
@@ -13,61 +12,61 @@ public class OutputLiquidCounter {
     private int currentTankTransferSize;
     private int currentBufferTransferSize;
 
-    public OutputLiquidCounter(List<LiquidBufferElement> liquidBuffer, List<SlotInventoryHolder> tanks, IFluidHandler tank, Setting setting, boolean useWhiteList) {
+    public OutputLiquidCounter(List<LiquidBufferElement> liquidBuffer, List<SlotInventoryHolder> tanks, SlotInventoryHolder tank, Setting setting, boolean useWhiteList) {
         this.setting = setting;
         this.useWhiteList = useWhiteList;
 
-        //TODO fix
-        /*if (setting != null && setting.getItem() != null && setting.isLimitedByAmount()) {
+        if (setting != null && setting.isValid() && setting.isLimitedByAmount()) {
             if (useWhiteList) {
                 if (tanks.get(0).isShared()) {
                     for (SlotInventoryHolder slotInventoryHolder : tanks) {
-                        addInventory(slotInventoryHolder.getTank());
+                        addTank(setting, slotInventoryHolder);
                     }
                 }else{
-                    addInventory(tank);
+                    addTank(setting, tank);
                 }
             }else{
                 for (LiquidBufferElement liquidBufferElement : liquidBuffer) {
                     currentBufferTransferSize += liquidBufferElement.getBufferSize(setting);
                 }
             }
-        } */
+        }
     }
 
-    private void addInventory(IFluidHandler tank) {
-        //TODO make a proper one
-        FluidStack temp = tank.drain(ForgeDirection.UNKNOWN, CommandExecutor.MAX_FLUID_TRANSFER, false);
-        if (temp != null) {
-            currentTankTransferSize += temp.amount;
-        }
-        /*for (int i = 0; i < tank.get(); i++) {
-            ItemStack item = inventory.getStackInSlot(i);
-            if (item != null && setting.getItem().itemID == item.itemID && (setting.isFuzzy() || setting.getItem().getItemDamage() == item.getItemDamage())) {
-                currentTankTransferSize += item.stackSize;
+    private void addTank(Setting setting, SlotInventoryHolder tankHolder) {
+        int max = 0;
+
+        for (SlotSideTarget slotSideTarget : tankHolder.getValidSlots().values()) {
+            for (int side : slotSideTarget.getSides()) {
+                FluidStack temp = tankHolder.getTank().drain(ForgeDirection.VALID_DIRECTIONS[side], CommandExecutor.MAX_FLUID_TRANSFER, false);
+
+                if (temp != null && temp.fluidID == ((LiquidSetting)setting).getLiquidId()) {
+                    max = Math.max(max, temp.amount);
+                }
             }
-        }*/
+        }
+
+        currentTankTransferSize += max;
     }
 
     public boolean areSettingsSame(Setting setting) {
         return (this.setting == null && setting == null) || (this.setting != null && setting != null && this.setting.getId() == setting.getId());
     }
 
-    //TODO fix
     public int retrieveItemCount(int desiredItemCount) {
-        //if (setting == null || !setting.isLimitedByAmount()) {
+        if (setting == null || !setting.isLimitedByAmount()) {
             return desiredItemCount;
-        /*}else {
+        }else {
             int itemsAllowedToBeMoved;
             if (useWhiteList) {
-                itemsAllowedToBeMoved = setting.getItem().stackSize - currentTankTransferSize;
+                itemsAllowedToBeMoved = setting.getAmount() - currentTankTransferSize;
             }else{
-                itemsAllowedToBeMoved = currentBufferTransferSize - setting.getItem().stackSize;
+                itemsAllowedToBeMoved = currentBufferTransferSize - setting.getAmount();
             }
 
 
             return Math.min(itemsAllowedToBeMoved, desiredItemCount);
-        }*/
+        }
     }
 
     public void modifyStackSize(int itemsToMove) {

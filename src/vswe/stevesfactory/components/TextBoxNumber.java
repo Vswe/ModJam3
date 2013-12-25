@@ -2,6 +2,9 @@ package vswe.stevesfactory.components;
 
 
 public class TextBoxNumber {
+    private static final int TEXT_BOX_SIZE_W = 21;
+    private static final int TEXT_BOX_SIZE_W_WIDE = 33;
+
     private int x;
     private int y;
     private int number;
@@ -45,4 +48,8 @@ public class TextBoxNumber {
     }
 
     public void onNumberChanged() {};
+
+    public int getWidth() {
+        return wide ? TEXT_BOX_SIZE_W_WIDE : TEXT_BOX_SIZE_W;
+    }
 }

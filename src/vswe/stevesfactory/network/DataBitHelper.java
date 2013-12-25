@@ -32,7 +32,8 @@ public enum DataBitHelper {
     GUI_BUTTON_ID(3),
 
     MENU_FLUID_ID(10) //Actually an int, but I think 10 bits is too much anyways. If someone has over 1024 fluids I have a problem
-    ;
+    ,
+    MENU_LIQUID_AMOUNT(20);
 
 
 

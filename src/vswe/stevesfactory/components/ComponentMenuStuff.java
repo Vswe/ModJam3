@@ -43,18 +43,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
         }
         numberTextBoxes = new TextBoxNumberList();
-        numberTextBoxes.addTextBox(amountTextBox = new TextBoxNumber(80 ,24, 3, true) {
-            @Override
-            public boolean isVisible() {
-                return selectedSetting.isLimitedByAmount();
-            }
 
-            @Override
-            public void onNumberChanged() {
-                selectedSetting.setAmount(getNumber());
-                writeServerData(DataTypeHeader.AMOUNT);
-            }
-        });
 
         radioButtons = new RadioButtonList() {
             @Override
@@ -166,7 +155,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     protected Setting selectedSetting;
     private boolean editSetting;
     protected TextBoxNumberList numberTextBoxes;
-    private TextBoxNumber amountTextBox;
+
     protected RadioButtonList radioButtons;
     protected CheckBoxList checkBoxes;
 
@@ -178,6 +167,12 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
     @SideOnly(Side.CLIENT)
     protected abstract void drawSettingObject(GuiManager gui, Setting setting, int x, int y);
+
+    @SideOnly(Side.CLIENT)
+    protected abstract void drawResultObjectMouseOver(GuiManager gui, Object obj, int x, int y);
+
+    @SideOnly(Side.CLIENT)
+    protected abstract void drawSettingObjectMouseOver(GuiManager gui, Setting setting, int x, int y);
 
     @SideOnly(Side.CLIENT)
     @Override
@@ -311,8 +306,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
         if (isEditing()) {
             if (CollisionHelper.inBounds(EDIT_ITEM_X, EDIT_ITEM_Y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                //TODO fix
-                //gui.drawMouseOver(getToolTip(selectedSetting.getItem()), mX, mY);
+                drawSettingObjectMouseOver(gui, selectedSetting, mX, mY);
             }else if(inDeleteBounds(mX, mY)) {
                 gui.drawMouseOver("Delete this item selection", mX, mY);
             }
@@ -323,8 +317,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             for (Point point : points) {
                 if (CollisionHelper.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (isSearching()) {
-                        //TODO fix
-                        //gui.drawMouseOver(getToolTip(result.get(point.id)), mX, mY);
+                        drawResultObjectMouseOver(gui, result.get(point.id), mX, mY);
                     }else{
                         gui.drawMouseOver(settings.get(point.id).getMouseOver(), mX, mY);
                     }
@@ -427,9 +420,8 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         }
     }
 
-    protected void updateTextBoxes() {
-        amountTextBox.setNumber(selectedSetting.getAmount());
-    }
+    protected abstract void updateTextBoxes();
+
 
     protected boolean isEditing() {
         return selectedSetting != null && editSetting;
@@ -481,7 +473,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 setting.writeData(dw);
                 dw.writeBoolean(setting.isLimitedByAmount());
                 if (setting.isLimitedByAmount()) {
-                    dw.writeData(setting.getAmount(), DataBitHelper.MENU_ITEM_AMOUNT);
+                    dw.writeData(setting.getAmount(), getAmountBitLength());
                 }
             }
         }
@@ -497,7 +489,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 setting.readData(dr);
                 setting.setLimitedByAmount(dr.readBoolean());
                 if (setting.isLimitedByAmount()) {
-                    setting.setAmount(dr.readData(DataBitHelper.MENU_ITEM_AMOUNT));
+                    setting.setAmount(dr.readData(getAmountBitLength()));
                 }else{
                     setting.setDefaultAmount();
                 }
@@ -584,9 +576,9 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                     break;
                 case AMOUNT:
                     if (setting.isValid()) {
-                        setting.setAmount(dr.readData(DataBitHelper.MENU_ITEM_AMOUNT));
+                        setting.setAmount(dr.readData(getAmountBitLength()));
                         if (isEditing()) {
-                            amountTextBox.setNumber(setting.getAmount());
+                            updateTextBoxes();
                         }
                     }
                     break;
@@ -613,6 +605,8 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         PacketHandler.sendDataToServer(dw);
     }
 
+    protected abstract DataBitHelper getAmountBitLength();
+
     private void writeData(DataWriter dw, DataTypeHeader header, Setting setting) {
         dw.writeBoolean(true); //specific setting is being used
         dw.writeData(setting.getId(), DataBitHelper.MENU_ITEM_SETTING_ID);
@@ -625,7 +619,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 dw.writeBoolean(setting.isLimitedByAmount());
                 break;
             case AMOUNT:
-                dw.writeData(setting.getAmount(), DataBitHelper.MENU_ITEM_AMOUNT);
+                dw.writeData(setting.getAmount(), getAmountBitLength());
                 break;
             default:
                 writeSpecificHeaderData(dw, header, setting);
@@ -726,35 +720,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
 
 
-    @SideOnly(Side.CLIENT)
-    public static List<String> getToolTip(ItemStack itemStack) {
-        try {
-            return itemStack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
-        }catch (Exception ex) {
-            if (itemStack.getItemDamage() == 0) {
-                return new ArrayList<String>();
-            }else{
-                ItemStack newItem = itemStack.copy();
-                newItem.setItemDamage(0);
-                return getToolTip(newItem);
-            }
-        }
-    }
 
-    @SideOnly(Side.CLIENT)
-    public static String getDisplayName(ItemStack itemStack) {
-        try {
-            return itemStack.getDisplayName();
-        }catch (Exception ex) {
-            if (itemStack.getItemDamage() == 0) {
-                return "";
-            }else{
-                ItemStack newItem = itemStack.copy();
-                newItem.setItemDamage(0);
-                return getDisplayName(newItem);
-            }
-        }
-    }
 
     protected boolean isFirstRadioButtonSelected() {
         return radioButtons.getSelectedOption() == 0;
@@ -771,7 +737,6 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     private static final String NBT_RADIO_SELECTION = "FirstSelected";
     private static final String NBT_SETTINGS = "Settings";
     private static final String NBT_SETTING_ID = "Id";
-    private static final String NBT_SETTING_ITEM_COUNT = "ItemCount";
     private static final String NBT_SETTING_USE_SIZE = "SizeLimit";
 
     @Override
@@ -784,7 +749,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             Setting setting = settings.get(settingTag.getByte(NBT_SETTING_ID));
             setting.load(settingTag);
             setting.setLimitedByAmount(settingTag.getBoolean(NBT_SETTING_USE_SIZE));
-            setting.setAmount(settingTag.getShort(NBT_SETTING_ITEM_COUNT));
+
         }
     }
 
@@ -799,7 +764,6 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 NBTTagCompound settingTag = new NBTTagCompound();
                 settingTag.setByte(NBT_SETTING_ID, (byte)setting.getId());
                 setting.save(settingTag);
-                settingTag.setShort(NBT_SETTING_ITEM_COUNT, (short)setting.getAmount());
                 settingTag.setBoolean(NBT_SETTING_USE_SIZE, setting.isLimitedByAmount());
                 settingTagList.appendTag(settingTag);
             }

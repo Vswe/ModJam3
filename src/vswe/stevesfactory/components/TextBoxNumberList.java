@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TextBoxNumberList {
-    private static final int TEXT_BOX_SIZE_W = 21;
-    private static final int TEXT_BOX_SIZE_W_WIDE = 33;
     private static final int TEXT_BOX_SIZE_H = 12;
     private static final int TEXT_BOX_SRC_X = 0;
     private static final int TEXT_BOX_SRC_Y = 221;
@@ -30,16 +28,16 @@ public class TextBoxNumberList {
                 int srcTextBoxX = textBox.equals(selectedTextBox) ? 1 : 0;
                 int srcTextBoxY = textBox.isWide() ? 1 : 0;
 
-                gui.drawTexture(textBox.getX(), textBox.getY(), TEXT_BOX_SRC_X + srcTextBoxX * getWidth(textBox.isWide()), TEXT_BOX_SRC_Y + srcTextBoxY * TEXT_BOX_SIZE_H, getWidth(textBox.isWide()), TEXT_BOX_SIZE_H);
+                gui.drawTexture(textBox.getX(), textBox.getY(), TEXT_BOX_SRC_X + srcTextBoxX * textBox.getWidth(), TEXT_BOX_SRC_Y + srcTextBoxY * TEXT_BOX_SIZE_H, textBox.getWidth(), TEXT_BOX_SIZE_H);
                 String str = String.valueOf(textBox.getNumber());
-                gui.drawString(str, textBox.getX() + (getWidth(textBox.isWide()) - gui.getStringWidth(str)) / 2, textBox.getY() + TEXT_Y, 0xFFFFFF);
+                gui.drawString(str, textBox.getX() + (textBox.getWidth() - gui.getStringWidth(str)) / 2, textBox.getY() + TEXT_Y, 0xFFFFFF);
             }
         }
     }
 
     public void onClick(int mX, int mY, int button) {
         for (TextBoxNumber textBox : textBoxes) {
-            if (textBox.isVisible() && CollisionHelper.inBounds(textBox.getX(), textBox.getY(), getWidth(textBox.isWide()), TEXT_BOX_SIZE_H, mX, mY)) {
+            if (textBox.isVisible() && CollisionHelper.inBounds(textBox.getX(), textBox.getY(), textBox.getWidth(), TEXT_BOX_SIZE_H, mX, mY)) {
                 if (textBox.equals(selectedTextBox)) {
                     selectedTextBox = null;
                 }else{
@@ -87,8 +85,6 @@ public class TextBoxNumberList {
         textBoxes.add(textBox);
     }
 
-    private int getWidth(boolean isWide) {
-        return isWide ? TEXT_BOX_SIZE_W_WIDE : TEXT_BOX_SIZE_W;
-    }
+
 
 }

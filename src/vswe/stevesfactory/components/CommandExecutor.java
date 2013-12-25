@@ -285,32 +285,51 @@ public class CommandExecutor {
 
     private void getLiquids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
         for (SlotInventoryHolder tank : tanks) {
-
             ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
             for (SlotSideTarget slot : tank.getValidSlots().values()) {
-
+                List<FluidTankInfo> tankInfos = new ArrayList<FluidTankInfo>();
                 for (int side : slot.getSides()) {
-
-                    FluidStack fluidStack = tank.getTank().drain(ForgeDirection.VALID_DIRECTIONS[side], MAX_FLUID_TRANSFER, false);
-
-                    Setting setting = isLiquidValid(componentMenu, fluidStack);
-                    if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
-                        FlowComponent owner = componentMenu.getParent();
-                        StackTankHolder target = new StackTankHolder(fluidStack, tank.getTank());
-
-                        boolean added = false;
-                        for (LiquidBufferElement liquidBufferElement : liquidBuffer) {
-                            if (liquidBufferElement.addTarget(owner, setting, tank, target)) {
-                                added = true;
-                                break;
+                    for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
+                        boolean alreadyUsed = false;
+                        for (FluidTankInfo tankInfo : tankInfos) {
+                            if (FluidStack.areFluidStackTagsEqual(tankInfo.fluid, fluidTankInfo.fluid) && tankInfo.capacity == fluidTankInfo.capacity) {
+                                alreadyUsed = true;
                             }
                         }
 
-                        if (!added) {
-                            LiquidBufferElement itemBufferElement = new LiquidBufferElement(owner, setting, tank, menuItem.useWhiteList(), target);
-                            liquidBuffer.add(itemBufferElement);
+                        if (alreadyUsed) {
+                            continue;
                         }
 
+                        FluidStack fluidStack = fluidTankInfo.fluid;
+
+                        if (fluidStack == null) {
+                            continue;
+                        }
+
+                        Setting setting = isLiquidValid(componentMenu, fluidStack);
+                        if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
+                            FlowComponent owner = componentMenu.getParent();
+                            StackTankHolder target = new StackTankHolder(fluidStack, tank.getTank());
+
+                            boolean added = false;
+                            for (LiquidBufferElement liquidBufferElement : liquidBuffer) {
+                                if (liquidBufferElement.addTarget(owner, setting, tank, target)) {
+                                    added = true;
+                                    break;
+                                }
+                            }
+
+                            if (!added) {
+                                LiquidBufferElement itemBufferElement = new LiquidBufferElement(owner, setting, tank, menuItem.useWhiteList(), target);
+                                liquidBuffer.add(itemBufferElement);
+                            }
+
+                        }
+                    }
+
+                    for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
+                        tankInfos.add(fluidTankInfo);
                     }
                 }
             }
@@ -334,6 +353,17 @@ public class CommandExecutor {
     }
 
     private Setting isLiquidValid(ComponentMenu componentMenu, FluidStack fluidStack)  {
+        ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
+
+        if (fluidStack != null)  {
+            int fluidId = fluidStack.fluidID;
+            for (Setting setting : menuItem.getSettings()) {
+                if (setting.isValid() && ((LiquidSetting)setting).getLiquidId() == fluidId) {
+                    return setting;
+                }
+            }
+        }
+
         return null;
     }
 
@@ -464,7 +494,7 @@ public class CommandExecutor {
                     }
 
                     if (outputLiquidCounter == null) {
-                        outputLiquidCounter = new OutputLiquidCounter(liquidBuffer, tanks, tank, setting, menuItem.useWhiteList());
+                        outputLiquidCounter = new OutputLiquidCounter(liquidBuffer, tanks, tankHolder, setting, menuItem.useWhiteList());
                         outputCounters.add(outputLiquidCounter);
                     }
 
@@ -476,14 +506,20 @@ public class CommandExecutor {
                             amount = outputLiquidCounter.retrieveItemCount(amount);
 
                             if (amount > 0) {
-                                FluidStack temp = holder.getTank().drain(ForgeDirection.VALID_DIRECTIONS[side], amount, true);
-                                tank.fill(ForgeDirection.VALID_DIRECTIONS[side], temp, true);
-                                liquidBufferElement.decreaseStackSize(amount);
-                                outputLiquidCounter.modifyStackSize(amount);
-                                fluidStack.amount -= amount;
-                                if (fluidStack.amount == 0) {
-                                    liquidIterator.remove();
-                                    break;
+                                FluidStack resource = fluidStack.copy();
+                                resource.amount = amount;
+
+                                //TODO use the proper side for the input
+                                resource = holder.getTank().drain(ForgeDirection.VALID_DIRECTIONS[side], resource, true);
+                                if (resource.amount > 0) {
+                                    tank.fill(ForgeDirection.VALID_DIRECTIONS[side], resource, true);
+                                    liquidBufferElement.decreaseStackSize(amount);
+                                    outputLiquidCounter.modifyStackSize(amount);
+                                    fluidStack.amount -= amount;
+                                    if (fluidStack.amount == 0) {
+                                        liquidIterator.remove();
+                                        break;
+                                    }
                                 }
                             }
 

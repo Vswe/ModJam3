@@ -25,7 +25,7 @@ public class ItemSetting extends Setting {
     @Override
     public List<String> getMouseOver() {
         if (item != null && GuiScreen.isShiftKeyDown()) {
-            return ComponentMenuStuff.getToolTip(item);
+            return ComponentMenuItem.getToolTip(item);
         }
 
         List<String> ret = new ArrayList<String>();
@@ -33,7 +33,7 @@ public class ItemSetting extends Setting {
         if (item == null) {
             ret.add("[No item selected]");
         }else{
-            ret.add(ComponentMenuStuff.getDisplayName(item));
+            ret.add(ComponentMenuItem.getDisplayName(item));
         }
 
         ret.add("");
@@ -112,16 +112,18 @@ public class ItemSetting extends Setting {
     private static final String NBT_SETTING_ITEM_ID = "ItemId";
     private static final String NBT_SETTING_ITEM_DMG = "ItemDamage";
     private static final String NBT_SETTING_FUZZY = "Fuzzy";
+    private static final String NBT_SETTING_ITEM_COUNT = "ItemCount";
 
     @Override
     public void load(NBTTagCompound settingTag) {
-        item = new ItemStack(settingTag.getShort(NBT_SETTING_ITEM_ID), 1, settingTag.getShort(NBT_SETTING_ITEM_DMG));
+        item = new ItemStack(settingTag.getShort(NBT_SETTING_ITEM_ID), settingTag.getShort(NBT_SETTING_ITEM_COUNT), settingTag.getShort(NBT_SETTING_ITEM_DMG));
         isFuzzy = settingTag.getBoolean(NBT_SETTING_FUZZY);
     }
 
     @Override
     public void save(NBTTagCompound settingTag) {
         settingTag.setShort(NBT_SETTING_ITEM_ID, (short)item.itemID);
+        settingTag.setShort(NBT_SETTING_ITEM_COUNT, (short)item.stackSize);
         settingTag.setShort(NBT_SETTING_ITEM_DMG, (short)item.getItemDamage());
         settingTag.setBoolean(NBT_SETTING_FUZZY, isFuzzy);
     }

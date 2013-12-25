@@ -3,6 +3,7 @@ package vswe.stevesfactory.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
@@ -25,9 +26,29 @@ public class LiquidSetting extends Setting {
     }
 
     @Override
+    public void clear() {
+        super.clear();
+
+        fluid = null;
+        setDefaultAmount();
+    }
+
+    @Override
     public List<String> getMouseOver() {
         List<String> ret = new ArrayList<String>();
-        ret.add("I'm a bloody liquid");
+
+        if (fluid == null) {
+            ret.add("[No liquid selected]");
+        }else{
+            ret.add(ComponentMenuLiquid.getDisplayName(fluid));
+        }
+
+        ret.add("");
+        ret.add("Left click to change liquid");
+        if (fluid != null) {
+            ret.add("Right click to edit settings");
+        }
+
         return ret;
     }
 
@@ -68,15 +89,17 @@ public class LiquidSetting extends Setting {
     }
 
     private static final String NBT_FLUID_ID = "FluidId";
-
+    private static final String NBT_FLUID_AMOUNT = "Amount";
     @Override
     public void load(NBTTagCompound settingTag) {
         fluid = FluidRegistry.getFluid(settingTag.getShort(NBT_FLUID_ID));
+        amount = settingTag.getInteger(NBT_FLUID_AMOUNT);
     }
 
     @Override
     public void save(NBTTagCompound settingTag) {
         settingTag.setShort(NBT_FLUID_ID, (short)fluid.getID());
+        settingTag.setInteger(NBT_FLUID_AMOUNT, amount);
     }
 
     @Override
@@ -87,6 +110,7 @@ public class LiquidSetting extends Setting {
     @Override
     public void setContent(Object obj) {
         fluid = (Fluid)obj;
+        setDefaultAmount();
     }
 
     public int getLiquidId() {

@@ -430,8 +430,20 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
 
         if (icon != null) {
             bindTexture(TERRAIN);
+            setColor(fluid.getColor());
+
             drawIcon(icon, x, y);
+
+            GL11.glColor4f(1F, 1F, 1F, 1F);
             bindTexture(COMPONENTS);
         }
+    }
+
+    private void setColor(int color) {
+        float[] colorComponents = new float[3];
+        for (int i = 0; i < colorComponents.length; i++) {
+            colorComponents[i] = ((color & (255 << (i * 8))) >> (i * 8)) / 255F;
+        }
+        GL11.glColor4f(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
     }
 }
