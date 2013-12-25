@@ -187,8 +187,11 @@ public class ComponentMenuRedstone extends ComponentMenu {
 
     @Override
     public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
-        selection = nbtTagCompound.getByte(NBT_ACTIVE);
-        setRequireAll(nbtTagCompound.getBoolean(NBT_ALL));
+        //Forgot to save it in earlier versions
+        if (version >= 3) {
+            selection = nbtTagCompound.getByte(NBT_ACTIVE);
+            setRequireAll(nbtTagCompound.getBoolean(NBT_ALL));
+        }
     }
 
     @Override
