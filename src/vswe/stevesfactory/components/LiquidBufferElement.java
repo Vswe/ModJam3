@@ -17,14 +17,22 @@ public class LiquidBufferElement {
 
     private List<StackTankHolder> holders;
 
+    private int sharedBy;
+    private boolean fairShare;
+    private int shareId;
 
     public LiquidBufferElement(FlowComponent owner, Setting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList, StackTankHolder target) {
+        this(owner, setting, inventoryHolder, useWhiteList);
+        addTarget(target);
+        sharedBy = 1;
+    }
+
+    public LiquidBufferElement(FlowComponent owner, Setting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList) {
         this.component = owner;
         this.setting = setting;
         this.inventoryHolder = inventoryHolder;
         this.useWhiteList = useWhiteList;
         holders = new ArrayList<StackTankHolder>();
-        addTarget(target);
     }
 
     public boolean addTarget(FlowComponent owner, Setting setting,  SlotInventoryHolder inventoryHolder, StackTankHolder target) {
@@ -42,7 +50,7 @@ public class LiquidBufferElement {
 
         FluidStack temp = target.getFluidStack();
         if (temp != null) {
-            totalTransferSize += temp.amount;
+            totalTransferSize += target.getSizeLeft();
             currentTransferSize = totalTransferSize;
         }
     }
@@ -63,6 +71,15 @@ public class LiquidBufferElement {
             if (useWhiteList) {
                 int movedItems = totalTransferSize - currentTransferSize;
                 itemsAllowedToBeMoved = setting.getAmount() - movedItems;
+
+                int amountLeft = itemsAllowedToBeMoved % sharedBy;
+                itemsAllowedToBeMoved /= sharedBy;
+
+                if (!fairShare) {
+                    if (shareId < amountLeft) {
+                        itemsAllowedToBeMoved++;
+                    }
+                }
             }else{
                 itemsAllowedToBeMoved = currentTransferSize - setting.getAmount();
             }
@@ -73,7 +90,7 @@ public class LiquidBufferElement {
     }
 
     public void decreaseStackSize(int itemsToMove) {
-        currentTransferSize -= itemsToMove;
+        currentTransferSize -= itemsToMove * (useWhiteList ? sharedBy : 1);
     }
 
     public int getBufferSize(Setting outputSetting) {
@@ -95,5 +112,27 @@ public class LiquidBufferElement {
             bufferSize = Math.min(bufferSize, maxSize);
         }
         return bufferSize;
+    }
+
+    public LiquidBufferElement getSplitElement(int elementAmount, int id, boolean fair) {
+
+        LiquidBufferElement element = new LiquidBufferElement(this.component, this.setting, this.inventoryHolder, this.useWhiteList);
+        element.holders = new ArrayList<StackTankHolder>();
+        for (StackTankHolder holder : holders) {
+            element.addTarget(holder.getSplitElement(elementAmount, id, fair));
+        }
+        if (useWhiteList) {
+            element.sharedBy = sharedBy * elementAmount;
+            element.fairShare = fair;
+            element.shareId = elementAmount * shareId + id;
+            element.currentTransferSize -= totalTransferSize - currentTransferSize;
+            if (element.currentTransferSize < 0) {
+                element.currentTransferSize = 0;
+            }
+        }else{
+            element.currentTransferSize = Math.min(currentTransferSize, element.totalTransferSize);
+        }
+
+        return element;
     }
 }

@@ -72,7 +72,7 @@ public class ComponentMenuSplit extends ComponentMenu {
     private static final int RADIO_X = 5;
     private static final int RADIO_Y = 5;
     private static final int CHECK_BOX_X = 15;
-    private static final int SPACING_Y = 15;
+    private static final int SPACING_Y = 15 ;
     @Override
     public String getName() {
         return "Split";  //To change body of implemented methods use File | Settings | File Templates.
@@ -230,10 +230,14 @@ public class ComponentMenuSplit extends ComponentMenu {
 
     @Override
     public boolean isVisible() {
-        return getParent().getConnectionSet() == ConnectionSet.MULTIPLE_OUTPUT_2 || getParent().getConnectionSet() == ConnectionSet.MULTIPLE_OUTPUT_5;
+        return isSplitConnection(getParent());
     }
 
-    private boolean useSplit() {
+    public static boolean isSplitConnection(FlowComponent component) {
+        return component.getConnectionSet() == ConnectionSet.MULTIPLE_OUTPUT_2 || component.getConnectionSet() == ConnectionSet.MULTIPLE_OUTPUT_5;
+    }
+
+    public boolean useSplit() {
         return radioButtons.getSelectedOption() == 1;
     }
 
@@ -241,7 +245,7 @@ public class ComponentMenuSplit extends ComponentMenu {
         radioButtons.setSelectedOption(val ? 1 : 0);
     }
 
-    private boolean useFair() {
+    public boolean useFair() {
         return useFair;
     }
 
@@ -249,7 +253,7 @@ public class ComponentMenuSplit extends ComponentMenu {
         useFair = val;
     }
 
-    private boolean useEmpty() {
+    public boolean useEmpty() {
         return useEmpty;
     }
 

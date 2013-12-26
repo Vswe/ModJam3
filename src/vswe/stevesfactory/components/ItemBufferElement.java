@@ -16,14 +16,24 @@ public class ItemBufferElement {
 
     private List<SlotStackInventoryHolder> holders;
 
+    private int sharedBy;
+    private boolean fairShare;
+    private int shareId;
 
     public ItemBufferElement(FlowComponent owner, Setting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList, SlotStackInventoryHolder target) {
+        this(owner, setting, inventoryHolder, useWhiteList);
+        addTarget(target);
+        sharedBy = 1;
+    }
+
+
+    private ItemBufferElement(FlowComponent owner, Setting setting, SlotInventoryHolder inventoryHolder, boolean useWhiteList) {
         this.component = owner;
         this.setting = (ItemSetting)setting;
         this.inventoryHolder = inventoryHolder;
         this.useWhiteList = useWhiteList;
         holders = new ArrayList<SlotStackInventoryHolder>();
-        addTarget(target);
+
     }
 
     public boolean addTarget(FlowComponent owner, Setting setting,  SlotInventoryHolder inventoryHolder, SlotStackInventoryHolder target) {
@@ -38,7 +48,7 @@ public class ItemBufferElement {
     private void addTarget(SlotStackInventoryHolder target) {
         holders.add(target);
 
-        totalStackSize += target.getItemStack().stackSize;
+        totalStackSize += target.getSizeLeft();
         currentStackSize = totalStackSize;
     }
 
@@ -58,6 +68,15 @@ public class ItemBufferElement {
             if (useWhiteList) {
                 int movedItems = totalStackSize - currentStackSize;
                 itemsAllowedToBeMoved = setting.getItem().stackSize - movedItems;
+
+                int amountLeft = itemsAllowedToBeMoved % sharedBy;
+                itemsAllowedToBeMoved /= sharedBy;
+
+                if (!fairShare) {
+                    if (shareId < amountLeft) {
+                        itemsAllowedToBeMoved++;
+                    }
+                }
             }else{
                 itemsAllowedToBeMoved = currentStackSize - setting.getItem().stackSize;
             }
@@ -68,7 +87,7 @@ public class ItemBufferElement {
     }
 
     public void decreaseStackSize(int itemsToMove) {
-        currentStackSize -= itemsToMove;
+        currentStackSize -= itemsToMove * (useWhiteList ? sharedBy : 1);
     }
 
     public ItemStack getItemStack() {
@@ -97,5 +116,27 @@ public class ItemBufferElement {
             bufferSize = Math.min(bufferSize, maxSize);
         }
         return bufferSize;
+    }
+
+    public ItemBufferElement getSplitElement(int elementAmount, int id, boolean fair) {
+
+        ItemBufferElement element = new ItemBufferElement(this.component, this.setting, this.inventoryHolder, this.useWhiteList);
+        element.holders = new ArrayList<SlotStackInventoryHolder>();
+        for (SlotStackInventoryHolder holder : holders) {
+            element.addTarget(holder.getSplitElement(elementAmount, id, fair));
+        }
+        if (useWhiteList) {
+            element.sharedBy = sharedBy * elementAmount;
+            element.fairShare = fair;
+            element.shareId = elementAmount * shareId + id;
+            element.currentStackSize -= totalStackSize - currentStackSize;
+            if (element.currentStackSize < 0) {
+                element.currentStackSize = 0;
+            }
+        }else{
+            element.currentStackSize = Math.min(currentStackSize, element.totalStackSize);
+        }
+
+        return element;
     }
 }

@@ -32,6 +32,13 @@ public class CommandExecutor {
         usedCommands = new ArrayList<Integer>();
     }
 
+    private CommandExecutor(TileEntityManager manager, List<ItemBufferElement> itemBufferSplit, List<LiquidBufferElement> liquidBufferSplit, List<Integer> usedCommandCopy) {
+        this.manager = manager;
+        this.itemBuffer = itemBufferSplit;
+        this.usedCommands = usedCommandCopy;
+        this.liquidBuffer = liquidBufferSplit;
+    }
+
     public void executeTriggerCommand(FlowComponent command, EnumSet<ConnectionOption> validTriggerOutputs) {
         for (int i = 0; i < command.getConnectionSet().getConnections().length; i++) {
             Connection connection = command.getConnection(i);
@@ -101,14 +108,19 @@ public class CommandExecutor {
                     }
                 }
                 return;
+            case FLOW_CONTROL:
+                if (ComponentMenuSplit.isSplitConnection(command)) {
+                    if (splitFlow(command.getMenus().get(0))) {
+                        return;
+                    }
+                }
+                break;
         }
 
 
         executeTriggerCommand(command, EnumSet.allOf(ConnectionOption.class));
         usedCommands.remove((Integer)command.getId());
     }
-
-
 
     private List<SlotInventoryHolder> getInventories(ComponentMenu componentMenu) {
         return getContainers(componentMenu, ConnectionBlockType.INVENTORY);
@@ -430,32 +442,36 @@ public class CommandExecutor {
 
                         if (itemInSlot == null) {
                             ItemStack temp = itemStack.copy();
-                            int moveCount = Math.min(itemStack.stackSize, inventory.getInventoryStackLimit());
+                            int moveCount = Math.min(holder.getSizeLeft(), inventory.getInventoryStackLimit());
                             moveCount = itemBufferElement.retrieveItemCount(moveCount);
                             moveCount = outputItemCounter.retrieveItemCount(moveCount);
                             if (moveCount > 0) {
                                 itemBufferElement.decreaseStackSize(moveCount);
                                 outputItemCounter.modifyStackSize(moveCount);
                                 temp.stackSize = moveCount;
-                                itemStack.stackSize -= moveCount;
+                                holder.reduceAmount(moveCount);
                                 inventory.setInventorySlotContents(slot.getSlot(), temp);
-                                if (itemStack.stackSize == 0) {
-                                    removeItemFromBuffer(holder);
+                                if (holder.getSizeLeft() == 0) {
+                                    if (itemStack.stackSize == 0) {
+                                        removeItemFromBuffer(holder);
+                                    }
                                     itemIterator.remove();
                                     break;
                                 }
                             }
                         }else if (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable()){
-                            int moveCount = Math.min(itemStack.stackSize, Math.min(inventory.getInventoryStackLimit(), itemInSlot.getMaxStackSize()) - itemInSlot.stackSize);
+                            int moveCount = Math.min(holder.getSizeLeft(), Math.min(inventory.getInventoryStackLimit(), itemInSlot.getMaxStackSize()) - itemInSlot.stackSize);
                             moveCount = itemBufferElement.retrieveItemCount(moveCount);
                             moveCount = outputItemCounter.retrieveItemCount(moveCount);
                             if (moveCount > 0) {
                                 itemBufferElement.decreaseStackSize(moveCount);
                                 outputItemCounter.modifyStackSize(moveCount);
                                 itemInSlot.stackSize += moveCount;
-                                itemStack.stackSize -= moveCount;
-                                if (itemStack.stackSize == 0) {
-                                    removeItemFromBuffer(holder);
+                                holder.reduceAmount(moveCount);
+                                if (holder.getSizeLeft() == 0) {
+                                    if (itemStack.stackSize == 0) {
+                                        removeItemFromBuffer(holder);
+                                    }
                                     itemIterator.remove();
                                     break;
                                 }
@@ -516,7 +532,9 @@ public class CommandExecutor {
                     for (SlotSideTarget slot : tankHolder.getValidSlots().values()) {
 
                         for (int side : slot.getSides()) {
-                            int amount = tank.fill(ForgeDirection.VALID_DIRECTIONS[side], fluidStack, false);
+                            FluidStack temp = fluidStack.copy();
+                            temp.amount = holder.getSizeLeft();
+                            int amount = tank.fill(ForgeDirection.VALID_DIRECTIONS[side], temp, false);
                             amount = liquidBufferElement.retrieveItemCount(amount);
                             amount = outputLiquidCounter.retrieveItemCount(amount);
 
@@ -529,8 +547,8 @@ public class CommandExecutor {
                                     tank.fill(ForgeDirection.VALID_DIRECTIONS[side], resource, true);
                                     liquidBufferElement.decreaseStackSize(resource.amount);
                                     outputLiquidCounter.modifyStackSize(resource.amount);
-                                    fluidStack.amount -= resource.amount;
-                                    if (fluidStack.amount == 0) {
+                                    holder.reduceAmount(resource.amount);
+                                    if (holder.getSizeLeft() == 0) {
                                         liquidIterator.remove();
                                         break;
                                     }
@@ -658,4 +676,52 @@ public class CommandExecutor {
         return menuCondition.requiresAll();
     }
 
+
+    private boolean splitFlow(ComponentMenu componentMenu) {
+        ComponentMenuSplit split = (ComponentMenuSplit)componentMenu;
+        if (split.useSplit()) {
+            int amount = componentMenu.getParent().getConnectionSet().getOutputCount();
+            if (!split.useEmpty()) {
+                ConnectionOption[] connections = componentMenu.getParent().getConnectionSet().getConnections();
+                for (int i = 0; i < connections.length; i++) {
+                    ConnectionOption connectionOption = connections[i];
+                    if (!connectionOption.isInput() && componentMenu.getParent().getConnection(i) == null) {
+                        amount--;
+                    }
+                }
+            }
+
+            int usedId = 0;
+            ConnectionOption[] connections = componentMenu.getParent().getConnectionSet().getConnections();
+            for (int i = 0; i < connections.length; i++) {
+                ConnectionOption connectionOption = connections[i];
+                Connection connection = componentMenu.getParent().getConnection(i);
+                if (!connectionOption.isInput() && connection != null) {
+                    List<ItemBufferElement> itemBufferSplit = new ArrayList<ItemBufferElement>();
+                    List<LiquidBufferElement> liquidBufferSplit = new ArrayList<LiquidBufferElement>();
+
+                    for (ItemBufferElement element : itemBuffer) {
+                        itemBufferSplit.add(element.getSplitElement(amount, usedId, split.useFair()));
+                    }
+
+                    for (LiquidBufferElement element : liquidBuffer) {
+                        liquidBufferSplit.add(element.getSplitElement(amount, usedId, split.useFair()));
+                    }
+
+                    List<Integer> usedCommandCopy = new ArrayList<Integer>();
+                    for (int usedCommand : usedCommands) {
+                        usedCommandCopy.add(usedCommand);
+                    }
+
+                    CommandExecutor newExecutor = new CommandExecutor(manager, itemBufferSplit, liquidBufferSplit, usedCommandCopy);
+                    newExecutor.executeCommand(manager.getFlowItems().get(connection.getComponentId()));
+                    usedId++;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 }
