@@ -1,0 +1,260 @@
+package vswe.stevesfactory.components;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.interfaces.ContainerManager;
+import vswe.stevesfactory.interfaces.GuiManager;
+import vswe.stevesfactory.network.DataBitHelper;
+import vswe.stevesfactory.network.DataReader;
+import vswe.stevesfactory.network.DataWriter;
+import vswe.stevesfactory.network.PacketHandler;
+
+
+public class ComponentMenuSplit extends ComponentMenu {
+    public ComponentMenuSplit(FlowComponent parent) {
+        super(parent);
+
+
+        radioButtons = new RadioButtonList() {
+            @Override
+            public void updateSelectedOption(int selectedOption) {
+                setSelectedOption(selectedOption);
+                sendServerData(0);
+            }
+        };
+
+        radioButtons.add(new RadioButton(RADIO_X, RADIO_Y, "Sequential"));
+        radioButtons.add(new RadioButton(RADIO_X, RADIO_Y + SPACING_Y, "Split"));
+
+        checkBoxes = new CheckBoxList();
+
+        checkBoxes.addCheckBox(new CheckBox("Use fair split", CHECK_BOX_X, RADIO_Y + 2 * SPACING_Y) {
+            @Override
+            public void setValue(boolean val) {
+                setFair(val);
+            }
+
+            @Override
+            public boolean getValue() {
+                return useFair();
+            }
+
+            @Override
+            public void onUpdate() {
+                sendServerData(1);
+            }
+        });
+
+        checkBoxes.addCheckBox(new CheckBox("Include empty pins", CHECK_BOX_X, RADIO_Y + 3 * SPACING_Y) {
+            @Override
+            public void setValue(boolean val) {
+                setEmpty(val);
+            }
+
+            @Override
+            public boolean getValue() {
+                return useEmpty();
+            }
+
+            @Override
+            public void onUpdate() {
+                sendServerData(2);
+            }
+        });
+    }
+
+    private RadioButtonList radioButtons;
+    private CheckBoxList checkBoxes;
+    private boolean useFair;
+    private boolean useEmpty;
+
+    private static final int RADIO_X = 5;
+    private static final int RADIO_Y = 5;
+    private static final int CHECK_BOX_X = 15;
+    private static final int SPACING_Y = 15;
+    @Override
+    public String getName() {
+        return "Split";  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void draw(GuiManager gui, int mX, int mY) {
+        if (useSplit()) {
+            checkBoxes.draw(gui, mX, mY);
+        }
+        radioButtons.draw(gui, mX, mY);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void drawMouseOver(GuiManager gui, int mX, int mY) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onClick(int mX, int mY, int button) {
+        if (useSplit()) {
+            checkBoxes.onClick(mX, mY);
+        }
+        radioButtons.onClick(mX, mY, button);
+    }
+
+    @Override
+    public void onDrag(int mX, int mY) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onRelease(int mX, int mY) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void writeData(DataWriter dw) {
+        dw.writeBoolean(useSplit());
+        if (useSplit()) {
+            dw.writeBoolean(useFair());
+            dw.writeBoolean(useEmpty());
+        }
+    }
+
+    @Override
+    public void readData(DataReader dr) {
+        setSplit(dr.readBoolean());
+        if (useSplit()) {
+            setFair(dr.readBoolean());
+            setEmpty(dr.readBoolean());
+        }else{
+            setFair(false);
+            setEmpty(false);
+        }
+    }
+
+    @Override
+    public void copyFrom(ComponentMenu menu) {
+       ComponentMenuSplit menuSplit = (ComponentMenuSplit)menu;
+       setSplit(menuSplit.useSplit());
+       setFair(menuSplit.useFair());
+       setEmpty(menuSplit.useEmpty());
+    }
+
+    @Override
+    public void refreshData(ContainerManager container, ComponentMenu newData) {
+        ComponentMenuSplit newDataSplit = (ComponentMenuSplit)newData;
+
+        if (useSplit() != newDataSplit.useSplit()) {
+            setSplit(newDataSplit.useSplit());
+
+            sendClientData(container, 0);
+        }
+
+        if (useFair() != newDataSplit.useFair()) {
+            setFair(newDataSplit.useFair());
+
+            sendClientData(container, 1);
+        }
+
+        if (useEmpty() != newDataSplit.useEmpty()) {
+            setEmpty(newDataSplit.useEmpty());
+
+            sendClientData(container, 2);
+        }
+    }
+
+    private void sendClientData(ContainerManager container, int id) {
+        DataWriter dw = getWriterForClientComponentPacket(container);
+        writeData(dw, id);
+        PacketHandler.sendDataToListeningClients(container, dw);
+    }
+
+    private void sendServerData(int id) {
+        DataWriter dw = getWriterForServerComponentPacket();
+        writeData(dw, id);
+        PacketHandler.sendDataToServer(dw);
+    }
+
+    private void writeData(DataWriter dw, int id) {
+        dw.writeData(id, DataBitHelper.MENU_SPLIT_DATA_ID);
+        switch (id) {
+            case 0:
+                dw.writeBoolean(useSplit());
+                break;
+            case 1:
+                dw.writeBoolean(useFair());
+                break;
+            case 2:
+                dw.writeBoolean(useEmpty());
+                break;
+        }
+    }
+
+    private static final String NBT_SPLIT = "Split";
+    private static final String NBT_FAIR = "Fair";
+    private static final String NBT_EMPTY = "Empty";
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+        setSplit(nbtTagCompound.getBoolean(NBT_SPLIT));
+        if (useSplit()) {
+            setFair(nbtTagCompound.getBoolean(NBT_FAIR));
+            setEmpty(nbtTagCompound.getBoolean(NBT_EMPTY));
+        }
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        nbtTagCompound.setBoolean(NBT_SPLIT, useSplit());
+        if (useSplit()) {
+            nbtTagCompound.setBoolean(NBT_FAIR, useFair());
+            nbtTagCompound.setBoolean(NBT_EMPTY, useEmpty());
+        }
+    }
+
+    @Override
+    public void readNetworkComponent(DataReader dr) {
+        int id = dr.readData(DataBitHelper.MENU_SPLIT_DATA_ID);
+        switch (id) {
+            case 0:
+                setSplit(dr.readBoolean());
+                break;
+            case 1:
+                setFair(dr.readBoolean());
+                break;
+            case 2:
+                setEmpty(dr.readBoolean());
+                break;
+        }
+    }
+
+    @Override
+    public boolean isVisible() {
+        return getParent().getConnectionSet() == ConnectionSet.MULTIPLE_OUTPUT_2 || getParent().getConnectionSet() == ConnectionSet.MULTIPLE_OUTPUT_5;
+    }
+
+    private boolean useSplit() {
+        return radioButtons.getSelectedOption() == 1;
+    }
+
+    private void setSplit(boolean val) {
+        radioButtons.setSelectedOption(val ? 1 : 0);
+    }
+
+    private boolean useFair() {
+        return useFair;
+    }
+
+    private void setFair(boolean val) {
+        useFair = val;
+    }
+
+    private boolean useEmpty() {
+        return useEmpty;
+    }
+
+    private void setEmpty(boolean val) {
+        useEmpty = val;
+    }
+
+}

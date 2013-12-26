@@ -751,6 +751,11 @@ public class FlowComponent implements IComponentNetworkReader {
                 menuId++;
             }
 
+            //added an extra menu to the flow controls
+            if (component.type == ComponentType.FLOW_CONTROL && i == 0 && version < 4) {
+                menuId++;
+            }
+
             component.menus.get(menuId).readFromNBT(menuTag, version);
             menuId++;
         }
