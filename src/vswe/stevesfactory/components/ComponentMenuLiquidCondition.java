@@ -3,8 +3,8 @@ package vswe.stevesfactory.components;
 
 import java.util.List;
 
-public class ComponentMenuItemCondition extends ComponentMenuItem implements IConditionStuffMenu {
-    public ComponentMenuItemCondition(FlowComponent parent) {
+public class ComponentMenuLiquidCondition extends ComponentMenuLiquid implements IConditionStuffMenu {
+    public ComponentMenuLiquidCondition(FlowComponent parent) {
         super(parent);
     }
 

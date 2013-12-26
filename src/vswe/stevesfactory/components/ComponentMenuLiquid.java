@@ -130,7 +130,7 @@ public class ComponentMenuLiquid extends ComponentMenuStuff {
         return "Liquids";
     }
 
-    private LiquidSetting getSelectedSetting() {
+    protected LiquidSetting getSelectedSetting() {
         return (LiquidSetting)selectedSetting;
     }
 

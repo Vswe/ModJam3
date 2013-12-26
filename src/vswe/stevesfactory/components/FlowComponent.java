@@ -247,7 +247,7 @@ public class FlowComponent implements IComponentNetworkReader {
             gui.drawTexture(x + ERROR_X, y + ERROR_Y, ERROR_SRC_X, ERROR_SRC_Y + srcErrorY * ERROR_SIZE_H, ERROR_SIZE_W, ERROR_SIZE_H);
         }
 
-        gui.drawString(getType().toString(), x + 10, y + 10, 0.7F, 0x404040);
+        gui.drawString(getType().getName(), x + 7, y + 10, 0.7F, 0x404040);
 
         GL11.glPopMatrix();
     }

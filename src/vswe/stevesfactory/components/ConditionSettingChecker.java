@@ -2,19 +2,19 @@ package vswe.stevesfactory.components;
 
 
 public class ConditionSettingChecker {
-    private ItemSetting setting;
-    private int itemCount;
+    private Setting setting;
+    private int amount;
 
     public ConditionSettingChecker(Setting setting) {
-        this.setting = (ItemSetting)setting;
-        itemCount = 0;
+        this.setting = setting;
+        amount = 0;
     }
 
     public void addCount(int n) {
-        itemCount += n;
+        amount += n;
     }
 
     public boolean isTrue() {
-        return !setting.isLimitedByAmount() || itemCount >= setting.getItem().stackSize;
+        return !setting.isLimitedByAmount() || amount >= setting.getAmount();
     }
 }

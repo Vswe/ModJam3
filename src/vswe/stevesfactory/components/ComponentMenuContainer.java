@@ -103,7 +103,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
 
 
-                int srcInventoryX = selectedInventories.contains(i) ? 1 : 0;
+                int srcInventoryX = selectedInventories.contains(inventories.get(i).getId()) ? 1 : 0;
                 int srcInventoryY = CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY) ? 1 : 0;
 
                 gui.drawTexture(x, INVENTORY_Y, INVENTORY_SRC_X + srcInventoryX * INVENTORY_SIZE, INVENTORY_SRC_Y + srcInventoryY * INVENTORY_SIZE, INVENTORY_SIZE, INVENTORY_SIZE);
@@ -197,7 +197,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
                 if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
                     if (CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
-                        setSelectedInventoryAndSync(i, !selectedInventories.contains(i));
+                        setSelectedInventoryAndSync(inventories.get(i).getId(), !selectedInventories.contains(inventories.get(i).getId()));
 
 
                         break;
@@ -387,6 +387,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
         return ret;
     }
+
 
 
 }

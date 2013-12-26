@@ -5,7 +5,7 @@ public enum DataBitHelper {
     FLOW_CONTROL_COUNT(7),
     FLOW_CONTROL_X(9),
     FLOW_CONTROL_Y(8),
-    FLOW_CONTROL_TYPE_ID(3),
+    FLOW_CONTROL_TYPE_ID(4),
     MENU_ITEM_ID(16),
     MENU_ITEM_META(15),
     MENU_ITEM_AMOUNT(10),
@@ -29,7 +29,7 @@ public enum DataBitHelper {
 
     CLIENT_HEADER(2),
     WORLD_COORDINATE(32),
-    GUI_BUTTON_ID(3),
+    GUI_BUTTON_ID(4),
 
     MENU_FLUID_ID(10) //Actually an int, but I think 10 bits is too much anyways. If someone has over 1024 fluids I have a problem
     ,

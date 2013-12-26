@@ -153,6 +153,7 @@ public class TileEntityManager extends TileEntity {
                                 }
 
                                 if (isValidConnection) {
+                                    connection.setId(inventories.size());
                                     inventories.add(connection);
                                 }else if (element.getDepth() < MAX_CABLE_LENGTH){
                                     if (worldObj.getBlockId(target.getX(), target.getY(), target.getZ()) == Blocks.blockCable.blockID) {
@@ -175,7 +176,6 @@ public class TileEntityManager extends TileEntity {
         firstInventoryUpdate = false;
     }
 
-    //TODO make sure this works properly with multiple types of "inventories"
     private void updateInventorySelection(WorldCoordinate[] oldCoordinates) {
         for (FlowComponent item : items) {
             for (ComponentMenu menu : item.getMenus()) {
@@ -400,7 +400,7 @@ public class TileEntityManager extends TileEntity {
         private ComponentType type;
 
         protected ButtonCreate(ComponentType type) {
-            super("Create " + type.toString());
+            super("Create " + type.getLongName());
 
             this.type = type;
         }

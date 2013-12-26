@@ -8,6 +8,7 @@ public class ConnectionBlock {
 
     private TileEntity tileEntity;
     private EnumSet<ConnectionBlockType> types;
+    private int id;
 
     public ConnectionBlock(TileEntity tileEntity) {
         this.tileEntity = tileEntity;
@@ -24,5 +25,13 @@ public class ConnectionBlock {
 
     public TileEntity getTileEntity() {
         return tileEntity;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 }

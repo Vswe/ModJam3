@@ -69,7 +69,7 @@ public class CommandExecutor {
                 List<SlotInventoryHolder> conditionInventory = getInventories(command.getMenus().get(0));
                 if (conditionInventory != null) {
                     getValidSlots(command.getMenus().get(1), conditionInventory);
-                    if (searchForItems(command.getMenus().get(2), conditionInventory)) {
+                    if (searchForStuff(command.getMenus().get(2), conditionInventory, false)) {
                         executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
                     }else{
                         executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
@@ -90,6 +90,17 @@ public class CommandExecutor {
                     insertLiquids(command.getMenus().get(2), outputTank);
                 }
                 break;
+            case LIQUID_CONDITION:
+                List<SlotInventoryHolder> conditionTank = getInventories(command.getMenus().get(0));
+                if (conditionTank != null) {
+                    getValidTanks(command.getMenus().get(1), conditionTank);
+                    if (searchForStuff(command.getMenus().get(2), conditionTank, true)) {
+                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
+                    }else{
+                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                    }
+                }
+                return;
         }
 
 
@@ -116,7 +127,7 @@ public class CommandExecutor {
 
         List<SlotInventoryHolder> ret = new ArrayList<SlotInventoryHolder>();
 
-        List<ConnectionBlock> inventories = menuContainer.getInventories(manager);
+        List<ConnectionBlock> inventories = manager.getConnectedInventories();
         for (int i = 0; i < menuContainer.getSelectedInventories().size(); i++) {
             int selected = menuContainer.getSelectedInventories().get(i);
 
@@ -312,7 +323,7 @@ public class CommandExecutor {
                         Setting setting = isLiquidValid(componentMenu, fluidStack);
                         if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
                             FlowComponent owner = componentMenu.getParent();
-                            StackTankHolder target = new StackTankHolder(fluidStack, tank.getTank());
+                            StackTankHolder target = new StackTankHolder(fluidStack, tank.getTank(), ForgeDirection.VALID_DIRECTIONS[side]);
 
                             boolean added = false;
                             for (LiquidBufferElement liquidBufferElement : liquidBuffer) {
@@ -331,7 +342,9 @@ public class CommandExecutor {
                     }
 
                     for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
-                        tankInfos.add(fluidTankInfo);
+                        if (fluidTankInfo != null) {
+                            tankInfos.add(fluidTankInfo);
+                        }
                     }
                 }
             }
@@ -511,13 +524,12 @@ public class CommandExecutor {
                                 FluidStack resource = fluidStack.copy();
                                 resource.amount = amount;
 
-                                //TODO use the proper side for the input
-                                resource = holder.getTank().drain(ForgeDirection.VALID_DIRECTIONS[side], resource, true);
+                                resource = holder.getTank().drain(holder.getSide(), resource, true);
                                 if (resource.amount > 0) {
                                     tank.fill(ForgeDirection.VALID_DIRECTIONS[side], resource, true);
-                                    liquidBufferElement.decreaseStackSize(amount);
-                                    outputLiquidCounter.modifyStackSize(amount);
-                                    fluidStack.amount -= amount;
+                                    liquidBufferElement.decreaseStackSize(resource.amount);
+                                    outputLiquidCounter.modifyStackSize(resource.amount);
+                                    fluidStack.amount -= resource.amount;
                                     if (fluidStack.amount == 0) {
                                         liquidIterator.remove();
                                         break;
@@ -536,18 +548,18 @@ public class CommandExecutor {
 
     }
 
-    private boolean searchForItems(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories) {
+    private boolean searchForStuff(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories, boolean useLiquids) {
         if (inventories.get(0).isShared()) {
             Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<Integer, ConditionSettingChecker>();
             for (int i = 0; i < inventories.size(); i++) {
-                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap);
+                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap, useLiquids);
             }
             return checkConditionResult(componentMenu, conditionSettingCheckerMap);
         }else{
             boolean useAnd = inventories.get(0).getSharedOption() == 1;
             for (int i = 0; i < inventories.size(); i++) {
                 Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<Integer, ConditionSettingChecker>();
-                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap);
+                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap, useLiquids);
 
                 if (checkConditionResult(componentMenu, conditionSettingCheckerMap)) {
                     if (!useAnd) {
@@ -561,7 +573,15 @@ public class CommandExecutor {
         }
     }
 
-    private void calculateConditionData(ComponentMenu componentMenu, SlotInventoryHolder inventoryHolder, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
+    private void calculateConditionData(ComponentMenu componentMenu, SlotInventoryHolder inventoryHolder, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap, boolean useLiquid) {
+        if (useLiquid) {
+            calculateConditionDataLiquid(componentMenu, inventoryHolder, conditionSettingCheckerMap);
+        }else{
+            calculateConditionDataItem(componentMenu, inventoryHolder, conditionSettingCheckerMap);
+        }
+    }
+
+    private void calculateConditionDataItem(ComponentMenu componentMenu, SlotInventoryHolder inventoryHolder, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
         for (SlotSideTarget slot : inventoryHolder.getValidSlots().values()) {
             ItemStack itemStack = inventoryHolder.getInventory().getStackInSlot(slot.getSlot());
 
@@ -580,24 +600,62 @@ public class CommandExecutor {
         }
     }
 
-    private boolean checkConditionResult(ComponentMenu componentMenu, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
-        ComponentMenuItemCondition menuItem = (ComponentMenuItemCondition)componentMenu;
+    private void calculateConditionDataLiquid(ComponentMenu componentMenu, SlotInventoryHolder tank, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
+        for (SlotSideTarget slot : tank.getValidSlots().values()) {
+            List<FluidTankInfo> tankInfos = new ArrayList<FluidTankInfo>();
+            for (int side : slot.getSides()) {
+                for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
+                    boolean alreadyUsed = false;
+                    for (FluidTankInfo tankInfo : tankInfos) {
+                        if (FluidStack.areFluidStackTagsEqual(tankInfo.fluid, fluidTankInfo.fluid) && tankInfo.capacity == fluidTankInfo.capacity) {
+                            alreadyUsed = true;
+                        }
+                    }
 
+                    if (alreadyUsed) {
+                        continue;
+                    }
+
+                    FluidStack fluidStack = fluidTankInfo.fluid;
+                    Setting setting = isLiquidValid(componentMenu, fluidStack);
+                    if (setting != null) {
+                        ConditionSettingChecker conditionSettingChecker = conditionSettingCheckerMap.get(setting.getId());
+                        if (conditionSettingChecker == null) {
+                            conditionSettingCheckerMap.put(setting.getId(), conditionSettingChecker = new ConditionSettingChecker(setting));
+                        }
+                        conditionSettingChecker.addCount(fluidStack.amount);
+                    }
+                }
+                for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
+                    if (fluidTankInfo != null) {
+                        tankInfos.add(fluidTankInfo);
+                    }
+                }
+            }
+
+        }
+    }
+
+
+
+    private boolean checkConditionResult(ComponentMenu componentMenu, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
+        ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
+        IConditionStuffMenu menuCondition = (IConditionStuffMenu)componentMenu;
         for (Setting setting : menuItem.getSettings()) {
             if (setting.isValid()) {
                 ConditionSettingChecker conditionSettingChecker = conditionSettingCheckerMap.get(setting.getId());
 
                 if (conditionSettingChecker != null && conditionSettingChecker.isTrue()) {
-                    if (!menuItem.requiresAll()) {
+                    if (!menuCondition.requiresAll()) {
                         return true;
                     }
-                }else if (menuItem.requiresAll()) {
+                }else if (menuCondition.requiresAll()) {
                     return false;
                 }
             }
         }
 
-        return menuItem.requiresAll();
+        return menuCondition.requiresAll();
     }
 
 }
