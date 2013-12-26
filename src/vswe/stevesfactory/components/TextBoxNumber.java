@@ -36,6 +36,11 @@ public class TextBoxNumber {
     }
 
     public void setNumber(int number) {
+        int max = getMaxNumber();
+        if (max != -1 && number > max) {
+            number = max;
+        }
+
         this.number = number;
     }
 
@@ -51,5 +56,9 @@ public class TextBoxNumber {
 
     public int getWidth() {
         return wide ? TEXT_BOX_SIZE_W_WIDE : TEXT_BOX_SIZE_W;
+    }
+
+    public int getMaxNumber() {
+        return -1;
     }
 }

@@ -35,7 +35,9 @@ public enum DataBitHelper {
     ,
     MENU_LIQUID_AMOUNT(20),
 
-    MENU_SPLIT_DATA_ID(2);
+    MENU_SPLIT_DATA_ID(2),
+
+    MENU_REDSTONE_ANALOG(4);
 
 
 

@@ -14,9 +14,9 @@ import vswe.stevesfactory.network.PacketHandler;
 
 import java.util.List;
 
-public class ComponentMenuRedstone extends ComponentMenu {
+public class ComponentMenuRedstoneSides extends ComponentMenu {
 
-    public ComponentMenuRedstone(FlowComponent parent) {
+    public ComponentMenuRedstoneSides(FlowComponent parent) {
         super(parent);
 
         selection = 0x3F; //All selected
@@ -88,7 +88,7 @@ public class ComponentMenuRedstone extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Redstone";
+        return "Redstone Sides";
     }
 
 
@@ -138,7 +138,7 @@ public class ComponentMenuRedstone extends ComponentMenu {
 
     @Override
     public void copyFrom(ComponentMenu menu) {
-        ComponentMenuRedstone menuRedstone = (ComponentMenuRedstone)menu;
+        ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)menu;
 
         selection = menuRedstone.selection;
         setRequireAll(menuRedstone.requireAll());
@@ -146,7 +146,7 @@ public class ComponentMenuRedstone extends ComponentMenu {
 
     @Override
     public void refreshData(ContainerManager container, ComponentMenu newData) {
-        ComponentMenuRedstone newDataRedstone = (ComponentMenuRedstone)newData;
+        ComponentMenuRedstoneSides newDataRedstone = (ComponentMenuRedstoneSides)newData;
 
        if (requireAll() != newDataRedstone.requireAll()) {
            setRequireAll(newDataRedstone.requireAll());

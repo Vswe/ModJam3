@@ -283,7 +283,7 @@ public class TileEntityManager extends TileEntity {
         return isTriggerPowered(component, isPowered, high);
     }
     private boolean isTriggerPowered(FlowComponent component, boolean[] currentPower, boolean high) {
-        ComponentMenuRedstone menuRedstone = (ComponentMenuRedstone)component.getMenus().get(1);
+        ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)component.getMenus().get(1);
         for (int i = 0; i < currentPower.length; i++) {
             if (menuRedstone.isSideRequired(i)) {
                 if (currentPower[i] == high) {
@@ -301,7 +301,7 @@ public class TileEntityManager extends TileEntity {
 
 
     private boolean hasRedStoneFlipped(FlowComponent component, boolean[] newPower, boolean high) {
-        ComponentMenuRedstone menuRedstone = (ComponentMenuRedstone)component.getMenus().get(1);
+        ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)component.getMenus().get(1);
         for (int i = 0; i < isPowered.length; i++) {
             if (menuRedstone.isSideRequired(i)) {
                 if ((high && !isPowered[i] && newPower[i]) || (!high && isPowered[i] && !newPower[i])) {
@@ -427,7 +427,7 @@ public class TileEntityManager extends TileEntity {
         }
     }
 
-    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 4;
+    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 5;
     private static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
     private static final String NBT_POWERED = "IsPowered";
     private static final String NBT_TIMER = "Timer";

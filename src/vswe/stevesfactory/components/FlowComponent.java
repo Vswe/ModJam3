@@ -756,6 +756,11 @@ public class FlowComponent implements IComponentNetworkReader {
                 menuId++;
             }
 
+            //added a second extra menu to the triggers
+            if (component.type == ComponentType.TRIGGER && i == 2 && version < 5) {
+                menuId++;
+            }
+
             component.menus.get(menuId).readFromNBT(menuTag, version);
             menuId++;
         }
