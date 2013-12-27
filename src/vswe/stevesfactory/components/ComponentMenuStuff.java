@@ -3,9 +3,6 @@ package vswe.stevesfactory.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ChatAllowedCharacters;
@@ -19,7 +16,6 @@ import vswe.stevesfactory.network.PacketHandler;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class ComponentMenuStuff extends ComponentMenu {
@@ -32,7 +28,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         text = "";
         result = new ArrayList();
         settings = new ArrayList<Setting>();
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < getSettingCount(); i++) {
             try {
                 Constructor<? extends Setting> constructor = settingClass.getConstructor(int.class);
                 Object obj = constructor.newInstance(i);
@@ -58,25 +54,24 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         initRadioButtons();
 
         checkBoxes = new CheckBoxList();
+        if (settings.get(0).isAmountSpecific()) {
+            checkBoxes.addCheckBox(new CheckBox("Specify amount?", 5, 25) {
+                @Override
+                public void setValue(boolean val) {
+                    selectedSetting.setLimitedByAmount(val);
+                }
 
-        checkBoxes.addCheckBox(new CheckBox("Specify amount?", 5, 25) {
-            @Override
-            public void setValue(boolean val) {
-                selectedSetting.setLimitedByAmount(val);
-            }
+                @Override
+                public boolean getValue() {
+                    return selectedSetting.isLimitedByAmount();
+                }
 
-            @Override
-            public boolean getValue() {
-                return selectedSetting.isLimitedByAmount();
-            }
-
-            @Override
-            public void onUpdate() {
-                writeServerData(DataTypeHeader.USE_AMOUNT);
-            }
-        });
-
-
+                @Override
+                public void onUpdate() {
+                    writeServerData(DataTypeHeader.USE_AMOUNT);
+                }
+            });
+        }
         updateScrolling();
     }
 
@@ -112,12 +107,43 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     private static final int ARROW_Y_DOWN = 42;
 
 
-    private static final int ITEMS_PER_ROW = 5;
-    private static final int VISIBLE_ROWS = 2;
-    private static final int ITEM_SIZE = 16;
-    private static final int ITEM_SIZE_WITH_MARGIN = 20;
-    private static final int ITEM_X = 5;
-    private static final int ITEM_Y = 20;
+
+    protected int getItemsPerRow() {
+        return 5;
+    }
+
+    protected int getVisibleRows() {
+        return 2;
+    }
+
+    protected int getSettingCount() {
+        return 30;
+    }
+
+    protected final int getScrollingStartY() {
+        return getScrollingUpperLimit() + 3;
+    }
+
+    protected int getItemUpperLimit() {
+        return getScrollingDefaultUpperLimit();
+    }
+
+    private int getScrollingDefaultUpperLimit() {
+        return TEXT_BOX_Y + TEXT_BOX_SIZE_H;
+    }
+
+    private int getScrollingUpperLimit() {
+        if (isSearching()) {
+            return getScrollingDefaultUpperLimit();
+        }else{
+            return getItemUpperLimit();
+        }
+    }
+
+    protected static final int ITEM_SIZE = 16;
+    protected static final int ITEM_SIZE_WITH_MARGIN = 20;
+    protected static final int ITEM_X = 5;
+
 
     private static final int SETTING_SRC_X = 0;
     private static final int SETTING_SRC_Y = 189;
@@ -233,7 +259,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             if (clicked && canScroll) {
                 setOffset(getOffset() + dir);
                 int min = 0;
-                int max = ((int)(Math.ceil(((float)getScrollingList().size() / ITEMS_PER_ROW)) - VISIBLE_ROWS)) * ITEM_SIZE_WITH_MARGIN - (ITEM_SIZE_WITH_MARGIN - ITEM_SIZE);
+                int max = ((int)(Math.ceil(((float)getScrollingList().size() / getItemsPerRow())) - getVisibleRows())) * ITEM_SIZE_WITH_MARGIN - (ITEM_SIZE_WITH_MARGIN - ITEM_SIZE);
                 if (getOffset() < min) {
                     setOffset(min);
                 }else if(getOffset() > max) {
@@ -279,22 +305,24 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     }
 
     protected void updateScrolling() {
-        canScroll = getScrollingList().size() > ITEMS_PER_ROW * VISIBLE_ROWS;
+        canScroll = getScrollingList().size() > getItemsPerRow() * getVisibleRows();
         if (!canScroll) {
             setOffset(0);
         }
     }
 
     private int getFirstRow() {
-        return (TEXT_BOX_Y + TEXT_BOX_SIZE_H + getOffset() - ITEM_Y) / ITEM_SIZE_WITH_MARGIN;
+        return (getScrollingUpperLimit() + getOffset() - getScrollingStartY()) / ITEM_SIZE_WITH_MARGIN;
     }
 
     @SideOnly(Side.CLIENT)
     private void drawArrow(GuiManager gui, boolean down, int mX, int mY) {
-        int srcArrowX = canScroll ? clicked && down == (dir == 1) ? 2 : inArrowBounds(down, mX, mY) ? 1 : 0 : 3;
-        int srcArrowY = down ? 1 : 0;
+        if (canScroll || isSearching()) {
+            int srcArrowX = canScroll ? clicked && down == (dir == 1) ? 2 : inArrowBounds(down, mX, mY) ? 1 : 0 : 3;
+            int srcArrowY = down ? 1 : 0;
 
-        gui.drawTexture(ARROW_X, down ? ARROW_Y_DOWN : ARROW_Y_UP, ARROW_SRC_X + srcArrowX * ARROW_SIZE_W, ARROW_SRC_Y + srcArrowY * ARROW_SIZE_H, ARROW_SIZE_W, ARROW_SIZE_H);
+            gui.drawTexture(ARROW_X, down ? ARROW_Y_DOWN : ARROW_Y_UP, ARROW_SRC_X + srcArrowX * ARROW_SIZE_W, ARROW_SRC_Y + srcArrowY * ARROW_SIZE_H, ARROW_SIZE_W, ARROW_SIZE_H);
+        }
     }
 
     private boolean inArrowBounds(boolean down, int mX, int mY) {
@@ -337,12 +365,12 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         List<Point> points = new ArrayList<Point>();
 
         int start = getFirstRow();
-        for (int row = start; row < start + VISIBLE_ROWS + 1; row++) {
-            for (int col = 0; col < ITEMS_PER_ROW; col++) {
-                int id = row * ITEMS_PER_ROW + col;
+        for (int row = start; row < start + getVisibleRows() + 1; row++) {
+            for (int col = 0; col < getItemsPerRow(); col++) {
+                int id = row * getItemsPerRow() + col;
                 if (id >= 0 && id < getScrollingList().size())  {
-                    int y = ITEM_Y + row * ITEM_SIZE_WITH_MARGIN - getOffset();
-                    if (y > TEXT_BOX_Y + TEXT_BOX_SIZE_H && y + ITEM_SIZE < FlowComponent.getMenuOpenSize()) {
+                    int y = getScrollingStartY() + row * ITEM_SIZE_WITH_MARGIN - getOffset();
+                    if (y > getScrollingUpperLimit() && y + ITEM_SIZE < FlowComponent.getMenuOpenSize()) {
                         points.add(new Point(id, ITEM_X + ITEM_SIZE_WITH_MARGIN * col, y));
                     }
                 }
@@ -427,7 +455,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         return selectedSetting != null && editSetting;
     }
 
-    private boolean isSearching() {
+    protected boolean isSearching() {
         return selectedSetting != null && !editSetting;
     }
 
@@ -471,9 +499,11 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             dw.writeBoolean(setting.isValid());
             if (setting.isValid()) {
                 setting.writeData(dw);
-                dw.writeBoolean(setting.isLimitedByAmount());
-                if (setting.isLimitedByAmount()) {
-                    dw.writeData(setting.getAmount(), getAmountBitLength());
+                if (setting.isAmountSpecific()) {
+                    dw.writeBoolean(setting.isLimitedByAmount());
+                    if (setting.isLimitedByAmount()) {
+                        dw.writeData(setting.getAmount(), getAmountBitLength());
+                    }
                 }
             }
         }
@@ -487,14 +517,19 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 setting.clear();
             }else{
                 setting.readData(dr);
-                setting.setLimitedByAmount(dr.readBoolean());
-                if (setting.isLimitedByAmount()) {
-                    setting.setAmount(dr.readData(getAmountBitLength()));
-                }else{
-                    setting.setDefaultAmount();
+                if (setting.isAmountSpecific()) {
+                    setting.setLimitedByAmount(dr.readBoolean());
+
+                    if (setting.isLimitedByAmount()) {
+                        setting.setAmount(dr.readData(getAmountBitLength()));
+                    }else{
+                        setting.setDefaultAmount();
+                    }
                 }
             }
         }
+
+        onSettingContentChange();
     }
 
     @Override
@@ -508,8 +543,10 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 settings.get(i).clear();
             }else{
                 settings.get(i).copyFrom(menuItem.settings.get(i));
-                settings.get(i).setLimitedByAmount(menuItem.settings.get(i).isLimitedByAmount());
-                settings.get(i).setAmount(menuItem.settings.get(i).getAmount());
+                if (settings.get(i).isAmountSpecific()) {
+                    settings.get(i).setLimitedByAmount(menuItem.settings.get(i).isLimitedByAmount());
+                    settings.get(i).setAmount(menuItem.settings.get(i).getAmount());
+                }
             }
         }
     }
@@ -539,15 +576,17 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 writeClientData(container, DataTypeHeader.SET_ITEM, setting);
             }
 
-            if (newSetting.isLimitedByAmount() != setting.isLimitedByAmount()) {
-                setting.setLimitedByAmount(newSetting.isLimitedByAmount());
-                writeClientData(container, DataTypeHeader.USE_AMOUNT, setting);
-            }
+            if (setting.isAmountSpecific()) {
+                if (newSetting.isLimitedByAmount() != setting.isLimitedByAmount()) {
+                    setting.setLimitedByAmount(newSetting.isLimitedByAmount());
+                    writeClientData(container, DataTypeHeader.USE_AMOUNT, setting);
+                }
 
-            if (newSetting.isValid() && setting.isValid()) {
-                if (newSetting.getAmount() != setting.getAmount()) {
-                    setting.setAmount(newSetting.getAmount());
-                    writeClientData(container, DataTypeHeader.AMOUNT, setting);
+                if (newSetting.isValid() && setting.isValid()) {
+                    if (newSetting.getAmount() != setting.getAmount()) {
+                        setting.setAmount(newSetting.getAmount());
+                        writeClientData(container, DataTypeHeader.AMOUNT, setting);
+                    }
                 }
             }
         }
@@ -569,13 +608,15 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                     selectedSetting = null;
                     break;
                 case USE_AMOUNT:
-                    setting.setLimitedByAmount(dr.readBoolean());
-                    if (!setting.isLimitedByAmount() && setting.isValid()) {
-                        setting.setDefaultAmount();
+                    if (setting.isAmountSpecific()) {
+                        setting.setLimitedByAmount(dr.readBoolean());
+                        if (!setting.isLimitedByAmount() && setting.isValid()) {
+                            setting.setDefaultAmount();
+                        }
                     }
                     break;
                 case AMOUNT:
-                    if (setting.isValid()) {
+                    if (setting.isAmountSpecific() && setting.isValid()) {
                         setting.setAmount(dr.readData(getAmountBitLength()));
                         if (isEditing()) {
                             updateTextBoxes();
@@ -586,6 +627,8 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                     readSpecificHeaderData(dr, header, setting);
 
             }
+
+            onSettingContentChange();
         }else{
             setFirstRadioButtonSelected(dr.readBoolean());
         }
@@ -616,16 +659,24 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             case CLEAR:
                 break;
             case USE_AMOUNT:
-                dw.writeBoolean(setting.isLimitedByAmount());
+                if (setting.isAmountSpecific()) {
+                    dw.writeBoolean(setting.isLimitedByAmount());
+                }
                 break;
             case AMOUNT:
-                dw.writeData(setting.getAmount(), getAmountBitLength());
+                if (setting.isAmountSpecific()) {
+                    dw.writeData(setting.getAmount(), getAmountBitLength());
+                }
                 break;
             default:
                 writeSpecificHeaderData(dw, header, setting);
 
         }
 
+        //if the client send data to the server, do the update right away on that client
+        if (getParent().getManager().worldObj.isRemote) {
+            onSettingContentChange();
+        }
     }
 
     protected abstract void readSpecificHeaderData(DataReader dr, DataTypeHeader header, Setting setting);
@@ -748,9 +799,12 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             NBTTagCompound settingTag = (NBTTagCompound)settingTagList.tagAt(i);
             Setting setting = settings.get(settingTag.getByte(NBT_SETTING_ID));
             setting.load(settingTag);
-            setting.setLimitedByAmount(settingTag.getBoolean(NBT_SETTING_USE_SIZE));
-
+            if (setting.isAmountSpecific()) {
+                setting.setLimitedByAmount(settingTag.getBoolean(NBT_SETTING_USE_SIZE));
+            }
         }
+
+        onSettingContentChange();
     }
 
     @Override
@@ -764,7 +818,9 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 NBTTagCompound settingTag = new NBTTagCompound();
                 settingTag.setByte(NBT_SETTING_ID, (byte)setting.getId());
                 setting.save(settingTag);
-                settingTag.setBoolean(NBT_SETTING_USE_SIZE, setting.isLimitedByAmount());
+                if (setting.isAmountSpecific()) {
+                    settingTag.setBoolean(NBT_SETTING_USE_SIZE, setting.isLimitedByAmount());
+                }
                 settingTagList.appendTag(settingTag);
             }
         }
@@ -781,6 +837,10 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             }
             errors.add("The whitelist is empty");
         }
+    }
+
+    protected void onSettingContentChange() {
+
     }
 }
 

@@ -25,7 +25,11 @@ public enum ComponentType {
             ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuLiquidOutput.class, ComponentMenuResult.class),
     LIQUID_CONDITION(7, "Condition (L)", "Liquid Condition",
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
-            ComponentMenuTankCondition.class, ComponentMenuTargetTank.class, ComponentMenuLiquidCondition.class, ComponentMenuResult.class);
+            ComponentMenuTankCondition.class, ComponentMenuTargetTank.class, ComponentMenuLiquidCondition.class, ComponentMenuResult.class),
+    AUTO_CRAFTING(8, "Crafter", "Auto Crafter",
+            new ConnectionSet[]{ConnectionSet.STANDARD},
+            ComponentMenuCrafting.class, ComponentMenuResult.class);
+
 
     private Class<? extends ComponentMenu>[] classes;
     private int id;

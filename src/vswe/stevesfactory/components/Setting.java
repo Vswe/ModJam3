@@ -57,4 +57,8 @@ public abstract class Setting {
     public abstract boolean isContentEqual(Setting otherSetting);
 
     public abstract void setContent(Object obj);
+
+    public boolean isAmountSpecific() {
+        return true;
+    }
 }

@@ -17,23 +17,27 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ComponentMenuItem extends ComponentMenuStuff {
-    public ComponentMenuItem(FlowComponent parent) {
-        super(parent, ItemSetting.class);
 
-        numberTextBoxes.addTextBox(amountTextBox = new TextBoxNumber(80 ,24, 3, true) {
-            @Override
-            public boolean isVisible() {
-                return selectedSetting.isLimitedByAmount();
-            }
 
-            @Override
-            public void onNumberChanged() {
-                selectedSetting.setAmount(getNumber());
-                writeServerData(DataTypeHeader.AMOUNT);
-            }
-        });
+    protected  ComponentMenuItem(FlowComponent parent, Class<? extends Setting> settingClass) {
+        super(parent, settingClass);
 
-        numberTextBoxes.addTextBox(damageValueTextBox = new TextBoxNumber(70 ,52, 5, true) {
+        if (settings.get(0).isAmountSpecific()) {
+            numberTextBoxes.addTextBox(amountTextBox = new TextBoxNumber(80 ,24, 3, true) {
+                @Override
+                public boolean isVisible() {
+                    return selectedSetting.isLimitedByAmount();
+                }
+
+                @Override
+                public void onNumberChanged() {
+                    selectedSetting.setAmount(getNumber());
+                    writeServerData(DataTypeHeader.AMOUNT);
+                }
+            });
+        }
+
+        numberTextBoxes.addTextBox(damageValueTextBox = new TextBoxNumber(70, 52, 5, true) {
             @Override
             public boolean isVisible() {
                 return !getSelectedSetting().isFuzzy();
@@ -62,6 +66,10 @@ public class ComponentMenuItem extends ComponentMenuStuff {
                 writeServerData(DataTypeHeader.USE_FUZZY);
             }
         });
+    }
+
+    public ComponentMenuItem(FlowComponent parent) {
+        this(parent, ItemSetting.class);
     }
 
     private static final int DMG_VAL_TEXT_X = 15;
@@ -113,7 +121,9 @@ public class ComponentMenuItem extends ComponentMenuStuff {
 
     @Override
     protected void updateTextBoxes() {
-        amountTextBox.setNumber(selectedSetting.getAmount());
+        if (amountTextBox != null) {
+            amountTextBox.setNumber(selectedSetting.getAmount());
+        }
         damageValueTextBox.setNumber(getSelectedSetting().getItem().getItemDamage());
     }
 
