@@ -10,6 +10,8 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
+import java.util.List;
+
 
 public class ComponentMenuRedstoneStrength extends ComponentMenu {
     public ComponentMenuRedstoneStrength(FlowComponent parent) {
@@ -58,6 +60,9 @@ public class ComponentMenuRedstoneStrength extends ComponentMenu {
                 return 15;
             }
         });
+
+        lowTextBox.setNumber(1);
+        highTextBox.setNumber(15);
     }
 
     private CheckBoxList checkBoxes;
@@ -228,4 +233,24 @@ public class ComponentMenuRedstoneStrength extends ComponentMenu {
     }
 
 
+    public boolean isInverted() {
+        return inverted;
+    }
+
+    public int getLow() {
+        return lowTextBox.getNumber();
+    }
+
+    public  int getHigh() {
+        return highTextBox.getNumber();
+    }
+
+    @Override
+    public void addErrors(List<String> errors) {
+        if (getLow() > getHigh()) {
+            errors.add("Invalid strength range");
+        }else if(getLow() == 0 && getHigh() == 15) {
+            errors.add("Redundant strength range");
+        }
+    }
 }
