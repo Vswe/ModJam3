@@ -221,7 +221,17 @@ public class ComponentMenuItem extends ComponentMenuStuff {
             while (itemIterator.hasNext()) {
 
                 ItemStack itemStack = itemIterator.next();
-                Iterator<String> descriptionIterator = itemStack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips).iterator();
+                List<String> description;
+
+                //if it encounters some weird items
+                try {
+                    description = itemStack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+                }catch (Throwable ex) {
+                    itemIterator.remove();
+                    continue;
+                }
+
+                Iterator<String> descriptionIterator = description.iterator();
 
                 boolean foundSequence = false;
 
