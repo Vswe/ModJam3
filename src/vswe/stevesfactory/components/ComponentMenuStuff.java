@@ -711,10 +711,13 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
     @SideOnly(Side.CLIENT)
     private void addText(GuiManager gui, String str) {
-        text = text.substring(0, cursor) + str + text.substring(cursor);
+        String newText = text.substring(0, cursor) + str + text.substring(cursor);
 
-        moveCursor(gui, str.length());
-        textChanged();
+        if (gui.getStringWidth(newText) <= TEXT_BOX_SIZE_W - TEXT_BOX_TEXT_X * 2) {
+            text = newText;
+            moveCursor(gui, str.length());
+            textChanged();
+        }
     }
 
     @SideOnly(Side.CLIENT)
