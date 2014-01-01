@@ -4,7 +4,7 @@ package vswe.stevesfactory.components;
 public enum ComponentType {
     TRIGGER(0, "Trigger", "Trigger",
             new ConnectionSet[] {ConnectionSet.CONTINUOUSLY, ConnectionSet.REDSTONE},
-            ComponentMenuInterval.class, ComponentMenuRedstoneSides.class, ComponentMenuRedstoneStrength.class, ComponentMenuResult.class),
+            ComponentMenuInterval.class, ComponentMenuRedstoneSidesTrigger.class, ComponentMenuRedstoneStrength.class, ComponentMenuResult.class),
     INPUT(1, "Input", "Input",
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuInventory.class, ComponentMenuTargetInventory.class, ComponentMenuItem.class, ComponentMenuResult.class),
@@ -26,7 +26,11 @@ public enum ComponentType {
     LIQUID_CONDITION(7, "Condition (L)", "Liquid Condition",
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
             ComponentMenuTankCondition.class, ComponentMenuTargetTank.class, ComponentMenuLiquidCondition.class, ComponentMenuResult.class),
-    ;/*AUTO_CRAFTING(8, "Crafter", "Auto Crafter",
+    REDSTONE_EMITTER(8, "Emitter", "Redstone Emitter",
+            new ConnectionSet[]{ConnectionSet.STANDARD},
+            ComponentMenuEmitters.class, ComponentMenuRedstoneSidesEmitter.class, ComponentMenuRedstoneOutput.class, ComponentMenuResult.class),
+
+    ;/*AUTO_CRAFTING(9, "Crafter", "Auto Crafter",
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuCrafting.class, ComponentMenuResult.class); */
 

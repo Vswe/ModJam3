@@ -6,7 +6,8 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 public enum ConnectionBlockType {
     INVENTORY(IInventory.class),
-    TANK(IFluidHandler.class);
+    TANK(IFluidHandler.class),
+    EMITTER(TileEntityOutput.class);
 
     private Class clazz;
 

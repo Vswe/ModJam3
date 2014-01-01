@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.IFluidHandler;
+import vswe.stevesfactory.blocks.TileEntityOutput;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,10 @@ public class SlotInventoryHolder {
 
     public IFluidHandler getTank() {
         return (IFluidHandler)inventory;
+    }
+
+    public TileEntityOutput getEmitter() {
+        return (TileEntityOutput)inventory;
     }
 
     public Map<Integer, SlotSideTarget> getValidSlots() {

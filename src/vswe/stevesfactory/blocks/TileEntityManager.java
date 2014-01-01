@@ -283,7 +283,7 @@ public class TileEntityManager extends TileEntity {
         return isTriggerPowered(component, isPowered, high);
     }
     private boolean isTriggerPowered(FlowComponent component, int[] currentPower, boolean high) {
-        ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)component.getMenus().get(1);
+        ComponentMenuRedstoneSidesTrigger menuRedstone = (ComponentMenuRedstoneSidesTrigger)component.getMenus().get(1);
         for (int i = 0; i < currentPower.length; i++) {
             if (menuRedstone.isSideRequired(i)) {
                 if (isRedstonePowered(component, currentPower[i]) == high) {

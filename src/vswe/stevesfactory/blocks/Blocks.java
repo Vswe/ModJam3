@@ -20,23 +20,33 @@ public final class Blocks {
     public static final String CABLE_LOCALIZED_NAME = "Inventory Cable";
     public static final int CABLE_DEFAULT_ID = 1312;
 
+    private static final String CABLE_OUTPUT_TILE_ENTITY_TAG = "TileEntityCableOutputName";
+    public static int CABLE_OUTPUT_ID;
+    public static final String CABLE_OUTPUT_NAME_TAG = "BlockCableOutputName";
+    public static final String CABLE_OUTPUT_LOCALIZED_NAME = "Signal Emitter";
+    public static final int CABLE_OUTPUT_DEFAULT_ID = 1313;
+
     public static BlockManager blockManager;
     public static BlockCable blockCable;
+    public static BlockCableOutput blockCableOutput;
 
     public static void init() {
         blockManager = new BlockManager(MANAGER_ID);
-
         GameRegistry.registerBlock(blockManager, MANAGER_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityManager.class, MANAGER_TILE_ENTITY_TAG);
 
         blockCable = new BlockCable(CABLE_ID);
-
         GameRegistry.registerBlock(blockCable, CABLE_NAME_TAG);
+
+        blockCableOutput = new BlockCableOutput(CABLE_OUTPUT_ID);
+        GameRegistry.registerBlock(blockCableOutput, CABLE_OUTPUT_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityOutput.class, CABLE_OUTPUT_TILE_ENTITY_TAG);
     }
 
     public static void addNames() {
         LanguageRegistry.addName(blockManager, MANAGER_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCable, CABLE_LOCALIZED_NAME);
+        LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
     }
 
     public static void addRecipes() {

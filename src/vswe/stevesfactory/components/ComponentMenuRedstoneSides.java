@@ -14,7 +14,7 @@ import vswe.stevesfactory.network.PacketHandler;
 
 import java.util.List;
 
-public class ComponentMenuRedstoneSides extends ComponentMenu {
+public abstract class ComponentMenuRedstoneSides extends ComponentMenu {
 
     public ComponentMenuRedstoneSides(FlowComponent parent) {
         super(parent);
@@ -30,20 +30,21 @@ public class ComponentMenuRedstoneSides extends ComponentMenu {
         radioButtonList = new RadioButtonList() {
             @Override
             public void updateSelectedOption(int selectedOption) {
-                setRequireAll(selectedOption == 0);
+                setFirstOption(selectedOption == 0);
                 sendServerData(true);
             }
         };
 
         radioButtonList.setSelectedOption(1);
 
-        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, "Requires all"));
-        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, "If any"));
+        initRadioButtons();
     }
 
-    private static final int RADIO_BUTTON_X_LEFT = 5;
-    private static final int RADIO_BUTTON_X_RIGHT = 65;
-    private static final int RADIO_BUTTON_Y = 23;
+    protected abstract void initRadioButtons();
+
+    protected static final int RADIO_BUTTON_X_LEFT = 5;
+    protected static final int RADIO_BUTTON_X_RIGHT = 65;
+    protected static final int RADIO_BUTTON_Y = 23;
 
     private static final int CHECKBOX_X = 5;
     private static final int CHECKBOX_Y = 35;
@@ -83,8 +84,8 @@ public class ComponentMenuRedstoneSides extends ComponentMenu {
     }
 
     private CheckBoxList checkBoxList;
-    private RadioButtonList radioButtonList;
-    private int selection;
+    protected RadioButtonList radioButtonList;
+    protected int selection;
 
     @Override
     public String getName() {
@@ -96,11 +97,13 @@ public class ComponentMenuRedstoneSides extends ComponentMenu {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
-        gui.drawSplitString("Select which block sides the redstone should be detected at", TEXT_MARGIN_X, TEXT_Y, MENU_WIDTH - TEXT_MARGIN_X, 0.7F, 0x404040);
+        gui.drawSplitString(getMessage(), TEXT_MARGIN_X, TEXT_Y, MENU_WIDTH - TEXT_MARGIN_X, 0.7F, 0x404040);
 
         checkBoxList.draw(gui, mX, mY);
         radioButtonList.draw(gui, mX, mY);
     }
+
+    protected abstract String getMessage();
 
     @SideOnly(Side.CLIENT)
     @Override
@@ -126,13 +129,13 @@ public class ComponentMenuRedstoneSides extends ComponentMenu {
 
     @Override
     public void writeData(DataWriter dw) {
-        dw.writeBoolean(requireAll());
+        dw.writeBoolean(useFirstOption());
         dw.writeData(selection, DataBitHelper.MENU_REDSTONE_SETTING);
     }
 
     @Override
     public void readData(DataReader dr) {
-       setRequireAll(dr.readBoolean());
+        setFirstOption(dr.readBoolean());
        selection = dr.readData(DataBitHelper.MENU_REDSTONE_SETTING);
     }
 
@@ -141,15 +144,15 @@ public class ComponentMenuRedstoneSides extends ComponentMenu {
         ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)menu;
 
         selection = menuRedstone.selection;
-        setRequireAll(menuRedstone.requireAll());
+        setFirstOption(menuRedstone.useFirstOption());
     }
 
     @Override
     public void refreshData(ContainerManager container, ComponentMenu newData) {
         ComponentMenuRedstoneSides newDataRedstone = (ComponentMenuRedstoneSides)newData;
 
-       if (requireAll() != newDataRedstone.requireAll()) {
-           setRequireAll(newDataRedstone.requireAll());
+       if (useFirstOption() != newDataRedstone.useFirstOption()) {
+           setFirstOption(newDataRedstone.useFirstOption());
 
            sendClientData(container, true);
        }
@@ -176,7 +179,7 @@ public class ComponentMenuRedstoneSides extends ComponentMenu {
     private void writeData(DataWriter dw, boolean syncRequire) {
         dw.writeBoolean(syncRequire);
         if (syncRequire) {
-            dw.writeBoolean(requireAll());
+            dw.writeBoolean(useFirstOption());
         }else{
             dw.writeData(selection, DataBitHelper.MENU_REDSTONE_SETTING);
         }
@@ -190,28 +193,39 @@ public class ComponentMenuRedstoneSides extends ComponentMenu {
         //Forgot to save it in earlier versions
         if (version >= 3) {
             selection = nbtTagCompound.getByte(NBT_ACTIVE);
-            setRequireAll(nbtTagCompound.getBoolean(NBT_ALL));
+            setFirstOption(nbtTagCompound.getBoolean(NBT_ALL));
         }
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbtTagCompound) {
         nbtTagCompound.setByte(NBT_ACTIVE, (byte)selection);
-        nbtTagCompound.setBoolean(NBT_ALL, requireAll());
+        nbtTagCompound.setBoolean(NBT_ALL, useFirstOption());
     }
 
     @Override
     public void readNetworkComponent(DataReader dr) {
         if (dr.readBoolean()) {
-            setRequireAll(dr.readBoolean());
+            setFirstOption(dr.readBoolean());
         }else{
             selection = dr.readData(DataBitHelper.MENU_REDSTONE_SETTING);
         }
     }
 
-    @Override
-    public boolean isVisible() {
-        return getParent().getConnectionSet() == ConnectionSet.REDSTONE;
+
+
+
+
+    protected boolean useFirstOption() {
+        return radioButtonList.getSelectedOption() == 0;
+    }
+
+    protected void setFirstOption(boolean val) {
+        radioButtonList.setSelectedOption(val ? 0 : 1);
+    }
+
+    public boolean isSideRequired(int i) {
+        return (selection & (1 << i)) != 0;
     }
 
     @Override
@@ -219,19 +233,5 @@ public class ComponentMenuRedstoneSides extends ComponentMenu {
         if (isVisible() && selection == 0) {
             errors.add("No redstone sides selected");
         }
-    }
-
-
-
-    public boolean requireAll() {
-        return radioButtonList.getSelectedOption() == 0;
-    }
-
-    private void setRequireAll(boolean val) {
-        radioButtonList.setSelectedOption(val ? 0 : 1);
-    }
-
-    public boolean isSideRequired(int i) {
-        return (selection & (1 << i)) != 0;
     }
 }

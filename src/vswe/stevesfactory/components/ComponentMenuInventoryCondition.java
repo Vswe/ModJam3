@@ -6,6 +6,7 @@ public class ComponentMenuInventoryCondition extends ComponentMenuInventory {
         super(parent);
     }
 
+    @Override
     protected void initRadioButtons() {
         radioButtons.add(new RadioButtonInventory(0, "Run a shared command once"));
         radioButtons.add(new RadioButtonInventory(1, "Require all targets"));
