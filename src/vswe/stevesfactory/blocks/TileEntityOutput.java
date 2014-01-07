@@ -1,6 +1,8 @@
 package vswe.stevesfactory.blocks;
 
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.components.ComponentMenuRedstoneOutput;
@@ -80,5 +82,44 @@ public class TileEntityOutput extends TileEntity {
                 worldObj.notifyBlockOfNeighborChange(x, y, z, Blocks.blockCableOutput.blockID);
             }
         }
+    }
+
+
+    private static final String NBT_SIDES = "Sides";
+    private static final String NBT_STRENGTH = "Strength";
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+        super.readFromNBT(nbtTagCompound);
+
+        int version = nbtTagCompound.getByte(Blocks.NBT_PROTOCOL_VERSION);
+
+
+        NBTTagList sidesTag = nbtTagCompound.getTagList(NBT_SIDES);
+        for (int i = 0; i < sidesTag.tagCount(); i++) {
+            NBTTagCompound sideTag = (NBTTagCompound)sidesTag.tagAt(i);
+
+            strengths[i] = sideTag.getByte(NBT_STRENGTH);
+        }
+    }
+
+
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        super.writeToNBT(nbtTagCompound);
+
+        nbtTagCompound.setByte(Blocks.NBT_PROTOCOL_VERSION, Blocks.NBT_CURRENT_PROTOCOL_VERSION);
+
+        NBTTagList sidesTag = new NBTTagList();
+        for (int i = 0; i < strengths.length; i++) {
+            NBTTagCompound sideTag = new NBTTagCompound();
+
+            sideTag.setByte(NBT_STRENGTH, (byte)strengths[i]);
+
+            sidesTag.appendTag(sideTag);
+        }
+
+
+        nbtTagCompound.setTag(NBT_SIDES, sidesTag);
     }
 }

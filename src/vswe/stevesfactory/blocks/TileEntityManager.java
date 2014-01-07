@@ -433,8 +433,7 @@ public class TileEntityManager extends TileEntity {
         }
     }
 
-    private static final byte NBT_CURRENT_PROTOCOL_VERSION = 5;
-    private static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
+
     private static final String NBT_POWERED = "IsPowered";
     private static final String NBT_TIMER = "Timer";
     private static final String NBT_COMPONENTS = "Components";
@@ -443,7 +442,7 @@ public class TileEntityManager extends TileEntity {
     public void readFromNBT(NBTTagCompound nbtTagCompound) {
         super.readFromNBT(nbtTagCompound);
 
-        int version =  nbtTagCompound.getByte(NBT_PROTOCOL_VERSION);
+        int version =  nbtTagCompound.getByte(Blocks.NBT_PROTOCOL_VERSION);
 
         //there used to be just one redstone detection, not specific sides
         if (version < 1) {
@@ -477,7 +476,7 @@ public class TileEntityManager extends TileEntity {
     public void writeToNBT(NBTTagCompound nbtTagCompound) {
         super.writeToNBT(nbtTagCompound);
 
-        nbtTagCompound.setByte(NBT_PROTOCOL_VERSION, NBT_CURRENT_PROTOCOL_VERSION);
+        nbtTagCompound.setByte(Blocks.NBT_PROTOCOL_VERSION, Blocks.NBT_CURRENT_PROTOCOL_VERSION);
 
         byte[] powered = new byte[isPowered.length];
         for (int i = 0; i < isPowered.length; i++) {

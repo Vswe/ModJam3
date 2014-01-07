@@ -9,6 +9,9 @@ import net.minecraft.item.ItemStack;
 
 public final class Blocks {
 
+    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 5;
+    public static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
+
     private static final String MANAGER_TILE_ENTITY_TAG = "TileEntityMachineManagerName";
     public static int MANAGER_ID;
     public static final String MANAGER_NAME_TAG = "BlockMachineManagerName";
