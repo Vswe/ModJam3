@@ -116,6 +116,7 @@ public class TileEntityManager extends TileEntity {
     public static final int MAX_CONNECTED_INVENTORIES = 1023;
 
     private boolean firstInventoryUpdate = true;
+    private boolean firstCommandExecution = true;
 
     public void updateInventories() {
         WorldCoordinate[] oldCoordinates = new WorldCoordinate[inventories.size()];
@@ -270,6 +271,11 @@ public class TileEntityManager extends TileEntity {
     }
 
     private void activateTrigger(FlowComponent component, EnumSet<ConnectionOption> validTriggerOutputs) {
+        if (firstCommandExecution) {
+            updateInventories();
+            firstCommandExecution = false;
+        }
+
         for (ConnectionBlock inventory : inventories) {
             if (inventory.getTileEntity().isInvalid()) {
                 updateInventories();

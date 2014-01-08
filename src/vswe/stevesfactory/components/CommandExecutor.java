@@ -324,7 +324,15 @@ public class CommandExecutor {
             for (SlotSideTarget slot : tank.getValidSlots().values()) {
                 List<FluidTankInfo> tankInfos = new ArrayList<FluidTankInfo>();
                 for (int side : slot.getSides()) {
-                    for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
+                    FluidTankInfo[] currentTankInfos = tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side]);
+                    if (currentTankInfos == null) {
+                        continue;
+                    }
+                    for (FluidTankInfo fluidTankInfo : currentTankInfos) {
+                        if (fluidTankInfo == null) {
+                            continue;
+                        }
+
                         boolean alreadyUsed = false;
                         for (FluidTankInfo tankInfo : tankInfos) {
                             if (FluidStack.areFluidStackTagsEqual(tankInfo.fluid, fluidTankInfo.fluid) && tankInfo.capacity == fluidTankInfo.capacity) {
