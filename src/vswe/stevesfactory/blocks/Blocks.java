@@ -23,15 +23,23 @@ public final class Blocks {
     public static final String CABLE_LOCALIZED_NAME = "Inventory Cable";
     public static final int CABLE_DEFAULT_ID = 1312;
 
+
+    private static final String CABLE_RELAY_TILE_ENTITY_TAG = "TileEntityCableRelayName";
+    public static int CABLE_RELAY_ID;
+    public static final String CABLE_RELAY_NAME_TAG = "BlockCableRelayName";
+    public static final String CABLE_RELAY_LOCALIZED_NAME = "Inventory Relay";
+    public static final int CABLE_RELAY_DEFAULT_ID = 1313;
+
     private static final String CABLE_OUTPUT_TILE_ENTITY_TAG = "TileEntityCableOutputName";
     public static int CABLE_OUTPUT_ID;
     public static final String CABLE_OUTPUT_NAME_TAG = "BlockCableOutputName";
     public static final String CABLE_OUTPUT_LOCALIZED_NAME = "Signal Emitter";
-    public static final int CABLE_OUTPUT_DEFAULT_ID = 1313;
+    public static final int CABLE_OUTPUT_DEFAULT_ID = 1314;
 
     public static BlockManager blockManager;
     public static BlockCable blockCable;
     public static BlockCableOutput blockCableOutput;
+    public static BlockCableRelay blockCableRelay;
 
     public static void init() {
         blockManager = new BlockManager(MANAGER_ID);
@@ -44,12 +52,17 @@ public final class Blocks {
         //blockCableOutput = new BlockCableOutput(CABLE_OUTPUT_ID);
         //GameRegistry.registerBlock(blockCableOutput, CABLE_OUTPUT_NAME_TAG);
         //GameRegistry.registerTileEntity(TileEntityOutput.class, CABLE_OUTPUT_TILE_ENTITY_TAG);
+
+        blockCableRelay = new BlockCableRelay(CABLE_RELAY_ID);
+        GameRegistry.registerBlock(blockCableRelay, CABLE_RELAY_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityRelay.class, CABLE_RELAY_TILE_ENTITY_TAG);
     }
 
     public static void addNames() {
         LanguageRegistry.addName(blockManager, MANAGER_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCable, CABLE_LOCALIZED_NAME);
         //LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
+        LanguageRegistry.addName(blockCableRelay, CABLE_RELAY_LOCALIZED_NAME);
     }
 
     public static void addRecipes() {
@@ -71,6 +84,11 @@ public final class Blocks {
                 'G', Block.glass,
                 'I', Item.ingotIron,
                 'P', Block.pressurePlateIron
+        );
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableRelay, 1),
+                blockCable,
+                Block.hopperBlock
         );
 
     }
