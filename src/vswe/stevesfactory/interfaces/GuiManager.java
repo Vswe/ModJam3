@@ -8,9 +8,14 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import org.lwjgl.opengl.GL11;
@@ -264,6 +269,67 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
     }
 
 
+    public void drawBlock(TileEntity te, int x, int y) {
+        ItemStack item = getItemStackFromBlock(te);
+        if (item != null) {
+            drawItemStack(item, x, y);
+        }
+    }
+
+
+    public String getBlockName(TileEntity te) {
+        ItemStack item = getItemStackFromBlock(te);
+
+        if (item != null) {
+            try {
+                List str = item.getTooltip(Minecraft.getMinecraft().thePlayer, false);
+                if (str != null && str.size() > 0) {
+                    return (String)str.get(0);
+                }
+            }catch (Throwable ignored) {}
+        }
+
+        return "Unknown";
+    }
+
+    private ItemStack getItemStackFromBlock(TileEntity te) {
+        World world = te.getWorldObj();
+        Block block = te.getBlockType();
+        if (world != null && block != null) {
+            int x = te.xCoord;
+            int y = te.yCoord;
+            int z = te.zCoord;
+
+
+
+
+            try {
+                //try to get it by picking the block
+                ItemStack item = block.getPickBlock(new MovingObjectPosition(x, y, z, 1, Vec3.createVectorHelper(x, y, z)), world, x, y, z);
+                if (item != null) {
+                    return item;
+                }
+            }catch (Throwable ignored) {}
+
+
+            try{
+                //try to get it from dropped items
+                List<ItemStack> items = block.getBlockDropped(world, x, y, z, te.getBlockMetadata(), 0);
+                if (items != null && items.size() > 0 && items.get(0) != null) {
+                    return items.get(0);
+                }
+            }catch (Throwable ignored) {}
+
+
+
+            //get it from its id and meta
+            return  new ItemStack(block, 1, te.getBlockMetadata());
+        }else{
+            return null;
+        }
+
+    }
+
     public void drawItemStack(ItemStack itemstack, int x, int y) {
         GL11.glPushMatrix();
 
@@ -446,4 +512,5 @@ public class GuiManager extends net.minecraft.client.gui.inventory.GuiContainer 
         }
         GL11.glColor4f(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
     }
+
 }

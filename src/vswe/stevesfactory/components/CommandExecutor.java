@@ -115,14 +115,14 @@ public class CommandExecutor {
                     }
                 }
                 break;
-            case REDSTONE_EMITTER:
+            /*case REDSTONE_EMITTER:
                 List<SlotInventoryHolder> emitters = getEmitters(command.getMenus().get(0));
                 if (emitters != null) {
                     for (SlotInventoryHolder emitter : emitters) {
                         emitter.getEmitter().updateState((ComponentMenuRedstoneSidesEmitter)command.getMenus().get(1), (ComponentMenuRedstoneOutput)command.getMenus().get(2));
                     }
                 }
-                break;
+                break;*/
         }
 
 
@@ -563,7 +563,7 @@ public class CommandExecutor {
                                 resource.amount = amount;
 
                                 resource = holder.getTank().drain(holder.getSide(), resource, true);
-                                if (resource.amount > 0) {
+                                if (resource != null && resource.amount > 0) {
                                     tank.fill(ForgeDirection.VALID_DIRECTIONS[side], resource, true);
                                     liquidBufferElement.decreaseStackSize(resource.amount);
                                     outputLiquidCounter.modifyStackSize(resource.amount);

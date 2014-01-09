@@ -26,9 +26,9 @@ public enum ComponentType {
     LIQUID_CONDITION(7, "Condition (L)", "Liquid Condition",
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
             ComponentMenuTankCondition.class, ComponentMenuTargetTank.class, ComponentMenuLiquidCondition.class, ComponentMenuResult.class),
-    REDSTONE_EMITTER(8, "Emitter", "Redstone Emitter",
+    /*REDSTONE_EMITTER(8, "Emitter", "Redstone Emitter",
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuEmitters.class, ComponentMenuRedstoneSidesEmitter.class, ComponentMenuRedstoneOutput.class, ComponentMenuResult.class),
+            ComponentMenuEmitters.class, ComponentMenuRedstoneSidesEmitter.class, ComponentMenuRedstoneOutput.class, ComponentMenuResult.class),*/
 
     ;/*AUTO_CRAFTING(9, "Crafter", "Auto Crafter",
             new ConnectionSet[]{ConnectionSet.STANDARD},

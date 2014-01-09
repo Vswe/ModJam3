@@ -13,6 +13,7 @@ import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.blocks.ConnectionBlock;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.TileEntityManager;
+import vswe.stevesfactory.interfaces.Color;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -107,7 +108,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 int srcInventoryY = CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY) ? 1 : 0;
 
                 gui.drawTexture(x, INVENTORY_Y, INVENTORY_SRC_X + srcInventoryX * INVENTORY_SIZE, INVENTORY_SRC_Y + srcInventoryY * INVENTORY_SIZE, INVENTORY_SIZE, INVENTORY_SIZE);
-                gui.drawItemStack(new ItemStack(te.getBlockType(), 1, te.getBlockMetadata()), x, INVENTORY_Y);
+                gui.drawBlock(te, x, INVENTORY_Y);
             }
         }
 
@@ -141,17 +142,13 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
             if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
                 if (CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
-                    String name = "Unknown";
-                    Item item = Item.itemsList[te.worldObj.getBlockId(te.xCoord, te.yCoord, te.zCoord)];
-                    Block block = Block.blocksList[te.worldObj.getBlockId(te.xCoord, te.yCoord, te.zCoord)];
-                    if (item != null && block != null) {
-                        name = item.getItemStackDisplayName(new ItemStack(block, 1, block.getDamageValue(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord)));
-                    }
-
-                    String str = name;
+                    String str = gui.getBlockName(te);
                     str += "\nX: " + te.xCoord + " Y: " + te.yCoord + " Z: " + te.zCoord;
                     str += "\n" + (int)Math.round(Math.sqrt(gui.getManager().getDistanceFrom(te.xCoord + 0.5, te.yCoord + 0.5, te.zCoord + 0.5))) + " block(s) away";
 
+                    if (selectedInventories.contains(inventories.get(i).getId())) {
+                        str += "\n" + Color.GREEN + "[Selected]";
+                    }
 
                     gui.drawMouseOver(str, mX, mY);
                 }

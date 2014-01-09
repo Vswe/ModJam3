@@ -41,15 +41,15 @@ public final class Blocks {
         blockCable = new BlockCable(CABLE_ID);
         GameRegistry.registerBlock(blockCable, CABLE_NAME_TAG);
 
-        blockCableOutput = new BlockCableOutput(CABLE_OUTPUT_ID);
-        GameRegistry.registerBlock(blockCableOutput, CABLE_OUTPUT_NAME_TAG);
-        GameRegistry.registerTileEntity(TileEntityOutput.class, CABLE_OUTPUT_TILE_ENTITY_TAG);
+        //blockCableOutput = new BlockCableOutput(CABLE_OUTPUT_ID);
+        //GameRegistry.registerBlock(blockCableOutput, CABLE_OUTPUT_NAME_TAG);
+        //GameRegistry.registerTileEntity(TileEntityOutput.class, CABLE_OUTPUT_TILE_ENTITY_TAG);
     }
 
     public static void addNames() {
         LanguageRegistry.addName(blockManager, MANAGER_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCable, CABLE_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
+        //LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
     }
 
     public static void addRecipes() {
