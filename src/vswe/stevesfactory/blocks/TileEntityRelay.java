@@ -24,7 +24,8 @@ public class TileEntityRelay extends TileEntity implements IInventory, ISidedInv
     private int[] cachedAllSlots;
     private boolean blockingUsage;
     private int chainLength;
-    private Entity cachedEntity;
+    private Entity[] cachedEntities = new Entity[2];
+
 
     @Override
     public int[] getAccessibleSlotsFromSide(int var1) {
@@ -361,25 +362,25 @@ public class TileEntityRelay extends TileEntity implements IInventory, ISidedInv
     }
 
     private IFluidHandler getTank() {
-        return getContainer(IFluidHandler.class);
+        return getContainer(IFluidHandler.class, 1);
     }
 
     private IInventory getInventory() {
-        return getContainer(IInventory.class);
+        return getContainer(IInventory.class, 0);
     }
 
-    private <T> T getContainer(Class<T> type) {
+    private <T> T getContainer(Class<T> type, int id) {
         if (isBlockingUsage()) {
             return null;
         }
 
         blockUsage();
 
-        if (cachedEntity != null) {
-            if (cachedEntity.isDead) {
-                cachedEntity = null;
+        if (cachedEntities[id] != null) {
+            if (cachedEntities[id].isDead) {
+                cachedEntities[id] = null;
             }else{
-                return (T)cachedEntity;
+                return (T)cachedEntities[id];
             }
         }
 
@@ -409,12 +410,12 @@ public class TileEntityRelay extends TileEntity implements IInventory, ISidedInv
                     double distance = entity.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
                     if ((closest == -1 || distance < closest)) {
                         closest = distance;
-                        cachedEntity = entity;
+                        cachedEntities[id] = entity;
                     }
                 }
 
 
-                return (T)cachedEntity;
+                return (T)cachedEntities[id];
             }
         }
 
@@ -426,7 +427,8 @@ public class TileEntityRelay extends TileEntity implements IInventory, ISidedInv
 
     @Override
     public void updateEntity() {
-        cachedEntity = null;
+        cachedEntities[0] = null;
+        cachedEntities[1] = null;
     }
 
 
