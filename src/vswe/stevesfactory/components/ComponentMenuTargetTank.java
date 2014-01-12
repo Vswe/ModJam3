@@ -11,6 +11,8 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
+import java.util.List;
+
 public class ComponentMenuTargetTank extends ComponentMenuTarget {
     public ComponentMenuTargetTank(FlowComponent parent) {
         super(parent);
@@ -124,12 +126,14 @@ public class ComponentMenuTargetTank extends ComponentMenuTarget {
     }
 
     @Override
-    protected void readAdvancedNetworkComponent(DataTypeHeader header, int i, int data) {
-        onlyFull[i] = data != 0;
+    protected void readAdvancedNetworkComponent(DataReader dr, DataTypeHeader header, int i) {
+        onlyFull[i] = dr.readBoolean();
         refreshAdvancedComponent();
     }
 
     public boolean requireEmpty(int side) {
         return !onlyFull[side];
     }
+
+
 }

@@ -138,7 +138,8 @@ public class ComponentMenuTargetInventory extends ComponentMenuTarget {
     }
 
     @Override
-    protected void readAdvancedNetworkComponent(DataTypeHeader header, int i, int data) {
+    protected void readAdvancedNetworkComponent(DataReader dr, DataTypeHeader header, int i) {
+        int data = dr.readData(header.getBits());
         switch (header) {
             case START_OR_TANK_DATA:
                 startRange[i] = data;
@@ -167,13 +168,7 @@ public class ComponentMenuTargetInventory extends ComponentMenuTarget {
             }
         }
 
-        for (int i = 0; i < directions.length; i++) {
-            if (isActive(i)) {
-                return;
-            }
-        }
-
-        errors.add("No direction is active");
+        super.addErrors(errors);
     }
 
     @SideOnly(Side.CLIENT)

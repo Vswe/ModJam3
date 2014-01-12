@@ -228,7 +228,7 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
     protected abstract void saveAdvancedComponent(NBTTagCompound directionTag, int i);
     protected abstract void resetAdvancedSetting(int i);
     protected abstract void refreshAdvancedComponentData(ContainerManager container, ComponentMenu newData, int i);
-    protected abstract void readAdvancedNetworkComponent(DataTypeHeader header, int i, int data);
+    protected abstract void readAdvancedNetworkComponent(DataReader dr, DataTypeHeader header, int i);
 
     @Override
     public void readData(DataReader dr) {
@@ -292,20 +292,19 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
        int direction = dr.readData(DataBitHelper.MENU_TARGET_DIRECTION_ID);
        int headerId = dr.readData(DataBitHelper.MENU_TARGET_TYPE_HEADER);
        DataTypeHeader header = getHeaderFromId(headerId);
-       int data = dr.readData(header.bits);
 
        switch (header) {
            case ACTIVATE:
-               activatedDirections[direction] = data != 0;
+               activatedDirections[direction] =  dr.readData(header.bits) != 0;
                break;
            case USE_ADVANCED_SETTING:
-               useRangeForDirections[direction] = data != 0;
+               useRangeForDirections[direction] =  dr.readData(header.bits) != 0;
                if (!useAdvancedSetting(direction)) {
                    resetAdvancedSetting(direction);
                }
                break;
            default:
-               readAdvancedNetworkComponent(header, direction, data);
+               readAdvancedNetworkComponent(dr, header, direction);
        }
     }
 
@@ -340,6 +339,10 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
 
         public int getId() {
             return id;
+        }
+
+        public DataBitHelper getBits() {
+            return bits;
         }
     }
 
@@ -387,5 +390,14 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
 
 
 
+    @Override
+    public void addErrors(List<String> errors) {
+        for (int i = 0; i < directions.length; i++) {
+            if (isActive(i)) {
+                return;
+            }
+        }
 
+        errors.add("No direction is active");
+    }
 }

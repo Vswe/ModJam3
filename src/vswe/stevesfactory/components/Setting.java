@@ -20,6 +20,7 @@ public abstract class Setting {
 
     public Setting(int id) {
         this.id = id;
+        clear();
     }
 
     @SideOnly(Side.CLIENT)
