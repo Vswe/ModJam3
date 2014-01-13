@@ -9,6 +9,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.tileentity.TileEntity;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.ComponentMenu;
 import vswe.stevesfactory.components.ComponentType;
@@ -17,14 +18,18 @@ import vswe.stevesfactory.interfaces.ContainerManager;
 
 
 public class PacketHandler implements IPacketHandler {
+    public static final double BLOCK_UPDATE_RANGE = 128;
+
+
     @Override
     public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player) {
 
         DataReader dr = new DataReader(packet.data);
 
+        boolean useContainer = dr.readBoolean();
 
+        if (useContainer) {
             int containerId = dr.readByte();
-
             Container container = ((EntityPlayer)player).openContainer;
 
             if (container != null && container.windowId == containerId && container instanceof ContainerManager) {
@@ -45,6 +50,20 @@ public class PacketHandler implements IPacketHandler {
 
                 }
             }
+        }else{
+            int x = dr.readData(DataBitHelper.WORLD_COORDINATE);
+            int y = dr.readData(DataBitHelper.WORLD_COORDINATE);
+            int z = dr.readData(DataBitHelper.WORLD_COORDINATE);
+
+            TileEntity te = ((EntityPlayer)player).worldObj.getBlockTileEntity(x, y, z);
+            if (te != null && te instanceof IPacketBlock) {
+                boolean onServer = player instanceof EntityPlayerMP;
+                int id = dr.readData(((IPacketBlock) te).infoBitLength(onServer));
+                ((IPacketBlock)te).readData(dr, ((EntityPlayer) player), onServer, id);
+            }
+        }
+
+
 
 
         dr.close();
@@ -75,6 +94,7 @@ public class PacketHandler implements IPacketHandler {
     public static void sendAllData(Container container, ICrafting crafting, TileEntityManager jam) {
         DataWriter dw = new DataWriter();
 
+        dw.writeBoolean(true); //use container
         dw.writeByte(container.windowId);
         dw.writeData(ClientPacketHeader.ALL.id, DataBitHelper.CLIENT_HEADER);
         writeAllData(dw, jam);
@@ -98,6 +118,7 @@ public class PacketHandler implements IPacketHandler {
     private static DataWriter getWriterForSpecificData(Container container) {
         DataWriter dw = new DataWriter();
 
+        dw.writeBoolean(true); //use container
         dw.writeByte(container.windowId);
         dw.writeData(ClientPacketHeader.SPECIFIC.id, DataBitHelper.CLIENT_HEADER);
 
@@ -109,7 +130,7 @@ public class PacketHandler implements IPacketHandler {
 
         if (container != null) {
             DataWriter dw = new DataWriter();
-
+            dw.writeBoolean(true); //use container
             dw.writeByte(container.windowId);
 
             return dw;
@@ -239,6 +260,7 @@ public class PacketHandler implements IPacketHandler {
     public static void sendNewFlowComponent(ContainerManager container, FlowComponent component) {
         DataWriter dw = new DataWriter();
 
+        dw.writeBoolean(true); //use container
         dw.writeByte(container.windowId);
         dw.writeData(ClientPacketHeader.NEW.id, DataBitHelper.CLIENT_HEADER);
 
@@ -273,5 +295,31 @@ public class PacketHandler implements IPacketHandler {
             }
         }
         return  null;
+    }
+
+    public static void sendBlockPacket(IPacketBlock block, EntityPlayer player, int id) {
+        if (block instanceof TileEntity) {
+            TileEntity te = (TileEntity)block;
+            boolean onServer = player == null || !player.worldObj.isRemote;
+
+            DataWriter dw = new DataWriter();
+            dw.writeBoolean(false); //no container
+            dw.writeData(te.xCoord, DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(te.yCoord, DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(te.zCoord, DataBitHelper.WORLD_COORDINATE);
+            int length = block.infoBitLength(onServer);
+            if (length != 0) {
+                dw.writeData(id, length);
+            }
+            block.writeData(dw, player, onServer, id);
+
+            if (!onServer) {
+                dw.sendServerPacket();
+            }else if(player != null) {
+                dw.sendPlayerPacket((Player)player);
+            }else{
+                dw.sendPlayerPackets(te.xCoord + 0.5, te.yCoord, te.zCoord, BLOCK_UPDATE_RANGE, te.worldObj.provider.dimensionId);
+            }
+        }
     }
 }

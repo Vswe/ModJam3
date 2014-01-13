@@ -16,4 +16,13 @@ public class ComponentMenuRedstoneSidesEmitter extends ComponentMenuRedstoneSide
     protected String getMessage() {
         return "Select which block sides the redstone should be emitted at";
     }
+
+    public boolean useStrongSignal() {
+        return useFirstOption();
+    }
+
+    @Override
+    public String getName() {
+        return "Sides";
+    }
 }

@@ -87,11 +87,6 @@ public abstract class ComponentMenuRedstoneSides extends ComponentMenu {
     protected RadioButtonList radioButtonList;
     protected int selection;
 
-    @Override
-    public String getName() {
-        return "Redstone Sides";
-    }
-
 
 
     @SideOnly(Side.CLIENT)

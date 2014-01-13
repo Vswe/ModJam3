@@ -179,9 +179,6 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             if (inArrowBounds(true, mX, mY)) {
                 clicked = true;
                 dir = -1;
-                DataWriter dw = new DataWriter();
-                dw.writeBoolean(true);
-                PacketHandler.sendDataToServer(dw);
             }else if (inArrowBounds(false, mX, mY)) {
                 clicked = true;
                 dir = 1;

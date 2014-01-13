@@ -30,26 +30,38 @@ public class BlockCableOutput extends BlockContainer {
 
     @SideOnly(Side.CLIENT)
     private Icon inactiveIcon;
+    @SideOnly(Side.CLIENT)
+    private Icon weakIcon;
+    @SideOnly(Side.CLIENT)
+    private Icon strongIcon;
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerIcons(IconRegister register) {
-        blockIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_output");
+        strongIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_output_strong");
+        weakIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_output_weak");
         inactiveIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_idle");
+    }
+
+
+    @Override
+    public Icon getIcon(int side, int meta) {
+        return weakIcon;
     }
 
     @Override
     public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
         TileEntityOutput te = getTileEntity(world, x, y, z);
-        if (te != null && te.getStrengthFromSide(side) == 0) {
-            return inactiveIcon;
+        if (te != null && te.getStrengthFromSide(side) > 0) {
+            return te.hasStrongSignalAtSide(side) ? strongIcon : weakIcon;
         }
-        return blockIcon;    }
+        return inactiveIcon;    }
 
     @Override
     public boolean shouldCheckWeakPower(World world, int x, int y, int z, int side) {
         return true;
     }
+
 
     @Override
     public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side) {
@@ -57,6 +69,16 @@ public class BlockCableOutput extends BlockContainer {
         if (te != null) {
             return te.getStrengthFromOppositeSide(side);
         }
+        return 0;
+    }
+
+    @Override
+    public int isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side) {
+        TileEntityOutput te = getTileEntity(world, x, y, z);
+        if (te != null && te.hasStrongSignalAtOppositeSide(side)) {
+            return te.getStrengthFromOppositeSide(side);
+        }
+
         return 0;
     }
 

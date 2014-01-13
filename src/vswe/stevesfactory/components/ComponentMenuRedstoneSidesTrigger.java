@@ -25,4 +25,9 @@ public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSide
     public boolean requireAll() {
         return useFirstOption();
     }
+
+    @Override
+    public String getName() {
+        return "Redstone Sides";
+    }
 }

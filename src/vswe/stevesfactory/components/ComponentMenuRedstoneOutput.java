@@ -94,7 +94,7 @@ public class ComponentMenuRedstoneOutput extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Redstone Output";
+        return "Output";
     }
 
     @SideOnly(Side.CLIENT)

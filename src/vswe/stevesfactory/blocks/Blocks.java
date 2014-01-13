@@ -33,7 +33,7 @@ public final class Blocks {
     private static final String CABLE_OUTPUT_TILE_ENTITY_TAG = "TileEntityCableOutputName";
     public static int CABLE_OUTPUT_ID;
     public static final String CABLE_OUTPUT_NAME_TAG = "BlockCableOutputName";
-    public static final String CABLE_OUTPUT_LOCALIZED_NAME = "Signal Emitter";
+    public static final String CABLE_OUTPUT_LOCALIZED_NAME = "Redstone Emitter";
     public static final int CABLE_OUTPUT_DEFAULT_ID = 1314;
 
     public static BlockManager blockManager;
@@ -49,9 +49,9 @@ public final class Blocks {
         blockCable = new BlockCable(CABLE_ID);
         GameRegistry.registerBlock(blockCable, CABLE_NAME_TAG);
 
-        //blockCableOutput = new BlockCableOutput(CABLE_OUTPUT_ID);
-        //GameRegistry.registerBlock(blockCableOutput, CABLE_OUTPUT_NAME_TAG);
-        //GameRegistry.registerTileEntity(TileEntityOutput.class, CABLE_OUTPUT_TILE_ENTITY_TAG);
+        blockCableOutput = new BlockCableOutput(CABLE_OUTPUT_ID);
+        GameRegistry.registerBlock(blockCableOutput, CABLE_OUTPUT_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityOutput.class, CABLE_OUTPUT_TILE_ENTITY_TAG);
 
         blockCableRelay = new BlockCableRelay(CABLE_RELAY_ID);
         GameRegistry.registerBlock(blockCableRelay, CABLE_RELAY_NAME_TAG);
@@ -61,7 +61,7 @@ public final class Blocks {
     public static void addNames() {
         LanguageRegistry.addName(blockManager, MANAGER_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCable, CABLE_LOCALIZED_NAME);
-        //LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
+        LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableRelay, CABLE_RELAY_LOCALIZED_NAME);
     }
 
@@ -89,6 +89,13 @@ public final class Blocks {
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableRelay, 1),
                 blockCable,
                 Block.hopperBlock
+        );
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableOutput, 1),
+                blockCable,
+                Item.redstone,
+                Item.redstone,
+                Item.redstone
         );
 
     }

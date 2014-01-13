@@ -115,14 +115,14 @@ public class CommandExecutor {
                     }
                 }
                 break;
-            /*case REDSTONE_EMITTER:
+            case REDSTONE_EMITTER:
                 List<SlotInventoryHolder> emitters = getEmitters(command.getMenus().get(0));
                 if (emitters != null) {
                     for (SlotInventoryHolder emitter : emitters) {
-                        emitter.getEmitter().updateState((ComponentMenuRedstoneSidesEmitter)command.getMenus().get(1), (ComponentMenuRedstoneOutput)command.getMenus().get(2));
+                        emitter.getEmitter().updateState((ComponentMenuRedstoneSidesEmitter)command.getMenus().get(1), (ComponentMenuRedstoneOutput)command.getMenus().get(2), (ComponentMenuPulse)command.getMenus().get(3));
                     }
                 }
-                break;*/
+                break;
         }
 
 

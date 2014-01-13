@@ -15,7 +15,7 @@ public class DataWriter {
     private int byteBuffer;
     private int bitCountBuffer;
 
-    public DataWriter() {
+    DataWriter() {
        stream = new ByteArrayOutputStream();
     }
 
@@ -31,8 +31,9 @@ public class DataWriter {
         writeData(data, bitCount.getBitCount());
     }
 
+
     public void writeData(int data, int bitCount) {
-        int mask = (int)Math.pow(2, bitCount) - 1;
+        long mask = (long)Math.pow(2, bitCount) - 1;
 
         data &= mask;
 
@@ -58,6 +59,13 @@ public class DataWriter {
         }
     }
 
+    void sendPlayerPackets(double x, double y, double z, double r, int dimension){
+        if (bitCountBuffer > 0) {
+            stream.write(byteBuffer);
+        }
+
+        PacketDispatcher.sendPacketToAllAround(x, y, z, r, dimension, PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()));
+    }
 
     void sendPlayerPacket(Player player){
         if (bitCountBuffer > 0) {
