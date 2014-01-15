@@ -90,4 +90,9 @@ public class BlockCableOutput extends BlockContainer {
             return null;
         }
     }
+
+    @Override
+    public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side) {
+        return true;
+    }
 }

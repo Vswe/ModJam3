@@ -746,8 +746,15 @@ public class FlowComponent implements IComponentNetworkReader {
         for (int i = 0; i < menuTagList.tagCount(); i++) {
             NBTTagCompound menuTag = (NBTTagCompound)menuTagList.tagAt(i);
 
+
+
             //added an extra menu to the triggers
             if (component.type == ComponentType.TRIGGER && i == 1 && version < 1) {
+                menuId++;
+            }
+
+            //added a second extra menu to the triggers
+            if (component.type == ComponentType.TRIGGER && i == 0 && version < 6) {
                 menuId++;
             }
 

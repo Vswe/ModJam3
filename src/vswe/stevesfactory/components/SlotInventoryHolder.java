@@ -4,6 +4,8 @@ package vswe.stevesfactory.components;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.IFluidHandler;
+import vswe.stevesfactory.blocks.IRedstoneNode;
+import vswe.stevesfactory.blocks.TileEntityInput;
 import vswe.stevesfactory.blocks.TileEntityOutput;
 
 import java.util.HashMap;
@@ -29,6 +31,14 @@ public class SlotInventoryHolder {
 
     public TileEntityOutput getEmitter() {
         return (TileEntityOutput)inventory;
+    }
+
+    public IRedstoneNode getNode() {
+        return (IRedstoneNode)inventory;
+    }
+
+    public TileEntityInput getReceiver() {
+        return (TileEntityInput)inventory;
     }
 
     public Map<Integer, SlotSideTarget> getValidSlots() {
@@ -61,4 +71,5 @@ public class SlotInventoryHolder {
     public int hashCode() {
         return inventory.hashCode();
     }
+
 }

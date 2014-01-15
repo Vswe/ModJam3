@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 
 public final class Blocks {
 
-    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 5;
+    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 6;
     public static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
 
     private static final String MANAGER_TILE_ENTITY_TAG = "TileEntityMachineManagerName";
@@ -36,10 +36,17 @@ public final class Blocks {
     public static final String CABLE_OUTPUT_LOCALIZED_NAME = "Redstone Emitter";
     public static final int CABLE_OUTPUT_DEFAULT_ID = 1314;
 
+    private static final String CABLE_INPUT_TILE_ENTITY_TAG = "TileEntityCableInputName";
+    public static int CABLE_INPUT_ID;
+    public static final String CABLE_INPUT_NAME_TAG = "BlockCableInputName";
+    public static final String CABLE_INPUT_LOCALIZED_NAME = "Redstone Receiver";
+    public static final int CABLE_INPUT_DEFAULT_ID = 1315;
+
     public static BlockManager blockManager;
     public static BlockCable blockCable;
-    public static BlockCableOutput blockCableOutput;
     public static BlockCableRelay blockCableRelay;
+    public static BlockCableOutput blockCableOutput;
+    public static BlockCableInput blockCableInput;
 
     public static void init() {
         blockManager = new BlockManager(MANAGER_ID);
@@ -49,20 +56,25 @@ public final class Blocks {
         blockCable = new BlockCable(CABLE_ID);
         GameRegistry.registerBlock(blockCable, CABLE_NAME_TAG);
 
+        blockCableRelay = new BlockCableRelay(CABLE_RELAY_ID);
+        GameRegistry.registerBlock(blockCableRelay, CABLE_RELAY_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityRelay.class, CABLE_RELAY_TILE_ENTITY_TAG);
+
         blockCableOutput = new BlockCableOutput(CABLE_OUTPUT_ID);
         GameRegistry.registerBlock(blockCableOutput, CABLE_OUTPUT_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityOutput.class, CABLE_OUTPUT_TILE_ENTITY_TAG);
 
-        blockCableRelay = new BlockCableRelay(CABLE_RELAY_ID);
-        GameRegistry.registerBlock(blockCableRelay, CABLE_RELAY_NAME_TAG);
-        GameRegistry.registerTileEntity(TileEntityRelay.class, CABLE_RELAY_TILE_ENTITY_TAG);
+        blockCableInput = new BlockCableInput(CABLE_INPUT_ID);
+        GameRegistry.registerBlock(blockCableInput, CABLE_INPUT_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityInput.class, CABLE_INPUT_TILE_ENTITY_TAG);
     }
 
     public static void addNames() {
         LanguageRegistry.addName(blockManager, MANAGER_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCable, CABLE_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableRelay, CABLE_RELAY_LOCALIZED_NAME);
+        LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
+        LanguageRegistry.addName(blockCableInput, CABLE_INPUT_LOCALIZED_NAME);
     }
 
     public static void addRecipes() {
@@ -98,6 +110,11 @@ public final class Blocks {
                 Item.redstone
         );
 
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableInput, 1),
+                blockCable,
+                Item.redstone
+        );
     }
 
     private Blocks() {}

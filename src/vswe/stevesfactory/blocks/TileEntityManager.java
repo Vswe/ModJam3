@@ -24,7 +24,6 @@ public class TileEntityManager extends TileEntity {
     public static final int BUTTON_INNER_SRC_Y = 0;
     private List<FlowComponent> items;
     private Connection currentlyConnecting;
-    private int[] isPowered;
     public List<Button> buttons;
     public boolean justSentServerComponentRemovalPacket;
     private List<FlowComponent> zLevelRenderingList;
@@ -34,7 +33,6 @@ public class TileEntityManager extends TileEntity {
         zLevelRenderingList = new ArrayList<FlowComponent>();
         buttons = new ArrayList<Button>();
         removedIds = new ArrayList<Integer>();
-        isPowered = new int[ForgeDirection.VALID_DIRECTIONS.length];
 
         for (int i = 0; i < ComponentType.values().length; i++) {
             buttons.add(new ButtonCreate(ComponentType.values()[i]));
@@ -123,6 +121,7 @@ public class TileEntityManager extends TileEntity {
         for (int i = 0; i < oldCoordinates.length; i++) {
             TileEntity inventory = inventories.get(i).getTileEntity();
             oldCoordinates[i] = new WorldCoordinate(inventory.xCoord, inventory.yCoord, inventory.zCoord);
+            oldCoordinates[i].setTileEntity(inventory);
         }
 
         List<WorldCoordinate> visited = new ArrayList<WorldCoordinate>();
@@ -156,6 +155,9 @@ public class TileEntityManager extends TileEntity {
                                 if (isValidConnection) {
                                     connection.setId(inventories.size());
                                     inventories.add(connection);
+                                    if (connection.getTileEntity() instanceof ISystemListener) {
+                                        ((ISystemListener)connection.getTileEntity()).added(this);
+                                    }
                                 }else if (element.getDepth() < MAX_CABLE_LENGTH){
                                     if (worldObj.getBlockId(target.getX(), target.getY(), target.getZ()) == Blocks.blockCable.blockID) {
                                         queue.add(target);
@@ -170,9 +172,28 @@ public class TileEntityManager extends TileEntity {
 
         }
 
-        if (!worldObj.isRemote && !firstInventoryUpdate) {
-            updateInventorySelection(oldCoordinates);
+        if (!firstInventoryUpdate) {
+            for (WorldCoordinate oldCoordinate : oldCoordinates) {
+                if (oldCoordinate.getTileEntity() instanceof ISystemListener) {
+                    boolean found = false;
+                    for (ConnectionBlock inventory : inventories) {
+                        if (oldCoordinate.getX() == inventory.getTileEntity().xCoord && oldCoordinate.getY() == inventory.getTileEntity().yCoord && oldCoordinate.getZ() == inventory.getTileEntity().zCoord) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        ((ISystemListener)oldCoordinate.getTileEntity()).removed(this);
+                    }
+                }
+            }
+
+            if (!worldObj.isRemote) {
+                updateInventorySelection(oldCoordinates);
+            }
         }
+
 
         firstInventoryUpdate = false;
     }
@@ -285,32 +306,30 @@ public class TileEntityManager extends TileEntity {
 
         new CommandExecutor(this).executeTriggerCommand(component, validTriggerOutputs);
     }
-    private boolean isTriggerPowered(FlowComponent component, boolean high) {
-        return isTriggerPowered(component, isPowered, high);
-    }
-    private boolean isTriggerPowered(FlowComponent component, int[] currentPower, boolean high) {
-        ComponentMenuRedstoneSidesTrigger menuRedstone = (ComponentMenuRedstoneSidesTrigger)component.getMenus().get(1);
+
+    private boolean isTriggerPowered(ComponentMenuRedstoneSidesTrigger menuSides, ComponentMenuRedstoneStrength menuStrength, int[] currentPower, boolean high) {
         for (int i = 0; i < currentPower.length; i++) {
-            if (menuRedstone.isSideRequired(i)) {
-                if (isRedstonePowered(component, currentPower[i]) == high) {
-                    if (!menuRedstone.requireAll()) {
+            if (menuSides.isSideRequired(i)) {
+                if (isRedstonePowered(menuStrength, currentPower[i]) == high) {
+                    if (!menuSides.requireAll()) {
                         return true;
                     }
-                }else if (menuRedstone.requireAll()){
+                }else if (menuSides.requireAll()){
                     return false;
                 }
             }
         }
 
-        return menuRedstone.requireAll();
+        return menuSides.requireAll();
     }
 
 
-    private boolean hasRedStoneFlipped(FlowComponent component, int[] newPower, boolean high) {
-        ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)component.getMenus().get(1);
-        for (int i = 0; i < isPowered.length; i++) {
+    private boolean hasRedStoneFlipped(FlowComponent component, int[] newPower, int[] oldPower, boolean high) {
+        ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)component.getMenus().get(2);
+        ComponentMenuRedstoneStrength menuStrength = (ComponentMenuRedstoneStrength)component.getMenus().get(3);
+        for (int i = 0; i < oldPower.length; i++) {
             if (menuRedstone.isSideRequired(i)) {
-                if ((high && !isRedstonePowered(component, isPowered[i]) && isRedstonePowered(component, newPower[i])) || (!high && isRedstonePowered(component, isPowered[i]) && !isRedstonePowered(component, newPower[i]))) {
+                if ((high && !isRedstonePowered(menuStrength, oldPower[i]) && isRedstonePowered(menuStrength, newPower[i])) || (!high && isRedstonePowered(menuStrength, oldPower[i]) && !isRedstonePowered(menuStrength, newPower[i]))) {
                     return true;
                 }
             }
@@ -319,39 +338,118 @@ public class TileEntityManager extends TileEntity {
         return false;
     }
 
-    private boolean isRedstonePowered(FlowComponent component, int power) {
-        ComponentMenuRedstoneStrength menuAnalog = (ComponentMenuRedstoneStrength)component.getMenus().get(2);
+    private boolean isRedstonePowered(ComponentMenuRedstoneStrength menuStrength, int power) {
+        boolean inRange = menuStrength.getLow() <= power && power <= menuStrength.getHigh();
 
-        boolean inRange = menuAnalog.getLow() <= power && power <= menuAnalog.getHigh();
-
-        return inRange != menuAnalog.isInverted();
+        return inRange != menuStrength.isInverted();
     }
 
-    private boolean isPulseReceived(FlowComponent component, int[] newPower, boolean high) {
-        return hasRedStoneFlipped(component, newPower, high) && isTriggerPowered(component, newPower, high);
+    private boolean isPulseReceived(FlowComponent component, int[] newPower, int[] oldPower, boolean high) {
+        return hasRedStoneFlipped(component, newPower, oldPower, high) && isTriggerPowered((ComponentMenuRedstoneSidesTrigger)component.getMenus().get(2), (ComponentMenuRedstoneStrength)component.getMenus().get(3), newPower, high);
     }
 
 
-    public void triggerRedstone() {
-        int[] powered = new int[isPowered.length];
-        for (int i = 0; i < powered.length; i++) {
-            ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[i];
-            powered[i] = worldObj.getIndirectPowerLevelTo(direction.offsetX + this.xCoord, direction.offsetY + this.yCoord, direction.offsetZ + this.zCoord, direction.ordinal());
-        }
 
+
+    public void triggerRedstone(TileEntityInput inputTrigger) {
         for (FlowComponent item : items) {
-            if (item.getType() == ComponentType.TRIGGER) {
-                if (isPulseReceived(item, powered, true)) {
-                    activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_HIGH));
-                }
-                if (isPulseReceived(item, powered, false)) {
-                    activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_LOW));
+            if (item.getType() == ComponentType.TRIGGER && item.getConnectionSet() == ConnectionSet.REDSTONE) {
+                List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(this, item.getMenus().get(0), ConnectionBlockType.RECEIVER);
+
+                if (receivers != null) {
+                    ComponentMenuContainer componentMenuContainer = (ComponentMenuContainer)item.getMenus().get(0);
+                    int[] newPower = new int[ForgeDirection.VALID_DIRECTIONS.length];
+                    int[] oldPower = new int[ForgeDirection.VALID_DIRECTIONS.length];
+                    if (componentMenuContainer.getOption() == 0) {
+                        for (SlotInventoryHolder receiver : receivers) {
+                           TileEntityInput input = receiver.getReceiver();
+
+                            for (int i = 0; i < newPower.length; i++) {
+                                newPower[i] = Math.min(15, newPower[i] + input.getPowered()[i]);
+                                oldPower[i] = Math.min(15, oldPower[i] + input.getOldPowered()[i]);
+                            }
+                        }
+                        if (isPulseReceived(item, newPower, oldPower, true)) {
+                            activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_HIGH));
+                        }
+                        if (isPulseReceived(item, newPower, oldPower, false)) {
+                            activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_LOW));
+                        }
+                    }else {
+                        TileEntityInput trigger = componentMenuContainer.getOption() == 1 ? inputTrigger : null;
+                        if (isPulseReceived(item, receivers, trigger, true)) {
+                            activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_HIGH));
+                        }
+
+                        if (isPulseReceived(item, receivers, trigger, false)) {
+                            activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_LOW));
+                        }
+                    }
+
                 }
             }
         }
-
-        this.isPowered = powered;
     }
+
+    private boolean isPulseReceived(FlowComponent component,List<SlotInventoryHolder> receivers, TileEntityInput trigger, boolean high) {
+        boolean requiresAll = trigger != null;
+        for (SlotInventoryHolder receiver : receivers) {
+            TileEntityInput input = receiver.getReceiver();
+
+
+            boolean flag;
+            if (input.equals(trigger) || !requiresAll) {
+                flag = isPulseReceived(component, input.getPowered(), input.getOldPowered(), high);
+            }else{
+                flag = isTriggerPowered((ComponentMenuRedstoneSidesTrigger)component.getMenus().get(2), (ComponentMenuRedstoneStrength)component.getMenus().get(3), input.getPowered(), high);
+            }
+
+            if (flag) {
+                if (!requiresAll) {
+                    return true;
+                }
+            }else if(requiresAll) {
+                return false;
+            }
+        }
+
+        return requiresAll;
+    }
+
+    private boolean isTriggerPowered(FlowComponent item, boolean high) {
+        List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(this, item.getMenus().get(0), ConnectionBlockType.RECEIVER);
+
+        return receivers != null && isTriggerPowered(receivers, (ComponentMenuContainer)item.getMenus().get(0), (ComponentMenuRedstoneSidesTrigger) item.getMenus().get(2), (ComponentMenuRedstoneStrength) item.getMenus().get(3), high);
+    }
+
+    public boolean isTriggerPowered(List<SlotInventoryHolder> receivers, ComponentMenuContainer menuContainer, ComponentMenuRedstoneSidesTrigger menuSides, ComponentMenuRedstoneStrength menuStrength, boolean high) {
+        if (menuContainer.getOption() == 0) {
+            int[] currentPower =  new int[ForgeDirection.VALID_DIRECTIONS.length];
+            for (SlotInventoryHolder receiver : receivers) {
+                IRedstoneNode node = receiver.getNode();
+                for (int i = 0; i < currentPower.length; i++) {
+                    currentPower[i] = Math.min(15, currentPower[i] + node.getPower()[i]);
+                }
+            }
+
+            return isTriggerPowered(menuSides, menuStrength, currentPower, high);
+        }else{
+            boolean requiresAll = menuContainer.getOption() == 1;
+            for (SlotInventoryHolder receiver : receivers) {
+                if (isTriggerPowered(menuSides, menuStrength, receiver.getNode().getPower(), high)) {
+                    if (!requiresAll) {
+                        return true;
+                    }
+                }else{
+                    if (requiresAll) {
+                        return false;
+                    }
+                }
+            }
+            return requiresAll;
+        }
+    }
+
 
     public void readGenericData(DataReader dr) {
         if (worldObj.isRemote) {
@@ -440,7 +538,6 @@ public class TileEntityManager extends TileEntity {
     }
 
 
-    private static final String NBT_POWERED = "IsPowered";
     private static final String NBT_TIMER = "Timer";
     private static final String NBT_COMPONENTS = "Components";
 
@@ -450,24 +547,7 @@ public class TileEntityManager extends TileEntity {
 
         int version =  nbtTagCompound.getByte(Blocks.NBT_PROTOCOL_VERSION);
 
-        //there used to be just one redstone detection, not specific sides
-        if (version < 1) {
-            boolean powered = nbtTagCompound.getBoolean(NBT_POWERED);
-            for (int i = 0; i < isPowered.length; i++) {
-                isPowered[i] = 15;
-            }
-        //the signal used to be digital
-        }else if (version < 5){
-            byte powered = nbtTagCompound.getByte(NBT_POWERED);
-            for (int i = 0; i < isPowered.length; i++) {
-                isPowered[i] = ((powered & (1 << i)) != 0) ? 15 : 0;
-            }
-        }else{
-            byte[] powered = nbtTagCompound.getByteArray(NBT_POWERED);
-            for (int i = 0; i < powered.length; i++) {
-                isPowered[i] = powered[i];
-            }
-        }
+
         timer = nbtTagCompound.getByte(NBT_TIMER);
 
         NBTTagList components = nbtTagCompound.getTagList(NBT_COMPONENTS);
@@ -483,12 +563,6 @@ public class TileEntityManager extends TileEntity {
         super.writeToNBT(nbtTagCompound);
 
         nbtTagCompound.setByte(Blocks.NBT_PROTOCOL_VERSION, Blocks.NBT_CURRENT_PROTOCOL_VERSION);
-
-        byte[] powered = new byte[isPowered.length];
-        for (int i = 0; i < isPowered.length; i++) {
-            powered[i] = (byte)isPowered[i];
-        }
-        nbtTagCompound.setByteArray(NBT_POWERED, powered);
 
         nbtTagCompound.setByte(NBT_TIMER, (byte)timer);
 

@@ -28,11 +28,6 @@ public class BlockManager extends BlockContainer {
 
 
     @Override
-    public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side) {
-        return true;
-    }
-
-    @Override
     public TileEntity createNewTileEntity(World world) {
         return new TileEntityManager();
     }
@@ -77,7 +72,6 @@ public class BlockManager extends BlockContainer {
     public void onBlockAdded(World world, int x, int y, int z) {
         super.onBlockAdded(world, x, y, z);
 
-        updateRedstone(world, x, y, z);
         updateInventories(world, x, y, z);
     }
 
@@ -86,21 +80,9 @@ public class BlockManager extends BlockContainer {
         super.onNeighborBlockChange(world, x, y, z, id);
 
 
-
-        updateRedstone(world, x, y, z);
         updateInventories(world, x, y, z);
     }
 
-    private void updateRedstone(World world, int x, int y, int z) {
-        if (!world.isRemote) {
-            TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
-            if (tileEntity != null && tileEntity instanceof TileEntityManager) {
-                TileEntityManager manager = (TileEntityManager)tileEntity;
-
-                manager.triggerRedstone();
-            }
-        }
-    }
 
     @Override
     public void breakBlock(World world, int x, int y, int z, int id, int meta) {

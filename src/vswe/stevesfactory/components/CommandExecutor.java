@@ -123,6 +123,17 @@ public class CommandExecutor {
                     }
                 }
                 break;
+            case REDSTONE_CONDITION:
+                List<SlotInventoryHolder> nodes = getNodes(command.getMenus().get(0));
+                if (nodes != null) {
+                    if (evaluateRedstoneCondition(nodes,(ComponentMenuContainer)command.getMenus().get(0), (ComponentMenuRedstoneSidesTrigger)command.getMenus().get(1), (ComponentMenuRedstoneStrength)command.getMenus().get(2))) {
+                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
+                    }else{
+                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                    }
+                }
+
+                return;
         }
 
 
@@ -131,18 +142,22 @@ public class CommandExecutor {
     }
 
     private List<SlotInventoryHolder> getEmitters(ComponentMenu componentMenu) {
-        return getContainers(componentMenu, ConnectionBlockType.EMITTER);
+        return getContainers(manager, componentMenu, ConnectionBlockType.EMITTER);
     }
 
     private List<SlotInventoryHolder> getInventories(ComponentMenu componentMenu) {
-        return getContainers(componentMenu, ConnectionBlockType.INVENTORY);
+        return getContainers(manager, componentMenu, ConnectionBlockType.INVENTORY);
     }
 
     private List<SlotInventoryHolder> getTanks(ComponentMenu componentMenu) {
-        return getContainers(componentMenu, ConnectionBlockType.TANK);
+        return getContainers(manager, componentMenu, ConnectionBlockType.TANK);
     }
 
-    private List<SlotInventoryHolder> getContainers(ComponentMenu componentMenu, ConnectionBlockType type) {
+    private List<SlotInventoryHolder> getNodes(ComponentMenu componentMenu) {
+        return getContainers(manager, componentMenu, ConnectionBlockType.NODE);
+    }
+
+    public static List<SlotInventoryHolder> getContainers(TileEntityManager manager, ComponentMenu componentMenu, ConnectionBlockType type) {
         ComponentMenuContainer menuContainer = (ComponentMenuContainer)componentMenu;
 
         if (menuContainer.getSelectedInventories().size() == 0) {
@@ -743,5 +758,9 @@ public class CommandExecutor {
         }
 
         return false;
+    }
+
+    private boolean evaluateRedstoneCondition(List<SlotInventoryHolder> nodes, ComponentMenuContainer menuContainer, ComponentMenuRedstoneSidesTrigger menuSides, ComponentMenuRedstoneStrength menuStrength) {
+        return manager.isTriggerPowered(nodes, menuContainer, menuSides, menuStrength, true);
     }
 }

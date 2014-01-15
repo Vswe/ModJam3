@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class TileEntityOutput extends TileEntity implements IPacketBlock {
+public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedstoneNode {
 
     private int[] strengths;
     private boolean[] strong;
@@ -164,11 +164,11 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock {
                 strength = Math.max(0, strength - selectedStrength);
                 break;
             case FORWARD:
-                strength = (strength + selectedStrength) % 15;
+                strength = (strength + selectedStrength) % 16;
                 break;
             case BACKWARD:
                 strength -= selectedStrength;
-                if (strength < 0) strength += 15;
+                if (strength < 0) strength += 16;
                 break;
         }
 
@@ -358,6 +358,11 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock {
             hasUpdatedData = true;
             PacketHandler.sendBlockPacket(this, Minecraft.getMinecraft().thePlayer, 0);
         }
+    }
+
+    @Override
+    public int[] getPower() {
+        return strengths;
     }
 
     private class PulseTimer {

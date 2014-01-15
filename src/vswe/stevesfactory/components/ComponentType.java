@@ -4,7 +4,7 @@ package vswe.stevesfactory.components;
 public enum ComponentType {
     TRIGGER(0, "Trigger", "Trigger",
             new ConnectionSet[] {ConnectionSet.CONTINUOUSLY, ConnectionSet.REDSTONE},
-            ComponentMenuInterval.class, ComponentMenuRedstoneSidesTrigger.class, ComponentMenuRedstoneStrength.class, ComponentMenuResult.class),
+            ComponentMenuReceivers.class, ComponentMenuInterval.class, ComponentMenuRedstoneSidesTrigger.class, ComponentMenuRedstoneStrength.class, ComponentMenuResult.class),
     INPUT(1, "Input", "Input",
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuInventory.class, ComponentMenuTargetInventory.class, ComponentMenuItem.class, ComponentMenuResult.class),
@@ -28,9 +28,12 @@ public enum ComponentType {
             ComponentMenuTankCondition.class, ComponentMenuTargetTank.class, ComponentMenuLiquidCondition.class, ComponentMenuResult.class),
     REDSTONE_EMITTER(8, "Emitter", "Redstone Emitter",
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuEmitters.class, ComponentMenuRedstoneSidesEmitter.class, ComponentMenuRedstoneOutput.class, ComponentMenuPulse.class, ComponentMenuResult.class)
+            ComponentMenuEmitters.class, ComponentMenuRedstoneSidesEmitter.class, ComponentMenuRedstoneOutput.class, ComponentMenuPulse.class, ComponentMenuResult.class),
+    REDSTONE_CONDITION(9, "Condition (R)", "Redstone Condition",
+            new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
+            ComponentMenuNodes.class, ComponentMenuRedstoneSidesNodes.class, ComponentMenuRedstoneStrengthNodes.class, ComponentMenuResult.class),
 
-    ;/*AUTO_CRAFTING(9, "Crafter", "Auto Crafter",
+    ;/*AUTO_CRAFTING(X, "Crafter", "Auto Crafter",
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuCrafting.class, ComponentMenuResult.class); */
 
