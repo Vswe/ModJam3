@@ -158,19 +158,19 @@ public class ComponentMenuRedstoneStrength extends ComponentMenu {
         if (lowTextBox.getNumber() != newDataStrength.lowTextBox.getNumber()) {
             lowTextBox.setNumber(newDataStrength.lowTextBox.getNumber());
 
-            sendServerData(0);
+            sendClientData(container, 0);
         }
 
         if (highTextBox.getNumber() != newDataStrength.highTextBox.getNumber()) {
             highTextBox.setNumber(newDataStrength.highTextBox.getNumber());
 
-            sendServerData(1);
+            sendClientData(container, 1);
         }
 
         if (inverted != newDataStrength.inverted) {
             inverted = newDataStrength.inverted;
 
-            sendServerData(2);
+            sendClientData(container, 2);
         }
     }
 

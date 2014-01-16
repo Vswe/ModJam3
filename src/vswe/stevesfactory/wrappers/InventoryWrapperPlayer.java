@@ -1,0 +1,26 @@
+package vswe.stevesfactory.wrappers;
+
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
+public class InventoryWrapperPlayer extends InventoryWrapper {
+    private EntityPlayer player;
+
+    public InventoryWrapperPlayer(EntityPlayer player) {
+        super(player.inventory);
+        this.player = player;
+    }
+
+    @Override
+    public boolean isItemValidForSlot(int i, ItemStack itemstack) {
+        if (i >= 36 && i <= 39 && itemstack != null) {
+            int armorType = 39 - i;
+            Item item = itemstack.getItem();
+            return item != null && item.isValidArmor(itemstack, armorType, player);
+        }else{
+            return super.isItemValidForSlot(i, itemstack);
+        }
+    }
+}

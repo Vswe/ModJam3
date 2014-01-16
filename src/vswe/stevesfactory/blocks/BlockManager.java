@@ -9,9 +9,13 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import vswe.stevesfactory.StevesFactoryManager;
@@ -72,16 +76,16 @@ public class BlockManager extends BlockContainer {
     public void onBlockAdded(World world, int x, int y, int z) {
         super.onBlockAdded(world, x, y, z);
 
-        updateInventories(world, x, y, z);
+        updateInventories(world, x, y, z);  
     }
 
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, int id) {
         super.onNeighborBlockChange(world, x, y, z, id);
 
-
         updateInventories(world, x, y, z);
     }
+
 
 
     @Override
@@ -99,4 +103,51 @@ public class BlockManager extends BlockContainer {
     }
 
 
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
+        System.out.println("Picked" + world.isRemote);
+        TileEntity te = world.getBlockTileEntity(x, y, z);
+        if (te != null && te instanceof TileEntityManager) {
+            TileEntityManager manager = (TileEntityManager)te;
+
+            if (manager.xCoord != x || manager.yCoord != y || manager.zCoord != z) {
+                return null;
+            }
+
+            ItemStack itemStack = super.getPickBlock(target, world, x, y, z);
+            if (itemStack != null) {
+                NBTTagCompound tagCompound = itemStack.getTagCompound();
+                if (tagCompound == null) {
+                    tagCompound = new NBTTagCompound();
+                    itemStack.setTagCompound(tagCompound);
+                }
+
+                NBTTagCompound info = new NBTTagCompound();
+                tagCompound.setCompoundTag("Manager", info);
+                manager.writeContentToNBT(info);
+
+                System.out.println("write");
+            }
+            return itemStack;
+        }
+
+        System.out.println("failed to write");
+        return  null;
+    }
+
+
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemStack) {
+        System.out.println("Placed" + world.isRemote);
+        TileEntity te = world.getBlockTileEntity(x, y, z);
+        if (te != null && te instanceof TileEntityManager) {
+            TileEntityManager manager = (TileEntityManager)te;
+            if (itemStack.hasTagCompound() && itemStack.getTagCompound().hasKey("Manager")) {
+                manager.readContentFromNBT(itemStack.getTagCompound().getCompoundTag("Manager"));
+                System.out.println("read");
+            }else{
+                System.out.println("no data");
+            }
+        }
+    }
 }

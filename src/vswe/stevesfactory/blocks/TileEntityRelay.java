@@ -14,6 +14,9 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
+import vswe.stevesfactory.wrappers.InventoryWrapper;
+import vswe.stevesfactory.wrappers.InventoryWrapperHorse;
+import vswe.stevesfactory.wrappers.InventoryWrapperPlayer;
 
 import java.util.List;
 
@@ -25,6 +28,7 @@ public class TileEntityRelay extends TileEntity implements IInventory, ISidedInv
     private boolean blockingUsage;
     private int chainLength;
     private Entity[] cachedEntities = new Entity[2];
+    private InventoryWrapper cachedInventoryWrapper;
 
 
     @Override
@@ -379,8 +383,11 @@ public class TileEntityRelay extends TileEntity implements IInventory, ISidedInv
         if (cachedEntities[id] != null) {
             if (cachedEntities[id].isDead) {
                 cachedEntities[id] = null;
+                if (id == 0) {
+                    cachedInventoryWrapper = null;
+                }
             }else{
-                return (T)cachedEntities[id];
+                return getEntityContainer(id);
             }
         }
 
@@ -403,19 +410,21 @@ public class TileEntityRelay extends TileEntity implements IInventory, ISidedInv
             }
 
 
-            List<Entity> entities = world.getEntitiesWithinAABB(type, AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 1, z + 1));
-            if (entities != null && entities.size() > 0) {
+            List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 1, z + 1));
+            if (entities != null) {
                 double closest = -1;
                 for (Entity entity : entities) {
                     double distance = entity.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
-                    if ((closest == -1 || distance < closest)) {
+                    if (isEntityValid(entity, type) && (closest == -1 || distance < closest)) {
                         closest = distance;
                         cachedEntities[id] = entity;
                     }
                 }
+                if (id == 0 && cachedEntities[id] != null) {
+                    cachedInventoryWrapper = getInventoryWrapper(cachedEntities[id]);
+                }
 
-
-                return (T)cachedEntities[id];
+                return getEntityContainer(id);
             }
         }
 
@@ -423,12 +432,34 @@ public class TileEntityRelay extends TileEntity implements IInventory, ISidedInv
         return null;
     }
 
+    private InventoryWrapper getInventoryWrapper(Entity entity) {
+        if (entity instanceof EntityPlayer) {
+            return new InventoryWrapperPlayer((EntityPlayer)entity);
+        }else if(entity instanceof EntityHorse) {
+            return new InventoryWrapperHorse((EntityHorse)entity);
+        }else{
+            return null;
+        }
+    }
 
+
+    private boolean isEntityValid(Entity entity, Class type) {
+        return type.isInstance(entity) || (type == IInventory.class && (entity instanceof EntityPlayer || entity instanceof EntityHorse));
+    }
+
+    private <T> T getEntityContainer(int id) {
+        if (id == 0 && cachedInventoryWrapper != null) {
+            return (T)cachedInventoryWrapper;
+        }
+
+        return (T)cachedEntities[id];
+    }
 
     @Override
     public void updateEntity() {
         cachedEntities[0] = null;
         cachedEntities[1] = null;
+        cachedInventoryWrapper = null;
     }
 
 

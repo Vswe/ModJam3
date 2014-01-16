@@ -545,6 +545,17 @@ public class TileEntityManager extends TileEntity {
     public void readFromNBT(NBTTagCompound nbtTagCompound) {
         super.readFromNBT(nbtTagCompound);
 
+        readContentFromNBT(nbtTagCompound);
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        super.writeToNBT(nbtTagCompound);
+
+        writeContentToNBT(nbtTagCompound);
+    }
+
+    public void readContentFromNBT(NBTTagCompound nbtTagCompound) {
         int version =  nbtTagCompound.getByte(Blocks.NBT_PROTOCOL_VERSION);
 
 
@@ -558,10 +569,7 @@ public class TileEntityManager extends TileEntity {
         }
     }
 
-    @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
-        super.writeToNBT(nbtTagCompound);
-
+    public void writeContentToNBT(NBTTagCompound nbtTagCompound) {
         nbtTagCompound.setByte(Blocks.NBT_PROTOCOL_VERSION, Blocks.NBT_CURRENT_PROTOCOL_VERSION);
 
         nbtTagCompound.setByte(NBT_TIMER, (byte)timer);

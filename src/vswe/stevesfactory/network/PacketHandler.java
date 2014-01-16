@@ -2,6 +2,8 @@ package vswe.stevesfactory.network;
 
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -125,6 +127,7 @@ public class PacketHandler implements IPacketHandler {
         return dw;
     }
 
+    @SideOnly(Side.CLIENT)
     private static DataWriter getWriterForServerPacket() {
         Container container = Minecraft.getMinecraft().thePlayer.openContainer;
 
