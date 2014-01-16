@@ -40,7 +40,7 @@ public class StackTankHolder {
     }
 
     public int getSizeLeft() {
-        return sizeLeft;
+        return Math.min(fluidStack.amount, sizeLeft);
     }
 
     public StackTankHolder getSplitElement(int elementAmount, int id, boolean fair) {

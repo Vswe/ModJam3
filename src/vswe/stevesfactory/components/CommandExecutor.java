@@ -98,7 +98,7 @@ public class CommandExecutor {
                 }
                 break;
             case LIQUID_CONDITION:
-                List<SlotInventoryHolder> conditionTank = getInventories(command.getMenus().get(0));
+                List<SlotInventoryHolder> conditionTank = getTanks(command.getMenus().get(0));
                 if (conditionTank != null) {
                     getValidTanks(command.getMenus().get(1), conditionTank);
                     if (searchForStuff(command.getMenus().get(2), conditionTank, true)) {

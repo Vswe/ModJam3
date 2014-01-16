@@ -433,24 +433,25 @@ public class TileEntityRelay extends TileEntity implements IInventory, ISidedInv
     }
 
     private InventoryWrapper getInventoryWrapper(Entity entity) {
-        if (entity instanceof EntityPlayer) {
+        /*if (entity instanceof EntityPlayer) {
             return new InventoryWrapperPlayer((EntityPlayer)entity);
         }else if(entity instanceof EntityHorse) {
             return new InventoryWrapperHorse((EntityHorse)entity);
         }else{
             return null;
-        }
+        }*/
+        return null;
     }
 
 
     private boolean isEntityValid(Entity entity, Class type) {
-        return type.isInstance(entity) || (type == IInventory.class && (entity instanceof EntityPlayer || entity instanceof EntityHorse));
+        return type.isInstance(entity); // || (type == IInventory.class && (entity instanceof EntityPlayer || entity instanceof EntityHorse));
     }
 
     private <T> T getEntityContainer(int id) {
-        if (id == 0 && cachedInventoryWrapper != null) {
+        /*if (id == 0 && cachedInventoryWrapper != null) {
             return (T)cachedInventoryWrapper;
-        }
+        }*/
 
         return (T)cachedEntities[id];
     }

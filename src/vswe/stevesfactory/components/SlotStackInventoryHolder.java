@@ -32,7 +32,7 @@ public class SlotStackInventoryHolder {
     }
 
     public int getSizeLeft() {
-        return sizeLeft;
+        return Math.min(itemStack.stackSize, sizeLeft);
     }
 
     public void reduceAmount(int val) {
