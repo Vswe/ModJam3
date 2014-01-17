@@ -514,6 +514,23 @@ public class TileEntityManager extends TileEntityInterface {
             menu.readData(dr);
         }
 
+        flowComponent.clearConnections();
+        for (int i = 0; i < flowComponent.getConnectionSet().getConnections().length; i++) {
+            boolean hasConnection = dr.readBoolean();
+
+            if (hasConnection) {
+                Connection connection = new Connection(dr.readData(DataBitHelper.FLOW_CONTROL_COUNT), dr.readData(DataBitHelper.CONNECTION_ID));
+                flowComponent.setConnection(i, connection);
+
+
+                int length = dr.readData(DataBitHelper.NODE_ID);
+                for (int j = 0; j < length; j++) {
+                    connection.getNodes().add(new Point(dr.readData(DataBitHelper.FLOW_CONTROL_X), dr.readData(DataBitHelper.FLOW_CONTROL_Y)));
+                }
+            }
+        }
+
+
         getFlowItems().add(flowComponent);
         getZLevelRenderingList().add(0, flowComponent);
     }

@@ -359,7 +359,7 @@ public class CommandExecutor {
     private void getLiquids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
         for (SlotInventoryHolder tank : tanks) {
             ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
-            if (tank.getInventory() instanceof TileEntityCreative) {
+            if (tank.getTank() instanceof TileEntityCreative) {
                 if (menuItem.useWhiteList()) {
                     for (SlotSideTarget slot : tank.getValidSlots().values()) {
                         for (Setting setting : menuItem.getSettings()) {

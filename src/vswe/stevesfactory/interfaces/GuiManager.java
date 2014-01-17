@@ -184,7 +184,7 @@ public class GuiManager extends GuiBase {
 
         if (!manager.justSentServerComponentRemovalPacket) {
             for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
-                itemBase.onRelease(x, y);
+                itemBase.onRelease(x, y, button);
             }
         }
 

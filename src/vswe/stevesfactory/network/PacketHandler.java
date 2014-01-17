@@ -14,9 +14,7 @@ import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.tileentity.TileEntity;
 import vswe.stevesfactory.blocks.TileEntityInterface;
 import vswe.stevesfactory.blocks.TileEntityManager;
-import vswe.stevesfactory.components.ComponentMenu;
-import vswe.stevesfactory.components.ComponentType;
-import vswe.stevesfactory.components.FlowComponent;
+import vswe.stevesfactory.components.*;
 import vswe.stevesfactory.interfaces.ContainerBase;
 import vswe.stevesfactory.interfaces.ContainerManager;
 
@@ -192,6 +190,21 @@ public class PacketHandler implements IPacketHandler {
 
         for (ComponentMenu menu : flowComponent.getMenus()) {
             menu.writeData(dw);
+        }
+
+        for (int i = 0; i < flowComponent.getConnectionSet().getConnections().length; i++) {
+            Connection connection = flowComponent.getConnection(i);
+            dw.writeBoolean(connection != null);
+            if (connection != null) {
+                dw.writeData(connection.getComponentId(), DataBitHelper.FLOW_CONTROL_COUNT);
+                dw.writeData(connection.getConnectionId(), DataBitHelper.CONNECTION_ID);
+
+                dw.writeData(connection.getNodes().size(), DataBitHelper.NODE_ID);
+                for (Point point : connection.getNodes()) {
+                    dw.writeData(point.getX(), DataBitHelper.FLOW_CONTROL_X);
+                    dw.writeData(point.getY(), DataBitHelper.FLOW_CONTROL_Y);
+                }
+            }
         }
     }
 

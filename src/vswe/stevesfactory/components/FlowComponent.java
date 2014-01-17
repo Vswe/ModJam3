@@ -3,6 +3,7 @@ package vswe.stevesfactory.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import org.lwjgl.opengl.GL11;
@@ -66,6 +67,11 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final int ERROR_SIZE_H = 10;
     private static final int ERROR_SRC_X = 62;
     private static final int ERROR_SRC_Y = 20;
+
+    private static final int NODE_SRC_X = 120;
+    private static final int NODE_SRC_Y = 152;
+    private static final int NODE_SIZE = 4;
+    private static final int MAX_NODES = 15;
 
     public FlowComponent(TileEntityManager manager, int x, int y, ComponentType type) {
         this.x = x;
@@ -223,15 +229,47 @@ public class FlowComponent implements IComponentNetworkReader {
                 hasConnection = true;
                 if (id < connectedConnection.getComponentId()) {
                     int[] otherLocation = manager.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
+                    int startX = location[0] + CONNECTION_SIZE_W / 2;
+                    int startY = location[1] + CONNECTION_SIZE_H / 2;
+                    int endX = otherLocation[0] + CONNECTION_SIZE_W / 2;
+                    int endY = otherLocation[1] + CONNECTION_SIZE_H / 2;
 
                     GL11.glPushMatrix();
                     GL11.glTranslatef(0, 0, -zLevel);
-                    gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, otherLocation[0] + CONNECTION_SIZE_W / 2, otherLocation[1] + CONNECTION_SIZE_H / 2);
+                    List<Point> nodes = connectedConnection.getNodes();
+                    for (int j = 0; j <= nodes.size(); j++) {
+                        int x1, y1, x2, y2;
+                        if (j == 0) {
+                            x1 = startX;
+                            y1 = startY;
+                        }else{
+                            x1 = nodes.get(j - 1).getX();
+                            y1 = nodes.get(j - 1).getY();
+                        }
+
+                        if (j == nodes.size()) {
+                            x2 = endX;
+                            y2 = endY;
+                        }else{
+                            x2 = nodes.get(j).getX();
+                            y2 = nodes.get(j).getY();
+                        }
+
+                        gui.drawLine(x1, y1, x2, y2);
+                    }
+
+                    for (Point node : nodes) {
+                        int x = node.getX() - NODE_SIZE / 2;
+                        int y = node.getY() - NODE_SIZE / 2;
+                        int srcXNode = connectedConnection.getSelectedNode() == null && CollisionHelper.inBounds(x, y, NODE_SIZE, NODE_SIZE, mX, mY) ? 1 : 0;
+                        gui.drawTexture(x, y, NODE_SRC_X + srcXNode * NODE_SIZE, NODE_SRC_Y, NODE_SIZE, NODE_SIZE);
+                    }
+
                     GL11.glPopMatrix();
                 }
             }
 
-            gui.drawTexture(location[0], location[1], CONNECTION_SRC_X +  srcConnectionX * CONNECTION_SIZE_W, location[2], CONNECTION_SIZE_W, CONNECTION_SIZE_H);
+            gui.drawTexture(location[0], location[1], CONNECTION_SRC_X + srcConnectionX * CONNECTION_SIZE_W, location[2], CONNECTION_SIZE_W, CONNECTION_SIZE_H);
 
         }
 
@@ -367,37 +405,81 @@ public class FlowComponent implements IComponentNetworkReader {
                 }
 
                 if (CollisionHelper.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) {
+
+
                     Connection current = manager.getCurrentlyConnecting();
-                    if (current == null) {
-                        if (connections.get(i) != null) {
-                            removeConnection(i);
-                        }
-                        manager.setCurrentlyConnecting(new Connection(id, i));
-                    }else if (current.getComponentId() == this.id && current.getConnectionId() == i) {
-                        manager.setCurrentlyConnecting(null);
-                    }else if (current.getComponentId() != id){
-                        FlowComponent connectTo = manager.getFlowItems().get(current.getComponentId());
-                        ConnectionOption connectToOption = connectTo.connectionSet.getConnections()[current.getConnectionId()];
+                    if (button == 1 && current == null) {
+                        Connection selected = connections.get(i);
 
-
-                        if (connectToOption.isInput() != connection.isInput()) {
-
-                            if (checkForLoops(i, current)) {
-                                return true;
+                        if (selected != null) {
+                            boolean reversed = false;
+                            FlowComponent component = this;
+                            if (selected.getComponentId() < id) {
+                                component = manager.getFlowItems().get(selected.getComponentId());
+                                selected = component.getConnection(selected.getConnectionId());
+                                reversed = true;
                             }
-
+                            if (selected.getNodes().size() < MAX_NODES && selected.getSelectedNode() == null) {
+                                int id = reversed ? selected.getNodes().size() : 0;
+                                selected.addAndSelectNode(mX, mY, id);
+                                component.sendConnectionNode(i, id, false, true, mX, mY);
+                            }
+                        }
+                    }else{
+                        if (current == null) {
                             if (connections.get(i) != null) {
                                 removeConnection(i);
                             }
-
-                            Connection thisConnection = new Connection(id, i);
-                            connectTo.addConnection(current.getConnectionId(), thisConnection);
-                            addConnection(i, manager.getCurrentlyConnecting());
+                            manager.setCurrentlyConnecting(new Connection(id, i));
+                        }else if (current.getComponentId() == this.id && current.getConnectionId() == i) {
                             manager.setCurrentlyConnecting(null);
+                        }else if (current.getComponentId() != id){
+                            FlowComponent connectTo = manager.getFlowItems().get(current.getComponentId());
+                            ConnectionOption connectToOption = connectTo.connectionSet.getConnections()[current.getConnectionId()];
+
+
+                            if (connectToOption.isInput() != connection.isInput()) {
+
+                                if (checkForLoops(i, current)) {
+                                    return true;
+                                }
+
+                                if (connections.get(i) != null) {
+                                    removeConnection(i);
+                                }
+
+                                Connection thisConnection = new Connection(id, i);
+                                connectTo.addConnection(current.getConnectionId(), thisConnection);
+                                addConnection(i, manager.getCurrentlyConnecting());
+                                manager.setCurrentlyConnecting(null);
+                            }
                         }
                     }
 
                     return true;
+                }else{
+                    Connection selected = connections.get(i);
+                    if (selected != null) {
+                        List<Point> nodes = selected.getNodes();
+                        for (int j = 0; j < nodes.size(); j++) {
+                            Point node = nodes.get(j);
+                            int x = node.getX() - NODE_SIZE / 2;
+                            int y = node.getY() - NODE_SIZE / 2;
+                            if (CollisionHelper.inBounds(x, y, NODE_SIZE, NODE_SIZE, mX, mY)) {
+                                if (button == 0) {
+                                    selected.setSelectedNode(node);
+                                }else if (button == 1) {
+                                    if (GuiScreen.isShiftKeyDown()) {
+                                        sendConnectionNode(i, j, true, false, 0, 0);
+                                    }else if (selected.getNodes().size() < MAX_NODES && selected.getSelectedNode() == null) {
+                                        selected.addAndSelectNode(mX, mY, j + 1);
+                                        sendConnectionNode(i, j + 1, false, true, mX, mY);
+                                    }
+                                }
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -472,9 +554,16 @@ public class FlowComponent implements IComponentNetworkReader {
             ComponentMenu menu = menus.get(i);
             menu.onDrag(mX - getMenuAreaX(), mY - getMenuAreaY(i));
         }
+
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            Connection connection = connections.get(i);
+            if (connection != null) {
+                connection.update(mX, mY);
+            }
+        }
     }
 
-    public void onRelease(int mX, int mY) {
+    public void onRelease(int mX, int mY, int button) {
         followMouse(mX, mY);
         if (isDragging) {
             writeLocationData();
@@ -485,6 +574,23 @@ public class FlowComponent implements IComponentNetworkReader {
             ComponentMenu menu = menus.get(i);
             menu.onRelease(mX - getMenuAreaX(), mY - getMenuAreaY(i));
         }
+
+
+
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            Connection connection = connections.get(i);
+            if (connection != null) {
+                for (int j = 0; j < connection.getNodes().size(); j++) {
+                    Point node = connection.getNodes().get(j);
+                    if (node.equals(connection.getSelectedNode())) {
+                        connection.setSelectedNode(null);
+                        sendConnectionNode(i, j, false, false, mX, mY);
+                        return;
+                    }
+                }
+            }
+        }
+
     }
 
     private void followMouse(int mX, int mY) {
@@ -494,6 +600,8 @@ public class FlowComponent implements IComponentNetworkReader {
 
             mouseDragX = mX;
             mouseDragY = mY;
+
+
         }
     }
 
@@ -601,17 +709,51 @@ public class FlowComponent implements IComponentNetworkReader {
             y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
         }else {
             int connectionId = dr.readData(DataBitHelper.CONNECTION_ID);
-            Connection connection;
             if (dr.readBoolean()) {
-                int targetComponentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
-                int targetConnectionId = dr.readData(DataBitHelper.CONNECTION_ID);
+                Connection connection;
+                if (dr.readBoolean()) {
+                    int targetComponentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+                    int targetConnectionId = dr.readData(DataBitHelper.CONNECTION_ID);
 
-                connection = new Connection(targetComponentId, targetConnectionId);
-            }else{
-                connection = null;
+                    connection = new Connection(targetComponentId, targetConnectionId);
+                }else{
+                    connection = null;
+                }
+
+                connections.put(connectionId, connection);
+            }else if(connections.get(connectionId) != null){
+                Connection connection = connections.get(connectionId);
+
+                int id = dr.readData(DataBitHelper.NODE_ID);
+                int length = -1;
+                if (manager.worldObj.isRemote) {
+                    length = dr.readData(DataBitHelper.NODE_ID);
+                }
+                boolean deleted = dr.readBoolean();
+                boolean created = false;
+                if (id >= 0 && ((!deleted && (created = dr.readBoolean()) && id == connection.getNodes().size()) || id < connection.getNodes().size())) {
+                    if (deleted) {
+                        connection.getNodes().remove(id);
+                        System.out.println("Deleted " + id + " " + manager.worldObj.isRemote);
+                    }else {
+                        Point node;
+                        if (created) {
+                            node = new Point();
+                            if (connection.getNodes().size() < MAX_NODES && (!manager.worldObj.isRemote || length > connection.getNodes().size())) {
+                                connection.getNodes().add(id, node);
+                                System.out.println("Added " + id + " " + manager.worldObj.isRemote);
+                            }
+                        }else{
+                            node = connection.getNodes().get(id);
+                            System.out.println("Updated " + id + " " + manager.worldObj.isRemote);
+                        }
+
+                        node.setX(dr.readData(DataBitHelper.FLOW_CONTROL_X));
+                        node.setY(dr.readData(DataBitHelper.FLOW_CONTROL_Y));
+                    }
+
+                }
             }
-
-            connections.put(connectionId, connection);
         }
     }
 
@@ -638,17 +780,54 @@ public class FlowComponent implements IComponentNetworkReader {
             copy.menus.get(i).copyFrom(menu);
         }
 
+
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            Connection connection = connections.get(i);
+            if (connection != null) {
+                copy.connections.put(i, connection.copy());
+            }
+        }
+
         return copy;
     }
 
     private void writeConnectionData(DataWriter dw, int i, boolean target, int targetComponent, int targetConnection) {
         dw.writeBoolean(false);
         dw.writeData(i, DataBitHelper.CONNECTION_ID);
+        dw.writeBoolean(true); //connection
         dw.writeBoolean(target);
         if (target) {
             dw.writeData(targetComponent, DataBitHelper.FLOW_CONTROL_COUNT);
             dw.writeData(targetConnection, DataBitHelper.CONNECTION_ID);
         }
+    }
+
+    private void writeConnectionNode(DataWriter dw, int length, int connectionId, int nodeId, boolean deleted, boolean created, int x, int y) {
+        dw.writeBoolean(false);
+        dw.writeData(connectionId, DataBitHelper.CONNECTION_ID);
+        dw.writeBoolean(false); //nodes
+        dw.writeData(nodeId, DataBitHelper.NODE_ID);
+        if (length != -1) {
+            dw.writeData(length, DataBitHelper.NODE_ID);
+        }
+        dw.writeBoolean(deleted);
+        if (!deleted) {
+            dw.writeBoolean(created);
+            dw.writeData(x, DataBitHelper.FLOW_CONTROL_X);
+            dw.writeData(y, DataBitHelper.FLOW_CONTROL_Y);
+        }
+    }
+
+    private void sendConnectionNode(int connectionId, int nodeId, boolean deleted, boolean created, int x, int y) {
+        DataWriter dw = PacketHandler.getWriterForServerComponentPacket(this, null);
+        writeConnectionNode(dw, -1, connectionId, nodeId, deleted, created, x, y);
+        PacketHandler.sendDataToServer(dw);
+    }
+
+    private void sendClientConnectionNode(ContainerManager container, int length, int connectionId, int nodeId, boolean deleted, boolean created, int x, int y) {
+        DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null);
+        writeConnectionNode(dw, length, connectionId, nodeId, deleted, created, x, y);
+        PacketHandler.sendDataToListeningClients(container, dw);
     }
 
     public void refreshData(ContainerManager container, FlowComponent newData) {
@@ -674,6 +853,54 @@ public class FlowComponent implements IComponentNetworkReader {
                 DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null);
                 writeConnectionData(dw, i, true, connections.get(i).getComponentId(), connections.get(i).getConnectionId());
                 PacketHandler.sendDataToListeningClients(container, dw);
+            }
+            Connection connection = connections.get(i);
+            Connection newConnection = newData.connections.get(i);
+            if (connection != null && newConnection != null) {
+                boolean deleted = connection.getNodes().size() > newConnection.getNodes().size();
+                boolean created = connection.getNodes().size() < newConnection.getNodes().size();
+
+                if (deleted) {
+                    boolean hasDeleted = false;
+                    for (int j = 0; j < newConnection.getNodes().size(); j++) {
+                        Point node = connection.getNodes().get(j);
+                        Point newNode = newConnection.getNodes().get(j);
+
+                        if (node.getX() != newNode.getX() || node.getY() != newNode.getY()) {
+                            sendClientConnectionNode(container, newConnection.getNodes().size(), i, j, true, false, 0, 0);
+                            hasDeleted = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasDeleted) {
+                        sendClientConnectionNode(container, newConnection.getNodes().size(), i, newConnection.getNodes().size(), true, false, 0, 0);
+                    }
+                }else{
+                    boolean updated = false;
+                    for (int j = 0; j < connection.getNodes().size(); j++) {
+                        Point node = connection.getNodes().get(j);
+                        Point newNode = newConnection.getNodes().get(j);
+
+                        if (node.getX() != newNode.getX() || node.getY() != newNode.getY()) {
+                            updated = true;
+                            if (created) {
+                                Point nextNode = newConnection.getNodes().get(j + 1);
+                                if (node.getX() == nextNode.getX() && node.getY() == nextNode.getY()) {
+                                    sendClientConnectionNode(container, newConnection.getNodes().size(), i, j, false, true, newNode.getX(), newNode.getY());
+                                    break;
+                                }
+                            }
+                            sendClientConnectionNode(container, newConnection.getNodes().size(), i, j, false, false, newNode.getX(), newNode.getY());
+                        }
+                    }
+
+                    if (!updated && created) {
+                        sendClientConnectionNode(container, newConnection.getNodes().size(), i, newConnection.getNodes().size() - 1, false, true, newConnection.getNodes().get(newConnection.getNodes().size() - 1).getX(), newConnection.getNodes().get(newConnection.getNodes().size() - 1).getY());
+                    }
+                }
+
+                connections.put(i, newConnection.copy());
             }
         }
 
@@ -721,6 +948,7 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final String NBT_CONNECTION_TARGET_CONNECTION = "ConnectionConnection";
     private static final String NBT_INTERVAL = "Interval";
     private static final String NBT_MENUS = "Menus";
+    private static final String NBT_NODES = "Nodes";
 
     public static FlowComponent readFromNBT(TileEntityManager jam, NBTTagCompound nbtTagCompound, int version) {
         int x = nbtTagCompound.getShort(NBT_POS_X);
@@ -734,6 +962,17 @@ public class FlowComponent implements IComponentNetworkReader {
             NBTTagCompound connectionTag = (NBTTagCompound)connections.tagAt(i);
 
             Connection connection = new Connection(connectionTag.getByte(NBT_CONNECTION_TARGET_COMPONENT), connectionTag.getByte(NBT_CONNECTION_TARGET_CONNECTION));
+
+            if (connectionTag.hasKey(NBT_NODES)) {
+                connection.getNodes().clear();
+                NBTTagList nodes = connectionTag.getTagList(NBT_NODES);
+                for (int j = 0; j < nodes.tagCount(); j++) {
+                    NBTTagCompound nodeTag = (NBTTagCompound)nodes.tagAt(j);
+
+                    connection.getNodes().add(new Point(nodeTag.getShort(NBT_POS_X), nodeTag.getShort(NBT_POS_Y)));
+                }
+            }
+
             component.connections.put((int)connectionTag.getByte(NBT_CONNECTION_POS), connection);
         }
 
@@ -789,6 +1028,20 @@ public class FlowComponent implements IComponentNetworkReader {
                 connectionTag.setByte(NBT_CONNECTION_POS, (byte)i);
                 connectionTag.setByte(NBT_CONNECTION_TARGET_COMPONENT, (byte)connection.getComponentId());
                 connectionTag.setByte(NBT_CONNECTION_TARGET_CONNECTION, (byte)connection.getConnectionId());
+
+
+                NBTTagList nodes = new NBTTagList();
+                for (Point point : connection.getNodes()) {
+                    NBTTagCompound nodeTag = new NBTTagCompound();
+
+                    nodeTag.setShort(NBT_POS_X, (short)point.getX());
+                    nodeTag.setShort(NBT_POS_Y, (short)point.getY());
+
+                    nodes.appendTag(nodeTag);
+                }
+
+                connectionTag.setTag(NBT_NODES, nodes);
+
                 connections.appendTag(connectionTag);
             }
         }
@@ -818,5 +1071,13 @@ public class FlowComponent implements IComponentNetworkReader {
 
     public void close() {
         isLarge = false;
+    }
+
+    public void setConnection(int i, Connection connection) {
+        connections.put(i, connection);
+    }
+
+    public void clearConnections() {
+        connections.clear();
     }
 }
