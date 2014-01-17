@@ -26,9 +26,15 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
     private int[] strengths;
     private boolean[] strong;
 
+    private int[] updatedStrength;
+    private boolean[] updatedStrong;
+
     public TileEntityOutput() {
         strengths = new int[ForgeDirection.VALID_DIRECTIONS.length];
         strong = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
+
+        updatedStrength = new int[ForgeDirection.VALID_DIRECTIONS.length];
+        updatedStrong = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
 
         pulseTimers = new List[ForgeDirection.VALID_DIRECTIONS.length];
         for (int i = 0; i < pulseTimers.length; i++) {
@@ -62,17 +68,17 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
         boolean updateClient = false;
         for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
             if (sides.isSideRequired(i)) {
-                int oldStrength = strengths[i];
-                boolean oldStrong = strong[i];
+                int oldStrength = updatedStrength[i];
+                boolean oldStrong = updatedStrong[i];
 
                 updateSideState(i, output);
-                strong[i] = sides.useStrongSignal();
+                updatedStrong[i] = sides.useStrongSignal();
 
 
-                if (((strengths[i] > 0) != (oldStrength > 0)) || (oldStrong != strong[i])) {
+                if (((updatedStrength[i] > 0) != (oldStrength > 0)) || (oldStrong != updatedStrong[i])) {
                     updateClient = true;
                 }
-                boolean updateBlocks = oldStrength != strengths[i] || oldStrong != strong[i];
+                boolean updateBlocks = oldStrength != updatedStrength[i] || oldStrong != updatedStrong[i];
 
 
 
@@ -141,7 +147,7 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
 
 
     private void updateSideState(int side, ComponentMenuRedstoneOutput output) {
-        int strength = strengths[side];
+        int strength = updatedStrength[side];
         int selectedStrength = output.getSelectedStrength();
 
         switch (output.getSelectedSetting()) {
@@ -173,13 +179,14 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
         }
 
 
-        strengths[side] = strength;
+        updatedStrength[side] = strength;
     }
 
 
     private void notifyUpdate(int x, int y, int z, boolean spread) {
         if (worldObj.getBlockId(x, y, z) != Blocks.blockCable.blockID && (x != xCoord || y != yCoord || z != zCoord)) {
             worldObj.notifyBlockOfNeighborChange(x, y, z, Blocks.blockCableOutput.blockID);
+
             if (spread) {
                 notifyUpdate(x - 1, y, z, false);
                 notifyUpdate(x + 1, y, z, false);
@@ -211,8 +218,8 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
 
             NBTTagCompound sideTag = (NBTTagCompound)sidesTag.tagAt(i);
 
-            strengths[i] = sideTag.getByte(NBT_STRENGTH);
-            strong[i] = sideTag.getBoolean(NBT_STRONG);
+            strengths[i] = updatedStrength[i] = sideTag.getByte(NBT_STRENGTH);
+            strong[i] = updatedStrong[i] = sideTag.getBoolean(NBT_STRONG);
 
             List<PulseTimer> timers = pulseTimers[i];
             timers.clear();
@@ -237,8 +244,8 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
         for (int i = 0; i < strengths.length; i++) {
             NBTTagCompound sideTag = new NBTTagCompound();
 
-            sideTag.setByte(NBT_STRENGTH, (byte)strengths[i]);
-            sideTag.setBoolean(NBT_STRONG, strong[i]);
+            sideTag.setByte(NBT_STRENGTH, (byte)updatedStrength[i]);
+            sideTag.setBoolean(NBT_STRONG, updatedStrong[i]);
 
             NBTTagList pulsesTag = new NBTTagList();
             List<PulseTimer> timers = pulseTimers[i];
@@ -264,10 +271,10 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
     public void writeData(DataWriter dw, EntityPlayer player, boolean onServer, int id) {
         if (onServer) {
             for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
-                boolean isOn = strengths[i] > 0;
+                boolean isOn = updatedStrength[i] > 0;
                 dw.writeBoolean(isOn);
                 if (isOn) {
-                    dw.writeBoolean(strong[i]);
+                    dw.writeBoolean(updatedStrong[i]);
                 }
             }
         }else{
@@ -311,10 +318,15 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
 
            if (hasUpdatedThisTick) {
                hasUpdatedThisTick = false;
-               for (WorldCoordinate coordinate : scheduledToUpdate) {
+               List<WorldCoordinate> coordinates = new ArrayList<WorldCoordinate>(scheduledToUpdate);
+               scheduledToUpdate.clear();
+               for (int i = 0; i < strengths.length; i++) {
+                   strengths[i] = updatedStrength[i];
+                   strong[i] = updatedStrong[i];
+               }
+               for (WorldCoordinate coordinate : coordinates) {
                    notifyUpdate(coordinate.getX(), coordinate.getY(), coordinate.getZ(), true);
                }
-               scheduledToUpdate.clear();
            }
        }
     }

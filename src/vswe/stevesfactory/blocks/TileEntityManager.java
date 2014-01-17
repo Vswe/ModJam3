@@ -1,18 +1,25 @@
 package vswe.stevesfactory.blocks;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.components.*;
-import vswe.stevesfactory.network.DataBitHelper;
-import vswe.stevesfactory.network.DataReader;
-import vswe.stevesfactory.network.DataWriter;
+import vswe.stevesfactory.interfaces.ContainerManager;
+import vswe.stevesfactory.interfaces.GuiManager;
+import vswe.stevesfactory.network.*;
 
 import java.util.*;
 
 
-public class TileEntityManager extends TileEntity {
+public class TileEntityManager extends TileEntityInterface {
 
     public static final int BUTTON_SIZE_W = 14;
     public static final int BUTTON_SIZE_H = 14;
@@ -472,6 +479,89 @@ public class TileEntityManager extends TileEntity {
 
     public List<Integer> getRemovedIds() {
         return removedIds;
+    }
+
+    @Override
+    public Container getContainer(TileEntity te, InventoryPlayer inv) {
+        return new ContainerManager((TileEntityManager)te, inv);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public GuiScreen getGui(TileEntity te, InventoryPlayer inv) {
+        return new GuiManager((TileEntityManager)te, inv);
+    }
+
+    @Override
+    public void readAllData(DataReader dr, EntityPlayer player) {
+        updateInventories();
+        int flowControlCount = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+        getFlowItems().clear();
+        getZLevelRenderingList().clear();
+        for (int i = 0; i < flowControlCount; i++) {
+            readAllComponentData(dr);
+        }
+    }
+
+    private void readAllComponentData(DataReader dr) {
+        int x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
+        int y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+        int id = dr.readData(DataBitHelper.FLOW_CONTROL_TYPE_ID);
+
+        FlowComponent flowComponent = new FlowComponent(this, x, y, ComponentType.getTypeFromId(id));
+
+        for (ComponentMenu menu : flowComponent.getMenus()) {
+            menu.readData(dr);
+        }
+
+        getFlowItems().add(flowComponent);
+        getZLevelRenderingList().add(0, flowComponent);
+    }
+
+    @Override
+    public void readUpdatedData(DataReader dr, EntityPlayer player) {
+        boolean isNew = worldObj.isRemote && dr.readBoolean();
+        if (isNew) {
+            readAllComponentData(dr);
+        }else{
+            boolean isSpecificComponent = dr.readBoolean();
+            if (isSpecificComponent) {
+
+                IComponentNetworkReader nr = getNetworkReaderForComponentPacket(dr, this);
+
+                if (nr != null) {
+                    nr.readNetworkComponent(dr);
+                }
+            }else{
+                readGenericData(dr);
+            }
+        }
+    }
+
+    @Override
+    public void writeAllData(DataWriter dw) {
+        dw.writeData(getFlowItems().size(), DataBitHelper.FLOW_CONTROL_COUNT);
+        for (FlowComponent flowComponent : getFlowItems()) {
+            PacketHandler.writeAllComponentData(dw, flowComponent);
+        }
+    }
+
+    private IComponentNetworkReader getNetworkReaderForComponentPacket(DataReader dr, TileEntityManager jam) {
+        int componentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+        if (componentId >= 0 && componentId < jam.getFlowItems().size()) {
+            FlowComponent component = jam.getFlowItems().get(componentId);
+
+            if (dr.readBoolean()) {
+                int menuId = dr.readData(DataBitHelper.FLOW_CONTROL_MENU_COUNT);
+                if (menuId >= 0 && menuId < component.getMenus().size()) {
+                    return component.getMenus().get(menuId);
+                }
+            }else{
+                return component;
+            }
+        }
+
+        return null;
     }
 
     public abstract class Button {

@@ -84,8 +84,8 @@ public class LiquidSetting extends Setting {
     }
 
     @Override
-    public void setDefaultAmount() {
-        setAmount(1000);
+    public int getDefaultAmount() {
+        return 1000;
     }
 
     private static final String NBT_FLUID_ID = "FluidId";

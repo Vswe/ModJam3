@@ -42,6 +42,10 @@ public abstract class Setting {
         isLimitedByAmount = limitedByAmount;
     }
 
+    public void setDefaultAmount() {
+        setAmount(getDefaultAmount());
+    };
+
     public abstract int getAmount();
     public abstract void setAmount(int val);
     public abstract boolean isValid();
@@ -50,7 +54,7 @@ public abstract class Setting {
     public abstract void readData(DataReader dr);
     public abstract void copyFrom(Setting setting);
 
-    public abstract void setDefaultAmount();
+    public abstract int getDefaultAmount();
 
     public abstract void load(NBTTagCompound settingTag);
     public abstract void save(NBTTagCompound settingTag);

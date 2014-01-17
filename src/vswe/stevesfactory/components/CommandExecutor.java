@@ -5,11 +5,13 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import vswe.stevesfactory.blocks.ConnectionBlock;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
+import vswe.stevesfactory.blocks.TileEntityCreative;
 import vswe.stevesfactory.blocks.TileEntityManager;
 
 
@@ -303,94 +305,115 @@ public class CommandExecutor {
         for (SlotInventoryHolder inventory : inventories) {
 
             ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
-            for (SlotSideTarget slot : inventory.getValidSlots().values()) {
-                ItemStack itemStack = inventory.getInventory().getStackInSlot(slot.getSlot());
-
-                if (!isSlotValid(inventory.getInventory(), itemStack, slot, true)) {
-                    continue;
-                }
-
-                Setting setting = isItemValid(componentMenu, itemStack);
-                if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
-                    FlowComponent owner = componentMenu.getParent();
-                    SlotStackInventoryHolder target = new SlotStackInventoryHolder(itemStack, inventory.getInventory(), slot.getSlot());
-
-                    boolean added = false;
-                    for (ItemBufferElement itemBufferElement : itemBuffer) {
-                        if (itemBufferElement.addTarget(owner, setting, inventory, target)) {
-                            added = true;
-                            break;
+            if (inventory.getInventory() instanceof TileEntityCreative) {
+                if (menuItem.useWhiteList()) {
+                    for (SlotSideTarget slot : inventory.getValidSlots().values()) {
+                        for (Setting setting : menuItem.getSettings()) {
+                           ItemStack item = ((ItemSetting)setting).getItem();
+                            if (item != null) {
+                                item = item.copy();
+                                item.stackSize = setting.isLimitedByAmount() ? setting.getAmount() : setting.getDefaultAmount();
+                                addItemToBuffer(menuItem, inventory, setting, item, slot);
+                            }
                         }
                     }
+                }
+            }else{
+                for (SlotSideTarget slot : inventory.getValidSlots().values()) {
+                    ItemStack itemStack = inventory.getInventory().getStackInSlot(slot.getSlot());
 
-                    if (!added) {
-                        ItemBufferElement itemBufferElement = new ItemBufferElement(owner, setting, inventory, menuItem.useWhiteList(), target);
-                        itemBuffer.add(itemBufferElement);
+                    if (!isSlotValid(inventory.getInventory(), itemStack, slot, true)) {
+                        continue;
                     }
 
+
+                    Setting setting = isItemValid(componentMenu, itemStack);
+                    addItemToBuffer(menuItem, inventory, setting, itemStack, slot);
                 }
             }
+        }
+    }
+
+    private void addItemToBuffer (ComponentMenuStuff menuItem, SlotInventoryHolder inventory, Setting setting, ItemStack itemStack, SlotSideTarget slot) {
+
+        if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
+            FlowComponent owner = menuItem.getParent();
+            SlotStackInventoryHolder target = new SlotStackInventoryHolder(itemStack, inventory.getInventory(), slot.getSlot());
+
+            boolean added = false;
+            for (ItemBufferElement itemBufferElement : itemBuffer) {
+                if (itemBufferElement.addTarget(owner, setting, inventory, target)) {
+                    added = true;
+                    break;
+                }
+            }
+
+            if (!added) {
+                ItemBufferElement itemBufferElement = new ItemBufferElement(owner, setting, inventory, menuItem.useWhiteList(), target);
+                itemBuffer.add(itemBufferElement);
+            }
+
         }
     }
 
     private void getLiquids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
         for (SlotInventoryHolder tank : tanks) {
             ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
-            for (SlotSideTarget slot : tank.getValidSlots().values()) {
-                List<FluidTankInfo> tankInfos = new ArrayList<FluidTankInfo>();
-                for (int side : slot.getSides()) {
-                    FluidTankInfo[] currentTankInfos = tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side]);
-                    if (currentTankInfos == null) {
-                        continue;
-                    }
-                    for (FluidTankInfo fluidTankInfo : currentTankInfos) {
-                        if (fluidTankInfo == null) {
-                            continue;
-                        }
+            if (tank.getInventory() instanceof TileEntityCreative) {
+                if (menuItem.useWhiteList()) {
+                    for (SlotSideTarget slot : tank.getValidSlots().values()) {
+                        for (Setting setting : menuItem.getSettings()) {
+                            Fluid fluid = ((LiquidSetting)setting).getFluid();
+                            if (fluid != null) {
+                                FluidStack liquid = new FluidStack(fluid, setting.isLimitedByAmount() ? setting.getAmount() : setting.getDefaultAmount());
 
-                        boolean alreadyUsed = false;
-                        for (FluidTankInfo tankInfo : tankInfos) {
-                            if (FluidStack.areFluidStackTagsEqual(tankInfo.fluid, fluidTankInfo.fluid) && tankInfo.capacity == fluidTankInfo.capacity) {
-                                alreadyUsed = true;
+                                if (liquid != null) {
+                                    addLiquidToBuffer(menuItem, tank, setting, liquid, 0);
+                                }
                             }
                         }
-
-                        if (alreadyUsed) {
+                    }
+                }
+            }else{
+                for (SlotSideTarget slot : tank.getValidSlots().values()) {
+                    List<FluidTankInfo> tankInfos = new ArrayList<FluidTankInfo>();
+                    for (int side : slot.getSides()) {
+                        FluidTankInfo[] currentTankInfos = tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side]);
+                        if (currentTankInfos == null) {
                             continue;
                         }
+                        for (FluidTankInfo fluidTankInfo : currentTankInfos) {
+                            if (fluidTankInfo == null) {
+                                continue;
+                            }
 
-                        FluidStack fluidStack = fluidTankInfo.fluid;
-
-                        if (fluidStack == null) {
-                            continue;
-                        }
-
-                        fluidStack = fluidStack.copy();
-
-                        Setting setting = isLiquidValid(componentMenu, fluidStack);
-                        if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
-                            FlowComponent owner = componentMenu.getParent();
-                            StackTankHolder target = new StackTankHolder(fluidStack, tank.getTank(), ForgeDirection.VALID_DIRECTIONS[side]);
-
-                            boolean added = false;
-                            for (LiquidBufferElement liquidBufferElement : liquidBuffer) {
-                                if (liquidBufferElement.addTarget(owner, setting, tank, target)) {
-                                    added = true;
-                                    break;
+                            boolean alreadyUsed = false;
+                            for (FluidTankInfo tankInfo : tankInfos) {
+                                if (FluidStack.areFluidStackTagsEqual(tankInfo.fluid, fluidTankInfo.fluid) && tankInfo.capacity == fluidTankInfo.capacity) {
+                                    alreadyUsed = true;
                                 }
                             }
 
-                            if (!added) {
-                                LiquidBufferElement itemBufferElement = new LiquidBufferElement(owner, setting, tank, menuItem.useWhiteList(), target);
-                                liquidBuffer.add(itemBufferElement);
+                            if (alreadyUsed) {
+                                continue;
                             }
 
-                        }
-                    }
+                            FluidStack fluidStack = fluidTankInfo.fluid;
 
-                    for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
-                        if (fluidTankInfo != null) {
-                            tankInfos.add(fluidTankInfo);
+                            if (fluidStack == null) {
+                                continue;
+                            }
+
+                            fluidStack = fluidStack.copy();
+
+                            Setting setting = isLiquidValid(componentMenu, fluidStack);
+                            addLiquidToBuffer(menuItem, tank, setting, fluidStack, side);
+                        }
+
+                        for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
+                            if (fluidTankInfo != null) {
+                                tankInfos.add(fluidTankInfo);
+                            }
                         }
                     }
                 }
@@ -398,6 +421,27 @@ public class CommandExecutor {
         }
     }
 
+
+    private void addLiquidToBuffer(ComponentMenuStuff menuItem, SlotInventoryHolder tank, Setting setting, FluidStack fluidStack, int side) {
+        if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
+            FlowComponent owner = menuItem.getParent();
+            StackTankHolder target = new StackTankHolder(fluidStack, tank.getTank(), ForgeDirection.VALID_DIRECTIONS[side]);
+
+            boolean added = false;
+            for (LiquidBufferElement liquidBufferElement : liquidBuffer) {
+                if (liquidBufferElement.addTarget(owner, setting, tank, target)) {
+                    added = true;
+                    break;
+                }
+            }
+
+            if (!added) {
+                LiquidBufferElement itemBufferElement = new LiquidBufferElement(owner, setting, tank, menuItem.useWhiteList(), target);
+                liquidBuffer.add(itemBufferElement);
+            }
+
+        }
+    }
 
     private Setting isItemValid(ComponentMenu componentMenu, ItemStack itemStack)  {
         ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;

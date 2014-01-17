@@ -12,10 +12,12 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.tileentity.TileEntity;
+import vswe.stevesfactory.blocks.TileEntityInterface;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.ComponentMenu;
 import vswe.stevesfactory.components.ComponentType;
 import vswe.stevesfactory.components.FlowComponent;
+import vswe.stevesfactory.interfaces.ContainerBase;
 import vswe.stevesfactory.interfaces.ContainerManager;
 
 
@@ -34,22 +36,11 @@ public class PacketHandler implements IPacketHandler {
             int containerId = dr.readByte();
             Container container = ((EntityPlayer)player).openContainer;
 
-            if (container != null && container.windowId == containerId && container instanceof ContainerManager) {
-                if (player instanceof EntityPlayerMP) {
-                    readComponentPacketFromDataReader(dr, ((ContainerManager) container).getManager());
-                }else {
-                    ClientPacketHeader header = getHeaderFromId(dr.readData(DataBitHelper.CLIENT_HEADER));
-                    switch (header) {
-                        case ALL:
-                            readAllData(dr, ((ContainerManager) container).getManager());
-                            break;
-                        case SPECIFIC:
-                            readComponentPacketFromDataReader(dr, ((ContainerManager) container).getManager());
-                            break;
-                        case NEW:
-                            readAllComponentData(dr, ((ContainerManager) container).getManager());
-                    }
-
+            if (container != null && container.windowId == containerId && container instanceof ContainerBase) {
+                if (player instanceof EntityPlayerMP || dr.readBoolean()) {
+                    ((ContainerBase) container).getTileEntity().readUpdatedData(dr, (EntityPlayer)player);
+                }else{
+                    ((ContainerBase) container).getTileEntity().readAllData(dr , (EntityPlayer)player);
                 }
             }
         }else{
@@ -87,19 +78,19 @@ public class PacketHandler implements IPacketHandler {
         dw.close();
     }
 
-    public static void sendDataToListeningClients(ContainerManager container, DataWriter dw) {
+    public static void sendDataToListeningClients(ContainerBase container, DataWriter dw) {
         dw.sendPlayerPackets(container);
         dw.close();
     }
 
 
-    public static void sendAllData(Container container, ICrafting crafting, TileEntityManager jam) {
+    public static void sendAllData(Container container, ICrafting crafting, TileEntityInterface te) {
         DataWriter dw = new DataWriter();
 
         dw.writeBoolean(true); //use container
         dw.writeByte(container.windowId);
-        dw.writeData(ClientPacketHeader.ALL.id, DataBitHelper.CLIENT_HEADER);
-        writeAllData(dw, jam);
+        dw.writeBoolean(false); //all data
+        te.writeAllData(dw);
 
         sendDataToPlayer(crafting, dw);
     }
@@ -117,18 +108,32 @@ public class PacketHandler implements IPacketHandler {
         }
     }*/
 
+    public static DataWriter getWriterForUpdate(Container container) {
+        DataWriter dw = new DataWriter();
+
+        dw.writeBoolean(true); //use container
+        dw.writeByte(container.windowId);
+        dw.writeBoolean(true); //updated data
+
+        return dw;
+    }
+
+
+
+
     private static DataWriter getWriterForSpecificData(Container container) {
         DataWriter dw = new DataWriter();
 
         dw.writeBoolean(true); //use container
         dw.writeByte(container.windowId);
-        dw.writeData(ClientPacketHeader.SPECIFIC.id, DataBitHelper.CLIENT_HEADER);
+        dw.writeBoolean(true); //updated data
+        dw.writeBoolean(false); //not new
 
         return dw;
     }
 
     @SideOnly(Side.CLIENT)
-    private static DataWriter getWriterForServerPacket() {
+    public static DataWriter getWriterForServerPacket() {
         Container container = Minecraft.getMinecraft().thePlayer.openContainer;
 
         if (container != null) {
@@ -177,49 +182,10 @@ public class PacketHandler implements IPacketHandler {
         return dw;
     }
 
-    public static void readComponentPacketFromDataReader(DataReader dr, TileEntityManager jam) {
-        boolean isSpecificComponent = dr.readBoolean();
-        if (isSpecificComponent) {
-
-            IComponentNetworkReader nr = getNetworkReaderForComponentPacket(dr, jam);
-
-            if (nr != null) {
-                nr.readNetworkComponent(dr);
-            }
-        }else{
-            jam.readGenericData(dr);
-        }
-    }
-
-
-    private static IComponentNetworkReader getNetworkReaderForComponentPacket(DataReader dr, TileEntityManager jam) {
-        int componentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
-        if (componentId >= 0 && componentId < jam.getFlowItems().size()) {
-            FlowComponent component = jam.getFlowItems().get(componentId);
-
-            if (dr.readBoolean()) {
-                int menuId = dr.readData(DataBitHelper.FLOW_CONTROL_MENU_COUNT);
-                if (menuId >= 0 && menuId < component.getMenus().size()) {
-                    return component.getMenus().get(menuId);
-                }
-            }else{
-                 return component;
-            }
-        }
-
-        return null;
-    }
 
 
 
-    private static void writeAllData(DataWriter dw, TileEntityManager jam){
-       dw.writeData(jam.getFlowItems().size(), DataBitHelper.FLOW_CONTROL_COUNT);
-        for (FlowComponent flowComponent : jam.getFlowItems()) {
-            writeAllComponentData(dw, flowComponent);
-        }
-    }
-
-    private static void writeAllComponentData(DataWriter dw, FlowComponent flowComponent) {
+    public static void writeAllComponentData(DataWriter dw, FlowComponent flowComponent) {
         dw.writeData(flowComponent.getX(), DataBitHelper.FLOW_CONTROL_X);
         dw.writeData(flowComponent.getY(), DataBitHelper.FLOW_CONTROL_Y);
         dw.writeData(flowComponent.getType().getId(), DataBitHelper.FLOW_CONTROL_TYPE_ID);
@@ -229,30 +195,7 @@ public class PacketHandler implements IPacketHandler {
         }
     }
 
-    private static void readAllData(DataReader dr, TileEntityManager manager){
-        manager.updateInventories();
-        int flowControlCount = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
-        manager.getFlowItems().clear();
-        manager.getZLevelRenderingList().clear();
-        for (int i = 0; i < flowControlCount; i++) {
-            readAllComponentData(dr, manager);
-        }
-    }
 
-    private static void readAllComponentData(DataReader dr, TileEntityManager manager) {
-        int x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
-        int y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
-        int id = dr.readData(DataBitHelper.FLOW_CONTROL_TYPE_ID);
-
-        FlowComponent flowComponent = new FlowComponent(manager, x, y, ComponentType.getTypeFromId(id));
-
-        for (ComponentMenu menu : flowComponent.getMenus()) {
-            menu.readData(dr);
-        }
-
-        manager.getFlowItems().add(flowComponent);
-        manager.getZLevelRenderingList().add(0, flowComponent);
-    }
 
     public static DataWriter getButtonPacketWriter() {
         DataWriter dw = getWriterForServerPacket();
@@ -265,7 +208,8 @@ public class PacketHandler implements IPacketHandler {
 
         dw.writeBoolean(true); //use container
         dw.writeByte(container.windowId);
-        dw.writeData(ClientPacketHeader.NEW.id, DataBitHelper.CLIENT_HEADER);
+        dw.writeBoolean(true); //updated data
+        dw.writeBoolean(true); //new data;
 
         writeAllComponentData(dw, component);
         PacketHandler.sendDataToListeningClients(container, dw);
@@ -277,27 +221,6 @@ public class PacketHandler implements IPacketHandler {
         dw.writeBoolean(false);
         dw.writeData(idToRemove, DataBitHelper.FLOW_CONTROL_COUNT);
         sendDataToListeningClients(container, dw);
-    }
-
-    private enum ClientPacketHeader {
-        ALL(0),
-        SPECIFIC(1),
-        NEW(2);
-
-        private int id;
-
-        private ClientPacketHeader(int id) {
-            this.id = id;
-        }
-    }
-
-    private ClientPacketHeader getHeaderFromId(int id) {
-        for (ClientPacketHeader header : ClientPacketHeader.values()) {
-            if (id == header.id) {
-                return header;
-            }
-        }
-        return  null;
     }
 
     public static void sendBlockPacket(IPacketBlock block, EntityPlayer player, int id) {

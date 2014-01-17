@@ -5,6 +5,7 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import net.minecraft.inventory.ICrafting;
 import vswe.stevesfactory.StevesFactoryManager;
+import vswe.stevesfactory.interfaces.ContainerBase;
 import vswe.stevesfactory.interfaces.ContainerManager;
 
 import java.io.ByteArrayOutputStream;
@@ -83,7 +84,7 @@ public class DataWriter {
         PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()));
     }
     
-    void sendPlayerPackets(ContainerManager container) {
+    void sendPlayerPackets(ContainerBase container) {
         if (bitCountBuffer > 0) {
             stream.write(byteBuffer);
         }
@@ -113,5 +114,15 @@ public class DataWriter {
     }
 
 
-
+    public void writeString(String str, DataBitHelper bits) {
+        if (str != null) {
+            byte[] bytes = str.getBytes();
+            writeData(bytes.length, bits);
+            for (byte b : bytes) {
+                writeByte(b);
+            }
+        }else{
+            writeData(0, bits);
+        }
+    }
 }

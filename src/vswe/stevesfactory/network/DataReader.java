@@ -61,5 +61,16 @@ public class DataReader {
         }
     }
 
-
+    public String readString(DataBitHelper bits) {
+        int length = readData(bits);
+        if (length == 0) {
+            return null;
+        }else{
+            byte[] bytes = new byte[length];
+            for (int i = 0; i < bytes.length; i++) {
+                bytes[i] = (byte)readByte();
+            }
+            return new String(bytes);
+        }
+    }
 }

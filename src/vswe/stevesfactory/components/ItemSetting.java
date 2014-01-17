@@ -105,8 +105,8 @@ public class ItemSetting extends Setting {
     }
 
     @Override
-    public void setDefaultAmount() {
-        setAmount(1);
+    public int getDefaultAmount() {
+        return 1;
     }
 
     private static final String NBT_SETTING_ITEM_ID = "ItemId";

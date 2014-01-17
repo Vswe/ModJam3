@@ -42,7 +42,11 @@ public enum DataBitHelper {
     PULSE_COMPONENT_TYPES(2),
     PULSE_TYPES(2),
     PULSE_SECONDS(7),
-    PULSE_TICKS(5);
+    PULSE_TICKS(5),
+
+    NAME_LENGTH(5),
+    PERMISSION_ID(8),
+    ;
 
 
 

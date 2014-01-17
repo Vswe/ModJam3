@@ -15,11 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ContainerManager extends Container {
+public class ContainerManager extends ContainerBase {
 
     private TileEntityManager manager;
 
     public ContainerManager(TileEntityManager manager, InventoryPlayer player) {
+        super(manager, player);
         this.manager = manager;
     }
 
@@ -91,15 +92,10 @@ public class ContainerManager extends Container {
         oldIdIndexToRemove = manager.getRemovedIds().size();
     }
 
-    public TileEntityManager getManager() {
-        return manager;
-    }
 
     private List<FlowComponent> oldComponents;
     private List<WorldCoordinate> oldInventories;
     private int oldIdIndexToRemove;
 
-    public List<ICrafting> getCrafters() {
-        return crafters;
-    }
+
 }
