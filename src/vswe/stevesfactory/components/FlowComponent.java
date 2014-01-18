@@ -412,17 +412,19 @@ public class FlowComponent implements IComponentNetworkReader {
                         Connection selected = connections.get(i);
 
                         if (selected != null) {
+                            int connectionId = i;
                             boolean reversed = false;
                             FlowComponent component = this;
                             if (selected.getComponentId() < id) {
+                                connectionId = selected.getConnectionId();
                                 component = manager.getFlowItems().get(selected.getComponentId());
                                 selected = component.getConnection(selected.getConnectionId());
                                 reversed = true;
-                            }
+                           }
                             if (selected.getNodes().size() < MAX_NODES && selected.getSelectedNode() == null) {
                                 int id = reversed ? selected.getNodes().size() : 0;
                                 selected.addAndSelectNode(mX, mY, id);
-                                component.sendConnectionNode(i, id, false, true, mX, mY);
+                                component.sendConnectionNode(connectionId, id, false, true, mX, mY);
                             }
                         }
                     }else{
@@ -731,21 +733,21 @@ public class FlowComponent implements IComponentNetworkReader {
                 }
                 boolean deleted = dr.readBoolean();
                 boolean created = false;
-                if (id >= 0 && ((!deleted && (created = dr.readBoolean()) && id == connection.getNodes().size()) || id < connection.getNodes().size())) {
+                if (!deleted) {
+                    created = dr.readBoolean();
+                }
+                if (id >= 0 && ((created && id == connection.getNodes().size()) || id < connection.getNodes().size())) {
                     if (deleted) {
                         connection.getNodes().remove(id);
-                        System.out.println("Deleted " + id + " " + manager.worldObj.isRemote);
                     }else {
                         Point node;
                         if (created) {
                             node = new Point();
                             if (connection.getNodes().size() < MAX_NODES && (!manager.worldObj.isRemote || length > connection.getNodes().size())) {
                                 connection.getNodes().add(id, node);
-                                System.out.println("Added " + id + " " + manager.worldObj.isRemote);
                             }
                         }else{
                             node = connection.getNodes().get(id);
-                            System.out.println("Updated " + id + " " + manager.worldObj.isRemote);
                         }
 
                         node.setX(dr.readData(DataBitHelper.FLOW_CONTROL_X));
@@ -816,6 +818,7 @@ public class FlowComponent implements IComponentNetworkReader {
             dw.writeData(x, DataBitHelper.FLOW_CONTROL_X);
             dw.writeData(y, DataBitHelper.FLOW_CONTROL_Y);
         }
+
     }
 
     private void sendConnectionNode(int connectionId, int nodeId, boolean deleted, boolean created, int x, int y) {
@@ -892,11 +895,13 @@ public class FlowComponent implements IComponentNetworkReader {
                                 }
                             }
                             sendClientConnectionNode(container, newConnection.getNodes().size(), i, j, false, false, newNode.getX(), newNode.getY());
+                            break;
                         }
                     }
 
                     if (!updated && created) {
-                        sendClientConnectionNode(container, newConnection.getNodes().size(), i, newConnection.getNodes().size() - 1, false, true, newConnection.getNodes().get(newConnection.getNodes().size() - 1).getX(), newConnection.getNodes().get(newConnection.getNodes().size() - 1).getY());
+                        int nodeId = connection.getNodes().size();
+                        sendClientConnectionNode(container, newConnection.getNodes().size(), i, nodeId, false, true, newConnection.getNodes().get(nodeId).getX(), newConnection.getNodes().get(nodeId).getY());
                     }
                 }
 

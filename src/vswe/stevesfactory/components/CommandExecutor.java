@@ -530,11 +530,20 @@ public class CommandExecutor {
                                 temp.stackSize = moveCount;
                                 holder.reduceAmount(moveCount);
                                 inventory.setInventorySlotContents(slot.getSlot(), temp);
+
+                                boolean done = false;
                                 if (holder.getSizeLeft() == 0) {
                                     if (itemStack.stackSize == 0) {
                                         removeItemFromBuffer(holder);
                                     }
                                     itemIterator.remove();
+                                    done = true;
+                                }
+
+                                inventory.onInventoryChanged();
+                                holder.getInventory().onInventoryChanged();
+
+                                if (done) {
                                     break;
                                 }
                             }
@@ -547,11 +556,19 @@ public class CommandExecutor {
                                 outputItemCounter.modifyStackSize(moveCount);
                                 itemInSlot.stackSize += moveCount;
                                 holder.reduceAmount(moveCount);
+                                boolean done = false;
                                 if (holder.getSizeLeft() == 0) {
                                     if (itemStack.stackSize == 0) {
                                         removeItemFromBuffer(holder);
                                     }
                                     itemIterator.remove();
+                                    done = true;
+                                }
+
+                                inventory.onInventoryChanged();
+                                holder.getInventory().onInventoryChanged();
+
+                                if (done) {
                                     break;
                                 }
                             }

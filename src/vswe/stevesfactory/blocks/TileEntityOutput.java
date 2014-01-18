@@ -341,9 +341,9 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
                 PulseTimer timer = iterator.next();
                 timer.ticks--;
                 if (timer.ticks == 0) {
-                    if (strengths[i] != timer.strength || strong[i] == timer.strong) {
-                        strengths[i] = timer.strength;
-                        strong[i] = timer.strong;
+                    if (updatedStrength[i] != timer.strength || updatedStrong[i] == timer.strong) {
+                        updatedStrength[i] = timer.strength;
+                        updatedStrong[i] = timer.strong;
                         addBlockScheduledForUpdate(i);
                         updateClient = true;
                     }
