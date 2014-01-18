@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import org.lwjgl.opengl.GL11;
@@ -73,6 +74,25 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final int NODE_SIZE = 4;
     private static final int MAX_NODES = 15;
 
+    private static final int CURSOR_X = -1;
+    private static final int CURSOR_Y = -4;
+    private static final int CURSOR_Z = 5;
+    private static final int TEXT_X = 7;
+    private static final int TEXT_Y = 10;
+    private static final int EDIT_SRC_X = 32;
+    private static final int EDIT_SRC_Y = 189;
+    private static final int EDIT_X = 103;
+    private static final int EDIT_Y = 6;
+    private static final int EDIT_X_SMALL = 105;
+    private static final int EDIT_Y_TOP = 2;
+    private static final int EDIT_Y_BOT = 11;
+    private static final int EDIT_SIZE = 9;
+    private static final int EDIT_SIZE_SMALL = 7;
+
+    private static final int TEXT_SPACE= 135;
+    private static final int TEXT_SPACE_SHORT = 65;
+    private static final int TEXT_MAX_LENGTH = 31;
+
     public FlowComponent(TileEntityManager manager, int x, int y, ComponentType type) {
         this.x = x;
         this.y = y;
@@ -96,6 +116,7 @@ public class FlowComponent implements IComponentNetworkReader {
 
         openMenuId = -1;
         connections = new HashMap<Integer, Connection>();
+        textBox = new TextBoxLogic(TEXT_MAX_LENGTH, TEXT_SPACE);
     }
 
     private int x;
@@ -112,6 +133,9 @@ public class FlowComponent implements IComponentNetworkReader {
     private int id;
     private Map<Integer, Connection> connections;
     private int currentInterval;
+    private boolean isEditing;
+    private TextBoxLogic textBox;
+    private String name;
 
 
     public int getCurrentInterval() {
@@ -191,6 +215,8 @@ public class FlowComponent implements IComponentNetworkReader {
                 int srcItemArrowX = inMenuArrowBounds(i, internalX, internalY) ? 1 : 0;
                 int srcItemArrowY = i == openMenuId ? 1 : 0;
                 gui.drawTexture(itemX + MENU_ARROW_X, itemY + MENU_ARROW_Y, MENU_ARROW_SRC_X + MENU_ARROW_SIZE_W * srcItemArrowX, MENU_ARROW_SRC_Y + MENU_ARROW_SIZE_H * srcItemArrowY, MENU_ARROW_SIZE_W, MENU_ARROW_SIZE_H);
+
+
 
                 gui.drawString(menu.getName(), x + MENU_X + MENU_ITEM_TEXT_X, y + getMenuItemY(i) + MENU_ITEM_TEXT_Y, 0x404040);
 
@@ -285,10 +311,61 @@ public class FlowComponent implements IComponentNetworkReader {
             gui.drawTexture(x + ERROR_X, y + ERROR_Y, ERROR_SRC_X, ERROR_SRC_Y + srcErrorY * ERROR_SIZE_H, ERROR_SIZE_W, ERROR_SIZE_H);
         }
 
-        gui.drawString(getType().getName(), x + 7, y + 10, 0.7F, 0x404040);
+        if (!isEditing || isLarge) {
+            String name = getName();
+            if (!isLarge) {
+                name = getShortName(gui, name);
+            }
+            gui.drawString(name, x + TEXT_X, y + TEXT_Y, 0.7F, isEditing ? 0x707020 : 0x404040);
+        }
+
+        if (isEditing) {
+            gui.drawString(getShortName(gui, getName()), x + TEXT_X, y + TEXT_Y, 0.7F, 0x207020);
+        }
+
+        if (isLarge) {
+            if (isEditing) {
+                gui.drawCursor(x + TEXT_X + (int)((textBox.getCursorPosition(gui) +  CURSOR_X) * 0.7F), y + TEXT_Y + (int)(CURSOR_Y * 0.7F), CURSOR_Z, 0.7F, 0xFFFFFFFF);
+                for (int i = 0; i < 2; i++) {
+                    int buttonX = x + EDIT_X_SMALL;
+                    int buttonY = y + (i == 0 ? EDIT_Y_TOP : EDIT_Y_BOT);
+
+                    int srcXButton = CollisionHelper.inBounds(buttonX, buttonY, EDIT_SIZE_SMALL, EDIT_SIZE_SMALL, mX, mY) ? 1 : 0;
+                    int srcYButton = i;
+
+                    gui.drawTexture(buttonX, buttonY, EDIT_SRC_X + srcXButton * EDIT_SIZE_SMALL, EDIT_SRC_Y + EDIT_SIZE + EDIT_SIZE_SMALL * srcYButton, EDIT_SIZE_SMALL, EDIT_SIZE_SMALL);
+                }
+            }else{
+                int buttonX = x + EDIT_X;
+                int buttonY = y + EDIT_Y;
+                int srcXButton = CollisionHelper.inBounds(buttonX, buttonY, EDIT_SIZE, EDIT_SIZE, mX, mY) ? 1 : 0;
+
+                gui.drawTexture(buttonX, buttonY, EDIT_SRC_X + srcXButton * EDIT_SIZE, EDIT_SRC_Y, EDIT_SIZE, EDIT_SIZE);
+            }
+        }
 
         GL11.glPopMatrix();
     }
+
+    private String cachedName;
+    private String cachedShortName;
+    private String getShortName(GuiManager gui, String name) {
+        if (!name.equals(cachedName)) {
+            cachedShortName = "";
+            for (char c : name.toCharArray()) {
+                if (gui.getStringWidth(cachedShortName + c) > TEXT_SPACE_SHORT) {
+                    break;
+                }
+                cachedShortName += c;
+            }
+        }
+        cachedName = name;
+        return cachedShortName;
+    }
+
+    private String getName() {
+         return textBox.getText() == null ? name == null ? getType().getName() : name : textBox.getText();
+     }
 
     List<String> errors = new ArrayList<String>();
 
@@ -367,6 +444,21 @@ public class FlowComponent implements IComponentNetworkReader {
                 isDragging = true;
             }else if(inArrowBounds(internalX, internalY)) {
                 isLarge = !isLarge;
+            }else if(isLarge && !isEditing && CollisionHelper.inBounds(EDIT_X, EDIT_Y, EDIT_SIZE, EDIT_SIZE, internalX, internalY)) {
+                isEditing = true;
+                textBox.setText(getName());
+                textBox.resetCursor();
+            }else if(isLarge && isEditing && CollisionHelper.inBounds(EDIT_X_SMALL, EDIT_Y_TOP, EDIT_SIZE_SMALL, EDIT_SIZE_SMALL, internalX, internalY)) {
+                isEditing = false;
+                name = textBox.getText();
+                if (name.equals("")) {
+                    name = null;
+                }
+                sendNameToServer();
+                textBox.setText(null);
+            }else if(isLarge && isEditing && CollisionHelper.inBounds(EDIT_X_SMALL, EDIT_Y_BOT, EDIT_SIZE_SMALL, EDIT_SIZE_SMALL, internalX, internalY)) {
+                isEditing = false;
+                textBox.setText(null);
             }else if (isLarge){
 
                 for (int i = 0; i < menus.size(); i++) {
@@ -488,6 +580,7 @@ public class FlowComponent implements IComponentNetworkReader {
             return false;
         }
     }
+
     private boolean checkForLoops(int connectionId, Connection connection) {
         return checkForLoops(new ArrayList<Integer>(), this, connectionId, connection);
     }
@@ -684,11 +777,14 @@ public class FlowComponent implements IComponentNetworkReader {
     }
     @SideOnly(Side.CLIENT)
     public boolean onKeyStroke(GuiManager gui, char c, int k) {
-        if (isLarge && openMenuId != -1) {
+        if (isLarge && isEditing) {
+            textBox.onKeyStroke(gui, c, k);
+            return true;
+        }else if (isLarge && openMenuId != -1) {
             return menus.get(openMenuId).onKeyStroke(gui, c, k);
+        }else{
+            return false;
         }
-
-        return false;
     }
 
     public ComponentType getType() {
@@ -707,8 +803,12 @@ public class FlowComponent implements IComponentNetworkReader {
     @Override
     public void readNetworkComponent(DataReader dr) {
         if (dr.readBoolean()) {
-            x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
-            y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+            if (dr.readBoolean()) {
+                x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
+                y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+            }else{
+                name = dr.readString(DataBitHelper.NAME_LENGTH);
+            }
         }else {
             int connectionId = dr.readData(DataBitHelper.CONNECTION_ID);
             if (dr.readBoolean()) {
@@ -767,7 +867,8 @@ public class FlowComponent implements IComponentNetworkReader {
     }
 
     private void writeLocationData(DataWriter dw) {
-        dw.writeBoolean(true);
+        dw.writeBoolean(true); //component specific
+        dw.writeBoolean(true); //position
         dw.writeData(x, DataBitHelper.FLOW_CONTROL_X);
         dw.writeData(y, DataBitHelper.FLOW_CONTROL_Y);
     }
@@ -775,6 +876,7 @@ public class FlowComponent implements IComponentNetworkReader {
     public FlowComponent copy() {
         FlowComponent copy = new FlowComponent(manager, x, y, type);
         copy.id = id;
+        copy.name = name;
 
         for (int i = 0; i < menus.size(); i++) {
             ComponentMenu menu = menus.get(i);
@@ -909,6 +1011,12 @@ public class FlowComponent implements IComponentNetworkReader {
             }
         }
 
+        if ((newData.name == null && name != null) || (newData.name != null && name == null) || (newData != null && name != null && !newData.name.equals(name))) {
+            name = newData.name;
+
+            sendNameToClient(container);
+        }
+
         for (int i = 0; i < menus.size(); i++) {
             menus.get(i).refreshData(container, newData.menus.get(i));
         }
@@ -944,6 +1052,24 @@ public class FlowComponent implements IComponentNetworkReader {
         }
     }
 
+    private void sendNameToServer() {
+        DataWriter dw = PacketHandler.getWriterForServerComponentPacket(this, null);
+        writeName(dw);
+        PacketHandler.sendDataToServer(dw);
+    }
+
+    private void sendNameToClient(ContainerManager container) {
+        DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null) ;
+        writeName(dw);
+        PacketHandler.sendDataToListeningClients(container, dw);
+    }
+
+    private void writeName(DataWriter dw) {
+        dw.writeBoolean(true); //component specific
+        dw.writeBoolean(false); //name
+        dw.writeString(name, DataBitHelper.NAME_LENGTH);
+    }
+
     private static final String NBT_POS_X = "PosX";
     private static final String NBT_POS_Y = "PosY";
     private static final String NBT_TYPE= "Type";
@@ -954,6 +1080,7 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final String NBT_INTERVAL = "Interval";
     private static final String NBT_MENUS = "Menus";
     private static final String NBT_NODES = "Nodes";
+    private static final String NBT_NAME = "Name";
 
     public static FlowComponent readFromNBT(TileEntityManager jam, NBTTagCompound nbtTagCompound, int version) {
         int x = nbtTagCompound.getShort(NBT_POS_X);
@@ -961,6 +1088,12 @@ public class FlowComponent implements IComponentNetworkReader {
         int typeId = nbtTagCompound.getByte(NBT_TYPE);
 
         FlowComponent component = new FlowComponent(jam, x, y, ComponentType.getTypeFromId(typeId));
+
+        if (nbtTagCompound.hasKey(NBT_NAME)) {
+            component.name = nbtTagCompound.getString(NBT_NAME);
+        }else{
+            component.name = null;
+        }
 
         NBTTagList connections = nbtTagCompound.getTagList(NBT_CONNECTION);
         for (int i = 0; i < connections.tagCount(); i++) {
@@ -1023,7 +1156,9 @@ public class FlowComponent implements IComponentNetworkReader {
         nbtTagCompound.setShort(NBT_POS_X, (short)x);
         nbtTagCompound.setShort(NBT_POS_Y, (short)y);
         nbtTagCompound.setByte(NBT_TYPE, (byte)type.getId());
-
+        if (name != null) {
+            nbtTagCompound.setString(NBT_NAME, name);
+        }
         NBTTagList connections = new NBTTagList();
         for (int i = 0; i < connectionSet.getConnections().length; i++) {
             Connection connection = this.connections.get(i);
@@ -1084,5 +1219,13 @@ public class FlowComponent implements IComponentNetworkReader {
 
     public void clearConnections() {
         connections.clear();
+    }
+
+    public String getComponentName() {
+        return name;
+    }
+
+    public void setComponentName(String name) {
+        this.name = name;
     }
 }

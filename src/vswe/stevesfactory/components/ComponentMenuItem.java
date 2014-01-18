@@ -216,7 +216,7 @@ public class ComponentMenuItem extends ComponentMenuStuff {
 
         if (!showAll) {
             Iterator<ItemStack> itemIterator = result.iterator();
-            String searchString = text.toLowerCase();
+            String searchString = textBox.getText().toLowerCase();
 
             while (itemIterator.hasNext()) {
 

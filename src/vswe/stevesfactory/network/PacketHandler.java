@@ -187,6 +187,7 @@ public class PacketHandler implements IPacketHandler {
         dw.writeData(flowComponent.getX(), DataBitHelper.FLOW_CONTROL_X);
         dw.writeData(flowComponent.getY(), DataBitHelper.FLOW_CONTROL_Y);
         dw.writeData(flowComponent.getType().getId(), DataBitHelper.FLOW_CONTROL_TYPE_ID);
+        dw.writeString(flowComponent.getComponentName(), DataBitHelper.NAME_LENGTH);
 
         for (ComponentMenu menu : flowComponent.getMenus()) {
             menu.writeData(dw);

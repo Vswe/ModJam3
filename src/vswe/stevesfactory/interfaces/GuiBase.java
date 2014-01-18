@@ -214,10 +214,16 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
     }
 
     public void drawCursor(int x, int y, int z, int color) {
+        drawCursor(x, y, z, 1F, color);
+    }
+    public void drawCursor(int x, int y, int z, float size, int color) {
         GL11.glPushMatrix();
         GL11.glTranslatef(0, 0, z);
         x += guiLeft;
         y += guiTop;
+        GL11.glTranslatef(x, y, 0);
+        GL11.glScalef(size, size, 0);
+        GL11.glTranslatef(-x, -y, 0);
         Gui.drawRect(x, y + 1, x + 1, y + 10, color);
         GL11.glPopMatrix();
     }

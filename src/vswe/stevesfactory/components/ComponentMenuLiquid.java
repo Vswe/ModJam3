@@ -140,7 +140,7 @@ public class ComponentMenuLiquid extends ComponentMenuStuff {
         result = new ArrayList(FluidRegistry.getRegisteredFluids().values());
 
         Iterator<Fluid> itemIterator = result.iterator();
-        String searchString = text.toLowerCase();
+        String searchString = textBox.getText().toLowerCase();
 
         if (!showAll) {
             while (itemIterator.hasNext()) {

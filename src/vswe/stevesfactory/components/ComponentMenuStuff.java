@@ -25,7 +25,20 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     public ComponentMenuStuff(FlowComponent parent, Class<? extends Setting> settingClass) {
         super(parent);
 
-        text = "";
+        textBox = new TextBoxLogic(Integer.MAX_VALUE, TEXT_BOX_SIZE_W - TEXT_BOX_TEXT_X * 2) {
+            @Override
+            protected void textChanged() {
+                if (getText().length() > 0 || getText().toLowerCase().equals("all")) {
+                    updateSearch(getText().toLowerCase().equals("all"));
+                }else{
+                    result.clear();
+                    updateScrolling();
+                }
+            }
+        };
+
+        textBox.setText("");
+
         result = new ArrayList();
         settings = new ArrayList<Setting>();
         for (int i = 0; i < getSettingCount(); i++) {
@@ -173,9 +186,8 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     private int dir;
     private boolean clicked;
     private boolean selected;
-    protected String text;
-    private int cursor;
-    private int cursorPosition;
+    protected TextBoxLogic textBox;
+
     protected List result;
     protected List<Setting> settings;
     protected Setting selectedSetting;
@@ -219,10 +231,10 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             int srcBoxY = selected ? 1 : 0;
 
             gui.drawTexture(TEXT_BOX_X, TEXT_BOX_Y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + srcBoxY * TEXT_BOX_SIZE_H, TEXT_BOX_SIZE_W, TEXT_BOX_SIZE_H);
-            gui.drawString(text, TEXT_BOX_X + TEXT_BOX_TEXT_X, TEXT_BOX_Y + TEXT_BOX_TEXT_Y, 0xFFFFFF);
+            gui.drawString(textBox.getText(), TEXT_BOX_X + TEXT_BOX_TEXT_X, TEXT_BOX_Y + TEXT_BOX_TEXT_Y, 0xFFFFFF);
 
             if (selected) {
-                gui.drawCursor(TEXT_BOX_X + cursorPosition + CURSOR_X, TEXT_BOX_Y + CURSOR_Y, CURSOR_Z, 0xFFFFFFFF);
+                gui.drawCursor(TEXT_BOX_X + textBox.getCursorPosition(gui) + CURSOR_X, TEXT_BOX_Y + CURSOR_Y, CURSOR_Z, 0xFFFFFFFF);
             }
 
             if (isScrollingVisible()) {
@@ -472,17 +484,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     @Override
     public boolean onKeyStroke(GuiManager gui, char c, int k) {
         if (selected && isSearching()) {
-            if (k == 203) {
-                moveCursor(gui, -1);
-            }else if(k == 205) {
-                moveCursor(gui, 1);
-            }else if (k == 14) {
-                deleteText(gui, -1);
-            }else if (k == 211) {
-                deleteText(gui, 1);
-            }else if (ChatAllowedCharacters.isAllowedCharacter(c)) {
-                addText(gui, Character.toString(c));
-            }
+            textBox.onKeyStroke(gui, c, k);
 
             return true;
         }else if (isEditing()){
@@ -709,52 +711,6 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         return  null;
     }
 
-    @SideOnly(Side.CLIENT)
-    private void addText(GuiManager gui, String str) {
-        String newText = text.substring(0, cursor) + str + text.substring(cursor);
-
-        if (gui.getStringWidth(newText) <= TEXT_BOX_SIZE_W - TEXT_BOX_TEXT_X * 2) {
-            text = newText;
-            moveCursor(gui, str.length());
-            textChanged();
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    private void deleteText(GuiManager gui, int direction) {
-        if (cursor + direction >= 0 && cursor + direction <= text.length()) {
-            if (direction > 0) {
-                text = text.substring(0, cursor) + text.substring(cursor + 1);
-            }else{
-                text = text.substring(0, cursor - 1) + text.substring(cursor);
-            }
-            moveCursor(gui, direction);
-            textChanged();
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    private void moveCursor(GuiManager gui, int steps) {
-        cursor += steps;
-
-        if (cursor < 0) {
-            cursor = 0;
-        }else if (cursor > text.length()) {
-            cursor = text.length();
-        }
-
-        cursorPosition = gui.getStringWidth(text.substring(0, cursor));
-    }
-
-    @SideOnly(Side.CLIENT)
-    private void textChanged() {
-        if (text.length() > 0 || text.toLowerCase().equals("all")) {
-            updateSearch(text.toLowerCase().equals("all"));
-        }else{
-            result.clear();
-            updateScrolling();
-        }
-    }
 
     @SideOnly(Side.CLIENT)
     protected abstract void updateSearch(boolean showAll);

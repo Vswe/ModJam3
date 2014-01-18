@@ -47,6 +47,8 @@ public enum DataBitHelper {
 
     NAME_LENGTH(5),
     PERMISSION_ID(8),
+
+    COMMAND_NAME(5)
     ;
 
 

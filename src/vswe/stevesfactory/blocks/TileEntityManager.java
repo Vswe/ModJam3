@@ -509,6 +509,7 @@ public class TileEntityManager extends TileEntityInterface {
         int id = dr.readData(DataBitHelper.FLOW_CONTROL_TYPE_ID);
 
         FlowComponent flowComponent = new FlowComponent(this, x, y, ComponentType.getTypeFromId(id));
+        flowComponent.setComponentName(dr.readString(DataBitHelper.NAME_LENGTH));
 
         for (ComponentMenu menu : flowComponent.getMenus()) {
             menu.readData(dr);
