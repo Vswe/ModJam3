@@ -54,19 +54,15 @@ public abstract class GuiBase extends GuiLarge {
     }
 
     public void drawString(String str, int x, int y, float mult, int color) {
-        drawScaledString(str, x, y, mult, color);
+        drawScaledString(str, x + offsetX, y + offsetY, mult, color);
         bindTexture(getComponentResource());
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     public void drawSplitString(String str, int x, int y, int w, float mult, int color) {
-        GL11.glPushMatrix();
-        GL11.glScalef(mult, mult, 1F);
-        fontRenderer.drawSplitString(str, (int)(scaleCoordinateX(x) / mult), (int)(scaleCoordinateY(y) / mult), (int)(scaleCoordinateX(w) / mult), color);
+        drawScaledSplitString(str, x + offsetX, y + offsetY, w, mult, color);
         bindTexture(getComponentResource());
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-        GL11.glPopMatrix();
     }
 
     public void drawString(String str, int x, int y, int color) {
@@ -78,7 +74,7 @@ public abstract class GuiBase extends GuiLarge {
     }
 
     public void drawMouseOver(List lst, int x, int y) {
-        drawHoveringText(lst, x + guiLeft, y + guiTop, fontRenderer);
+        drawHoveringText(lst, x + guiLeft + offsetX, y + guiTop + offsetY, fontRenderer);
     }
 
 
@@ -156,7 +152,7 @@ public abstract class GuiBase extends GuiLarge {
 
 
         try {
-            ItemRenderHelper.renderItemIntoGUI(itemRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
+            ItemRenderHelper.renderItemIntoGUI(itemRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft + offsetX, y + guiTop + offsetY);
         }catch (Exception ex) {
             if (itemstack.getItemDamage() != 0) {
                 ItemStack newStack = itemstack.copy();
@@ -187,6 +183,7 @@ public abstract class GuiBase extends GuiLarge {
     public void drawCursor(int x, int y, int z, int color) {
         drawCursor(x, y, z, 1F, color);
     }
+    //TODO
     public void drawCursor(int x, int y, int z, float size, int color) {
         GL11.glPushMatrix();
         GL11.glTranslatef(0, 0, z);
@@ -199,7 +196,7 @@ public abstract class GuiBase extends GuiLarge {
         GL11.glPopMatrix();
     }
 
-
+   //TODO
     public void drawLine(int x1, int y1, int x2, int y2) {
         GL11.glPushMatrix();
 
@@ -227,7 +224,7 @@ public abstract class GuiBase extends GuiLarge {
 
 
 
-
+    //TODO
     public void drawIcon(Icon icon, int x, int y) {
         drawTexturedModelRectFromIcon(guiLeft + x, guiTop + y, icon, 16, 16);
     }

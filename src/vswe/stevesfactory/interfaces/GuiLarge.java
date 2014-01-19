@@ -61,17 +61,19 @@ public class GuiLarge extends net.minecraft.client.gui.inventory.GuiContainer  {
         float total = size * getScale();
         GL11.glPushMatrix();
         GL11.glScalef(total, total, 1F);
-        //fontRenderer.drawString(str, (int)((x / size + guiLeft / total)), (int)((y / size + guiTop / total)), color);
-        fontRenderer.drawString(str, (int)((x + guiLeft) / total), (int)((y + guiTop) / total), color);
-        //fontRenderer.drawString(str, (int)(scaleCoordinateX(x, total) / total), (int)(scaleCoordinateY(y, total) / total), color);
-        //fontRenderer.drawString(str, (int)((x + guiLeft) / mult), (int)((y + guiTop) / mult), color);
+        fontRenderer.drawString(str, (int)((scaleCoordinateX(x)) / total), (int)((scaleCoordinateY(y)) / total), color);
         GL11.glPopMatrix();
     }
 
-    public void drawScaledSplitString(String str, int x, int y, int w, int color) {
+    public void drawScaledSplitString(String str, int x, int y, int w, float size, int color) {
         int left = (int)scaleCoordinateX(x);
         int right = (int)scaleCoordinateX(x + w);
-        fontRenderer.drawSplitString(str, left, (int) scaleCoordinateY(y), right - left, color);
+
+        float total = size * getScale();
+        GL11.glPushMatrix();
+        GL11.glScalef(total, total, 1F);
+        fontRenderer.drawSplitString(str, (int)(left / total), (int)((scaleCoordinateY(y)) / total), (int)((right - left) / total), color);
+        GL11.glPopMatrix();
     }
 
    @Override
