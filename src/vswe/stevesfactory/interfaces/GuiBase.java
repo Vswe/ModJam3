@@ -152,7 +152,7 @@ public abstract class GuiBase extends GuiLarge {
 
 
         try {
-            ItemRenderHelper.renderItemIntoGUI(itemRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft + offsetX, y + guiTop + offsetY);
+            renderItemStack(itemstack, x + offsetX, y + offsetY);
         }catch (Exception ex) {
             if (itemstack.getItemDamage() != 0) {
                 ItemStack newStack = itemstack.copy();
@@ -169,6 +169,13 @@ public abstract class GuiBase extends GuiLarge {
             GL11.glPopMatrix();
         }
 
+    }
+
+    private void renderItemStack(ItemStack itemstack, int x, int y) {
+        GL11.glPushMatrix();
+        GL11.glScalef(getScale(), getScale(), 1F);
+        ItemRenderHelper.renderItemIntoGUI(itemRenderer, this.mc.getTextureManager(), itemstack, (int)((scaleCoordinateX(x)) / getScale()), (int)((scaleCoordinateY(y)) / getScale()));
+        GL11.glPopMatrix();
     }
 
     public int getStringWidth(String str) {
@@ -224,9 +231,8 @@ public abstract class GuiBase extends GuiLarge {
 
 
 
-    //TODO
     public void drawIcon(Icon icon, int x, int y) {
-        drawTexturedModelRectFromIcon(guiLeft + x, guiTop + y, icon, 16, 16);
+        drawTexturedModelRectFromIcon(offsetX + x, offsetY + y, icon, 16, 16);
     }
 
     public void drawFluid(Fluid fluid, int x, int y) {

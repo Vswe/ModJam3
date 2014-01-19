@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.inventory.Container;
+import net.minecraft.util.Icon;
 import org.lwjgl.opengl.GL11;
 
 
@@ -72,24 +73,36 @@ public class GuiLarge extends net.minecraft.client.gui.inventory.GuiContainer  {
         float total = size * getScale();
         GL11.glPushMatrix();
         GL11.glScalef(total, total, 1F);
-        fontRenderer.drawSplitString(str, (int)(left / total), (int)((scaleCoordinateY(y)) / total), (int)((right - left) / total), color);
+        fontRenderer.drawSplitString(str, (int) (left / total), (int) ((scaleCoordinateY(y)) / total), (int) ((right - left) / total), color);
         GL11.glPopMatrix();
     }
 
-   @Override
+    @Override
     public void drawTexturedModalRect(int x, int y, int srcX, int srcY, int w, int h) {
+        float f = 0.00390625F;
+        float f1 = 0.00390625F;
+
+        float srcLeft = (float)srcX * f;
+        float srcRight = (float)(srcX + w) * f;
+        float srcTop = (float)srcY * f1;
+        float srcBot = (float)(srcY + h) * f1;
+
+        drawTexturedModalRect(x, y, w, h, srcLeft, srcRight, srcTop, srcBot);
+    }
+
+    @Override
+    public void drawTexturedModelRectFromIcon(int x, int y, Icon icon, int w, int h) {
+        drawTexturedModalRect(x, y, w, h, icon.getMinU(), icon.getMaxU(), icon.getMinV(), icon.getMaxV());
+    }
+
+    private void drawTexturedModalRect(int x, int y, int w, int h, float srcLeft, float srcRight, float srcTop, float srcBot) {
         float targetLeft = scaleCoordinateX(x);
         float targetRight = scaleCoordinateX(x + w);
         float targetTop = scaleCoordinateY(y);
         float targetBot = scaleCoordinateY(y + h);
 
-        float f = 0.00390625F;
-        float f1 = 0.00390625F;
 
-        float srcLeft = srcX * f;
-        float srcRight = (srcX + w) * f;
-        float srcTop = srcY * f1;
-        float srcBot = (srcY + h) * f1;
+
 
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
