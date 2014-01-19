@@ -446,12 +446,9 @@ public class CommandExecutor {
     private Setting isItemValid(ComponentMenu componentMenu, ItemStack itemStack)  {
         ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
 
-        int itemId = itemStack.itemID;
         for (Setting setting : menuItem.getSettings()) {
-            if (setting.isValid()) {
-                if (((ItemSetting)setting).getItem().itemID == itemId && (((ItemSetting)setting).isFuzzy() || ((ItemSetting)setting).getItem().getItemDamage() == itemStack.getItemDamage())) {
-                    return setting;
-                }
+            if (((ItemSetting)setting).isEqualForCommandExecutor(itemStack)) {
+                return setting;
             }
         }
 

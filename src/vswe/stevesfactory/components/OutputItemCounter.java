@@ -36,7 +36,7 @@ public class OutputItemCounter {
     private void addInventory(IInventory inventory) {
         for (int i = 0; i < inventory.getSizeInventory(); i++) {
             ItemStack item = inventory.getStackInSlot(i);
-            if (item != null && ((ItemSetting)setting).getItem().itemID == item.itemID && (((ItemSetting)setting).isFuzzy() || ((ItemSetting)setting).getItem().getItemDamage() == item.getItemDamage())) {
+            if (((ItemSetting)setting).isEqualForCommandExecutor(item)) {
                 currentInventoryStackSize += item.stackSize;
             }
         }

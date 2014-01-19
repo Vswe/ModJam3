@@ -102,7 +102,7 @@ public class ItemBufferElement {
         int bufferSize = 0;
         for (SlotStackInventoryHolder holder : getHolders()) {
             ItemStack item = holder.getItemStack();
-            if (item != null && ((ItemSetting)outputSetting).getItem().itemID == item.itemID && (((ItemSetting)outputSetting).isFuzzy() || ((ItemSetting)outputSetting).getItem().getItemDamage() == item.getItemDamage())) {
+            if (((ItemSetting)setting).isEqualForCommandExecutor(item)) {
                 bufferSize += item.stackSize;
             }
         }

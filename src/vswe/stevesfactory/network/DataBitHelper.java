@@ -48,8 +48,9 @@ public enum DataBitHelper {
     NAME_LENGTH(5),
     PERMISSION_ID(8),
 
-    COMMAND_NAME(5)
-    ;
+    COMMAND_NAME(5),
+    NBT_LENGTH(15),
+    FUZZY_MODE(2);
 
 
 

@@ -4,12 +4,13 @@ package vswe.stevesfactory.network;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import net.minecraft.inventory.ICrafting;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
 import vswe.stevesfactory.StevesFactoryManager;
 import vswe.stevesfactory.interfaces.ContainerBase;
 import vswe.stevesfactory.interfaces.ContainerManager;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class DataWriter {
     private ByteArrayOutputStream stream;
@@ -127,4 +128,25 @@ public class DataWriter {
             writeData(0, bits);
         }
     }
+
+    public void writeNBT(NBTTagCompound nbtTagCompound){
+        byte[] bytes = null;
+
+        if (nbtTagCompound != null) {
+            try {
+                bytes = CompressedStreamTools.compress(nbtTagCompound);
+            }catch (IOException ex) {
+                bytes = null;
+            }
+        }
+
+        writeBoolean(bytes != null);
+        if (bytes != null) {
+            writeData(bytes.length, DataBitHelper.NBT_LENGTH);
+            for (byte b : bytes) {
+                writeByte(b);
+            }
+        }
+    }
+
 }

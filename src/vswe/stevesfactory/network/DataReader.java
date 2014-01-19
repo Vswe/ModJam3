@@ -1,7 +1,11 @@
 package vswe.stevesfactory.network;
 
 
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+
 import java.io.ByteArrayInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 public class DataReader {
@@ -71,6 +75,23 @@ public class DataReader {
                 bytes[i] = (byte)readByte();
             }
             return new String(bytes);
+        }
+    }
+
+    public NBTTagCompound readNBT(){
+        if (readBoolean()) {
+            byte[] bytes = new byte[readData(DataBitHelper.NBT_LENGTH)];
+            for (int i = 0; i < bytes.length; i++) {
+                bytes[i] = (byte)readByte();
+            }
+
+            try {
+                return CompressedStreamTools.decompress(bytes);
+            }catch (IOException ex) {
+                return null;
+            }
+        }else{
+            return null;
         }
     }
 }

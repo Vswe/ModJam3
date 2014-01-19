@@ -363,9 +363,10 @@ public class FlowComponent implements IComponentNetworkReader {
         return cachedShortName;
     }
 
+    @SideOnly(Side.CLIENT)
     private String getName() {
-         return textBox.getText() == null ? name == null ? getType().getName() : name : textBox.getText();
-     }
+         return textBox.getText() == null ? name == null ||GuiScreen.isCtrlKeyDown() ? getType().getName() : name : textBox.getText();
+    }
 
     List<String> errors = new ArrayList<String>();
 

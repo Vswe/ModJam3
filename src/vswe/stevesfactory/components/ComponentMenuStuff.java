@@ -28,8 +28,8 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         textBox = new TextBoxLogic(Integer.MAX_VALUE, TEXT_BOX_SIZE_W - TEXT_BOX_TEXT_X * 2) {
             @Override
             protected void textChanged() {
-                if (getText().length() > 0 || getText().toLowerCase().equals("all")) {
-                    updateSearch(getText().toLowerCase().equals("all"));
+                if (getText().length() > 0) {
+                    updateSearch(getText().toLowerCase().equals(".all"));
                 }else{
                     result.clear();
                     updateScrolling();
