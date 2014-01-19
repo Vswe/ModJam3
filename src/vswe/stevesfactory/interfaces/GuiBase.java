@@ -26,49 +26,24 @@ import java.util.Arrays;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiContainer {
+public abstract class GuiBase extends GuiLarge {
     public GuiBase(Container container) {
         super(container);
     }
+
+
 
     private static final ResourceLocation TERRAIN = new ResourceLocation("textures/atlas/blocks.png");
 
     protected abstract ResourceLocation getComponentResource();
 
+
+    public int offsetX;
+    public int offsetY;
     public void drawTexture(int x, int y, int srcX, int srcY, int w, int h) {
-        float scale = getScale();
-
-        drawScaleFriendlyTexture(
-                fixScaledCoordinate(guiLeft + x, scale, this.mc.displayWidth),
-                fixScaledCoordinate(guiTop + y, scale, this.mc.displayHeight),
-                fixScaledCoordinate(srcX, scale, 256),
-                fixScaledCoordinate(srcY, scale, 256),
-                fixScaledCoordinate(w, scale, this.mc.displayWidth),
-                fixScaledCoordinate(h, scale, this.mc.displayHeight)
-        );
+        drawTexturedModalRect(x + offsetX, y + offsetY, srcX, srcY, w, h);
     }
 
-    private double fixScaledCoordinate(int val, float scale, int size) {
-        double d = val / scale;
-        d *= size;
-        d = Math.floor(d);
-        d /= size;
-        d *= scale;
-
-        return d;
-    }
-
-    public void drawScaleFriendlyTexture(double x, double y, double srcX, double srcY, double w, double h) {
-        float f = 0.00390625F;
-        float f1 = 0.00390625F;
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(x + 0, y + h, (double)this.zLevel, (srcX + 0) * f, (srcY + h) * f1);
-        tessellator.addVertexWithUV(x + w, y + h, (double)this.zLevel, (srcX + w) * f, (srcY + h) * f1);
-        tessellator.addVertexWithUV(x + w, y + 0, (double)this.zLevel, (srcX + w) * f, (srcY + 0) * f1);
-        tessellator.addVertexWithUV(x + 0, y + 0, (double)this.zLevel, (srcX + 0) * f, (srcY + 0) * f1);
-        tessellator.draw();
-    }
 
     public static void bindTexture(ResourceLocation resource)  {
         Minecraft.getMinecraft().getTextureManager().bindTexture(resource);
@@ -79,19 +54,15 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
     }
 
     public void drawString(String str, int x, int y, float mult, int color) {
-        GL11.glPushMatrix();
-        GL11.glScalef(mult, mult, 1F);
-        fontRenderer.drawString(str, (int)((x + guiLeft) / mult), (int)((y + guiTop) / mult), color);
+        drawScaledString(str, x, y, mult, color);
         bindTexture(getComponentResource());
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-        GL11.glPopMatrix();
     }
 
     public void drawSplitString(String str, int x, int y, int w, float mult, int color) {
         GL11.glPushMatrix();
         GL11.glScalef(mult, mult, 1F);
-        fontRenderer.drawSplitString(str, (int)((x + guiLeft) / mult), (int)((y + guiTop) / mult), (int)(w / mult), color);
+        fontRenderer.drawSplitString(str, (int)(scaleCoordinateX(x) / mult), (int)(scaleCoordinateY(y) / mult), (int)(scaleCoordinateX(w) / mult), color);
         bindTexture(getComponentResource());
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
@@ -252,68 +223,10 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
         GL11.glPopMatrix();
     }
 
-    @Override
-    public void drawDefaultBackground() {
-        super.drawDefaultBackground();
 
-        startScaling();
-    }
 
-    @Override
-    public void drawScreen(int x, int y, float f) {
 
-        super.drawScreen(scaleX(x), scaleY(y), f);
 
-        stopScaling();
-    }
-
-    private void startScaling() {
-        //start scale
-        GL11.glPushMatrix();
-
-        float scale = getScale();
-
-        GL11.glScalef(scale, scale, 1);
-        GL11.glTranslatef(-guiLeft, -guiTop, 0.0F);
-        GL11.glTranslatef((this.width - this.xSize * scale) / (2 * scale), (this.height - this.ySize * scale) / (2 * scale), 0.0F);
-    }
-
-    private void stopScaling() {
-        //stop scale
-        GL11.glPopMatrix();
-    }
-
-    protected float getScale() {
-
-        net.minecraft.client.gui.ScaledResolution scaledresolution = new net.minecraft.client.gui.ScaledResolution(this.mc.gameSettings, this.mc.displayWidth, this.mc.displayHeight);
-        float w = scaledresolution.getScaledWidth() * 0.9F;
-        float h = scaledresolution.getScaledHeight() * 0.9F;
-        float multX = w / xSize;
-        float multY = h / ySize;
-        float mult = Math.min(multX, multY);
-        if (mult > 1F) {
-            mult = 1F;
-        }
-
-        mult = (float)(Math.floor(mult * 1000)) / 1000F;
-
-        return mult;
-    }
-
-    protected int scaleX(float x) {
-        float scale = getScale();
-        x /= scale;
-        x += guiLeft;
-        x -= (this.width - this.xSize * scale) / (2 * scale);
-        return (int)x;
-    }
-    protected int scaleY(float y) {
-        float scale = getScale();
-        y /= scale;
-        y += guiTop;
-        y -= (this.height - this.ySize * scale) / (2 * scale);
-        return (int)y;
-    }
 
     public void drawIcon(Icon icon, int x, int y) {
         drawTexturedModelRectFromIcon(guiLeft + x, guiTop + y, icon, 16, 16);

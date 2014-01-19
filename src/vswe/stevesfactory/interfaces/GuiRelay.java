@@ -307,15 +307,12 @@ public class GuiRelay extends GuiBase {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float f, int mX, int mY) {
+    protected void drawBackground(float f, int mX, int mY) {
         hasCachedPermission = false;
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         bindTexture(TEXTURE);
         drawTexture(0, 0, 0, 0, xSize, ySize);
-
-        mX -= guiLeft;
-        mY -= guiTop;
 
         UserPermission player = getUserPermission();
         UserPermission selected = getSelectedPermission() == -1 ? null : relay.getPermissions().get(getSelectedPermission());
@@ -439,15 +436,7 @@ public class GuiRelay extends GuiBase {
 
 
     @Override
-    protected void mouseClicked(int mX, int mY, int b) {
-        mX = scaleX(mX);
-        mY = scaleY(mY);
-
-        super.mouseClicked(mX, mY, b);
-
-        mX -= guiLeft;
-        mY -= guiTop;
-
+    protected void onClick(int mX, int mY, int b) {
         UserPermission player = getUserPermission();
 
         if (!relay.doesListRequireOp() || isOp(player, true)) {

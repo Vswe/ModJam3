@@ -221,10 +221,13 @@ public class FlowComponent implements IComponentNetworkReader {
                 gui.drawString(menu.getName(), x + MENU_X + MENU_ITEM_TEXT_X, y + getMenuItemY(i) + MENU_ITEM_TEXT_Y, 0x404040);
 
                 if (i == openMenuId) {
-                    GL11.glPushMatrix();
-                    GL11.glTranslatef(itemX, getMenuAreaY(i), 0);
+                    int oldX = gui.offsetX;
+                    int oldY = gui.offsetY;
+                    gui.offsetX = itemX;
+                    gui.offsetY = getMenuAreaY(i);
                     menu.draw(gui, mX - itemX, mY - getMenuAreaY(i));
-                    GL11.glPopMatrix();
+                    gui.offsetX = oldX;
+                    gui.offsetY = oldY;
                 }
             }
         }

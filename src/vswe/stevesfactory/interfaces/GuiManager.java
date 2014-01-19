@@ -58,7 +58,7 @@ public class GuiManager extends GuiBase {
     public static int Z_LEVEL_OPEN_MAXIMUM = 5;
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
+    protected void drawBackground(float f, int x, int y) {
 
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
@@ -67,9 +67,6 @@ public class GuiManager extends GuiBase {
 
         bindTexture(BACKGROUND_2);
         drawTexture(256, 0, 0, 0, 256, 256);
-
-        x -= guiLeft;
-        y -= guiTop;
 
         bindTexture(COMPONENTS);
         for (int i = 0; i < manager.buttons.size(); i++) {
@@ -120,15 +117,7 @@ public class GuiManager extends GuiBase {
     }
 
     @Override
-    protected void mouseClicked(int x, int y, int button) {
-        x = scaleX(x);
-        y = scaleY(y);
-
-        super.mouseClicked(x, y, button);
-
-        x -= guiLeft;
-        y -= guiTop;
-
+    protected void onClick(int x, int y, int button) {
         for (int i = 0; i < manager.getZLevelRenderingList().size(); i++) {
             FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
             if (itemBase.onClick(x, y, button)) {
@@ -156,30 +145,14 @@ public class GuiManager extends GuiBase {
     }
 
     @Override
-    protected void mouseClickMove(int x, int y, int button, long ticks) {
-        x = scaleX(x);
-        y = scaleY(y);
-
-        super.mouseClickMove(x, y, button, ticks);
-
-        x -= guiLeft;
-        y -= guiTop;
-
+    protected void onDrag(int x, int y, int button, long ticks) {
         for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
             itemBase.onDrag(x, y);
         }
     }
 
     @Override
-    protected void mouseMovedOrUp(int x, int y, int button) {
-        x = scaleX(x);
-        y = scaleY(y);
-
-        super.mouseMovedOrUp(x, y, button);
-
-        x -= guiLeft;
-        y -= guiTop;
-
+    protected void onRelease(int x, int y, int button) {
         onClickButtonCheck(x, y, true);
 
         if (!manager.justSentServerComponentRemovalPacket) {
