@@ -337,22 +337,24 @@ public class ComponentMenuItem extends ComponentMenuStuff {
     public void onClick(int mX, int mY, int button) {
         super.onClick(mX, mY, button);
 
-        for (int i = -1; i <= 1; i+=2) {
-            int x = i == 1 ? ARROW_X_RIGHT : ARROW_X_LEFT;
-            int y = ARROW_Y;
+        if (isEditing()) {
+            for (int i = -1; i <= 1; i+=2) {
+                int x = i == 1 ? ARROW_X_RIGHT : ARROW_X_LEFT;
+                int y = ARROW_Y;
 
 
-            if (CollisionHelper.inBounds(x, y, ARROW_WIDTH, ARROW_HEIGHT, mX, mY)) {
-                int id = getSelectedSetting().getFuzzyMode().ordinal();
-                id += i;
-                if (id < 0) {
-                    id = FuzzyMode.values().length - 1;
-                }else if(id == FuzzyMode.values().length) {
-                    id = 0;
+                if (CollisionHelper.inBounds(x, y, ARROW_WIDTH, ARROW_HEIGHT, mX, mY)) {
+                    int id = getSelectedSetting().getFuzzyMode().ordinal();
+                    id += i;
+                    if (id < 0) {
+                        id = FuzzyMode.values().length - 1;
+                    }else if(id == FuzzyMode.values().length) {
+                        id = 0;
+                    }
+                    getSelectedSetting().setFuzzyMode(FuzzyMode.values()[id]);
+                    writeServerData(DataTypeHeader.USE_FUZZY);
+                    break;
                 }
-                getSelectedSetting().setFuzzyMode(FuzzyMode.values()[id]);
-                writeServerData(DataTypeHeader.USE_FUZZY);
-                break;
             }
         }
     }
