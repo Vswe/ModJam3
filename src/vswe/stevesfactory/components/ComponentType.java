@@ -32,6 +32,10 @@ public enum ComponentType {
     REDSTONE_CONDITION(9, "Condition (R)", "Redstone Condition",
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
             ComponentMenuNodes.class, ComponentMenuRedstoneSidesNodes.class, ComponentMenuRedstoneStrengthNodes.class, ComponentMenuResult.class),
+    VARIABLE(10, "Variable", "Container Variable",
+            new ConnectionSet[]{ConnectionSet.EMPTY},
+            ComponentMenuContainerTypes.class, ComponentMenuVariable.class, ComponentMenuResult.class),
+
 
     ;/*AUTO_CRAFTING(X, "Crafter", "Auto Crafter",
             new ConnectionSet[]{ConnectionSet.STANDARD},

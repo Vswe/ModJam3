@@ -23,6 +23,16 @@ public class ConnectionBlock {
         return types.contains(type);
     }
 
+    public boolean isOfAnyType(EnumSet<ConnectionBlockType> types) {
+        for (ConnectionBlockType type : types) {
+            if (isOfType(type)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public TileEntity getTileEntity() {
         return tileEntity;
     }

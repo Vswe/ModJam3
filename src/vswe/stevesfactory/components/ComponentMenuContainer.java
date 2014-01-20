@@ -22,6 +22,7 @@ import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 public abstract class ComponentMenuContainer extends ComponentMenu {
@@ -54,6 +55,10 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     protected RadioButtonList radioButtons;
 
     private ConnectionBlockType validType;
+
+    protected EnumSet<ConnectionBlockType> getValidTypes() {
+        return EnumSet.of(validType);
+    }
 
     public ComponentMenuContainer(FlowComponent parent, ConnectionBlockType validType) {
         super(parent);
@@ -371,10 +376,11 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     }
 
     public List<ConnectionBlock> getInventories(TileEntityManager manager) {
+        EnumSet<ConnectionBlockType> validTypes = getValidTypes();
         List<ConnectionBlock> tempInventories = manager.getConnectedInventories();
         List<ConnectionBlock> ret = new ArrayList<ConnectionBlock>();
         for (ConnectionBlock tempInventory : tempInventories) {
-            if (tempInventory.isOfType(validType)) {
+            if (tempInventory.isOfAnyType(validTypes)) {
                 ret.add(tempInventory);
             }
         }

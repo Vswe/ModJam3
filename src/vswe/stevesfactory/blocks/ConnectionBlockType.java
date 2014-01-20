@@ -5,16 +5,18 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.IFluidHandler;
 
 public enum ConnectionBlockType {
-    INVENTORY(IInventory.class),
-    TANK(IFluidHandler.class),
-    EMITTER(TileEntityOutput.class),
-    RECEIVER(TileEntityInput.class),
-    NODE(IRedstoneNode.class);
+    INVENTORY(IInventory.class, false),
+    TANK(IFluidHandler.class, false),
+    EMITTER(TileEntityOutput.class, false),
+    RECEIVER(TileEntityInput.class, false),
+    NODE(IRedstoneNode.class, true);
 
     private Class clazz;
+    private boolean group;
 
-    private ConnectionBlockType(Class clazz) {
+    private ConnectionBlockType(Class clazz, boolean group) {
         this.clazz = clazz;
+        this.group = group;
     }
 
     public boolean isInstance(TileEntity tileEntity) {
@@ -23,5 +25,15 @@ public enum ConnectionBlockType {
 
     public <T> T getObject(TileEntity tileEntity) {
         return (T)tileEntity;
+    }
+
+    public boolean isGroup() {
+        return group;
+    }
+
+
+    @Override
+    public String toString() {
+        return super.toString().charAt(0) + super.toString().substring(1).toLowerCase();
     }
 }
