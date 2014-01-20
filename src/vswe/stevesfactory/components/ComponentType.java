@@ -33,8 +33,8 @@ public enum ComponentType {
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
             ComponentMenuNodes.class, ComponentMenuRedstoneSidesNodes.class, ComponentMenuRedstoneStrengthNodes.class, ComponentMenuResult.class),
     VARIABLE(10, "Variable", "Container Variable",
-            new ConnectionSet[]{ConnectionSet.EMPTY},
-            ComponentMenuContainerTypes.class, ComponentMenuVariable.class, ComponentMenuResult.class),
+            new ConnectionSet[]{ConnectionSet.EMPTY, ConnectionSet.STANDARD},
+            ComponentMenuVariable.class, ComponentMenuContainerTypes.class, ComponentMenuVariableContainers.class,ComponentMenuResult.class),
 
 
     ;/*AUTO_CRAFTING(X, "Crafter", "Auto Crafter",

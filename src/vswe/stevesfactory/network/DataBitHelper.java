@@ -52,7 +52,9 @@ public enum DataBitHelper {
     NBT_LENGTH(15),
     FUZZY_MODE(2),
 
-    CONTAINER_TYPE(2);
+    CONTAINER_TYPE(2),
+    CONTAINER_MODE(3),
+    VARIABLE_TYPE(4);
 
 
 

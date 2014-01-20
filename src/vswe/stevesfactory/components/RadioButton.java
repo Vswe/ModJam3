@@ -23,4 +23,8 @@ public class RadioButton {
     public String getText() {
         return text;
     }
+
+    public boolean isVisible() {
+        return true;
+    }
 }
