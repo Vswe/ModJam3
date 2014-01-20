@@ -31,4 +31,9 @@ public class ComponentMenuVariableContainers extends ComponentMenuContainer {
         }
         return types;
     }
+
+    @Override
+    public boolean isVariableAllowed(int i) {
+        return i != ((ComponentMenuVariable)getParent().getMenus().get(0)).getSelectedVariable();
+    }
 }

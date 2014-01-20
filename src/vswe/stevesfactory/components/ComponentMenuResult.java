@@ -25,6 +25,17 @@ public class ComponentMenuResult extends ComponentMenu {
                 writeData(dw, selectedOption);
                 PacketHandler.sendDataToServer(dw);
             }
+
+            @Override
+            public void setSelectedOption(int selectedOption) {
+                super.setSelectedOption(selectedOption);
+
+                getParent().setConnectionSet(sets[radioButtons.getSelectedOption()]);
+
+                if (getParent().getType() == ComponentType.VARIABLE) {
+                    getParent().getManager().updateVariables();
+                }
+            }
         };
 
         for (int i = 0; i < sets.length; i++) {
@@ -91,7 +102,6 @@ public class ComponentMenuResult extends ComponentMenu {
     @Override
     public void copyFrom(ComponentMenu menu) {
         radioButtons.setSelectedOption(((ComponentMenuResult)menu).radioButtons.getSelectedOption());
-        getParent().setConnectionSet(menu.getParent().getConnectionSet());
     }
 
     @Override
@@ -114,7 +124,6 @@ public class ComponentMenuResult extends ComponentMenu {
 
     private void readTheData(DataReader dr) {
         radioButtons.setSelectedOption(dr.readData(DataBitHelper.MENU_CONNECTION_TYPE_ID));
-        getParent().setConnectionSet(sets[radioButtons.getSelectedOption()]);
     }
 
     private void writeData(DataWriter dw, int val) {
@@ -127,7 +136,6 @@ public class ComponentMenuResult extends ComponentMenu {
     @Override
     public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
         radioButtons.setSelectedOption(nbtTagCompound.getByte(NBT_SELECTED));
-        getParent().setConnectionSet(sets[radioButtons.getSelectedOption()]);
     }
 
     @Override

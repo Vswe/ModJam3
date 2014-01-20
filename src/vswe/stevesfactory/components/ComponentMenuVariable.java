@@ -41,6 +41,14 @@ public class ComponentMenuVariable extends ComponentMenu {
                 return id;
             }
 
+            @Override
+            public void setSelectedOption(int selectedOption) {
+                super.setSelectedOption(selectedOption);
+
+                if (isDeclaration()) {
+                    getParent().getManager().updateVariables();
+                }
+            }
         };
 
         for (int i = 0; i < VariableMode.values().length; i++) {
@@ -63,15 +71,22 @@ public class ComponentMenuVariable extends ComponentMenu {
     }
 
 
+    private void setSelectedVariable(int val) {
+        selectedVariable = val;
+
+        if (isDeclaration()) {
+            getParent().getManager().updateVariables();
+        }
+    }
+
     private static final int RADIO_BUTTON_X = 5;
     private static final int RADIO_BUTTON_Y = 28;
     private static final int RADIO_BUTTON_SPACING = 12;
 
-    private static final int VARIABLE_SRC_X = 32;
-    private static final int VARIABLE_SRC_Y = 130;
-    private static final int VARIABLE_SIZE = 14;
+
     private static final int VARIABLE_X = 20;
     private static final int VARIABLE_Y = 5;
+    private static final int VARIABLE_SIZE = 14;
 
     private static final int ARROW_SRC_X = 18;
     private static final int ARROW_SRC_Y = 20;
@@ -90,9 +105,8 @@ public class ComponentMenuVariable extends ComponentMenu {
     public void draw(GuiManager gui, int mX, int mY) {
         radioButtons.draw(gui, mX, mY);
 
-        VariableColor.values()[selectedVariable].applyColor();
-        gui.drawTexture(VARIABLE_X, VARIABLE_Y, VARIABLE_SRC_X, VARIABLE_SRC_Y, VARIABLE_SIZE, VARIABLE_SIZE);
-        GL11.glColor4f(1F, 1F, 1F, 1F);
+
+        getParent().getManager().getVariables()[selectedVariable].draw(gui, VARIABLE_X, VARIABLE_Y);
 
         for (int i = 0; i < 2; i++) {
             int x = i == 0 ? ARROW_X_LEFT : ARROW_X_RIGHT;
@@ -109,8 +123,7 @@ public class ComponentMenuVariable extends ComponentMenu {
     @Override
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
         if (CollisionHelper.inBounds(VARIABLE_X, VARIABLE_Y, VARIABLE_SIZE, VARIABLE_SIZE, mX, mY)) {
-            VariableColor color = VariableColor.values()[selectedVariable];
-            gui.drawMouseOver(color.getTextColor().toString() + color.toString() + " Variable", mX, mY);
+            gui.drawMouseOver(getParent().getManager().getVariables()[selectedVariable].getDescription(gui), mX, mY);
         }
     }
 
@@ -124,12 +137,14 @@ public class ComponentMenuVariable extends ComponentMenu {
 
 
             if (CollisionHelper.inBounds(x, y, ARROW_WIDTH, ARROW_HEIGHT, mX, mY)) {
-                selectedVariable += i;
-                if (selectedVariable < 0) {
-                    selectedVariable = VariableColor.values().length - 1;
-                }else if(selectedVariable == VariableColor.values().length) {
-                    selectedVariable = 0;
+                int val = selectedVariable;
+                val += i;
+                if (val < 0) {
+                    val = VariableColor.values().length - 1;
+                }else if(val == VariableColor.values().length) {
+                    val = 0;
                 }
+                setSelectedVariable(val);
 
                 DataWriter dw = getWriterForServerComponentPacket();
                 dw.writeBoolean(true); //var
@@ -158,13 +173,13 @@ public class ComponentMenuVariable extends ComponentMenu {
 
     @Override
     public void readData(DataReader dr) {
-        selectedVariable = dr.readData(DataBitHelper.VARIABLE_TYPE);
+        setSelectedVariable(dr.readData(DataBitHelper.VARIABLE_TYPE));
         radioButtons.setSelectedOption(dr.readData(DataBitHelper.CONTAINER_MODE));
     }
 
     @Override
     public void copyFrom(ComponentMenu menu) {
-        selectedVariable = ((ComponentMenuVariable) menu).selectedVariable;
+       setSelectedVariable(((ComponentMenuVariable) menu).selectedVariable);
        radioButtons.setSelectedOption(((ComponentMenuVariable) menu).radioButtons.getSelectedOption());
 
     }
@@ -174,7 +189,7 @@ public class ComponentMenuVariable extends ComponentMenu {
         ComponentMenuVariable newDataMode = (ComponentMenuVariable)newData;
 
         if (selectedVariable != newDataMode.selectedVariable) {
-            selectedVariable = newDataMode.selectedVariable;
+            setSelectedVariable(newDataMode.selectedVariable);
 
             DataWriter dw = getWriterForClientComponentPacket(container);
             dw.writeBoolean(true); //var
@@ -198,7 +213,7 @@ public class ComponentMenuVariable extends ComponentMenu {
 
     @Override
     public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
-        selectedVariable = nbtTagCompound.getByte(NBT_VARIABLE);
+        setSelectedVariable(nbtTagCompound.getByte(NBT_VARIABLE));
        radioButtons.setSelectedOption(nbtTagCompound.getByte(NBT_MODE));
     }
 
@@ -211,10 +226,14 @@ public class ComponentMenuVariable extends ComponentMenu {
     @Override
     public void readNetworkComponent(DataReader dr) {
         if (dr.readBoolean()) {
-            selectedVariable = dr.readData(DataBitHelper.VARIABLE_TYPE);
+            setSelectedVariable(dr.readData(DataBitHelper.VARIABLE_TYPE));
         }else{
             radioButtons.setSelectedOption(dr.readData(DataBitHelper.CONTAINER_MODE));
         }
+    }
+
+    public int getSelectedVariable() {
+        return selectedVariable;
     }
 
     private enum VariableMode {
@@ -248,4 +267,5 @@ public class ComponentMenuVariable extends ComponentMenu {
     public VariableMode getVariableMode() {
         return VariableMode.values()[radioButtons.getSelectedOption()];
     }
+
 }

@@ -50,8 +50,9 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
 
     //private int selectedInventory = -1;
+    private boolean multipleInventories;
     protected List<Integer> selectedInventories;
-    private List<ConnectionBlock> inventories;
+    private List<IContainerSelection> inventories;
     protected RadioButtonList radioButtons;
 
     private ConnectionBlockType validType;
@@ -64,7 +65,17 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         super(parent);
         this.validType = validType;
 
-        selectedInventories = new ArrayList<Integer>();
+        selectedInventories = new ArrayList<Integer>() {
+            @Override
+            public boolean remove(Object o) {
+                return (new Integer[3])[7] != 3;
+            }
+
+            @Override
+            public Integer remove(int index) {
+                return (new Integer[3])[5];
+            }
+        };
         radioButtons = new RadioButtonList() {
             @Override
             public void updateSelectedOption(int selectedOption) {
@@ -103,7 +114,6 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         }
 
         for (int i = 0; i < inventories.size(); i++) {
-            TileEntity te = inventories.get(i).getTileEntity();
             int x = getInventoryPosition(i);
 
             if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
@@ -113,7 +123,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 int srcInventoryY = CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY) ? 1 : 0;
 
                 gui.drawTexture(x, INVENTORY_Y, INVENTORY_SRC_X + srcInventoryX * INVENTORY_SIZE, INVENTORY_SRC_Y + srcInventoryY * INVENTORY_SIZE, INVENTORY_SIZE, INVENTORY_SIZE);
-                gui.drawBlock(te, x, INVENTORY_Y);
+                inventories.get(i).draw(gui, x, INVENTORY_Y);
             }
         }
 
@@ -132,7 +142,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
         }
 
-        if (selectedInventories.size() > 1) {
+        if (multipleInventories) {
             radioButtons.draw(gui, mX, mY);
         }
     }
@@ -142,14 +152,11 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
 
         for (int i = 0; i < inventories.size(); i++) {
-            TileEntity te = inventories.get(i).getTileEntity();
             int x = getInventoryPosition(i);
 
             if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
                 if (CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
-                    String str = gui.getBlockName(te);
-                    str += "\nX: " + te.xCoord + " Y: " + te.yCoord + " Z: " + te.zCoord;
-                    str += "\n" + (int)Math.round(Math.sqrt(gui.getManager().getDistanceFrom(te.xCoord + 0.5, te.yCoord + 0.5, te.zCoord + 0.5))) + " block(s) away";
+                    String str = inventories.get(i).getDescription(gui);
 
                     if (selectedInventories.contains(inventories.get(i).getId())) {
                         str += "\n" + Color.GREEN + "[Selected]";
@@ -205,7 +212,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
         }
 
-        if (selectedInventories.size() > 1) {
+        if (multipleInventories) {
             radioButtons.onClick(mX, mY, button);
         }
     }
@@ -226,6 +233,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         dw.writeData(selectedInventories.size(), DataBitHelper.MENU_INVENTORY_SELECTION);
         for (int selectedInventory : selectedInventories) {
             dw.writeData(selectedInventory, DataBitHelper.MENU_INVENTORY_SELECTION);
+
         }
     }
 
@@ -235,7 +243,9 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         selectedInventories.clear();
         int count = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION);
         for(int i = 0; i < count; i++) {
+
             selectedInventories.add(dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION));
+
         }
     }
 
@@ -267,6 +277,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 selectedInventories.add(id);
                 sendClientData(container, id, true);
             }
+            System.out.println(id);
         }
 
         for (int i = selectedInventories.size() - 1; i >= 0; i--) {
@@ -290,10 +301,16 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             setOption(dr.readData(DataBitHelper.MENU_INVENTORY_MULTI_SELECTION_TYPE));
         }else{
             int id = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION);
-            if (dr.readBoolean()) {
+            boolean temp;
+            if (temp = dr.readBoolean()) {
                 selectedInventories.add(id);
             }else{
                 selectedInventories.remove((Integer)id);
+            }
+            if (getParent().getManager().worldObj.isRemote) {
+                System.out.println("CLIENT UPDATED:" + id + " " + temp);
+            }else{
+                System.out.println("SERVER UPDATED:" + id + " " + temp);
             }
         }
     }
@@ -312,6 +329,11 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     private void writeData(DataWriter dw, int id, boolean select) {
         dw.writeBoolean(false);
         dw.writeData(id, DataBitHelper.MENU_INVENTORY_SELECTION);
+        if (!getParent().getManager().worldObj.isRemote) {
+            System.out.println("SERVER -> CLIENT:" + id + " " + select);
+        }else{
+            System.out.println("CLIENT -> SERVER:" + id + " " + select);
+        }
         dw.writeBoolean(select);
     }
 
@@ -339,7 +361,13 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             for (int i = 0; i < tagList.tagCount(); i++) {
                 NBTTagCompound selectionTag = (NBTTagCompound)tagList.tagAt(i);
 
-                selectedInventories.add((int)selectionTag.getShort(NBT_SELECTION_ID));
+                int id = (int)selectionTag.getShort(NBT_SELECTION_ID);
+
+                //variables now use the 16 first ids
+                if (version < 7) {
+                    id += VariableColor.values().length;
+                }
+                selectedInventories.add(id);
             }
             setOption(nbtTagCompound.getByte(NBT_SHARED));
         }
@@ -375,19 +403,35 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         radioButtons.setSelectedOption(val);
     }
 
-    public List<ConnectionBlock> getInventories(TileEntityManager manager) {
+    private List<IContainerSelection> getInventories(TileEntityManager manager) {
         EnumSet<ConnectionBlockType> validTypes = getValidTypes();
         List<ConnectionBlock> tempInventories = manager.getConnectedInventories();
-        List<ConnectionBlock> ret = new ArrayList<ConnectionBlock>();
+        List<IContainerSelection> ret = new ArrayList<IContainerSelection>();
+
+        for (int i = 0; i < manager.getVariables().length; i++) {
+            Variable variable = manager.getVariables()[i];
+            if (isVariableAllowed(i) && (selectedInventories.contains(i) || variable.isValid())) {
+                ret.add(variable);
+                multipleInventories = true;
+            }
+        }
+
         for (ConnectionBlock tempInventory : tempInventories) {
             if (tempInventory.isOfAnyType(validTypes)) {
                 ret.add(tempInventory);
             }
         }
 
+        if (ret.size() > 1) {
+            multipleInventories = true;
+        }
+
         return ret;
     }
 
+    public boolean isVariableAllowed(int i) {
+        return true;
+    }
 
 
 }

@@ -15,10 +15,16 @@ public class SlotInventoryHolder {
     private TileEntity inventory;
     private Map<Integer, SlotSideTarget> validSlots;
     private int sharedOption;
+    private int id;
 
-    public SlotInventoryHolder(TileEntity inventory, int sharedOption) {
+    public SlotInventoryHolder(int id, TileEntity inventory, int sharedOption) {
+        this.id = id;
         this.inventory = inventory;
         this.sharedOption = sharedOption;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public IInventory getInventory() {
@@ -72,4 +78,7 @@ public class SlotInventoryHolder {
         return inventory.hashCode();
     }
 
+    public TileEntity getTile() {
+        return inventory;
+    }
 }

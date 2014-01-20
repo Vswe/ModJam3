@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -136,6 +137,17 @@ public class CommandExecutor {
                 }
 
                 return;
+            case VARIABLE:
+                List<SlotInventoryHolder> tiles = getTiles(command.getMenus().get(2));
+                if (tiles != null) {
+                    Variable variable = manager.getVariables()[((ComponentMenuVariable)command.getMenus().get(0)).getSelectedVariable()];
+                    if (variable.isValid()) {
+                        for (SlotInventoryHolder tile : tiles) {
+                            variable.add(tile.getId());
+                        }
+                    }
+                }
+
         }
 
 
@@ -159,6 +171,10 @@ public class CommandExecutor {
         return getContainers(manager, componentMenu, ConnectionBlockType.NODE);
     }
 
+    private List<SlotInventoryHolder> getTiles(ComponentMenu componentMenu) {
+        return getContainers(manager, componentMenu, null);
+    }
+
     public static List<SlotInventoryHolder> getContainers(TileEntityManager manager, ComponentMenu componentMenu, ConnectionBlockType type) {
         ComponentMenuContainer menuContainer = (ComponentMenuContainer)componentMenu;
 
@@ -167,19 +183,27 @@ public class CommandExecutor {
         }
 
         List<SlotInventoryHolder> ret = new ArrayList<SlotInventoryHolder>();
-
         List<ConnectionBlock> inventories = manager.getConnectedInventories();
-        for (int i = 0; i < menuContainer.getSelectedInventories().size(); i++) {
-            int selected = menuContainer.getSelectedInventories().get(i);
+        Variable[] variables = manager.getVariables();
+        for (int i = 0; i < variables.length; i++) {
+            Variable variable = variables[i];
+            if(variable.isValid()) {
+                for (int j = 0; i < menuContainer.getSelectedInventories().size(); j++) {
+                    if (menuContainer.getSelectedInventories().get(j) == i) {
+                        List<Integer> selection = variable.getContainers();
 
-            if (selected >= 0 && selected < inventories.size()) {
-                ConnectionBlock connection = inventories.get(selected);
-
-                if (connection.isOfType(type) && !connection.getTileEntity().isInvalid()) {
-                    ret.add(new SlotInventoryHolder(connection.getTileEntity(), menuContainer.getOption()));
+                        for (int selected : selection) {
+                            addContainer(inventories, ret, selected, menuContainer, type);
+                        }
+                    }
                 }
-
             }
+        }
+
+        for (int i = 0; i < menuContainer.getSelectedInventories().size(); i++) {
+            int selected = menuContainer.getSelectedInventories().get(i) - VariableColor.values().length;
+
+            addContainer(inventories, ret, selected, menuContainer, type);
         }
 
         if (ret.isEmpty()) {
@@ -187,6 +211,26 @@ public class CommandExecutor {
         }else{
             return ret;
         }
+    }
+
+    private static void addContainer(List<ConnectionBlock> inventories, List<SlotInventoryHolder> ret, int selected, ComponentMenuContainer menuContainer,  ConnectionBlockType type) {
+        if (selected >= 0 && selected < inventories.size()) {
+            ConnectionBlock connection = inventories.get(selected);
+
+            if (connection.isOfType(type) && !connection.getTileEntity().isInvalid() && !containsTe(ret, connection.getTileEntity())) {
+                ret.add(new SlotInventoryHolder(selected, connection.getTileEntity(), menuContainer.getOption()));
+            }
+
+        }
+    }
+
+    private static boolean containsTe(List<SlotInventoryHolder> lst, TileEntity te) {
+        for (SlotInventoryHolder slotInventoryHolder : lst) {
+            if (slotInventoryHolder.getTile().xCoord == te.xCoord && slotInventoryHolder.getTile().yCoord == te.yCoord && slotInventoryHolder.getTile().zCoord == te.zCoord) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void getValidSlots(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories) {

@@ -207,6 +207,8 @@ public class PacketHandler implements IPacketHandler {
                 }
             }
         }
+
+        flowComponent.getManager().updateVariables();
     }
 
 

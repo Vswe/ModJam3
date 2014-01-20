@@ -34,12 +34,17 @@ public class TileEntityManager extends TileEntityInterface {
     public List<Button> buttons;
     public boolean justSentServerComponentRemovalPacket;
     private List<FlowComponent> zLevelRenderingList;
+    private Variable[] variables;
 
     public TileEntityManager() {
         items = new ArrayList<FlowComponent>();
         zLevelRenderingList = new ArrayList<FlowComponent>();
         buttons = new ArrayList<Button>();
         removedIds = new ArrayList<Integer>();
+        variables = new Variable[VariableColor.values().length];
+        for (int i = 0; i < variables.length; i++) {
+            variables[i] = new Variable(i);
+        }
 
         for (int i = 0; i < ComponentType.values().length; i++) {
             buttons.add(new ButtonCreate(ComponentType.values()[i]));
@@ -100,6 +105,7 @@ public class TileEntityManager extends TileEntityInterface {
                 }
             }
         }
+        updateVariables();
     }
 
 
@@ -160,7 +166,7 @@ public class TileEntityManager extends TileEntityInterface {
                                 }
 
                                 if (isValidConnection) {
-                                    connection.setId(inventories.size());
+                                    connection.setId(variables.length + inventories.size());
                                     inventories.add(connection);
                                     if (connection.getTileEntity() instanceof ISystemListener) {
                                         ((ISystemListener)connection.getTileEntity()).added(this);
@@ -250,11 +256,11 @@ public class TileEntityManager extends TileEntityInterface {
     }
 
     private int timer = 0;
-
     @Override
     public void updateEntity() {
         justSentServerComponentRemovalPacket = false;
         if (!worldObj.isRemote) {
+
             if (timer >= 20) {
                 timer = 0;
 
@@ -534,6 +540,8 @@ public class TileEntityManager extends TileEntityInterface {
 
         getFlowItems().add(flowComponent);
         getZLevelRenderingList().add(0, flowComponent);
+
+        updateVariables();
     }
 
     @Override
@@ -580,6 +588,23 @@ public class TileEntityManager extends TileEntityInterface {
         }
 
         return null;
+    }
+
+    public Variable[] getVariables() {
+        return variables;
+    }
+
+    public void updateVariables() {
+        for (Variable variable : variables) {
+            variable.setDeclaration(false);
+        }
+
+        for (FlowComponent item : items) {
+            if (item.getType() == ComponentType.VARIABLE && item.getConnectionSet() == ConnectionSet.EMPTY) {
+                int selectedVariable = ((ComponentMenuVariable)item.getMenus().get(0)).getSelectedVariable();
+                variables[selectedVariable].setDeclaration(true);
+            }
+        }
     }
 
     public abstract class Button {
@@ -691,4 +716,5 @@ public class TileEntityManager extends TileEntityInterface {
         nbtTagCompound.setTag(NBT_COMPONENTS, components);
 
     }
+
 }
