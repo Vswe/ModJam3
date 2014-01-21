@@ -67,13 +67,12 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
         selectedInventories = new ArrayList<Integer>() {
             @Override
-            public boolean remove(Object o) {
-                return (new Integer[3])[7] != 3;
-            }
+            public void clear() {
+                if (size() > 0) {
+                   int d = (new Integer[3])[5];
+                }
 
-            @Override
-            public Integer remove(int index) {
-                return (new Integer[3])[5];
+                super.clear();
             }
         };
         radioButtons = new RadioButtonList() {
@@ -277,7 +276,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 selectedInventories.add(id);
                 sendClientData(container, id, true);
             }
-            System.out.println(id);
+
         }
 
         for (int i = selectedInventories.size() - 1; i >= 0; i--) {
@@ -301,16 +300,10 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             setOption(dr.readData(DataBitHelper.MENU_INVENTORY_MULTI_SELECTION_TYPE));
         }else{
             int id = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION);
-            boolean temp;
-            if (temp = dr.readBoolean()) {
+            if (dr.readBoolean()) {
                 selectedInventories.add(id);
             }else{
                 selectedInventories.remove((Integer)id);
-            }
-            if (getParent().getManager().worldObj.isRemote) {
-                System.out.println("CLIENT UPDATED:" + id + " " + temp);
-            }else{
-                System.out.println("SERVER UPDATED:" + id + " " + temp);
             }
         }
     }
@@ -329,11 +322,6 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     private void writeData(DataWriter dw, int id, boolean select) {
         dw.writeBoolean(false);
         dw.writeData(id, DataBitHelper.MENU_INVENTORY_SELECTION);
-        if (!getParent().getManager().worldObj.isRemote) {
-            System.out.println("SERVER -> CLIENT:" + id + " " + select);
-        }else{
-            System.out.println("CLIENT -> SERVER:" + id + " " + select);
-        }
         dw.writeBoolean(select);
     }
 

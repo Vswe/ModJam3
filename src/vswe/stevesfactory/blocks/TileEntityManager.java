@@ -223,22 +223,28 @@ public class TileEntityManager extends TileEntityInterface {
 
                     for (int i = 0; i < oldSelection.size(); i++) {
                         int selection = oldSelection.get(i);
-                        if (selection >= 0 && selection < oldCoordinates.length) {
-                            WorldCoordinate coordinate = oldCoordinates[selection];
+                        if (selection >= 0 && selection < 16) {
+                            newSelection.add(selection);
+                        }else{
+                            selection -=  variables.length;
+                            if (selection >= 0 && selection < oldCoordinates.length) {
+                                WorldCoordinate coordinate = oldCoordinates[selection];
 
-                            for (int j = 0; j < inventories.size(); j++) {
-                                TileEntity inventory = inventories.get(j).getTileEntity();
-                                if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord) {
-                                    if (!newSelection.contains(j)) {
-                                        newSelection.add(j);
+                                for (int j = 0; j < inventories.size(); j++) {
+                                    TileEntity inventory = inventories.get(j).getTileEntity();
+                                    if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord) {
+                                        if (!newSelection.contains(j)) {
+                                            newSelection.add(j + variables.length);
+                                        }
+
+                                        break;
                                     }
-
-                                    break;
                                 }
-                            }
 
+                            }
                         }
                     }
+
 
                     menuInventory.setSelectedInventories(newSelection);
                 }
