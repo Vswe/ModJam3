@@ -43,6 +43,19 @@ public class CommandExecutor {
     }
 
     public void executeTriggerCommand(FlowComponent command, EnumSet<ConnectionOption> validTriggerOutputs) {
+        for (Variable variable : manager.getVariables()) {
+            if (variable.isValid()) {
+                if (!variable.hasBeenExecuted() || ((ComponentMenuVariable)variable.getDeclaration().getMenus().get(0)).getVariableMode() == ComponentMenuVariable.VariableMode.LOCAL)  {
+                    executeCommand(variable.getDeclaration());
+                    variable.setExecuted(true);
+                }
+            }
+        }
+
+        executeChildCommands(command, validTriggerOutputs);
+    }
+
+    private void executeChildCommands(FlowComponent command, EnumSet<ConnectionOption> validTriggerOutputs) {
         for (int i = 0; i < command.getConnectionSet().getConnections().length; i++) {
             Connection connection = command.getConnection(i);
             ConnectionOption option = command.getConnectionSet().getConnections()[i];
@@ -80,9 +93,9 @@ public class CommandExecutor {
                 if (conditionInventory != null) {
                     getValidSlots(command.getMenus().get(1), conditionInventory);
                     if (searchForStuff(command.getMenus().get(2), conditionInventory, false)) {
-                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
+                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
                     }else{
-                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
                     }
                 }
                 return;
@@ -105,9 +118,9 @@ public class CommandExecutor {
                 if (conditionTank != null) {
                     getValidTanks(command.getMenus().get(1), conditionTank);
                     if (searchForStuff(command.getMenus().get(2), conditionTank, true)) {
-                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
+                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
                     }else{
-                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
                     }
                 }
                 return;
@@ -130,9 +143,9 @@ public class CommandExecutor {
                 List<SlotInventoryHolder> nodes = getNodes(command.getMenus().get(0));
                 if (nodes != null) {
                     if (evaluateRedstoneCondition(nodes,(ComponentMenuContainer)command.getMenus().get(0), (ComponentMenuRedstoneSidesTrigger)command.getMenus().get(1), (ComponentMenuRedstoneStrength)command.getMenus().get(2))) {
-                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
+                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
                     }else{
-                        executeTriggerCommand(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
                     }
                 }
 
@@ -140,10 +153,23 @@ public class CommandExecutor {
             case VARIABLE:
                 List<SlotInventoryHolder> tiles = getTiles(command.getMenus().get(2));
                 if (tiles != null) {
-                    Variable variable = manager.getVariables()[((ComponentMenuVariable)command.getMenus().get(0)).getSelectedVariable()];
+                    ComponentMenuVariable variableMenu = (ComponentMenuVariable)command.getMenus().get(0);
+                    ComponentMenuVariable.VariableMode mode = variableMenu.getVariableMode();
+                    Variable variable = manager.getVariables()[variableMenu.getSelectedVariable()];
+
+                    boolean remove = mode == ComponentMenuVariable.VariableMode.REMOVE;
+                    if (!remove && mode != ComponentMenuVariable.VariableMode.ADD) {
+                        variable.clearContainers();
+                    }
+
+
                     if (variable.isValid()) {
                         for (SlotInventoryHolder tile : tiles) {
-                            variable.add(tile.getId());
+                            if (remove) {
+                                variable.remove(tile.getId());
+                            }else{
+                                variable.add(tile.getId());
+                            }
                         }
                     }
                 }
@@ -151,7 +177,7 @@ public class CommandExecutor {
         }
 
 
-        executeTriggerCommand(command, EnumSet.allOf(ConnectionOption.class));
+        executeChildCommands(command, EnumSet.allOf(ConnectionOption.class));
         usedCommands.remove((Integer)command.getId());
     }
 
@@ -188,13 +214,15 @@ public class CommandExecutor {
         for (int i = 0; i < variables.length; i++) {
             Variable variable = variables[i];
             if(variable.isValid()) {
-                for (int j = 0; i < menuContainer.getSelectedInventories().size(); j++) {
-                    if (menuContainer.getSelectedInventories().get(j) == i) {
+                for (int val : menuContainer.getSelectedInventories()) {
+                    if (val == i) {
                         List<Integer> selection = variable.getContainers();
 
                         for (int selected : selection) {
                             addContainer(inventories, ret, selected, menuContainer, type);
                         }
+                        System.out.println("CONTAINERS FOUND " + ret.size());
+                        break;
                     }
                 }
             }

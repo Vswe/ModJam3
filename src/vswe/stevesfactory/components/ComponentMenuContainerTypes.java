@@ -27,6 +27,9 @@ public class ComponentMenuContainerTypes extends ComponentMenu {
         }
 
         checked = new boolean[types.size()];
+        for (int i = 0; i < checked.length; i++) {
+            checked[i] = true;
+        }
         checkBoxes = new CheckBoxList();
         for (int i = 0; i  < types.size(); i++) {
             final int id = i;

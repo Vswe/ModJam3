@@ -65,16 +65,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         super(parent);
         this.validType = validType;
 
-        selectedInventories = new ArrayList<Integer>() {
-            @Override
-            public void clear() {
-                if (size() > 0) {
-                   int d = (new Integer[3])[5];
-                }
-
-                super.clear();
-            }
-        };
+        selectedInventories = new ArrayList<Integer>();
         radioButtons = new RadioButtonList() {
             @Override
             public void updateSelectedOption(int selectedOption) {
@@ -203,7 +194,6 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
                     if (CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
                         setSelectedInventoryAndSync(inventories.get(i).getId(), !selectedInventories.contains(inventories.get(i).getId()));
-
 
                         break;
                     }
@@ -356,6 +346,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                     id += VariableColor.values().length;
                 }
                 selectedInventories.add(id);
+                System.out.println("READ " + id);
             }
             setOption(nbtTagCompound.getByte(NBT_SHARED));
         }
@@ -369,6 +360,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             NBTTagCompound selectionTag = new NBTTagCompound();
 
             selectionTag.setShort(NBT_SELECTION_ID, (short)(int)selectedInventories.get(i));
+            System.out.println("SAVE " + (short)(int)selectedInventories.get(i));
             tagList.appendTag(selectionTag);
         }
 
@@ -398,7 +390,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
         for (int i = 0; i < manager.getVariables().length; i++) {
             Variable variable = manager.getVariables()[i];
-            if (isVariableAllowed(i) && (selectedInventories.contains(i) || variable.isValid())) {
+            if (isVariableAllowed(i) && variable.isValid()) {
                 ret.add(variable);
                 multipleInventories = true;
             }

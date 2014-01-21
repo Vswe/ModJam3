@@ -10,9 +10,9 @@ import java.util.List;
 
 public class Variable implements IContainerSelection {
     private int id;
-    private boolean declared;
+    private FlowComponent declaration;
     private List<Integer> containers;
-    private boolean hasGlobalBeenSetUp;
+    private boolean executed;
 
     public Variable(int id) {
         this.id = id;
@@ -20,7 +20,7 @@ public class Variable implements IContainerSelection {
     }
 
     public boolean isValid() {
-        return declared;
+        return declaration != null;
     }
 
     @Override
@@ -45,8 +45,14 @@ public class Variable implements IContainerSelection {
         return color.getTextColor().toString() + color.toString() + " Variable";
     }
 
-    public void setDeclaration(boolean val) {
-        declared = val;
+    public void setDeclaration(FlowComponent flowComponent) {
+        if (flowComponent == null || declaration == null) {
+            declaration = flowComponent;
+        }
+    }
+
+    public FlowComponent getDeclaration() {
+        return declaration;
     }
 
     public List<Integer> getContainers() {
@@ -57,5 +63,25 @@ public class Variable implements IContainerSelection {
         if (!containers.contains((Integer)id)) {
             containers.add(id);
         }
+    }
+
+    public void setContainers(List<Integer> containers) {
+        this.containers = containers;
+    }
+
+    public boolean hasBeenExecuted() {
+        return executed;
+    }
+
+    public void setExecuted(boolean executed) {
+        this.executed = executed;
+    }
+
+    public void clearContainers() {
+        containers.clear();
+    }
+
+    public void remove(int id) {
+        containers.remove((Integer)id);
     }
 }

@@ -300,7 +300,7 @@ public class FlowComponent implements IComponentNetworkReader {
         }
 
         errors.clear();
-        if (hasConnection) {
+        if (hasConnection || getConnectionSet().getConnections().length == 0) {
             for (ComponentMenu menu : menus) {
                 menu.addErrors(errors);
             }

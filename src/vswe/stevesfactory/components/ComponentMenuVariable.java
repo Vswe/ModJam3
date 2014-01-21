@@ -13,6 +13,8 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
+import java.util.List;
+
 public class ComponentMenuVariable extends ComponentMenu {
     public ComponentMenuVariable(FlowComponent parent) {
         super(parent);
@@ -236,7 +238,7 @@ public class ComponentMenuVariable extends ComponentMenu {
         return selectedVariable;
     }
 
-    private enum VariableMode {
+    public enum VariableMode {
         GLOBAL(true),
         LOCAL(true),
         ADD(false),
@@ -268,4 +270,14 @@ public class ComponentMenuVariable extends ComponentMenu {
         return VariableMode.values()[radioButtons.getSelectedOption()];
     }
 
+
+    @Override
+    public void addErrors(List<String> errors) {
+        Variable variable = getParent().getManager().getVariables()[selectedVariable];
+        if (!variable.isValid()) {
+            errors.add("This variable hasn't been declared");
+        }else if(isDeclaration() && variable.getDeclaration().getId() != getParent().getId()) {
+            errors.add("This variable has already been declared");
+        }
+    }
 }

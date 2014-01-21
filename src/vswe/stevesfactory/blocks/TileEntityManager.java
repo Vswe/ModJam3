@@ -217,39 +217,54 @@ public class TileEntityManager extends TileEntityInterface {
                 if (menu instanceof ComponentMenuContainer) {
                     ComponentMenuContainer menuInventory = (ComponentMenuContainer)menu;
 
-
                     List<Integer> oldSelection = menuInventory.getSelectedInventories();
-                    List<Integer> newSelection = new ArrayList<Integer>();
-
-                    for (int i = 0; i < oldSelection.size(); i++) {
-                        int selection = oldSelection.get(i);
-                        if (selection >= 0 && selection < 16) {
-                            newSelection.add(selection);
-                        }else{
-                            selection -=  variables.length;
-                            if (selection >= 0 && selection < oldCoordinates.length) {
-                                WorldCoordinate coordinate = oldCoordinates[selection];
-
-                                for (int j = 0; j < inventories.size(); j++) {
-                                    TileEntity inventory = inventories.get(j).getTileEntity();
-                                    if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord) {
-                                        if (!newSelection.contains(j)) {
-                                            newSelection.add(j + variables.length);
-                                        }
-
-                                        break;
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-
-
-                    menuInventory.setSelectedInventories(newSelection);
+                    menuInventory.setSelectedInventories(getNewSelection(oldCoordinates, oldSelection, true));
                 }
             }
         }
+
+        for (Variable variable : variables) {
+            variable.setContainers(getNewSelection(oldCoordinates, variable.getContainers(), false));
+        }
+    }
+
+    private List<Integer> getNewSelection(WorldCoordinate[] oldCoordinates, List<Integer> oldSelection, boolean hasVariables)  {
+
+        List<Integer> newSelection = new ArrayList<Integer>();
+
+        for (int i = 0; i < oldSelection.size(); i++) {
+            int selection = oldSelection.get(i);
+            System.out.println("OLD: " + selection);
+            if (hasVariables && selection >= 0 && selection < 16) {
+                newSelection.add(selection);
+                System.out.println("VARIABLE");
+            }else{
+                if (hasVariables) {
+                    selection -=  variables.length;
+                }
+
+                if (selection >= 0 && selection < oldCoordinates.length) {
+                    WorldCoordinate coordinate = oldCoordinates[selection];
+
+                    for (int j = 0; j < inventories.size(); j++) {
+                        TileEntity inventory = inventories.get(j).getTileEntity();
+                        if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord) {
+                            int id = j + (hasVariables ? variables.length : 0);
+                            if (!newSelection.contains(id)) {
+                                System.out.println("INVENTORY " + id);
+                                newSelection.add(id);
+                            }
+
+                            break;
+                        }
+                    }
+
+                }
+            }
+            System.out.println();
+        }
+
+        return newSelection;
     }
 
 
@@ -602,13 +617,13 @@ public class TileEntityManager extends TileEntityInterface {
 
     public void updateVariables() {
         for (Variable variable : variables) {
-            variable.setDeclaration(false);
+            variable.setDeclaration(null);
         }
 
         for (FlowComponent item : items) {
             if (item.getType() == ComponentType.VARIABLE && item.getConnectionSet() == ConnectionSet.EMPTY) {
                 int selectedVariable = ((ComponentMenuVariable)item.getMenus().get(0)).getSelectedVariable();
-                variables[selectedVariable].setDeclaration(true);
+                variables[selectedVariable].setDeclaration(item);
             }
         }
     }
