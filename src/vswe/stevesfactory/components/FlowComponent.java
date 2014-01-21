@@ -61,6 +61,7 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final int CONNECTION_SIZE_H = 6;
     private static final int CONNECTION_SRC_X = 0;
     private static final int CONNECTION_SRC_Y = 58;
+    private static final int CONNECTION_SRC_Y_SIDE = 245;
 
     private static final int ERROR_X = 2;
     private static final int ERROR_Y = 8;
@@ -233,21 +234,27 @@ public class FlowComponent implements IComponentNetworkReader {
         boolean hasConnection = false;
         int outputCount = 0;
         int inputCount = 0;
+        int sideCount = 0;
         for (int i = 0; i < connectionSet.getConnections().length; i++) {
             ConnectionOption connection = connectionSet.getConnections()[i];
 
-            int[] location = getConnectionLocation(connection, inputCount, outputCount);
+            int[] location = getConnectionLocation(connection, inputCount, outputCount, sideCount);
             if (connection.isInput()) {
                 inputCount++;
-            }else{
+            }else if(connection.getType() == ConnectionOption.ConnectionType.OUTPUT){
                 outputCount++;
+            }else{
+                sideCount++;
             }
 
-            int srcConnectionX = (CollisionHelper.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) ? 1 : 0;
+            int connectionWidth = location[3];
+            int connectionHeight = location[4];
+
+            int srcConnectionX = (CollisionHelper.inBounds(location[0], location[1], connectionWidth, connectionHeight, mX, mY)) ? 1 : 0;
 
             Connection current = manager.getCurrentlyConnecting();
             if (current != null && current.getComponentId() == id && current.getConnectionId() == i) {
-                gui.drawLine(location[0] + CONNECTION_SIZE_W / 2, location[1] + CONNECTION_SIZE_H / 2, mX, mY);
+                gui.drawLine(location[0] + connectionWidth / 2, location[1] + connectionHeight / 2, mX, mY);
             }
 
             Connection connectedConnection = connections.get(i);
@@ -255,10 +262,10 @@ public class FlowComponent implements IComponentNetworkReader {
                 hasConnection = true;
                 if (id < connectedConnection.getComponentId()) {
                     int[] otherLocation = manager.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
-                    int startX = location[0] + CONNECTION_SIZE_W / 2;
-                    int startY = location[1] + CONNECTION_SIZE_H / 2;
-                    int endX = otherLocation[0] + CONNECTION_SIZE_W / 2;
-                    int endY = otherLocation[1] + CONNECTION_SIZE_H / 2;
+                    int startX = location[0] + connectionWidth / 2;
+                    int startY = location[1] + connectionHeight / 2;
+                    int endX = otherLocation[0] + connectionWidth / 2;
+                    int endY = otherLocation[1] + connectionHeight / 2;
 
                     GL11.glPushMatrix();
                     GL11.glTranslatef(0, 0, -zLevel);
@@ -295,7 +302,7 @@ public class FlowComponent implements IComponentNetworkReader {
                 }
             }
 
-            gui.drawTexture(location[0], location[1], CONNECTION_SRC_X + srcConnectionX * CONNECTION_SIZE_W, location[2], CONNECTION_SIZE_W, CONNECTION_SIZE_H);
+            gui.drawTexture(location[0], location[1], CONNECTION_SRC_X + srcConnectionX * connectionWidth, location[2], connectionWidth, connectionHeight);
 
         }
 
@@ -373,17 +380,20 @@ public class FlowComponent implements IComponentNetworkReader {
     private int[] getConnectionLocationFromId(int id) {
         int outputCount = 0;
         int inputCount = 0;
+        int sideCount = 0;
         for (int i = 0; i < connectionSet.getConnections().length; i++) {
             ConnectionOption connection = connectionSet.getConnections()[i];
 
-            int[] location = getConnectionLocation(connection, inputCount, outputCount);
+            int[] location = getConnectionLocation(connection, inputCount, outputCount, sideCount);
             if (id == i) {
                 return location;
             }
             if (connection.isInput()) {
                 inputCount++;
-            }else{
+            }else if(connection.getType() == ConnectionOption.ConnectionType.OUTPUT){
                 outputCount++;
+            }else{
+                sideCount++;
             }
         }
         return null;
@@ -407,12 +417,15 @@ public class FlowComponent implements IComponentNetworkReader {
 
         int outputCount = 0;
         int inputCount = 0;
+        int sideCount = 0;
         for (ConnectionOption connection : connectionSet.getConnections()) {
-            int[] location = getConnectionLocation(connection, inputCount, outputCount);
+            int[] location = getConnectionLocation(connection, inputCount, outputCount, sideCount);
             if (connection.isInput()) {
                 inputCount++;
-            }else{
+            }else if(connection.getType() == ConnectionOption.ConnectionType.OUTPUT){
                 outputCount++;
+            }else{
+                sideCount++;
             }
 
             if (CollisionHelper.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) {
@@ -487,14 +500,17 @@ public class FlowComponent implements IComponentNetworkReader {
         }else{
             int outputCount = 0;
             int inputCount = 0;
+            int sideCount = 0;
             for (int i = 0; i < connectionSet.getConnections().length; i++) {
                 ConnectionOption connection = connectionSet.getConnections()[i];
 
-                int[] location = getConnectionLocation(connection, inputCount, outputCount);
+                int[] location = getConnectionLocation(connection, inputCount, outputCount, sideCount);
                 if (connection.isInput()) {
                     inputCount++;
-                }else{
+                }else if(connection.getType() == ConnectionOption.ConnectionType.OUTPUT){
                     outputCount++;
+                }else{
+                    sideCount++;
                 }
 
                 if (CollisionHelper.inBounds(location[0], location[1], CONNECTION_SIZE_W, CONNECTION_SIZE_H, mX, mY)) {
@@ -742,30 +758,37 @@ public class FlowComponent implements IComponentNetworkReader {
         return isLarge ? COMPONENT_SIZE_LARGE_H : COMPONENT_SIZE_H;
     }
 
-    private int[] getConnectionLocation(ConnectionOption connection, int inputCount, int outputCount) {
+    private int[] getConnectionLocation(ConnectionOption connection, int inputCount, int outputCount, int sideCount) {
         int targetX;
         int targetY;
 
-        int srcConnectionY;
-        int currentCount;
-        int totalCount;
-
-        if (connection.isInput()) {
-            currentCount = inputCount;
-            totalCount = connectionSet.getInputCount();
-            srcConnectionY = 1;
-            targetY = y - CONNECTION_SIZE_H;
+        if (connection.getType() == ConnectionOption.ConnectionType.SIDE) {
+            targetY = y + (int)(getComponentHeight() * ((sideCount + 0.5)  / connectionSet.getSideCount()));
+            targetY -= CONNECTION_SIZE_H / 2;
+            targetX = x + getComponentWidth();
+            return new int[] {targetX, targetY, CONNECTION_SRC_Y_SIDE, CONNECTION_SIZE_H, CONNECTION_SIZE_W};
         }else{
-            currentCount = outputCount;
-            totalCount = connectionSet.getOutputCount();
-            srcConnectionY = 0;
-            targetY = y + getComponentHeight();
+            int srcConnectionY;
+            int currentCount;
+            int totalCount;
+
+            if (connection.isInput()) {
+                currentCount = inputCount;
+                totalCount = connectionSet.getInputCount();
+                srcConnectionY = 1;
+                targetY = y - CONNECTION_SIZE_H;
+            }else{
+                currentCount = outputCount;
+                totalCount = connectionSet.getOutputCount();
+                srcConnectionY = 0;
+                targetY = y + getComponentHeight();
+            }
+
+            targetX = x + (int)(getComponentWidth() * ((currentCount + 0.5)  / totalCount));
+            targetX -= CONNECTION_SIZE_W / 2;
+
+            return new int[] {targetX, targetY, CONNECTION_SRC_Y + srcConnectionY * CONNECTION_SIZE_H, CONNECTION_SIZE_W, CONNECTION_SIZE_H};
         }
-
-        targetX = x + (int)(getComponentWidth() * ((currentCount + 0.5)  / totalCount));
-        targetX -= CONNECTION_SIZE_W / 2;
-
-        return new int[] {targetX, targetY, CONNECTION_SRC_Y + srcConnectionY * CONNECTION_SIZE_H};
     }
 
 

@@ -42,8 +42,19 @@ public class Variable implements IContainerSelection {
     @Override
     public String getDescription(GuiManager gui) {
         VariableColor color = VariableColor.values()[id];
-        return color.getTextColor().toString() + color.toString() + " Variable";
+
+        String name;
+        if (getDeclaration() == null || getDeclaration().getComponentName() == null) {
+            name = color.toString() + " Variable";
+        }else{
+            name = getDeclaration().getComponentName();
+        }
+
+
+        return color.getTextColor().toString() + name;
     }
+
+
 
     public void setDeclaration(FlowComponent flowComponent) {
         if (flowComponent == null || declaration == null) {
@@ -84,4 +95,5 @@ public class Variable implements IContainerSelection {
     public void remove(int id) {
         containers.remove((Integer)id);
     }
+
 }

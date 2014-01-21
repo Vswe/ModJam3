@@ -72,113 +72,150 @@ public class CommandExecutor {
             return;
         }
 
-        usedCommands.add(command.getId());
-        switch (command.getType()) {
-            case INPUT:
-                List<SlotInventoryHolder> inputInventory = getInventories(command.getMenus().get(0));
-                if (inputInventory != null) {
-                    getValidSlots(command.getMenus().get(1), inputInventory);
-                    getItems(command.getMenus().get(2), inputInventory);
-                }
-                break;
-            case OUTPUT:
-                List<SlotInventoryHolder> outputInventory = getInventories(command.getMenus().get(0));
-                if (outputInventory != null) {
-                    getValidSlots(command.getMenus().get(1), outputInventory);
-                    insertItems(command.getMenus().get(2), outputInventory);
-                }
-                break;
-            case CONDITION:
-                List<SlotInventoryHolder> conditionInventory = getInventories(command.getMenus().get(0));
-                if (conditionInventory != null) {
-                    getValidSlots(command.getMenus().get(1), conditionInventory);
-                    if (searchForStuff(command.getMenus().get(2), conditionInventory, false)) {
-                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
-                    }else{
-                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+        try {
+            usedCommands.add(command.getId());
+            switch (command.getType()) {
+                case INPUT:
+                    List<SlotInventoryHolder> inputInventory = getInventories(command.getMenus().get(0));
+                    if (inputInventory != null) {
+                        getValidSlots(command.getMenus().get(1), inputInventory);
+                        getItems(command.getMenus().get(2), inputInventory);
                     }
-                }
-                return;
-            case LIQUID_INPUT:
-                List<SlotInventoryHolder> inputTank = getTanks(command.getMenus().get(0));
-                if (inputTank != null) {
-                    getValidTanks(command.getMenus().get(1), inputTank);
-                    getLiquids(command.getMenus().get(2), inputTank);
-                }
-                break;
-            case LIQUID_OUTPUT:
-                List<SlotInventoryHolder> outputTank = getTanks(command.getMenus().get(0));
-                if (outputTank != null) {
-                    getValidTanks(command.getMenus().get(1), outputTank);
-                    insertLiquids(command.getMenus().get(2), outputTank);
-                }
-                break;
-            case LIQUID_CONDITION:
-                List<SlotInventoryHolder> conditionTank = getTanks(command.getMenus().get(0));
-                if (conditionTank != null) {
-                    getValidTanks(command.getMenus().get(1), conditionTank);
-                    if (searchForStuff(command.getMenus().get(2), conditionTank, true)) {
-                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
-                    }else{
-                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                    break;
+                case OUTPUT:
+                    List<SlotInventoryHolder> outputInventory = getInventories(command.getMenus().get(0));
+                    if (outputInventory != null) {
+                        getValidSlots(command.getMenus().get(1), outputInventory);
+                        insertItems(command.getMenus().get(2), outputInventory);
                     }
-                }
-                return;
-            case FLOW_CONTROL:
-                if (ComponentMenuSplit.isSplitConnection(command)) {
-                    if (splitFlow(command.getMenus().get(0))) {
-                        return;
+                    break;
+                case CONDITION:
+                    List<SlotInventoryHolder> conditionInventory = getInventories(command.getMenus().get(0));
+                    if (conditionInventory != null) {
+                        getValidSlots(command.getMenus().get(1), conditionInventory);
+                        if (searchForStuff(command.getMenus().get(2), conditionInventory, false)) {
+                            executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
+                        }else{
+                            executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                        }
                     }
-                }
-                break;
-            case REDSTONE_EMITTER:
-                List<SlotInventoryHolder> emitters = getEmitters(command.getMenus().get(0));
-                if (emitters != null) {
-                    for (SlotInventoryHolder emitter : emitters) {
-                        emitter.getEmitter().updateState((ComponentMenuRedstoneSidesEmitter)command.getMenus().get(1), (ComponentMenuRedstoneOutput)command.getMenus().get(2), (ComponentMenuPulse)command.getMenus().get(3));
+                    return;
+                case LIQUID_INPUT:
+                    List<SlotInventoryHolder> inputTank = getTanks(command.getMenus().get(0));
+                    if (inputTank != null) {
+                        getValidTanks(command.getMenus().get(1), inputTank);
+                        getLiquids(command.getMenus().get(2), inputTank);
                     }
-                }
-                break;
-            case REDSTONE_CONDITION:
-                List<SlotInventoryHolder> nodes = getNodes(command.getMenus().get(0));
-                if (nodes != null) {
-                    if (evaluateRedstoneCondition(nodes,(ComponentMenuContainer)command.getMenus().get(0), (ComponentMenuRedstoneSidesTrigger)command.getMenus().get(1), (ComponentMenuRedstoneStrength)command.getMenus().get(2))) {
-                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
-                    }else{
-                        executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                    break;
+                case LIQUID_OUTPUT:
+                    List<SlotInventoryHolder> outputTank = getTanks(command.getMenus().get(0));
+                    if (outputTank != null) {
+                        getValidTanks(command.getMenus().get(1), outputTank);
+                        insertLiquids(command.getMenus().get(2), outputTank);
                     }
-                }
-
-                return;
-            case VARIABLE:
-                List<SlotInventoryHolder> tiles = getTiles(command.getMenus().get(2));
-                if (tiles != null) {
-                    ComponentMenuVariable variableMenu = (ComponentMenuVariable)command.getMenus().get(0);
-                    ComponentMenuVariable.VariableMode mode = variableMenu.getVariableMode();
-                    Variable variable = manager.getVariables()[variableMenu.getSelectedVariable()];
-
-                    boolean remove = mode == ComponentMenuVariable.VariableMode.REMOVE;
-                    if (!remove && mode != ComponentMenuVariable.VariableMode.ADD) {
-                        variable.clearContainers();
+                    break;
+                case LIQUID_CONDITION:
+                    List<SlotInventoryHolder> conditionTank = getTanks(command.getMenus().get(0));
+                    if (conditionTank != null) {
+                        getValidTanks(command.getMenus().get(1), conditionTank);
+                        if (searchForStuff(command.getMenus().get(2), conditionTank, true)) {
+                            executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
+                        }else{
+                            executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                        }
+                    }
+                    return;
+                case FLOW_CONTROL:
+                    if (ComponentMenuSplit.isSplitConnection(command)) {
+                        if (splitFlow(command.getMenus().get(0))) {
+                            return;
+                        }
+                    }
+                    break;
+                case REDSTONE_EMITTER:
+                    List<SlotInventoryHolder> emitters = getEmitters(command.getMenus().get(0));
+                    if (emitters != null) {
+                        for (SlotInventoryHolder emitter : emitters) {
+                            emitter.getEmitter().updateState((ComponentMenuRedstoneSidesEmitter)command.getMenus().get(1), (ComponentMenuRedstoneOutput)command.getMenus().get(2), (ComponentMenuPulse)command.getMenus().get(3));
+                        }
+                    }
+                    break;
+                case REDSTONE_CONDITION:
+                    List<SlotInventoryHolder> nodes = getNodes(command.getMenus().get(0));
+                    if (nodes != null) {
+                        if (evaluateRedstoneCondition(nodes,(ComponentMenuContainer)command.getMenus().get(0), (ComponentMenuRedstoneSidesTrigger)command.getMenus().get(1), (ComponentMenuRedstoneStrength)command.getMenus().get(2))) {
+                            executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
+                        }else{
+                            executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
+                        }
                     }
 
+                    return;
+                case VARIABLE:
+                    List<SlotInventoryHolder> tiles = getTiles(command.getMenus().get(2));
+                    if (tiles != null) {
+                        ComponentMenuVariable variableMenu = (ComponentMenuVariable)command.getMenus().get(0);
+                        ComponentMenuVariable.VariableMode mode = variableMenu.getVariableMode();
+                        Variable variable = manager.getVariables()[variableMenu.getSelectedVariable()];
 
-                    if (variable.isValid()) {
-                        for (SlotInventoryHolder tile : tiles) {
-                            if (remove) {
-                                variable.remove(tile.getId());
-                            }else{
-                                variable.add(tile.getId());
+                        boolean remove = mode == ComponentMenuVariable.VariableMode.REMOVE;
+                        if (!remove && mode != ComponentMenuVariable.VariableMode.ADD) {
+                            variable.clearContainers();
+                        }
+
+
+                        if (variable.isValid()) {
+                            for (SlotInventoryHolder tile : tiles) {
+                                if (remove) {
+                                    variable.remove(tile.getId());
+                                }else{
+                                    variable.add(tile.getId());
+                                }
                             }
                         }
                     }
-                }
+                    break;
+                case FOR_EACH:
+                    ComponentMenuVariableLoop variableMenu = ((ComponentMenuVariableLoop)command.getMenus().get(0));
+                    ComponentMenuContainerTypes typesMenu = ((ComponentMenuContainerTypes)command.getMenus().get(1));
+                    ComponentMenuLoopOrder orderMenu = ((ComponentMenuLoopOrder)command.getMenus().get(2));
+                    Variable list = variableMenu.getListVariable();
+                    Variable element = variableMenu.getElementVariable();
+                    List<Integer> selection = new ArrayList<Integer>(list.getContainers());
+                    if (orderMenu.getOrder() == ComponentMenuLoopOrder.LoopOrder.RANDOM) {
+                        Collections.shuffle(selection);
+                    }else if (orderMenu.getOrder() == ComponentMenuLoopOrder.LoopOrder.NORMAL){
+                        if (!orderMenu.isReversed()) {
+                            Collections.reverse(selection);
+                        }
+                    }else{
+                        Collections.sort(selection, orderMenu.getComparator());
+                    }
 
+                    EnumSet<ConnectionBlockType> validTypes = typesMenu.getValidTypes();
+                    List<ConnectionBlock> inventories = manager.getConnectedInventories();
+                    for (Integer selected : selection) {
+                        //Should always be true, simply making sure if the inventories have changed
+                        if (selected >= 0 && selected < manager.getConnectedInventories().size()) {
+                            ConnectionBlock inventory = inventories.get(selected);
+                            if (inventory.isOfAnyType(validTypes)) {
+                                element.clearContainers();
+                                element.add(selected);
+                                executeChildCommands(command, EnumSet.of(ConnectionOption.FOR_EACH));
+                            }
+                        }
+                    }
+
+                    executeChildCommands(command, EnumSet.of(ConnectionOption.STANDARD_OUTPUT));
+                    return;
+            }
+
+
+            executeChildCommands(command, EnumSet.allOf(ConnectionOption.class));
+
+        }finally {
+            usedCommands.remove((Integer)command.getId());
         }
-
-
-        executeChildCommands(command, EnumSet.allOf(ConnectionOption.class));
-        usedCommands.remove((Integer)command.getId());
     }
 
     private List<SlotInventoryHolder> getEmitters(ComponentMenu componentMenu) {
@@ -221,7 +258,6 @@ public class CommandExecutor {
                         for (int selected : selection) {
                             addContainer(inventories, ret, selected, menuContainer, type);
                         }
-                        System.out.println("CONTAINERS FOUND " + ret.size());
                         break;
                     }
                 }

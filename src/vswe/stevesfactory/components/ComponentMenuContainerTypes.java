@@ -13,6 +13,7 @@ import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 public class ComponentMenuContainerTypes extends ComponentMenu {
@@ -167,6 +168,16 @@ public class ComponentMenuContainerTypes extends ComponentMenu {
     }
 
     public List<ConnectionBlockType> getTypes() {
+        return types;
+    }
+
+    public EnumSet<ConnectionBlockType> getValidTypes() {
+        EnumSet<ConnectionBlockType> types = EnumSet.noneOf(ConnectionBlockType.class);
+        for (int i = 0; i < getTypes().size(); i++) {
+            if (getChecked()[i]) {
+                types.add(getTypes().get(i));
+            }
+        }
         return types;
     }
 }

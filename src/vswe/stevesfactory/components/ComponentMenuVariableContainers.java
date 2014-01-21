@@ -22,14 +22,7 @@ public class ComponentMenuVariableContainers extends ComponentMenuContainer {
 
     @Override
     protected EnumSet<ConnectionBlockType> getValidTypes() {
-        EnumSet<ConnectionBlockType> types = EnumSet.noneOf(ConnectionBlockType.class);
-        ComponentMenuContainerTypes typeMenu = (ComponentMenuContainerTypes)getParent().getMenus().get(1);
-        for (int i = 0; i < typeMenu.getTypes().size(); i++) {
-            if (typeMenu.getChecked()[i]) {
-                types.add(typeMenu.getTypes().get(i));
-            }
-        }
-        return types;
+        return ((ComponentMenuContainerTypes)getParent().getMenus().get(1)).getValidTypes();
     }
 
     @Override

@@ -54,7 +54,8 @@ public enum DataBitHelper {
 
     CONTAINER_TYPE(2),
     CONTAINER_MODE(3),
-    VARIABLE_TYPE(4);
+    VARIABLE_TYPE(4),
+    ORDER_TYPES(2);
 
 
 

@@ -65,6 +65,26 @@ public class ComponentMenuVariable extends ComponentMenu {
         }
 
         radioButtons.setSelectedOption(getDefaultId());
+
+        varDisplay = new VariableDisplay(null, 5, 5) {
+            @Override
+            public int getValue() {
+                return selectedVariable;
+            }
+
+            @Override
+            public void setValue(int val) {
+                selectedVariable = val;
+            }
+
+            @Override
+            public void onUpdate() {
+                DataWriter dw = getWriterForServerComponentPacket();
+                dw.writeBoolean(true); //var
+                dw.writeData(selectedVariable, DataBitHelper.VARIABLE_TYPE);
+                PacketHandler.sendDataToServer(dw);
+            }
+        };
     }
 
     @Override
@@ -86,19 +106,10 @@ public class ComponentMenuVariable extends ComponentMenu {
     private static final int RADIO_BUTTON_SPACING = 12;
 
 
-    private static final int VARIABLE_X = 20;
-    private static final int VARIABLE_Y = 5;
-    private static final int VARIABLE_SIZE = 14;
 
-    private static final int ARROW_SRC_X = 18;
-    private static final int ARROW_SRC_Y = 20;
-    private static final int ARROW_WIDTH = 6;
-    private static final int ARROW_HEIGHT = 10;
-    private static final int ARROW_X_LEFT = 5;
-    private static final int ARROW_X_RIGHT = 43;
-    private static final int ARROW_Y = 7;
 
     private RadioButtonList radioButtons;
+    private VariableDisplay varDisplay;
     private int selectedVariable = 0;
 
 
@@ -106,55 +117,19 @@ public class ComponentMenuVariable extends ComponentMenu {
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
         radioButtons.draw(gui, mX, mY);
-
-
-        getParent().getManager().getVariables()[selectedVariable].draw(gui, VARIABLE_X, VARIABLE_Y);
-
-        for (int i = 0; i < 2; i++) {
-            int x = i == 0 ? ARROW_X_LEFT : ARROW_X_RIGHT;
-            int y = ARROW_Y;
-
-            int srcXArrow = i;
-            int srcYArrow = CollisionHelper.inBounds(x, y, ARROW_WIDTH, ARROW_HEIGHT, mX, mY) ? 1 : 0;
-
-            gui.drawTexture(x, y, ARROW_SRC_X + srcXArrow * ARROW_WIDTH, ARROW_SRC_Y + srcYArrow * ARROW_HEIGHT, ARROW_WIDTH, ARROW_HEIGHT);
-        }
+        varDisplay.draw(gui, mX, mY);
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
-        if (CollisionHelper.inBounds(VARIABLE_X, VARIABLE_Y, VARIABLE_SIZE, VARIABLE_SIZE, mX, mY)) {
-            gui.drawMouseOver(getParent().getManager().getVariables()[selectedVariable].getDescription(gui), mX, mY);
-        }
+        varDisplay.drawMouseOver(gui, mX, mY);
     }
 
     @Override
     public void onClick(int mX, int mY, int button) {
         radioButtons.onClick(mX, mY, button);
-
-        for (int i = -1; i <= 1; i+=2) {
-            int x = i == 1 ? ARROW_X_RIGHT : ARROW_X_LEFT;
-            int y = ARROW_Y;
-
-
-            if (CollisionHelper.inBounds(x, y, ARROW_WIDTH, ARROW_HEIGHT, mX, mY)) {
-                int val = selectedVariable;
-                val += i;
-                if (val < 0) {
-                    val = VariableColor.values().length - 1;
-                }else if(val == VariableColor.values().length) {
-                    val = 0;
-                }
-                setSelectedVariable(val);
-
-                DataWriter dw = getWriterForServerComponentPacket();
-                dw.writeBoolean(true); //var
-                dw.writeData(selectedVariable, DataBitHelper.VARIABLE_TYPE);
-                PacketHandler.sendDataToServer(dw);
-                break;
-            }
-        }
+        varDisplay.onClick(mX, mY);
     }
 
     @Override
