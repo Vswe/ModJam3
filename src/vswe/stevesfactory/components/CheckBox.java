@@ -27,4 +27,8 @@ public abstract class CheckBox {
     public String getName() {
         return name;
     }
+
+    public boolean isVisible() {
+        return true;
+    }
 }

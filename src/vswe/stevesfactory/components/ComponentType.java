@@ -34,10 +34,10 @@ public enum ComponentType {
             ComponentMenuNodes.class, ComponentMenuRedstoneSidesNodes.class, ComponentMenuRedstoneStrengthNodes.class, ComponentMenuResult.class),
     VARIABLE(10, "Variable", "Container Variable",
             new ConnectionSet[]{ConnectionSet.EMPTY, ConnectionSet.STANDARD},
-            ComponentMenuVariable.class, ComponentMenuContainerTypes.class, ComponentMenuVariableContainers.class,ComponentMenuResult.class),
+            ComponentMenuVariable.class, ComponentMenuContainerTypes.class, ComponentMenuVariableContainers.class, ComponentMenuListOrderVariable.class, ComponentMenuResult.class),
     FOR_EACH(11, "For Each", "For Each Loop",
             new ConnectionSet[]{ConnectionSet.FOR_EACH},
-            ComponentMenuVariableLoop.class, ComponentMenuContainerTypes.class, ComponentMenuLoopOrder.class, ComponentMenuResult.class),
+            ComponentMenuVariableLoop.class, ComponentMenuContainerTypes.class, ComponentMenuListOrder.class, ComponentMenuResult.class),
 
     ;/*AUTO_CRAFTING(X, "Crafter", "Auto Crafter",
             new ConnectionSet[]{ConnectionSet.STANDARD},

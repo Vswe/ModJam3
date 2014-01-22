@@ -29,17 +29,19 @@ public class CheckBoxList {
     @SideOnly(Side.CLIENT)
     public void draw(GuiManager gui, int mX, int mY) {
         for (CheckBox checkBox : checkBoxes) {
+            if (checkBox.isVisible()) {
             int srcCheckBoxX = checkBox.getValue() ? 1 : 0;
             int srcCheckBoxY = CollisionHelper.inBounds(checkBox.getX(), checkBox.getY(), CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY) ? 1 : 0;
 
             gui.drawTexture(checkBox.getX(), checkBox.getY(), CHECK_BOX_SRC_X + srcCheckBoxX * CHECK_BOX_SIZE, CHECK_BOX_SRC_Y + srcCheckBoxY * CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE);
             gui.drawString(checkBox.getName(), checkBox.getX() + CHECK_BOX_TEXT_X, checkBox.getY() + CHECK_BOX_TEXT_Y, 0.7F, 0x404040);
+            }
         }
     }
 
     public void onClick(int mX, int mY) {
         for (CheckBox checkBox : checkBoxes) {
-            if (CollisionHelper.inBounds(checkBox.getX(), checkBox.getY(), CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY)) {
+            if (checkBox.isVisible() && CollisionHelper.inBounds(checkBox.getX(), checkBox.getY(), CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY)) {
                 checkBox.setValue(!checkBox.getValue());
                 checkBox.onUpdate();
                 break;

@@ -154,58 +154,11 @@ public class CommandExecutor {
                 case VARIABLE:
                     List<SlotInventoryHolder> tiles = getTiles(command.getMenus().get(2));
                     if (tiles != null) {
-                        ComponentMenuVariable variableMenu = (ComponentMenuVariable)command.getMenus().get(0);
-                        ComponentMenuVariable.VariableMode mode = variableMenu.getVariableMode();
-                        Variable variable = manager.getVariables()[variableMenu.getSelectedVariable()];
-
-                        boolean remove = mode == ComponentMenuVariable.VariableMode.REMOVE;
-                        if (!remove && mode != ComponentMenuVariable.VariableMode.ADD) {
-                            variable.clearContainers();
-                        }
-
-
-                        if (variable.isValid()) {
-                            for (SlotInventoryHolder tile : tiles) {
-                                if (remove) {
-                                    variable.remove(tile.getId());
-                                }else{
-                                    variable.add(tile.getId());
-                                }
-                            }
-                        }
+                        updateVariable(tiles, (ComponentMenuVariable)command.getMenus().get(0), (ComponentMenuListOrder)command.getMenus().get(3));
                     }
                     break;
                 case FOR_EACH:
-                    ComponentMenuVariableLoop variableMenu = ((ComponentMenuVariableLoop)command.getMenus().get(0));
-                    ComponentMenuContainerTypes typesMenu = ((ComponentMenuContainerTypes)command.getMenus().get(1));
-                    ComponentMenuLoopOrder orderMenu = ((ComponentMenuLoopOrder)command.getMenus().get(2));
-                    Variable list = variableMenu.getListVariable();
-                    Variable element = variableMenu.getElementVariable();
-                    List<Integer> selection = new ArrayList<Integer>(list.getContainers());
-                    if (orderMenu.getOrder() == ComponentMenuLoopOrder.LoopOrder.RANDOM) {
-                        Collections.shuffle(selection);
-                    }else if (orderMenu.getOrder() == ComponentMenuLoopOrder.LoopOrder.NORMAL){
-                        if (!orderMenu.isReversed()) {
-                            Collections.reverse(selection);
-                        }
-                    }else{
-                        Collections.sort(selection, orderMenu.getComparator());
-                    }
-
-                    EnumSet<ConnectionBlockType> validTypes = typesMenu.getValidTypes();
-                    List<ConnectionBlock> inventories = manager.getConnectedInventories();
-                    for (Integer selected : selection) {
-                        //Should always be true, simply making sure if the inventories have changed
-                        if (selected >= 0 && selected < manager.getConnectedInventories().size()) {
-                            ConnectionBlock inventory = inventories.get(selected);
-                            if (inventory.isOfAnyType(validTypes)) {
-                                element.clearContainers();
-                                element.add(selected);
-                                executeChildCommands(command, EnumSet.of(ConnectionOption.FOR_EACH));
-                            }
-                        }
-                    }
-
+                    updateForLoop(command, (ComponentMenuVariableLoop)command.getMenus().get(0), (ComponentMenuContainerTypes)command.getMenus().get(1), (ComponentMenuListOrder)command.getMenus().get(2));
                     executeChildCommands(command, EnumSet.of(ConnectionOption.STANDARD_OUTPUT));
                     return;
             }
@@ -217,6 +170,8 @@ public class CommandExecutor {
             usedCommands.remove((Integer)command.getId());
         }
     }
+
+
 
     private List<SlotInventoryHolder> getEmitters(ComponentMenu componentMenu) {
         return getContainers(manager, componentMenu, ConnectionBlockType.EMITTER);
@@ -928,5 +883,83 @@ public class CommandExecutor {
 
     private boolean evaluateRedstoneCondition(List<SlotInventoryHolder> nodes, ComponentMenuContainer menuContainer, ComponentMenuRedstoneSidesTrigger menuSides, ComponentMenuRedstoneStrength menuStrength) {
         return manager.isTriggerPowered(nodes, menuContainer, menuSides, menuStrength, true);
+    }
+
+    private void updateVariable(List<SlotInventoryHolder> tiles, ComponentMenuVariable menuVariable, ComponentMenuListOrder menuOrder) {
+
+        ComponentMenuVariable.VariableMode mode = menuVariable.getVariableMode();
+        Variable variable = manager.getVariables()[menuVariable.getSelectedVariable()];
+
+        if (variable.isValid()) {
+            boolean remove = mode == ComponentMenuVariable.VariableMode.REMOVE;
+            if (!remove && mode != ComponentMenuVariable.VariableMode.ADD) {
+                variable.clearContainers();
+            }
+
+            List<Integer> idList = new ArrayList<Integer>();
+            for (SlotInventoryHolder tile : tiles) {
+                idList.add(tile.getId());
+            }
+
+            if (!menuVariable.isDeclaration())  {
+                idList = applyOrder(idList, menuOrder);
+            }
+
+            for (int id : idList) {
+                if (remove) {
+                    variable.remove(id);
+                }else{
+                    variable.add(id);
+                }
+            }
+
+        }
+    }
+
+    private void updateForLoop(FlowComponent command, ComponentMenuVariableLoop variableMenu, ComponentMenuContainerTypes typesMenu, ComponentMenuListOrder orderMenu) {
+        Variable list = variableMenu.getListVariable();
+        Variable element = variableMenu.getElementVariable();
+
+        if (!list.isValid() || !element.isValid()) {
+            return;
+        }
+
+        List<Integer> selection = applyOrder(list.getContainers(), orderMenu);
+
+        EnumSet<ConnectionBlockType> validTypes = typesMenu.getValidTypes();
+        List<ConnectionBlock> inventories = manager.getConnectedInventories();
+        for (Integer selected : selection) {
+            //Should always be true, simply making sure if the inventories have changed
+            if (selected >= 0 && selected < manager.getConnectedInventories().size()) {
+                ConnectionBlock inventory = inventories.get(selected);
+                if (inventory.isOfAnyType(validTypes)) {
+                    element.clearContainers();
+                    element.add(selected);
+                    executeChildCommands(command, EnumSet.of(ConnectionOption.FOR_EACH));
+                }
+            }
+        }
+    }
+
+    private  List<Integer> applyOrder(List<Integer> original, ComponentMenuListOrder orderMenu) {
+        List<Integer> ret = new ArrayList<Integer>(original);
+        if (orderMenu.getOrder() == ComponentMenuListOrder.LoopOrder.RANDOM) {
+            Collections.shuffle(ret);
+        }else if (orderMenu.getOrder() == ComponentMenuListOrder.LoopOrder.NORMAL){
+            if (!orderMenu.isReversed()) {
+                Collections.reverse(ret);
+            }
+        }else{
+            Collections.sort(ret, orderMenu.getComparator());
+        }
+
+        if (!orderMenu.useAll()) {
+            int len = orderMenu.getAmount();
+            while (ret.size() > len) {
+                ret.remove(ret.size() - 1);
+            }
+        }
+
+        return ret;
     }
 }
