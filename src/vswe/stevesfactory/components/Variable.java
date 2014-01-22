@@ -2,6 +2,8 @@ package vswe.stevesfactory.components;
 
 
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import org.lwjgl.opengl.GL11;
 import vswe.stevesfactory.interfaces.GuiManager;
 
@@ -96,4 +98,34 @@ public class Variable implements IContainerSelection {
         containers.remove((Integer)id);
     }
 
+    private static final String NBT_EXECUTED = "Executed";
+    private static final String NBT_SELECTION = "Selection";
+    private static final String NBT_SELECTION_ID = "Id";
+
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+        executed = nbtTagCompound.getBoolean(NBT_EXECUTED);
+        containers.clear();
+        NBTTagList tagList = nbtTagCompound.getTagList(NBT_SELECTION);
+
+        for (int i = 0; i < tagList.tagCount(); i++) {
+            NBTTagCompound selectionTag = (NBTTagCompound)tagList.tagAt(i);
+
+            containers.add((int)selectionTag.getShort(NBT_SELECTION_ID));
+        }
+    }
+
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+        nbtTagCompound.setBoolean(NBT_EXECUTED, executed);
+
+        NBTTagList tagList = new NBTTagList();
+
+        for (int i = 0; i < containers.size(); i++) {
+            NBTTagCompound selectionTag = new NBTTagCompound();
+
+            selectionTag.setShort(NBT_SELECTION_ID, (short)(int)containers.get(i));
+            tagList.appendTag(selectionTag);
+        }
+
+        nbtTagCompound.setTag(NBT_SELECTION, tagList);
+    }
 }

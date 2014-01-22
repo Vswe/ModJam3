@@ -12,6 +12,7 @@ import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
 import java.util.Comparator;
+import java.util.List;
 
 public class ComponentMenuVariableLoop extends ComponentMenu {
     public ComponentMenuVariableLoop(FlowComponent parent) {
@@ -181,5 +182,16 @@ public class ComponentMenuVariableLoop extends ComponentMenu {
 
     public Variable getElementVariable() {
         return getParent().getManager().getVariables()[selectedElement];
+    }
+
+    @Override
+    public void addErrors(List<String> errors) {
+        if (!getListVariable().isValid()) {
+            errors.add("List variable hasn't been declared");
+        }
+
+        if (!getElementVariable().isValid()) {
+            errors.add("Element variable hasn't been declared");
+        }
     }
 }

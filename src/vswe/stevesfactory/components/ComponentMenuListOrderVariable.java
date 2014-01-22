@@ -10,4 +10,9 @@ public class ComponentMenuListOrderVariable extends ComponentMenuListOrder {
     public boolean isVisible() {
         return getParent().getConnectionSet() == ConnectionSet.STANDARD;
     }
+
+    @Override
+    public String getName() {
+        return "Value Order";
+    }
 }

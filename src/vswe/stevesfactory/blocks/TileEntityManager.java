@@ -234,10 +234,8 @@ public class TileEntityManager extends TileEntityInterface {
 
         for (int i = 0; i < oldSelection.size(); i++) {
             int selection = oldSelection.get(i);
-            System.out.println("OLD: " + selection);
             if (hasVariables && selection >= 0 && selection < 16) {
                 newSelection.add(selection);
-                System.out.println("VARIABLE");
             }else{
                 if (hasVariables) {
                     selection -=  variables.length;
@@ -251,7 +249,6 @@ public class TileEntityManager extends TileEntityInterface {
                         if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord) {
                             int id = j + (hasVariables ? variables.length : 0);
                             if (!newSelection.contains(id)) {
-                                System.out.println("INVENTORY " + id);
                                 newSelection.add(id);
                             }
 
@@ -261,7 +258,6 @@ public class TileEntityManager extends TileEntityInterface {
 
                 }
             }
-            System.out.println();
         }
 
         return newSelection;
@@ -694,6 +690,7 @@ public class TileEntityManager extends TileEntityInterface {
 
     private static final String NBT_TIMER = "Timer";
     private static final String NBT_COMPONENTS = "Components";
+    private static final String NBT_VARIABLES = "Variables";
 
     @Override
     public void readFromNBT(NBTTagCompound nbtTagCompound) {
@@ -721,6 +718,13 @@ public class TileEntityManager extends TileEntityInterface {
 
             items.add(FlowComponent.readFromNBT(this, component, version));
         }
+
+        NBTTagList variablesTag = nbtTagCompound.getTagList(NBT_VARIABLES);
+        for (int i = 0; i < variablesTag.tagCount(); i++) {
+            NBTTagCompound variableTag = (NBTTagCompound)variablesTag.tagAt(i);
+            variables[i].readFromNBT(variableTag);
+        }
+
     }
 
     public void writeContentToNBT(NBTTagCompound nbtTagCompound) {
@@ -736,6 +740,14 @@ public class TileEntityManager extends TileEntityInterface {
         }
         nbtTagCompound.setTag(NBT_COMPONENTS, components);
 
+
+        NBTTagList variablesTag = new NBTTagList();
+        for (Variable variable : variables) {
+            NBTTagCompound variableTag = new NBTTagCompound();
+            variable.writeToNBT(variableTag);
+            variablesTag.appendTag(variableTag);
+        }
+        nbtTagCompound.setTag(NBT_VARIABLES, variablesTag);
     }
 
 }

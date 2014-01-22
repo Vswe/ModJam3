@@ -50,7 +50,6 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
 
     //private int selectedInventory = -1;
-    private boolean multipleInventories;
     protected List<Integer> selectedInventories;
     private List<IContainerSelection> inventories;
     protected RadioButtonList radioButtons;
@@ -132,7 +131,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
         }
 
-        if (multipleInventories) {
+        if (hasMultipleInventories()) {
             radioButtons.draw(gui, mX, mY);
         }
     }
@@ -201,9 +200,13 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
         }
 
-        if (multipleInventories) {
+        if (hasMultipleInventories()) {
             radioButtons.onClick(mX, mY, button);
         }
+    }
+
+    private boolean hasMultipleInventories() {
+        return selectedInventories.size() > 1 || (selectedInventories.size() > 0 && selectedInventories.get(0) < VariableColor.values().length);
     }
 
     @Override
@@ -346,7 +349,6 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                     id += VariableColor.values().length;
                 }
                 selectedInventories.add(id);
-                System.out.println("READ " + id);
             }
             setOption(nbtTagCompound.getByte(NBT_SHARED));
         }
@@ -360,7 +362,6 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             NBTTagCompound selectionTag = new NBTTagCompound();
 
             selectionTag.setShort(NBT_SELECTION_ID, (short)(int)selectedInventories.get(i));
-            System.out.println("SAVE " + (short)(int)selectedInventories.get(i));
             tagList.appendTag(selectionTag);
         }
 
@@ -390,9 +391,8 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
         for (int i = 0; i < manager.getVariables().length; i++) {
             Variable variable = manager.getVariables()[i];
-            if (isVariableAllowed(i) && variable.isValid()) {
+            if (isVariableAllowed(validTypes, i)) {
                 ret.add(variable);
-                multipleInventories = true;
             }
         }
 
@@ -402,15 +402,21 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
         }
 
-        if (ret.size() > 1) {
-            multipleInventories = true;
-        }
 
         return ret;
     }
 
-    public boolean isVariableAllowed(int i) {
-        return true;
+    public boolean isVariableAllowed(EnumSet<ConnectionBlockType> validTypes, int i) {
+        Variable variable = getParent().getManager().getVariables()[i];
+        if (variable.isValid()) {
+            EnumSet<ConnectionBlockType> variableValidTypes = ((ComponentMenuContainerTypes)variable.getDeclaration().getMenus().get(1)).getValidTypes();
+            for (ConnectionBlockType type : validTypes) {
+                if (ConnectionBlock.isOfType(variableValidTypes, type)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 

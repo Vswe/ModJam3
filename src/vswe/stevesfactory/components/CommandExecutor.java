@@ -206,12 +206,13 @@ public class CommandExecutor {
         for (int i = 0; i < variables.length; i++) {
             Variable variable = variables[i];
             if(variable.isValid()) {
+
                 for (int val : menuContainer.getSelectedInventories()) {
                     if (val == i) {
                         List<Integer> selection = variable.getContainers();
 
                         for (int selected : selection) {
-                            addContainer(inventories, ret, selected, menuContainer, type);
+                            addContainer(inventories, ret, selected, menuContainer, type, ((ComponentMenuContainerTypes)variable.getDeclaration().getMenus().get(1)).getValidTypes());
                         }
                         break;
                     }
@@ -222,7 +223,7 @@ public class CommandExecutor {
         for (int i = 0; i < menuContainer.getSelectedInventories().size(); i++) {
             int selected = menuContainer.getSelectedInventories().get(i) - VariableColor.values().length;
 
-            addContainer(inventories, ret, selected, menuContainer, type);
+            addContainer(inventories, ret, selected, menuContainer, type, EnumSet.allOf(ConnectionBlockType.class));
         }
 
         if (ret.isEmpty()) {
@@ -232,11 +233,11 @@ public class CommandExecutor {
         }
     }
 
-    private static void addContainer(List<ConnectionBlock> inventories, List<SlotInventoryHolder> ret, int selected, ComponentMenuContainer menuContainer,  ConnectionBlockType type) {
+    private static void addContainer(List<ConnectionBlock> inventories, List<SlotInventoryHolder> ret, int selected, ComponentMenuContainer menuContainer,  ConnectionBlockType requestType, EnumSet<ConnectionBlockType> variableType) {
         if (selected >= 0 && selected < inventories.size()) {
             ConnectionBlock connection = inventories.get(selected);
 
-            if (connection.isOfType(type) && !connection.getTileEntity().isInvalid() && !containsTe(ret, connection.getTileEntity())) {
+            if (connection.isOfType(requestType) && connection.isOfAnyType(variableType) && !connection.getTileEntity().isInvalid() && !containsTe(ret, connection.getTileEntity())) {
                 ret.add(new SlotInventoryHolder(selected, connection.getTileEntity(), menuContainer.getOption()));
             }
 
@@ -905,10 +906,12 @@ public class CommandExecutor {
                 idList = applyOrder(idList, menuOrder);
             }
 
+            List<ConnectionBlock> inventories = manager.getConnectedInventories();
+            EnumSet<ConnectionBlockType> validTypes = ((ComponentMenuContainerTypes)variable.getDeclaration().getMenus().get(1)).getValidTypes();
             for (int id : idList) {
                 if (remove) {
                     variable.remove(id);
-                }else{
+                }else if (id >= 0 && id < inventories.size() && inventories.get(id).isOfAnyType(validTypes)) {
                     variable.add(id);
                 }
             }
@@ -927,10 +930,11 @@ public class CommandExecutor {
         List<Integer> selection = applyOrder(list.getContainers(), orderMenu);
 
         EnumSet<ConnectionBlockType> validTypes = typesMenu.getValidTypes();
+        validTypes.addAll(((ComponentMenuContainerTypes)element.getDeclaration().getMenus().get(1)).getValidTypes());
         List<ConnectionBlock> inventories = manager.getConnectedInventories();
         for (Integer selected : selection) {
             //Should always be true, simply making sure if the inventories have changed
-            if (selected >= 0 && selected < manager.getConnectedInventories().size()) {
+            if (selected >= 0 && selected < inventories.size()) {
                 ConnectionBlock inventory = inventories.get(selected);
                 if (inventory.isOfAnyType(validTypes)) {
                     element.clearContainers();

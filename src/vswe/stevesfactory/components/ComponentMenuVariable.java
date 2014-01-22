@@ -27,6 +27,7 @@ public class ComponentMenuVariable extends ComponentMenu {
             public void updateSelectedOption(int selectedOption) {
                 setSelectedOption(selectedOption);
                 DataWriter dw = getWriterForServerComponentPacket();
+                dw.writeBoolean(true); //var || mode
                 dw.writeBoolean(false); //mode
                 dw.writeData(selectedOption, DataBitHelper.CONTAINER_MODE);
                 PacketHandler.sendDataToServer(dw);
@@ -74,17 +75,44 @@ public class ComponentMenuVariable extends ComponentMenu {
 
             @Override
             public void setValue(int val) {
-                selectedVariable = val;
+                setSelectedVariable(val);
             }
 
             @Override
             public void onUpdate() {
                 DataWriter dw = getWriterForServerComponentPacket();
+                dw.writeBoolean(true); //var || mode
                 dw.writeBoolean(true); //var
                 dw.writeData(selectedVariable, DataBitHelper.VARIABLE_TYPE);
                 PacketHandler.sendDataToServer(dw);
             }
         };
+
+        checkBoxes = new CheckBoxList();
+        checkBoxes.addCheckBox(new CheckBox("Global value set", CHECK_BOX_X, CHECK_BOX_Y) {
+            @Override
+            public void setValue(boolean val) {
+                executed = val;
+            }
+
+            @Override
+            public boolean getValue() {
+                return executed;
+            }
+
+            @Override
+            public void onUpdate() {
+                DataWriter dw = getWriterForServerComponentPacket();
+                dw.writeBoolean(false); //executed
+                dw.writeBoolean(executed);
+                PacketHandler.sendDataToServer(dw);
+            }
+
+            @Override
+            public boolean isVisible() {
+                return getVariableMode() == VariableMode.GLOBAL;
+            }
+        });
     }
 
     @Override
@@ -101,16 +129,25 @@ public class ComponentMenuVariable extends ComponentMenu {
         }
     }
 
+    private Variable getVariable() {
+        return getParent().getManager().getVariables()[getSelectedVariable()];
+    }
+
     private static final int RADIO_BUTTON_X = 5;
     private static final int RADIO_BUTTON_Y = 28;
     private static final int RADIO_BUTTON_SPACING = 12;
 
+    private static final int CHECK_BOX_X = 5;
+    private static final int CHECK_BOX_Y = 52;
 
 
 
     private RadioButtonList radioButtons;
     private VariableDisplay varDisplay;
     private int selectedVariable = 0;
+    private CheckBoxList checkBoxes;
+    private boolean executed;
+
 
 
     @SideOnly(Side.CLIENT)
@@ -118,6 +155,7 @@ public class ComponentMenuVariable extends ComponentMenu {
     public void draw(GuiManager gui, int mX, int mY) {
         radioButtons.draw(gui, mX, mY);
         varDisplay.draw(gui, mX, mY);
+        checkBoxes.draw(gui, mX ,mY);
     }
 
     @SideOnly(Side.CLIENT)
@@ -130,6 +168,7 @@ public class ComponentMenuVariable extends ComponentMenu {
     public void onClick(int mX, int mY, int button) {
         radioButtons.onClick(mX, mY, button);
         varDisplay.onClick(mX, mY);
+        checkBoxes.onClick(mX, mY);
     }
 
     @Override
@@ -146,20 +185,23 @@ public class ComponentMenuVariable extends ComponentMenu {
     public void writeData(DataWriter dw) {
         dw.writeData(selectedVariable, DataBitHelper.VARIABLE_TYPE);
         dw.writeData(radioButtons.getSelectedOption(), DataBitHelper.CONTAINER_MODE);
+        dw.writeBoolean(executed);
     }
 
     @Override
     public void readData(DataReader dr) {
         setSelectedVariable(dr.readData(DataBitHelper.VARIABLE_TYPE));
         radioButtons.setSelectedOption(dr.readData(DataBitHelper.CONTAINER_MODE));
+        executed = dr.readBoolean();
     }
 
     @Override
     public void copyFrom(ComponentMenu menu) {
        setSelectedVariable(((ComponentMenuVariable) menu).selectedVariable);
        radioButtons.setSelectedOption(((ComponentMenuVariable) menu).radioButtons.getSelectedOption());
-
+        executed = ((ComponentMenuVariable) menu).executed;
     }
+
 
     @Override
     public void refreshData(ContainerManager container, ComponentMenu newData) {
@@ -169,6 +211,7 @@ public class ComponentMenuVariable extends ComponentMenu {
             setSelectedVariable(newDataMode.selectedVariable);
 
             DataWriter dw = getWriterForClientComponentPacket(container);
+            dw.writeBoolean(true); //var  || mode
             dw.writeBoolean(true); //var
             dw.writeData(selectedVariable, DataBitHelper.VARIABLE_TYPE);
             PacketHandler.sendDataToListeningClients(container, dw);
@@ -178,34 +221,54 @@ public class ComponentMenuVariable extends ComponentMenu {
             radioButtons.setSelectedOption(newDataMode.radioButtons.getRawSelectedOption());
 
             DataWriter dw = getWriterForClientComponentPacket(container);
+            dw.writeBoolean(true); //var  || mode
             dw.writeBoolean(false); //mode
             dw.writeData(radioButtons.getRawSelectedOption(), DataBitHelper.CONTAINER_MODE);
             PacketHandler.sendDataToListeningClients(container, dw);
         }
 
+
+        if (executed != newDataMode.getVariable().hasBeenExecuted()) {
+            executed = newDataMode.getVariable().hasBeenExecuted();
+
+            DataWriter dw = getWriterForClientComponentPacket(container);
+            dw.writeBoolean(false); //executed
+            dw.writeBoolean(executed);
+            PacketHandler.sendDataToListeningClients(container, dw);
+        }
     }
 
     private static final String NBT_VARIABLE = "Variable";
     private static final String NBT_MODE = "Mode";
+    private static final String NBT_EXECUTED = "Executed";
 
     @Override
     public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
-        setSelectedVariable(nbtTagCompound.getByte(NBT_VARIABLE));
+       setSelectedVariable(nbtTagCompound.getByte(NBT_VARIABLE));
        radioButtons.setSelectedOption(nbtTagCompound.getByte(NBT_MODE));
+        executed = nbtTagCompound.getBoolean(NBT_EXECUTED);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbtTagCompound) {
         nbtTagCompound.setByte(NBT_VARIABLE, (byte)selectedVariable);
         nbtTagCompound.setByte(NBT_MODE, (byte)radioButtons.getSelectedOption());
+        nbtTagCompound.setBoolean(NBT_EXECUTED, executed);
     }
 
     @Override
     public void readNetworkComponent(DataReader dr) {
         if (dr.readBoolean()) {
-            setSelectedVariable(dr.readData(DataBitHelper.VARIABLE_TYPE));
+            if (dr.readBoolean()) {
+                setSelectedVariable(dr.readData(DataBitHelper.VARIABLE_TYPE));
+            }else{
+                radioButtons.setSelectedOption(dr.readData(DataBitHelper.CONTAINER_MODE));
+            }
         }else{
-            radioButtons.setSelectedOption(dr.readData(DataBitHelper.CONTAINER_MODE));
+            executed = dr.readBoolean();
+            if (!getParent().getManager().worldObj.isRemote) {
+                getVariable().setExecuted(executed);
+            }
         }
     }
 

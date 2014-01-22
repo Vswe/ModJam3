@@ -26,8 +26,12 @@ public class ConnectionBlock implements IContainerSelection {
         types.add(type);
     }
 
+    public static boolean isOfType(EnumSet<ConnectionBlockType> types, ConnectionBlockType type) {
+        return type == null || types.contains(type) || (type == ConnectionBlockType.NODE && (types.contains(ConnectionBlockType.RECEIVER) || types.contains(ConnectionBlockType.EMITTER)));
+    }
+
     public boolean isOfType(ConnectionBlockType type) {
-        return type == null || types.contains(type);
+       return isOfType(this.types, type);
     }
 
     public boolean isOfAnyType(EnumSet<ConnectionBlockType> types) {
