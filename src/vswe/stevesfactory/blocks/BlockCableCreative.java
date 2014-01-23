@@ -14,7 +14,7 @@ import vswe.stevesfactory.StevesFactoryManager;
 public class BlockCableCreative extends BlockContainer {
     public BlockCableCreative(int id) {
         super(id, Material.iron);
-        setCreativeTab(CreativeTabs.tabRedstone);
+        setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
         setUnlocalizedName(Blocks.CABLE_CREATIVE_NAME_TAG);
         setHardness(1.2F);

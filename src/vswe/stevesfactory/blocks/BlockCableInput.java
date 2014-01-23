@@ -15,7 +15,7 @@ import vswe.stevesfactory.StevesFactoryManager;
 public class BlockCableInput extends BlockContainer {
     public BlockCableInput(int id) {
         super(id, Material.iron);
-        setCreativeTab(CreativeTabs.tabRedstone);
+        setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
         setUnlocalizedName(Blocks.CABLE_INPUT_NAME_TAG);
         setHardness(1.2F);

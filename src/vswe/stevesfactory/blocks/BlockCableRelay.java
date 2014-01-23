@@ -25,7 +25,7 @@ import java.util.List;
 public class BlockCableRelay extends BlockContainer {
     public BlockCableRelay(int id) {
         super(id, Material.iron);
-        setCreativeTab(CreativeTabs.tabRedstone);
+        setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
         setHardness(1.2F);
     }

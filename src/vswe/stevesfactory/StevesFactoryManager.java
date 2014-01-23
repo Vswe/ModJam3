@@ -20,6 +20,7 @@ public class StevesFactoryManager {
     public static final String RESOURCE_LOCATION = "stevesfactory";
     public static final String CHANNEL = "FactoryManager";
 
+
     @SidedProxy(clientSide = "vswe.stevesfactory.proxy.ClientProxy", serverSide = "vswe.stevesfactory.proxy.CommonProxy")
     public static CommonProxy proxy;
 

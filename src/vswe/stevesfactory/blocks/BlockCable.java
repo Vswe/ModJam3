@@ -19,7 +19,7 @@ import java.util.Queue;
 public class BlockCable extends Block {
     public BlockCable(int id) {
         super(id, Material.iron);
-        setCreativeTab(CreativeTabs.tabRedstone);
+        setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
         setUnlocalizedName(Blocks.CABLE_NAME_TAG);
         setHardness(0.4F);

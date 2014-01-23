@@ -4,6 +4,7 @@ package vswe.stevesfactory.blocks;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBlockWithMetadata;
@@ -58,8 +59,16 @@ public final class Blocks {
     public static BlockCableOutput blockCableOutput;
     public static BlockCableInput blockCableInput;
     public static BlockCableCreative blockCableCreative;
+    public static CreativeTabs creativeTab;
 
     public static void init() {
+        creativeTab = new CreativeTabs("SFM") {
+            @Override
+            public ItemStack getIconItemStack() {
+                return new ItemStack(blockManager);
+            }
+        };
+
         blockManager = new BlockManager(MANAGER_ID);
         GameRegistry.registerBlock(blockManager, MANAGER_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityManager.class, MANAGER_TILE_ENTITY_TAG);
@@ -92,6 +101,7 @@ public final class Blocks {
         LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableInput, CABLE_INPUT_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableCreative, CABLE_CREATIVE_LOCALIZED_NAME);
+        LanguageRegistry.instance().addStringLocalization(creativeTab.getTranslatedTabLabel(), "en_US", "Steve's Factory Manager");
     }
 
     public static void addRecipes() {
