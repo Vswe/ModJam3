@@ -374,7 +374,7 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
 
     @Override
     public int[] getPower() {
-        return strengths;
+        return updatedStrength;
     }
 
     private class PulseTimer {
