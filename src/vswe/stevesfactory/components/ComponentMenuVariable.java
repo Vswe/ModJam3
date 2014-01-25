@@ -4,8 +4,6 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
-import org.lwjgl.opengl.GL11;
-import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -243,14 +241,14 @@ public class ComponentMenuVariable extends ComponentMenu {
     private static final String NBT_EXECUTED = "Executed";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
        setSelectedVariable(nbtTagCompound.getByte(NBT_VARIABLE));
        radioButtons.setSelectedOption(nbtTagCompound.getByte(NBT_MODE));
         executed = nbtTagCompound.getBoolean(NBT_EXECUTED);
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setByte(NBT_VARIABLE, (byte)selectedVariable);
         nbtTagCompound.setByte(NBT_MODE, (byte)radioButtons.getSelectedOption());
         nbtTagCompound.setBoolean(NBT_EXECUTED, executed);

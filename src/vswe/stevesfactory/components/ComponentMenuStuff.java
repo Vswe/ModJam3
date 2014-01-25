@@ -5,7 +5,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ChatAllowedCharacters;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
@@ -750,7 +749,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     private static final String NBT_SETTING_USE_SIZE = "SizeLimit";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
        setFirstRadioButtonSelected(nbtTagCompound.getBoolean(NBT_RADIO_SELECTION));
 
         NBTTagList settingTagList = nbtTagCompound.getTagList(NBT_SETTINGS);
@@ -767,7 +766,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setBoolean(NBT_RADIO_SELECTION, isFirstRadioButtonSelected());
 
         NBTTagList settingTagList = new NBTTagList();

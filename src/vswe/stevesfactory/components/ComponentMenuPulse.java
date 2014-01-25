@@ -258,7 +258,7 @@ public class ComponentMenuPulse extends ComponentMenu {
     private static final String NBT_TICK = "Ticks";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         usePulse = nbtTagCompound.getBoolean(NBT_USE_PULSE);
         if (usePulse) {
             radioButtons.setSelectedOption(nbtTagCompound.getByte(NBT_TYPE));
@@ -270,7 +270,7 @@ public class ComponentMenuPulse extends ComponentMenu {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setBoolean(NBT_USE_PULSE, usePulse);
         if (usePulse) {
             nbtTagCompound.setByte(NBT_TYPE, (byte)radioButtons.getSelectedOption());

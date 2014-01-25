@@ -103,7 +103,7 @@ public class BlockManager extends BlockContainer {
     }
 
 
-    /*@Override
+    @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         System.out.println("Picked" + world.isRemote);
         TileEntity te = world.getBlockTileEntity(x, y, z);
@@ -124,7 +124,7 @@ public class BlockManager extends BlockContainer {
 
                 NBTTagCompound info = new NBTTagCompound();
                 tagCompound.setCompoundTag("Manager", info);
-                manager.writeContentToNBT(info);
+                manager.writeContentToNBT(info, true);
 
                 System.out.println("write");
             }
@@ -143,12 +143,12 @@ public class BlockManager extends BlockContainer {
         if (te != null && te instanceof TileEntityManager) {
             TileEntityManager manager = (TileEntityManager)te;
             if (itemStack.hasTagCompound() && itemStack.getTagCompound().hasKey("Manager")) {
-                manager.readContentFromNBT(itemStack.getTagCompound().getCompoundTag("Manager"));
+                manager.readContentFromNBT(itemStack.getTagCompound().getCompoundTag("Manager"), true);
                 System.out.println("read");
             }else{
                 System.out.println("no data");
             }
         }
-    }*/
+    }
 
 }

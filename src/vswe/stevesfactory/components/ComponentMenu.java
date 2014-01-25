@@ -61,8 +61,8 @@ public abstract class ComponentMenu implements IComponentNetworkReader {
         return id;
     }
 
-    public abstract void readFromNBT(NBTTagCompound nbtTagCompound, int version);
-    public abstract void writeToNBT(NBTTagCompound nbtTagCompound);
+    public abstract void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup);
+    public abstract void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup);
 
     public void addErrors(List<String> errors) {}
 

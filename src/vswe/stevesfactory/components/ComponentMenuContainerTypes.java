@@ -139,7 +139,7 @@ public class ComponentMenuContainerTypes extends ComponentMenu {
     private static final String NBT_CHECKED = "Checked";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         byte data = nbtTagCompound.getByte(NBT_CHECKED);
         for (int i = 0; i < checked.length; i++) {
             checked[i] = ((data >> i) & 1) != 0;
@@ -147,7 +147,7 @@ public class ComponentMenuContainerTypes extends ComponentMenu {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         byte data = 0;
         for (int i = 0; i < checked.length; i++) {
             if (checked[i]) {

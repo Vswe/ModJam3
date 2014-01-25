@@ -361,7 +361,7 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
 
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         NBTTagList directionTagList = nbtTagCompound.getTagList(NBT_DIRECTIONS);
 
         for (int i = 0; i < directionTagList.tagCount(); i++) {
@@ -374,7 +374,7 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
 
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         NBTTagList directionTagList = new NBTTagList();
 
         for (int i = 0; i < directions.length; i++)  {

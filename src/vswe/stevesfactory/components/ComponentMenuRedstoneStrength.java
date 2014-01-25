@@ -204,14 +204,14 @@ public class ComponentMenuRedstoneStrength extends ComponentMenu {
     private static final String NBT_INVERTED = "Inverted";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         lowTextBox.setNumber(nbtTagCompound.getByte(NBT_LOW));
         highTextBox.setNumber(nbtTagCompound.getByte(NBT_HIGH));
         inverted = nbtTagCompound.getBoolean(NBT_INVERTED);
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setByte(NBT_LOW, (byte)lowTextBox.getNumber());
         nbtTagCompound.setByte(NBT_HIGH, (byte)highTextBox.getNumber());
         nbtTagCompound.setBoolean(NBT_INVERTED, inverted);

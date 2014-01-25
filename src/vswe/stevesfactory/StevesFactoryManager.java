@@ -37,7 +37,7 @@ public class StevesFactoryManager {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        Blocks.addNames();
+        proxy.init();
         Blocks.addRecipes();
 
         NetworkRegistry.instance().registerGuiHandler(this, new GuiHandler());

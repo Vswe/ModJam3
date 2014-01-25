@@ -190,13 +190,13 @@ public class ComponentMenuRedstoneOutput extends ComponentMenu {
     private static final String NBT_TYPE = "OutputType";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         textBox.setNumber(nbtTagCompound.getByte(NBT_NUMBER));
         radioButtons.setSelectedOption(nbtTagCompound.getByte(NBT_TYPE));
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setByte(NBT_NUMBER, (byte)textBox.getNumber());
         nbtTagCompound.setByte(NBT_TYPE, (byte)radioButtons.getSelectedOption());
     }

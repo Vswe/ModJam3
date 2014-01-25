@@ -235,7 +235,7 @@ public class ComponentMenuListOrder extends ComponentMenu {
     private static final String NBT_ORDER = "Order";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         all = nbtTagCompound.getBoolean(NBT_ALL);
         textBox.setNumber(nbtTagCompound.getByte(NBT_AMOUNT));
         reversed = nbtTagCompound.getBoolean(NBT_REVERSED);
@@ -243,7 +243,7 @@ public class ComponentMenuListOrder extends ComponentMenu {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setBoolean(NBT_ALL, all);
         nbtTagCompound.setByte(NBT_AMOUNT, (byte)textBox.getNumber());
         nbtTagCompound.setBoolean(NBT_REVERSED, reversed);

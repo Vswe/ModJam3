@@ -195,7 +195,7 @@ public class ComponentMenuSplit extends ComponentMenu {
     private static final String NBT_EMPTY = "Empty";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         setSplit(nbtTagCompound.getBoolean(NBT_SPLIT));
         if (useSplit()) {
             setFair(nbtTagCompound.getBoolean(NBT_FAIR));
@@ -204,7 +204,7 @@ public class ComponentMenuSplit extends ComponentMenu {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setBoolean(NBT_SPLIT, useSplit());
         if (useSplit()) {
             nbtTagCompound.setBoolean(NBT_FAIR, useFair());

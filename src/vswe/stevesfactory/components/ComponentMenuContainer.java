@@ -3,12 +3,8 @@ package vswe.stevesfactory.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.blocks.ConnectionBlock;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
@@ -330,39 +326,43 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     private static final String NBT_SELECTION_ID = "InventoryID";
     private static final String NBT_SHARED = "SharedCommand";
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         selectedInventories.clear();
         //in earlier version one could only select one inventory
         if (version < 2) {
             selectedInventories.add((int)nbtTagCompound.getShort(NBT_SELECTION));
             setOption(0);
         }else{
-            NBTTagList tagList = nbtTagCompound.getTagList(NBT_SELECTION);
+            if (!pickup) {
+                NBTTagList tagList = nbtTagCompound.getTagList(NBT_SELECTION);
 
-            for (int i = 0; i < tagList.tagCount(); i++) {
-                NBTTagCompound selectionTag = (NBTTagCompound)tagList.tagAt(i);
+                for (int i = 0; i < tagList.tagCount(); i++) {
+                    NBTTagCompound selectionTag = (NBTTagCompound)tagList.tagAt(i);
 
-                int id = (int)selectionTag.getShort(NBT_SELECTION_ID);
+                    int id = (int)selectionTag.getShort(NBT_SELECTION_ID);
 
-                //variables now use the 16 first ids
-                if (version < 7) {
-                    id += VariableColor.values().length;
+                    //variables now use the 16 first ids
+                    if (version < 7) {
+                        id += VariableColor.values().length;
+                    }
+                    selectedInventories.add(id);
                 }
-                selectedInventories.add(id);
             }
             setOption(nbtTagCompound.getByte(NBT_SHARED));
         }
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         NBTTagList tagList = new NBTTagList();
 
-        for (int i = 0; i < selectedInventories.size(); i++) {
-            NBTTagCompound selectionTag = new NBTTagCompound();
+        if (!pickup) {
+            for (int i = 0; i < selectedInventories.size(); i++) {
+                NBTTagCompound selectionTag = new NBTTagCompound();
 
-            selectionTag.setShort(NBT_SELECTION_ID, (short)(int)selectedInventories.get(i));
-            tagList.appendTag(selectionTag);
+                selectionTag.setShort(NBT_SELECTION_ID, (short)(int)selectedInventories.get(i));
+                tagList.appendTag(selectionTag);
+            }
         }
 
         nbtTagCompound.setTag(NBT_SELECTION, tagList);

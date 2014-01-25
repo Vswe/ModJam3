@@ -1106,7 +1106,7 @@ public class FlowComponent implements IComponentNetworkReader {
     private static final String NBT_NODES = "Nodes";
     private static final String NBT_NAME = "Name";
 
-    public static FlowComponent readFromNBT(TileEntityManager jam, NBTTagCompound nbtTagCompound, int version) {
+    public static FlowComponent readFromNBT(TileEntityManager jam, NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         int x = nbtTagCompound.getShort(NBT_POS_X);
         int y = nbtTagCompound.getShort(NBT_POS_Y);
         int typeId = nbtTagCompound.getByte(NBT_TYPE);
@@ -1169,14 +1169,14 @@ public class FlowComponent implements IComponentNetworkReader {
                 menuId++;
             }
 
-            component.menus.get(menuId).readFromNBT(menuTag, version);
+            component.menus.get(menuId).readFromNBT(menuTag, version, pickup);
             menuId++;
         }
 
         return component;
     }
 
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setShort(NBT_POS_X, (short)x);
         nbtTagCompound.setShort(NBT_POS_Y, (short)y);
         nbtTagCompound.setByte(NBT_TYPE, (byte)type.getId());
@@ -1221,7 +1221,7 @@ public class FlowComponent implements IComponentNetworkReader {
 
             NBTTagCompound menuTag = new NBTTagCompound();
 
-            menu.writeToNBT(menuTag);
+            menu.writeToNBT(menuTag, pickup);
 
             menuTagList.appendTag(menuTag);
 

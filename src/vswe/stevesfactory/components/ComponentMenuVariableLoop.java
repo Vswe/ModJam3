@@ -11,7 +11,6 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class ComponentMenuVariableLoop extends ComponentMenu {
@@ -154,13 +153,13 @@ public class ComponentMenuVariableLoop extends ComponentMenu {
     private static final String NBT_ELEMENT = "Element";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         selectedList = nbtTagCompound.getByte(NBT_LIST);
         selectedElement = nbtTagCompound.getByte(NBT_ELEMENT);
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setByte(NBT_LIST, (byte)selectedList);
         nbtTagCompound.setByte(NBT_ELEMENT, (byte)selectedElement);
     }

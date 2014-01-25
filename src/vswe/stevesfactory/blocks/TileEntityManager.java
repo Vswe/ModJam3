@@ -696,17 +696,17 @@ public class TileEntityManager extends TileEntityInterface {
     public void readFromNBT(NBTTagCompound nbtTagCompound) {
         super.readFromNBT(nbtTagCompound);
 
-        readContentFromNBT(nbtTagCompound);
+        readContentFromNBT(nbtTagCompound, false);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbtTagCompound) {
         super.writeToNBT(nbtTagCompound);
 
-        writeContentToNBT(nbtTagCompound);
+        writeContentToNBT(nbtTagCompound, false);
     }
 
-    public void readContentFromNBT(NBTTagCompound nbtTagCompound) {
+    public void readContentFromNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         int version =  nbtTagCompound.getByte(Blocks.NBT_PROTOCOL_VERSION);
 
 
@@ -716,7 +716,7 @@ public class TileEntityManager extends TileEntityInterface {
         for (int i = 0; i < components.tagCount(); i++) {
             NBTTagCompound component = (NBTTagCompound)components.tagAt(i);
 
-            items.add(FlowComponent.readFromNBT(this, component, version));
+            items.add(FlowComponent.readFromNBT(this, component, version, pickup));
         }
 
         NBTTagList variablesTag = nbtTagCompound.getTagList(NBT_VARIABLES);
@@ -727,7 +727,7 @@ public class TileEntityManager extends TileEntityInterface {
 
     }
 
-    public void writeContentToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeContentToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setByte(Blocks.NBT_PROTOCOL_VERSION, Blocks.NBT_CURRENT_PROTOCOL_VERSION);
 
         nbtTagCompound.setByte(NBT_TIMER, (byte)timer);
@@ -735,7 +735,7 @@ public class TileEntityManager extends TileEntityInterface {
         NBTTagList components = new NBTTagList();
         for (FlowComponent item : items) {
             NBTTagCompound component = new NBTTagCompound();
-            item.writeToNBT(component);
+            item.writeToNBT(component, pickup);
             components.appendTag(component);
         }
         nbtTagCompound.setTag(NBT_COMPONENTS, components);

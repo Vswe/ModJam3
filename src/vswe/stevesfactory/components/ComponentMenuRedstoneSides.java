@@ -184,7 +184,7 @@ public abstract class ComponentMenuRedstoneSides extends ComponentMenu {
     private static final String NBT_ALL = "RequrieAll";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound, int version) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
         //Forgot to save it in earlier versions
         if (version >= 3) {
             selection = nbtTagCompound.getByte(NBT_ACTIVE);
@@ -193,7 +193,7 @@ public abstract class ComponentMenuRedstoneSides extends ComponentMenu {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         nbtTagCompound.setByte(NBT_ACTIVE, (byte)selection);
         nbtTagCompound.setBoolean(NBT_ALL, useFirstOption());
     }
