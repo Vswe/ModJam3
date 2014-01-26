@@ -18,6 +18,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import vswe.stevesfactory.GeneratedInfo;
 import vswe.stevesfactory.StevesFactoryManager;
 
 public class BlockManager extends BlockContainer {
@@ -103,51 +104,59 @@ public class BlockManager extends BlockContainer {
     }
 
 
-    @Override
+   @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
-        System.out.println("Picked" + world.isRemote);
-        TileEntity te = world.getBlockTileEntity(x, y, z);
-        if (te != null && te instanceof TileEntityManager) {
-            TileEntityManager manager = (TileEntityManager)te;
+       if (GeneratedInfo.inDev) {
+            System.out.println("Picked" + world.isRemote);
+            TileEntity te = world.getBlockTileEntity(x, y, z);
+            if (te != null && te instanceof TileEntityManager) {
+                TileEntityManager manager = (TileEntityManager)te;
 
-            if (manager.xCoord != x || manager.yCoord != y || manager.zCoord != z) {
-                return null;
-            }
-
-            ItemStack itemStack = super.getPickBlock(target, world, x, y, z);
-            if (itemStack != null) {
-                NBTTagCompound tagCompound = itemStack.getTagCompound();
-                if (tagCompound == null) {
-                    tagCompound = new NBTTagCompound();
-                    itemStack.setTagCompound(tagCompound);
+                if (manager.xCoord != x || manager.yCoord != y || manager.zCoord != z) {
+                    return null;
                 }
 
-                NBTTagCompound info = new NBTTagCompound();
-                tagCompound.setCompoundTag("Manager", info);
-                manager.writeContentToNBT(info, true);
+                ItemStack itemStack = super.getPickBlock(target, world, x, y, z);
+                if (itemStack != null) {
+                    NBTTagCompound tagCompound = itemStack.getTagCompound();
+                    if (tagCompound == null) {
+                        tagCompound = new NBTTagCompound();
+                        itemStack.setTagCompound(tagCompound);
+                    }
 
-                System.out.println("write");
+                    NBTTagCompound info = new NBTTagCompound();
+                    tagCompound.setCompoundTag("Manager", info);
+                    manager.writeContentToNBT(info, true);
+
+                    System.out.println("write");
+                }
+                return itemStack;
             }
-            return itemStack;
-        }
 
-        System.out.println("failed to write");
-        return  null;
+            System.out.println("failed to write");
+            return  null;
+       }else{
+           return super.getPickBlock(target, world, x, y, z);
+       }
     }
 
 
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemStack) {
-        System.out.println("Placed" + world.isRemote);
-        TileEntity te = world.getBlockTileEntity(x, y, z);
-        if (te != null && te instanceof TileEntityManager) {
-            TileEntityManager manager = (TileEntityManager)te;
-            if (itemStack.hasTagCompound() && itemStack.getTagCompound().hasKey("Manager")) {
-                manager.readContentFromNBT(itemStack.getTagCompound().getCompoundTag("Manager"), true);
-                System.out.println("read");
-            }else{
-                System.out.println("no data");
+        if (GeneratedInfo.inDev) {
+            System.out.println("Placed" + world.isRemote);
+            TileEntity te = world.getBlockTileEntity(x, y, z);
+            if (te != null && te instanceof TileEntityManager) {
+                TileEntityManager manager = (TileEntityManager)te;
+                if (itemStack.hasTagCompound() && itemStack.getTagCompound().hasKey("Manager")) {
+                    manager.readContentFromNBT(itemStack.getTagCompound().getCompoundTag("Manager"), true);
+                    System.out.println("read");
+                }else{
+                    System.out.println("no data");
+                }
             }
+        }else{
+            super.onBlockPlacedBy(world, x, y, z, entity, itemStack);
         }
     }
 
