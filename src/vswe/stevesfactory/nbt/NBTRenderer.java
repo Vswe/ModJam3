@@ -3,6 +3,7 @@ package vswe.stevesfactory.nbt;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.*;
+import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.interfaces.IInterfaceRenderer;
 
@@ -23,6 +24,10 @@ public class NBTRenderer implements IInterfaceRenderer {
     private static final int LINE_HEIGHT = 8;
     private static final int INDENT_WIDTH = 5;
     private static final int VALUE_OFFSET = 70;
+    private static final int TEXT_OFFSET = 10;
+    private static final int NODE_SIZE = 4;
+    private static final int NODE_SRC_X = 120;
+    private static final int NODE_SRC_Y = 156;
 
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
@@ -30,15 +35,27 @@ public class NBTRenderer implements IInterfaceRenderer {
     }
 
     private void drawNode(NBTNode node, GuiManager gui, int mX, int mY) {
-        if (node.getCachedDepth() >= 0) {
-            gui.drawString(node.getName(), POS_X + INDENT_WIDTH * node.getCachedDepth(), POS_Y + LINE_HEIGHT * node.getCachedLine(), 0.7F, 0x404040);
+        int x = POS_X + INDENT_WIDTH * node.getCachedDepth();
+        int y = POS_Y + LINE_HEIGHT * node.getCachedLine();
 
-            gui.drawString(node.getValue(), POS_X + INDENT_WIDTH * node.getCachedDepth() + VALUE_OFFSET, POS_Y + LINE_HEIGHT * node.getCachedLine(), 0.7F, 0x404040);
+        if (node.getCachedDepth() >= 0) {
+            gui.drawString(node.getName(), x + TEXT_OFFSET, y, 0.7F, 0x404040);
+
+            gui.drawString(node.getValue(), x + TEXT_OFFSET + VALUE_OFFSET, y, 0.7F, 0x404040);
         }
 
-        if (node.isOpen() && node.getNodes() != null) {
-            for (NBTNode child : node.getNodes()) {
-                drawNode(child, gui, mX, mY);
+        if (node.getNodes() != null) {
+            if (node.getCachedDepth() >= 0) {
+                int nodeSrcX = CollisionHelper.inBounds(x, y, NODE_SIZE, NODE_SIZE, mX, mY) ? 1 : 0;
+                int nodeSrcY = node.isOpen() ? 1 : 0;
+
+                gui.drawTexture(x, y, NODE_SRC_X + nodeSrcX * NODE_SIZE, NODE_SRC_Y + nodeSrcY * NODE_SIZE, NODE_SIZE, NODE_SIZE);
+            }
+
+            if (node.isOpen()) {
+                for (NBTNode child : node.getNodes()) {
+                    drawNode(child, gui, mX, mY);
+                }
             }
         }
     }
@@ -50,8 +67,37 @@ public class NBTRenderer implements IInterfaceRenderer {
     }
 
     @Override
-    public void onClick(GuiManager gui, int mX, int mY) {
-        gui.getManager().specialRenderer = null;
+    public void onClick(GuiManager gui, int mX, int mY, int button) {
+        if (button == 1) {
+            gui.getManager().specialRenderer = null;
+        }else{
+            onNodeClick(root, mX, mY);
+        }
+    }
+
+    private boolean onNodeClick(NBTNode node, int mX, int mY) {
+        int x = POS_X + INDENT_WIDTH * node.getCachedDepth();
+        int y = POS_Y + LINE_HEIGHT * node.getCachedLine();
+
+
+        if (node.getNodes() != null) {
+            if (node.getCachedDepth() >= 0) {
+                if (CollisionHelper.inBounds(x, y, NODE_SIZE, NODE_SIZE, mX, mY)) {
+                    node.setOpen(!node.isOpen());
+                    root.updatePosition();
+                    return true;
+                }
+            }
+
+
+            if (node.isOpen()) {
+                for (NBTNode child : node.getNodes()) {
+                    if (onNodeClick(child, mX, mY)) return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override

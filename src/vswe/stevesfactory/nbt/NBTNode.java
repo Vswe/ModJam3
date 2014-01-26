@@ -37,7 +37,7 @@ public class NBTNode {
 
 
 
-    private void updatePosition() {
+    public void updatePosition() {
         updatePosition(0, -1);
     }
 
@@ -164,5 +164,9 @@ public class NBTNode {
                 return node;
         }
 
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
     }
 }

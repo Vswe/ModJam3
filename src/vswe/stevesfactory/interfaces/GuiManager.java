@@ -136,7 +136,7 @@ public class GuiManager extends GuiBase {
         y -= guiTop;
 
         if (hasSpecialRenderer()) {
-            getSpecialRenderer().onClick(this, x, y);
+            getSpecialRenderer().onClick(this, x, y, button);
         }else{
             for (int i = 0; i < manager.getZLevelRenderingList().size(); i++) {
                 FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
