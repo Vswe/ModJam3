@@ -9,6 +9,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import vswe.stevesfactory.blocks.Blocks;
 import vswe.stevesfactory.configs.ConfigHandler;
+import vswe.stevesfactory.multipart.MultiPartFactory;
 import vswe.stevesfactory.network.PacketHandler;
 import vswe.stevesfactory.proxy.CommonProxy;
 
@@ -33,6 +34,7 @@ public class StevesFactoryManager {
         ConfigHandler config = new ConfigHandler(event.getSuggestedConfigurationFile());
 
         Blocks.init();
+        new MultiPartFactory();
     }
 
     @Mod.EventHandler

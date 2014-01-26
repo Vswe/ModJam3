@@ -29,6 +29,8 @@
     <orderEntry type="library" name="lzma-0.0.1" level="project" />
     <orderEntry type="library" name="soundsystem-20120107" level="project" />
     <orderEntry type="module" module-name="Forge" />
+    <orderEntry type="library" name="ForgeMultipart-dev-1.6.4-1.0.0.237" level="project" />
+    <orderEntry type="library" name="CodeChickenLib-dev-1.6.4-1.0.0.51" level="project" />
   </component>
 </module>
 

@@ -333,21 +333,24 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             selectedInventories.add((int)nbtTagCompound.getShort(NBT_SELECTION));
             setOption(0);
         }else{
-            if (!pickup) {
-                NBTTagList tagList = nbtTagCompound.getTagList(NBT_SELECTION);
 
-                for (int i = 0; i < tagList.tagCount(); i++) {
-                    NBTTagCompound selectionTag = (NBTTagCompound)tagList.tagAt(i);
+            NBTTagList tagList = nbtTagCompound.getTagList(NBT_SELECTION);
 
-                    int id = (int)selectionTag.getShort(NBT_SELECTION_ID);
+            for (int i = 0; i < tagList.tagCount(); i++) {
+                NBTTagCompound selectionTag = (NBTTagCompound)tagList.tagAt(i);
 
-                    //variables now use the 16 first ids
-                    if (version < 7) {
-                        id += VariableColor.values().length;
-                    }
+                int id = (int)selectionTag.getShort(NBT_SELECTION_ID);
+
+                //variables now use the 16 first ids
+                if (version < 7) {
+                    id += VariableColor.values().length;
+                }
+
+                if (id < 16 || !pickup) {
                     selectedInventories.add(id);
                 }
             }
+
             setOption(nbtTagCompound.getByte(NBT_SHARED));
         }
     }
@@ -356,14 +359,16 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
         NBTTagList tagList = new NBTTagList();
 
-        if (!pickup) {
-            for (int i = 0; i < selectedInventories.size(); i++) {
-                NBTTagCompound selectionTag = new NBTTagCompound();
 
-                selectionTag.setShort(NBT_SELECTION_ID, (short)(int)selectedInventories.get(i));
+        for (int i = 0; i < selectedInventories.size(); i++) {
+            NBTTagCompound selectionTag = new NBTTagCompound();
+            int id = selectedInventories.get(i);
+            if (id < 16 || !pickup) {
+                selectionTag.setShort(NBT_SELECTION_ID, (short)id );
                 tagList.appendTag(selectionTag);
             }
         }
+
 
         nbtTagCompound.setTag(NBT_SELECTION, tagList);
         nbtTagCompound.setByte(NBT_SHARED, (byte) getOption());

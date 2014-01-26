@@ -102,7 +102,7 @@ public class BlockManager extends BlockContainer {
         }
     }
 
-
+   /*
     @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         System.out.println("Picked" + world.isRemote);
@@ -149,6 +149,6 @@ public class BlockManager extends BlockContainer {
                 System.out.println("no data");
             }
         }
-    }
+    } */
 
 }

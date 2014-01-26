@@ -6,9 +6,8 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemStack;
+import vswe.stevesfactory.multipart.BlockMultiTest;
 
 public final class Blocks {
 
@@ -91,6 +90,7 @@ public final class Blocks {
         blockCableCreative = new BlockCableCreative(CABLE_CREATIVE_ID);
         GameRegistry.registerBlock(blockCableCreative, CABLE_CREATIVE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityCreative.class, CABLE_CREATIVE_TILE_ENTITY_TAG);
+
     }
 
     public static void addNames() {
