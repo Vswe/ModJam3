@@ -53,12 +53,19 @@ public final class Blocks {
     public static final String CABLE_CREATIVE_LOCALIZED_NAME = "Creative Supplier";
     public static final int CABLE_CREATIVE_DEFAULT_ID = 1316;
 
+    private static final String CABLE_INTAKE_TILE_ENTITY_TAG = "TileEntityCableIntakeName";
+    public static int CABLE_INTAKE_ID;
+    public static final String CABLE_INTAKE_NAME_TAG = "BlockCableIntakeName";
+    public static final String CABLE_INTAKE_LOCALIZED_NAME = "Inventory Intake";
+    public static final int CABLE_INTAKE_DEFAULT_ID = 1317;
+
     public static BlockManager blockManager;
     public static BlockCable blockCable;
     public static BlockCableRelay blockCableRelay;
     public static BlockCableOutput blockCableOutput;
     public static BlockCableInput blockCableInput;
     public static BlockCableCreative blockCableCreative;
+    public static BlockCableIntake blockCableIntake;
     public static CreativeTabs creativeTab;
 
     public static void init() {
@@ -91,6 +98,10 @@ public final class Blocks {
         blockCableCreative = new BlockCableCreative(CABLE_CREATIVE_ID);
         GameRegistry.registerBlock(blockCableCreative, CABLE_CREATIVE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityCreative.class, CABLE_CREATIVE_TILE_ENTITY_TAG);
+
+        blockCableIntake = new BlockCableIntake(CABLE_INTAKE_ID);
+        GameRegistry.registerBlock(blockCableIntake, CABLE_INTAKE_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityIntake.class, CABLE_INTAKE_TILE_ENTITY_TAG);
     }
 
     public static void addNames() {
@@ -101,6 +112,7 @@ public final class Blocks {
         LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableInput, CABLE_INPUT_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableCreative, CABLE_CREATIVE_LOCALIZED_NAME);
+        LanguageRegistry.addName(blockCableIntake, CABLE_INTAKE_LOCALIZED_NAME);
         LanguageRegistry.instance().addStringLocalization(creativeTab.getTranslatedTabLabel(), "en_US", "Steve's Factory Manager");
     }
 

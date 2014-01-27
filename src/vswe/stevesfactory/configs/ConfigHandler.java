@@ -17,6 +17,7 @@ public class ConfigHandler extends Configuration {
         Blocks.CABLE_OUTPUT_ID = getBlock(Blocks.CABLE_OUTPUT_NAME_TAG, Blocks.CABLE_OUTPUT_DEFAULT_ID).getInt(Blocks.CABLE_OUTPUT_DEFAULT_ID);
         Blocks.CABLE_INPUT_ID = getBlock(Blocks.CABLE_INPUT_NAME_TAG, Blocks.CABLE_INPUT_DEFAULT_ID).getInt(Blocks.CABLE_INPUT_DEFAULT_ID);
         Blocks.CABLE_CREATIVE_ID = getBlock(Blocks.CABLE_CREATIVE_NAME_TAG, Blocks.CABLE_CREATIVE_DEFAULT_ID).getInt(Blocks.CABLE_CREATIVE_DEFAULT_ID);
+        Blocks.CABLE_INTAKE_ID = getBlock(Blocks.CABLE_INTAKE_NAME_TAG, Blocks.CABLE_INTAKE_DEFAULT_ID).getInt(Blocks.CABLE_INTAKE_DEFAULT_ID);
 
         save();
     }
