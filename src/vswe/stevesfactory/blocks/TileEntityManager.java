@@ -21,6 +21,14 @@ import java.util.*;
 
 public class TileEntityManager extends TileEntityInterface {
 
+    public static final int TRIGGER_RECEIVER_ID = 0;
+    public static final int TRIGGER_BUD_ID = 1;
+    public static final int TRIGGER_INTERVAL_ID = 2;
+    public static final int TRIGGER_REDSTONE_SIDES_ID = 3;
+    public static final int TRIGGER_REDSTONE_STRENGTH_ID = 4;
+    public static final int TRIGGER_BUD_BLOCK_ID = 5;
+    public static final int TRIGGER_BUD_META_ID = 6;
+
     public static final int BUTTON_SIZE_W = 14;
     public static final int BUTTON_SIZE_H = 14;
     public static final int BUTTON_SRC_X = 242;
@@ -282,24 +290,25 @@ public class TileEntityManager extends TileEntityInterface {
                 timer = 0;
 
                 for (FlowComponent item : items) {
-                    if (item.getType() == ComponentType.TRIGGER) {
-                        for (ComponentMenu menu : item.getMenus()) {
-                            if (menu instanceof ComponentMenuInterval) {
-                                int interval = ((ComponentMenuInterval)menu).getInterval();
-                                item.setCurrentInterval(item.getCurrentInterval() + 1);
-                                if (item.getCurrentInterval() >= interval) {
-                                    item.setCurrentInterval(0);
 
-                                    EnumSet<ConnectionOption> valid = EnumSet.of(ConnectionOption.INTERVAL);
-                                    if (isTriggerPowered(item, true)) {
-                                        valid.add(ConnectionOption.REDSTONE_HIGH);
-                                    }
-                                    if (isTriggerPowered(item, false)) {
-                                        valid.add(ConnectionOption.REDSTONE_LOW);
-                                    }
-                                    activateTrigger(item, valid);
+                    if (item.getType() == ComponentType.TRIGGER) {
+                        ComponentMenuInterval componentMenuInterval = (ComponentMenuInterval)item.getMenus().get(TRIGGER_INTERVAL_ID);
+                        int interval = componentMenuInterval.getInterval();
+                        item.setCurrentInterval(item.getCurrentInterval() + 1);
+                        if (item.getCurrentInterval() >= interval) {
+                            item.setCurrentInterval(0);
+
+                            EnumSet<ConnectionOption> valid = EnumSet.of(ConnectionOption.INTERVAL);
+                            if (item.getConnectionSet() == ConnectionSet.REDSTONE) {
+                                if (isTriggerPowered(item, true)) {
+                                    valid.add(ConnectionOption.REDSTONE_HIGH);
+                                }
+                                if (isTriggerPowered(item, false)) {
+                                    valid.add(ConnectionOption.REDSTONE_LOW);
                                 }
                             }
+                            activateTrigger(item, valid);
+
                         }
                     }
                 }
@@ -356,8 +365,8 @@ public class TileEntityManager extends TileEntityInterface {
 
 
     private boolean hasRedStoneFlipped(FlowComponent component, int[] newPower, int[] oldPower, boolean high) {
-        ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)component.getMenus().get(2);
-        ComponentMenuRedstoneStrength menuStrength = (ComponentMenuRedstoneStrength)component.getMenus().get(3);
+        ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)component.getMenus().get(TRIGGER_REDSTONE_SIDES_ID);
+        ComponentMenuRedstoneStrength menuStrength = (ComponentMenuRedstoneStrength)component.getMenus().get(TRIGGER_REDSTONE_STRENGTH_ID);
         for (int i = 0; i < oldPower.length; i++) {
             if (menuRedstone.isSideRequired(i)) {
                 if ((high && !isRedstonePowered(menuStrength, oldPower[i]) && isRedstonePowered(menuStrength, newPower[i])) || (!high && isRedstonePowered(menuStrength, oldPower[i]) && !isRedstonePowered(menuStrength, newPower[i]))) {
@@ -376,7 +385,7 @@ public class TileEntityManager extends TileEntityInterface {
     }
 
     private boolean isPulseReceived(FlowComponent component, int[] newPower, int[] oldPower, boolean high) {
-        return hasRedStoneFlipped(component, newPower, oldPower, high) && isTriggerPowered((ComponentMenuRedstoneSidesTrigger)component.getMenus().get(2), (ComponentMenuRedstoneStrength)component.getMenus().get(3), newPower, high);
+        return hasRedStoneFlipped(component, newPower, oldPower, high) && isTriggerPowered((ComponentMenuRedstoneSidesTrigger)component.getMenus().get(TRIGGER_REDSTONE_SIDES_ID), (ComponentMenuRedstoneStrength)component.getMenus().get(TRIGGER_REDSTONE_STRENGTH_ID), newPower, high);
     }
 
 
@@ -385,10 +394,10 @@ public class TileEntityManager extends TileEntityInterface {
     public void triggerRedstone(TileEntityInput inputTrigger) {
         for (FlowComponent item : items) {
             if (item.getType() == ComponentType.TRIGGER && item.getConnectionSet() == ConnectionSet.REDSTONE) {
-                List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(this, item.getMenus().get(0), ConnectionBlockType.RECEIVER);
+                List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(this, item.getMenus().get(TRIGGER_RECEIVER_ID), ConnectionBlockType.RECEIVER);
 
                 if (receivers != null) {
-                    ComponentMenuContainer componentMenuContainer = (ComponentMenuContainer)item.getMenus().get(0);
+                    ComponentMenuContainer componentMenuContainer = (ComponentMenuContainer)item.getMenus().get(TRIGGER_RECEIVER_ID);
                     int[] newPower = new int[ForgeDirection.VALID_DIRECTIONS.length];
                     int[] oldPower = new int[ForgeDirection.VALID_DIRECTIONS.length];
                     if (componentMenuContainer.getOption() == 0) {
@@ -432,7 +441,7 @@ public class TileEntityManager extends TileEntityInterface {
             if (input.equals(trigger) || !requiresAll) {
                 flag = isPulseReceived(component, input.getPowered(), input.getOldPowered(), high);
             }else{
-                flag = isTriggerPowered((ComponentMenuRedstoneSidesTrigger)component.getMenus().get(2), (ComponentMenuRedstoneStrength)component.getMenus().get(3), input.getPowered(), high);
+                flag = isTriggerPowered((ComponentMenuRedstoneSidesTrigger)component.getMenus().get(TRIGGER_REDSTONE_SIDES_ID), (ComponentMenuRedstoneStrength)component.getMenus().get(TRIGGER_REDSTONE_STRENGTH_ID), input.getPowered(), high);
             }
 
             if (flag) {
@@ -448,9 +457,9 @@ public class TileEntityManager extends TileEntityInterface {
     }
 
     private boolean isTriggerPowered(FlowComponent item, boolean high) {
-        List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(this, item.getMenus().get(0), ConnectionBlockType.RECEIVER);
+        List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(this, item.getMenus().get(TRIGGER_RECEIVER_ID), ConnectionBlockType.RECEIVER);
 
-        return receivers != null && isTriggerPowered(receivers, (ComponentMenuContainer)item.getMenus().get(0), (ComponentMenuRedstoneSidesTrigger) item.getMenus().get(2), (ComponentMenuRedstoneStrength) item.getMenus().get(3), high);
+        return receivers != null && isTriggerPowered(receivers, (ComponentMenuContainer)item.getMenus().get(TRIGGER_RECEIVER_ID), (ComponentMenuRedstoneSidesTrigger) item.getMenus().get(TRIGGER_REDSTONE_SIDES_ID), (ComponentMenuRedstoneStrength) item.getMenus().get(TRIGGER_REDSTONE_STRENGTH_ID), high);
     }
 
     public boolean isTriggerPowered(List<SlotInventoryHolder> receivers, ComponentMenuContainer menuContainer, ComponentMenuRedstoneSidesTrigger menuSides, ComponentMenuRedstoneStrength menuStrength, boolean high) {
@@ -621,6 +630,22 @@ public class TileEntityManager extends TileEntityInterface {
             if (item.getType() == ComponentType.VARIABLE && item.getConnectionSet() == ConnectionSet.EMPTY) {
                 int selectedVariable = ((ComponentMenuVariable)item.getMenus().get(0)).getSelectedVariable();
                 variables[selectedVariable].setDeclaration(item);
+            }
+        }
+    }
+
+    public void triggerBUD(TileEntityBUD tileEntityBUD) {
+        for (FlowComponent item : items) {
+            if (item.getType() == ComponentType.TRIGGER && item.getConnectionSet() == ConnectionSet.BUD) {
+                List<SlotInventoryHolder> buds = CommandExecutor.getContainers(this, item.getMenus().get(TRIGGER_BUD_ID), ConnectionBlockType.BUD);
+
+                for (SlotInventoryHolder bud : buds) {
+                    if (bud.getBUD().equals(tileEntityBUD)) {
+                        activateTrigger(item, EnumSet.of(ConnectionOption.BUD));
+                        break;
+                    }
+                }
+
             }
         }
     }

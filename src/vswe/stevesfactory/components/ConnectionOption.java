@@ -11,7 +11,10 @@ public enum ConnectionOption {
     REDSTONE_LOW("While low signal", ConnectionType.OUTPUT),
     CONDITION_TRUE("True", ConnectionType.OUTPUT),
     CONDITION_FALSE("False", ConnectionType.OUTPUT),
-    FOR_EACH("For each", ConnectionType.SIDE);
+    FOR_EACH("For each", ConnectionType.SIDE),
+    BUD("On update", ConnectionType.OUTPUT),
+    BUD_PULSE("On update pulse", ConnectionType.OUTPUT),
+    BUD_MATCH("While matching", ConnectionType.OUTPUT);
 
     private String name;
     private ConnectionType type;

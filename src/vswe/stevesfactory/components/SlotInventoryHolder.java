@@ -5,6 +5,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.IFluidHandler;
 import vswe.stevesfactory.blocks.IRedstoneNode;
+import vswe.stevesfactory.blocks.TileEntityBUD;
 import vswe.stevesfactory.blocks.TileEntityInput;
 import vswe.stevesfactory.blocks.TileEntityOutput;
 
@@ -45,6 +46,10 @@ public class SlotInventoryHolder {
 
     public TileEntityInput getReceiver() {
         return (TileEntityInput)inventory;
+    }
+
+    public TileEntityBUD getBUD() {
+        return (TileEntityBUD)inventory;
     }
 
     public Map<Integer, SlotSideTarget> getValidSlots() {

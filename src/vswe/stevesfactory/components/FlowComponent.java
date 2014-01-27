@@ -1155,17 +1155,26 @@ public class FlowComponent implements IComponentNetworkReader {
             }
 
             //added a second extra menu to the triggers
+            if (component.type == ComponentType.TRIGGER && i == 2 && version < 5) {
+                menuId++;
+            }
+
+            //added a third extra menu to the triggers
             if (component.type == ComponentType.TRIGGER && i == 0 && version < 6) {
                 menuId++;
             }
 
-            //added an extra menu to the flow controls
-            if (component.type == ComponentType.FLOW_CONTROL && i == 0 && version < 4) {
+
+            //added the bud menus to the triggers
+            if (component.type == ComponentType.TRIGGER && i == 1 && version < 8) {
                 menuId++;
             }
+            if (component.type == ComponentType.TRIGGER && i == 4 && version < 8) {
+                menuId += 2;
+            }
 
-            //added a second extra menu to the triggers
-            if (component.type == ComponentType.TRIGGER && i == 2 && version < 5) {
+            //added an extra menu to the flow controls
+            if (component.type == ComponentType.FLOW_CONTROL && i == 0 && version < 4) {
                 menuId++;
             }
 

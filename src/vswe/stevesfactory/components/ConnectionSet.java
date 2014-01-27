@@ -11,7 +11,8 @@ public enum ConnectionSet {
     MULTIPLE_OUTPUT_2("Split - 2 outputs",  ConnectionOption.STANDARD_INPUT,  ConnectionOption.STANDARD_OUTPUT, ConnectionOption.STANDARD_OUTPUT),
     MULTIPLE_OUTPUT_5("Split - 5 outputs",  ConnectionOption.STANDARD_INPUT,  ConnectionOption.STANDARD_OUTPUT, ConnectionOption.STANDARD_OUTPUT, ConnectionOption.STANDARD_OUTPUT, ConnectionOption.STANDARD_OUTPUT, ConnectionOption.STANDARD_OUTPUT),
     EMPTY("Declaration"),
-    FOR_EACH("For each", ConnectionOption.STANDARD_INPUT, ConnectionOption.FOR_EACH, ConnectionOption.STANDARD_OUTPUT);
+    FOR_EACH("For each", ConnectionOption.STANDARD_INPUT, ConnectionOption.FOR_EACH, ConnectionOption.STANDARD_OUTPUT),
+    BUD("Block update detector", ConnectionOption.BUD, ConnectionOption.BUD_PULSE, ConnectionOption.BUD_MATCH);
 
 
     private ConnectionOption[] connections;

@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 
 public final class Blocks {
 
-    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 7;
+    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 8;
     public static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
 
     private static final String MANAGER_TILE_ENTITY_TAG = "TileEntityMachineManagerName";
@@ -59,6 +59,12 @@ public final class Blocks {
     public static final String CABLE_INTAKE_LOCALIZED_NAME = "Item Valve";
     public static final int CABLE_INTAKE_DEFAULT_ID = 1317;
 
+    private static final String CABLE_BUD_TILE_ENTITY_TAG = "TileEntityCableBUDName";
+    public static int CABLE_BUD_ID;
+    public static final String CABLE_BUD_NAME_TAG = "BlockCableBUDName";
+    public static final String CABLE_BUD_LOCALIZED_NAME = "BUD Detector";
+    public static final int CABLE_BUD_DEFAULT_ID = 1318;
+
     public static BlockManager blockManager;
     public static BlockCable blockCable;
     public static BlockCableRelay blockCableRelay;
@@ -66,6 +72,7 @@ public final class Blocks {
     public static BlockCableInput blockCableInput;
     public static BlockCableCreative blockCableCreative;
     public static BlockCableIntake blockCableIntake;
+    public static BlockCableBUD blockCableBUD;
     public static CreativeTabs creativeTab;
 
     public static void init() {
@@ -102,6 +109,10 @@ public final class Blocks {
         blockCableIntake = new BlockCableIntake(CABLE_INTAKE_ID);
         GameRegistry.registerBlock(blockCableIntake, CABLE_INTAKE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityIntake.class, CABLE_INTAKE_TILE_ENTITY_TAG);
+
+        blockCableBUD = new BlockCableBUD(CABLE_BUD_ID);
+        GameRegistry.registerBlock(blockCableBUD, CABLE_BUD_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityBUD.class, CABLE_BUD_TILE_ENTITY_TAG);
     }
 
     public static void addNames() {
@@ -113,6 +124,7 @@ public final class Blocks {
         LanguageRegistry.addName(blockCableInput, CABLE_INPUT_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableCreative, CABLE_CREATIVE_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableIntake, CABLE_INTAKE_LOCALIZED_NAME);
+        LanguageRegistry.addName(blockCableBUD, CABLE_BUD_LOCALIZED_NAME);
         LanguageRegistry.instance().addStringLocalization(creativeTab.getTranslatedTabLabel(), "en_US", "Steve's Factory Manager");
     }
 

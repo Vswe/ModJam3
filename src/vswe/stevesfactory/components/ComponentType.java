@@ -3,8 +3,8 @@ package vswe.stevesfactory.components;
 
 public enum ComponentType {
     TRIGGER(0, "Trigger", "Trigger",
-            new ConnectionSet[] {ConnectionSet.CONTINUOUSLY, ConnectionSet.REDSTONE},
-            ComponentMenuReceivers.class, ComponentMenuInterval.class, ComponentMenuRedstoneSidesTrigger.class, ComponentMenuRedstoneStrength.class, ComponentMenuResult.class),
+            new ConnectionSet[] {ConnectionSet.CONTINUOUSLY, ConnectionSet.REDSTONE, ConnectionSet.BUD},
+            ComponentMenuReceivers.class, ComponentMenuBUDs.class, ComponentMenuInterval.class, ComponentMenuRedstoneSidesTrigger.class, ComponentMenuRedstoneStrength.class, ComponentMenuUpdateId.class, ComponentMenuUpdateMeta.class, ComponentMenuResult.class),
     INPUT(1, "Input", "Input",
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuInventory.class, ComponentMenuTargetInventory.class, ComponentMenuItem.class, ComponentMenuResult.class),

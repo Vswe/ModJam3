@@ -9,7 +9,8 @@ public enum ConnectionBlockType {
     TANK(IFluidHandler.class, false),
     EMITTER(TileEntityOutput.class, false),
     RECEIVER(TileEntityInput.class, false),
-    NODE(IRedstoneNode.class, true);
+    NODE(IRedstoneNode.class, true),
+    BUD(TileEntityBUD.class, false);
 
     private Class clazz;
     private boolean group;
