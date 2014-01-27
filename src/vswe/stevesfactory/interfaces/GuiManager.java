@@ -58,15 +58,30 @@ public class GuiManager extends GuiBase {
     public static int Z_LEVEL_OPEN_MAXIMUM = 5;
 
     @Override
+    public void drawWorldBackground(int val) {
+        if (StevesFactoryManager.GREEN_SCREEN_MODE) {
+            drawRect(0, 0, width, height, 0xFF00FF00);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        }else{
+            super.drawWorldBackground(val);
+        }
+    }
+
+
+
+    @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-        bindTexture(BACKGROUND_1);
-        drawTexture(0, 0, 0, 0, 256, 256);
 
-        bindTexture(BACKGROUND_2);
-        drawTexture(256, 0, 0, 0, 256, 256);
+        if (!StevesFactoryManager.GREEN_SCREEN_MODE) {
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            bindTexture(BACKGROUND_1);
+            drawTexture(0, 0, 0, 0, 256, 256);
+
+            bindTexture(BACKGROUND_2);
+            drawTexture(256, 0, 0, 0, 256, 256);
+        }
 
         x -= guiLeft;
         y -= guiTop;
@@ -103,16 +118,18 @@ public class GuiManager extends GuiBase {
         }
         CollisionHelper.disableInBoundsCheck = false;
 
-        for (TileEntityManager.Button button : manager.buttons) {
-            if (CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y)) {
-                drawMouseOver(button.getMouseOver(), x, y);
+        if (!StevesFactoryManager.GREEN_SCREEN_MODE) {
+            for (TileEntityManager.Button button : manager.buttons) {
+                if (CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y)) {
+                    drawMouseOver(button.getMouseOver(), x, y);
+                }
             }
-        }
 
-        for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
-            itemBase.drawMouseOver(this, x, y);
-            if (itemBase.isBeingMoved() || CollisionHelper.inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
-                CollisionHelper.disableInBoundsCheck = true;
+            for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
+                itemBase.drawMouseOver(this, x, y);
+                if (itemBase.isBeingMoved() || CollisionHelper.inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
+                    CollisionHelper.disableInBoundsCheck = true;
+                }
             }
         }
         CollisionHelper.disableInBoundsCheck = false;

@@ -253,11 +253,13 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
     }
 
     @Override
-    public void drawDefaultBackground() {
+    public final void drawDefaultBackground() {
         super.drawDefaultBackground();
 
         startScaling();
     }
+
+
 
     @Override
     public void drawScreen(int x, int y, float f) {
