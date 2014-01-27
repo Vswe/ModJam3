@@ -324,6 +324,7 @@ public class TileEntityManager extends TileEntityInterface {
     private void activateTrigger(FlowComponent component, EnumSet<ConnectionOption> validTriggerOutputs) {
         if (firstCommandExecution) {
             updateInventories();
+            updateVariables();
             firstCommandExecution = false;
         }
 
