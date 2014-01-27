@@ -53,7 +53,7 @@ public class BlockCableRelay extends BlockContainer {
     @SideOnly(Side.CLIENT)
     @Override
     public Icon getIcon(int side, int meta) {
-        //pretend the meta is 2
+        //pretend the meta is 3
         return getIconFromSideAndMeta(side,  addAdvancedMeta(3, meta));
     }
 

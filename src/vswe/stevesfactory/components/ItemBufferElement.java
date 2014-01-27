@@ -37,7 +37,7 @@ public class ItemBufferElement {
     }
 
     public boolean addTarget(FlowComponent owner, Setting setting,  SlotInventoryHolder inventoryHolder, SlotStackInventoryHolder target) {
-        if (component.getId() == owner.getId() && (this.setting == null || this.setting.getId() == setting.getId()) && (this.inventoryHolder.isShared() || this.inventoryHolder.equals(inventoryHolder))) {
+        if (component.getId() == owner.getId() && (this.setting == null || (setting != null && this.setting.getId() == setting.getId())) && (this.inventoryHolder.isShared() || this.inventoryHolder.equals(inventoryHolder))) {
             addTarget(target);
             return true;
         }else{

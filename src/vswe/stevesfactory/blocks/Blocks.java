@@ -56,7 +56,7 @@ public final class Blocks {
     private static final String CABLE_INTAKE_TILE_ENTITY_TAG = "TileEntityCableIntakeName";
     public static int CABLE_INTAKE_ID;
     public static final String CABLE_INTAKE_NAME_TAG = "BlockCableIntakeName";
-    public static final String CABLE_INTAKE_LOCALIZED_NAME = "Inventory Intake";
+    public static final String CABLE_INTAKE_LOCALIZED_NAME = "Item Valve";
     public static final int CABLE_INTAKE_DEFAULT_ID = 1317;
 
     public static BlockManager blockManager;
@@ -158,6 +158,13 @@ public final class Blocks {
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableRelay, 1, 8),
                 new ItemStack(blockCableRelay, 1, 0),
                 new ItemStack(Item.dyePowder, 1, 4)
+        );
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableIntake, 1),
+                blockCable,
+                Block.hopperBlock,
+                Block.hopperBlock,
+                Block.dropper
         );
     }
 

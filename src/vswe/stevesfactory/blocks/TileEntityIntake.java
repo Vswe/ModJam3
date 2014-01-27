@@ -6,8 +6,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.ForgeDirection;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -25,7 +27,7 @@ public class TileEntityIntake extends TileEntity implements IInventory {
     public ItemStack getStackInSlot(int id) {
         updateInventory();
         id--;
-        if (id < 0 || items.get(id).isDead) {
+        if (id < 0 || items.get(id).isDead || items.get(id).delayBeforeCanPickup > 0) {
             return null;
         }else{
             return items.get(id).getEntityItem();
@@ -57,11 +59,28 @@ public class TileEntityIntake extends TileEntity implements IInventory {
     public void setInventorySlotContents(int id, ItemStack itemstack) {
         updateInventory();
         id--;
-        if (id < 0 || items.get(id).isDead) {
+        if (id < 0 || items.get(id).isDead || items.get(id).delayBeforeCanPickup > 0) {
             if (itemstack != null) {
-                EntityItem item = new EntityItem(worldObj, xCoord + 0.5, yCoord + 1.5, zCoord + 0.5, itemstack);
-                //todo define position better and speed
+                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
+
+                double posX = xCoord + 0.5 + direction.offsetX * 0.75;
+                double posY = yCoord + 0.5 + direction.offsetY * 0.75;
+                double posZ = zCoord + 0.5 + direction.offsetZ * 0.75;
+
+                if (direction.offsetY == 0) {
+                    posY -= 0.1;
+                }
+
+                EntityItem item = new EntityItem(worldObj, posX, posY, posZ, itemstack);
+
+                item.motionX = direction.offsetX * 0.2;
+                item.motionY = direction.offsetY * 0.2;
+                item.motionZ = direction.offsetZ * 0.2;
+
+
+                item.delayBeforeCanPickup = 40;
                 worldObj.spawnEntityInWorld(item);
+
 
                 if (id < 0) {
                     items.add(item);
@@ -72,6 +91,9 @@ public class TileEntityIntake extends TileEntity implements IInventory {
         }else if (itemstack != null){
             items.get(id).setEntityItemStack(itemstack);
         }else{
+            //seems to be an issue with setting it to null
+            items.get(id).setEntityItemStack(items.get(id).getEntityItem().copy());
+            items.get(id).getEntityItem().stackSize = 0;
             items.get(id).setDead();
         }
     }
@@ -82,11 +104,23 @@ public class TileEntityIntake extends TileEntity implements IInventory {
         if (items == null) {
             items = new ArrayList<EntityItem>();
 
-            double centerX = xCoord + 0.5;
-            double centerY = yCoord + 0.5;
-            double centerZ = zCoord + 0.5;
+            int lowX = xCoord - DISTANCE;
+            int lowY = yCoord - DISTANCE;
+            int lowZ = zCoord - DISTANCE;
 
-            items = worldObj.getEntitiesWithinAABB(EntityItem.class, AxisAlignedBB.getBoundingBox(centerX - DISTANCE, centerY - DISTANCE, centerZ - DISTANCE, centerX + DISTANCE, centerY + DISTANCE, centerZ + DISTANCE));
+            int highX = xCoord + 1 + DISTANCE;
+            int highY = yCoord + 1 + DISTANCE;
+            int highZ = zCoord + 1 + DISTANCE;
+
+            items = worldObj.getEntitiesWithinAABB(EntityItem.class, AxisAlignedBB.getBoundingBox(lowX, lowY, lowZ, highX, highY, highZ));
+
+            //remove items we can't use right away, this check is done when we interact with items too, to make sure it hasn't changed
+            for (Iterator<EntityItem> iterator = items.iterator(); iterator.hasNext(); ) {
+                EntityItem next = iterator.next();
+                if (next.isDead || next.delayBeforeCanPickup > 0) {
+                    iterator.remove();
+                }
+            }
         }
     }
 
