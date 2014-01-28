@@ -4,10 +4,7 @@ package vswe.stevesfactory.components;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.IFluidHandler;
-import vswe.stevesfactory.blocks.IRedstoneNode;
-import vswe.stevesfactory.blocks.TileEntityBUD;
-import vswe.stevesfactory.blocks.TileEntityInput;
-import vswe.stevesfactory.blocks.TileEntityOutput;
+import vswe.stevesfactory.blocks.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -85,5 +82,9 @@ public class SlotInventoryHolder {
 
     public TileEntity getTile() {
         return inventory;
+    }
+
+    public ITriggerNode getTrigger() {
+        return (ITriggerNode)inventory;
     }
 }

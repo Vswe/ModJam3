@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TileEntityInput extends TileEntity implements IRedstoneNode, ISystemListener {
+public class TileEntityInput extends TileEntity implements IRedstoneNode, ISystemListener, ITriggerNode {
     private List<TileEntityManager> managerList = new ArrayList<TileEntityManager>();
     private int[] oldPowered = new int[ForgeDirection.VALID_DIRECTIONS.length];
     private int[] isPowered = new int[ForgeDirection.VALID_DIRECTIONS.length];
@@ -38,14 +38,6 @@ public class TileEntityInput extends TileEntity implements IRedstoneNode, ISyste
         }
 
         oldPowered = isPowered;
-    }
-
-    public int[] getOldPowered() {
-        return oldPowered;
-    }
-
-    public int[] getPowered() {
-        return isPowered;
     }
 
     @Override
@@ -92,5 +84,15 @@ public class TileEntityInput extends TileEntity implements IRedstoneNode, ISyste
 
 
         nbtTagCompound.setTag(NBT_SIDES, sidesTag);
+    }
+
+    @Override
+    public int[] getData() {
+        return isPowered;
+    }
+
+    @Override
+    public int[] getOldData() {
+        return oldPowered;
     }
 }

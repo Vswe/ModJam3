@@ -47,8 +47,8 @@ public class TriggerHelperRedstone extends TriggerHelper {
                     TileEntityInput input = receiver.getReceiver();
 
                     for (int i = 0; i < newPower.length; i++) {
-                        newPower[i] = Math.min(15, newPower[i] + input.getPowered()[i]);
-                        oldPower[i] = Math.min(15, oldPower[i] + input.getOldPowered()[i]);
+                        newPower[i] = Math.min(15, newPower[i] + input.getData()[i]);
+                        oldPower[i] = Math.min(15, oldPower[i] + input.getOldData()[i]);
                     }
                 }
                 if (isPulseReceived(item, newPower, oldPower, true)) {

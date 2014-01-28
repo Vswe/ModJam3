@@ -1,7 +1,9 @@
 package vswe.stevesfactory.components;
 
+import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.TileEntityBUD;
+import vswe.stevesfactory.blocks.TileEntityInput;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -23,16 +25,16 @@ public class TriggerHelperBUD extends TriggerHelper {
     }
 
     public void triggerBUD(FlowComponent item, TileEntityBUD tileEntityBUD) {
-        List<SlotInventoryHolder> buds = CommandExecutor.getContainers(item.getManager(), item.getMenus().get(containerId), ConnectionBlockType.BUD);
+        List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(item.getManager(), item.getMenus().get(containerId), blockType);
 
-        if (buds != null) {
-            for (SlotInventoryHolder bud : buds) {
-                if (bud.getBUD().equals(tileEntityBUD)) {
-                    activateTrigger(item, EnumSet.of(ConnectionOption.BUD));
-                    break;
-                }
+        if (receivers != null) {
+            ComponentMenuContainer componentMenuContainer = (ComponentMenuContainer)item.getMenus().get(containerId);
+
+            TileEntityBUD trigger = componentMenuContainer.getOption() == 0 ? tileEntityBUD : null;
+            if (isPulseReceived(item, receivers, trigger, true)) {
+                activateTrigger(item, EnumSet.of(ConnectionOption.BUD_PULSE));
             }
-        }
 
+        }
     }
 }

@@ -4,8 +4,8 @@ package vswe.stevesfactory.components;
 import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.IRedstoneNode;
-import vswe.stevesfactory.blocks.TileEntityBUD;
-import vswe.stevesfactory.blocks.TileEntityInput;
+import vswe.stevesfactory.blocks.ITriggerNode;
+
 
 import java.util.EnumSet;
 import java.util.List;
@@ -67,17 +67,17 @@ public abstract class TriggerHelper {
         return hasRedStoneFlipped(component, newPower, oldPower, high) && isTriggerPowered(component, newPower, high);
     }
 
-    protected boolean isPulseReceived(FlowComponent component,List<SlotInventoryHolder> receivers, TileEntityInput trigger, boolean high) {
+    protected boolean isPulseReceived(FlowComponent component,List<SlotInventoryHolder> containers, ITriggerNode trigger, boolean high) {
         boolean requiresAll = trigger != null;
-        for (SlotInventoryHolder receiver : receivers) {
-            TileEntityInput input = receiver.getReceiver();
+        for (SlotInventoryHolder container : containers) {
+            ITriggerNode input = container.getTrigger();
 
 
             boolean flag;
             if (input.equals(trigger) || !requiresAll) {
-                flag = isPulseReceived(component, input.getPowered(), input.getOldPowered(), high);
+                flag = isPulseReceived(component, input.getData(), input.getOldData(), high);
             }else{
-                flag = isTriggerPowered(component, input.getPowered(), high);
+                flag = isTriggerPowered(component, input.getData(), high);
             }
 
             if (flag) {

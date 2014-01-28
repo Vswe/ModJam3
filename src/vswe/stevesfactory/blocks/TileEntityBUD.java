@@ -1,12 +1,13 @@
 package vswe.stevesfactory.blocks;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.ForgeDirection;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class TileEntityBUD extends TileEntity implements ISystemListener{
+public class TileEntityBUD extends TileEntity implements ISystemListener, ITriggerNode{
     private List<TileEntityManager> managerList = new ArrayList<TileEntityManager>();
 
     @Override
@@ -25,5 +26,15 @@ public class TileEntityBUD extends TileEntity implements ISystemListener{
         for (TileEntityManager tileEntityManager : managerList) {
             tileEntityManager.triggerBUD(this);
         }
+    }
+
+    @Override
+    public int[] getData() {
+        return new int[ForgeDirection.VALID_DIRECTIONS.length];
+    }
+
+    @Override
+    public int[] getOldData() {
+        return new int[ForgeDirection.VALID_DIRECTIONS.length];
     }
 }
