@@ -1170,7 +1170,7 @@ public class FlowComponent implements IComponentNetworkReader {
                 menuId++;
             }
             if (component.type == ComponentType.TRIGGER && i == 4 && version < 8) {
-                menuId += 2;
+                menuId++;
             }
 
             //added an extra menu to the flow controls

@@ -143,7 +143,7 @@ public class CommandExecutor {
                 case REDSTONE_CONDITION:
                     List<SlotInventoryHolder> nodes = getNodes(command.getMenus().get(0));
                     if (nodes != null) {
-                        if (evaluateRedstoneCondition(nodes,(ComponentMenuContainer)command.getMenus().get(0), (ComponentMenuRedstoneSidesTrigger)command.getMenus().get(1), (ComponentMenuRedstoneStrength)command.getMenus().get(2))) {
+                        if (evaluateRedstoneCondition(nodes, command)) {
                             executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_TRUE));
                         }else{
                             executeChildCommands(command, EnumSet.of(ConnectionOption.CONDITION_FALSE));
@@ -882,8 +882,8 @@ public class CommandExecutor {
         return false;
     }
 
-    private boolean evaluateRedstoneCondition(List<SlotInventoryHolder> nodes, ComponentMenuContainer menuContainer, ComponentMenuRedstoneSidesTrigger menuSides, ComponentMenuRedstoneStrength menuStrength) {
-        return manager.isTriggerPowered(nodes, menuContainer, menuSides, menuStrength, true);
+    private boolean evaluateRedstoneCondition(List<SlotInventoryHolder> nodes, FlowComponent component) {
+        return TileEntityManager.redstoneCondition.isTriggerPowered(nodes, component, true);
     }
 
     private void updateVariable(List<SlotInventoryHolder> tiles, ComponentMenuVariable menuVariable, ComponentMenuListOrder menuOrder) {

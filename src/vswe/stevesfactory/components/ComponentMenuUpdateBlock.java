@@ -7,14 +7,14 @@ import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 
-public class ComponentMenuUpdateMeta extends ComponentMenu {
-    public ComponentMenuUpdateMeta(FlowComponent parent) {
+public class ComponentMenuUpdateBlock extends ComponentMenu {
+    public ComponentMenuUpdateBlock(FlowComponent parent) {
         super(parent);
     }
 
     @Override
     public String getName() {
-        return "Block Meta";
+        return "Update Block";
     }
 
     @Override

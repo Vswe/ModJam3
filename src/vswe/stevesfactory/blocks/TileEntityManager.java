@@ -20,14 +20,9 @@ import java.util.*;
 
 
 public class TileEntityManager extends TileEntityInterface {
-
-    public static final int TRIGGER_RECEIVER_ID = 0;
-    public static final int TRIGGER_BUD_ID = 1;
-    public static final int TRIGGER_INTERVAL_ID = 2;
-    public static final int TRIGGER_REDSTONE_SIDES_ID = 3;
-    public static final int TRIGGER_REDSTONE_STRENGTH_ID = 4;
-    public static final int TRIGGER_BUD_BLOCK_ID = 5;
-    public static final int TRIGGER_BUD_META_ID = 6;
+    public static final TriggerHelperRedstone redstoneTrigger = new TriggerHelperRedstone(3, 4);
+    public static final TriggerHelperRedstone redstoneCondition = new TriggerHelperRedstone(1, 2);
+    public static final TriggerHelperBUD budTrigger = new TriggerHelperBUD();
 
     public static final int BUTTON_SIZE_W = 14;
     public static final int BUTTON_SIZE_H = 14;
@@ -292,7 +287,7 @@ public class TileEntityManager extends TileEntityInterface {
                 for (FlowComponent item : items) {
 
                     if (item.getType() == ComponentType.TRIGGER) {
-                        ComponentMenuInterval componentMenuInterval = (ComponentMenuInterval)item.getMenus().get(TRIGGER_INTERVAL_ID);
+                        ComponentMenuInterval componentMenuInterval = (ComponentMenuInterval)item.getMenus().get(TriggerHelper.TRIGGER_INTERVAL_ID);
                         int interval = componentMenuInterval.getInterval();
                         item.setCurrentInterval(item.getCurrentInterval() + 1);
                         if (item.getCurrentInterval() >= interval) {
@@ -300,15 +295,11 @@ public class TileEntityManager extends TileEntityInterface {
 
                             EnumSet<ConnectionOption> valid = EnumSet.of(ConnectionOption.INTERVAL);
                             if (item.getConnectionSet() == ConnectionSet.REDSTONE) {
-                                if (isTriggerPowered(item, true)) {
-                                    valid.add(ConnectionOption.REDSTONE_HIGH);
-                                }
-                                if (isTriggerPowered(item, false)) {
-                                    valid.add(ConnectionOption.REDSTONE_LOW);
-                                }
+                                redstoneTrigger.onTrigger(item, valid);
+                            }else if(item.getConnectionSet() == ConnectionSet.BUD) {
+                                budTrigger.onTrigger(item, valid);
                             }
                             activateTrigger(item, valid);
-
                         }
                     }
                 }
@@ -320,17 +311,7 @@ public class TileEntityManager extends TileEntityInterface {
         }
     }
 
-
-
-    private void activateTriggers(EnumSet<ConnectionOption> validTriggerOutputs) {
-        for (FlowComponent item : items) {
-            if (item.getType() == ComponentType.TRIGGER) {
-                activateTrigger(item, validTriggerOutputs);
-            }
-        }
-    }
-
-    private void activateTrigger(FlowComponent component, EnumSet<ConnectionOption> validTriggerOutputs) {
+    public void activateTrigger(FlowComponent component, EnumSet<ConnectionOption> validTriggerOutputs) {
         if (firstCommandExecution) {
             updateInventories();
             updateVariables();
@@ -347,46 +328,7 @@ public class TileEntityManager extends TileEntityInterface {
         new CommandExecutor(this).executeTriggerCommand(component, validTriggerOutputs);
     }
 
-    private boolean isTriggerPowered(ComponentMenuRedstoneSidesTrigger menuSides, ComponentMenuRedstoneStrength menuStrength, int[] currentPower, boolean high) {
-        for (int i = 0; i < currentPower.length; i++) {
-            if (menuSides.isSideRequired(i)) {
-                if (isRedstonePowered(menuStrength, currentPower[i]) == high) {
-                    if (!menuSides.requireAll()) {
-                        return true;
-                    }
-                }else if (menuSides.requireAll()){
-                    return false;
-                }
-            }
-        }
 
-        return menuSides.requireAll();
-    }
-
-
-    private boolean hasRedStoneFlipped(FlowComponent component, int[] newPower, int[] oldPower, boolean high) {
-        ComponentMenuRedstoneSides menuRedstone = (ComponentMenuRedstoneSides)component.getMenus().get(TRIGGER_REDSTONE_SIDES_ID);
-        ComponentMenuRedstoneStrength menuStrength = (ComponentMenuRedstoneStrength)component.getMenus().get(TRIGGER_REDSTONE_STRENGTH_ID);
-        for (int i = 0; i < oldPower.length; i++) {
-            if (menuRedstone.isSideRequired(i)) {
-                if ((high && !isRedstonePowered(menuStrength, oldPower[i]) && isRedstonePowered(menuStrength, newPower[i])) || (!high && isRedstonePowered(menuStrength, oldPower[i]) && !isRedstonePowered(menuStrength, newPower[i]))) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isRedstonePowered(ComponentMenuRedstoneStrength menuStrength, int power) {
-        boolean inRange = menuStrength.getLow() <= power && power <= menuStrength.getHigh();
-
-        return inRange != menuStrength.isInverted();
-    }
-
-    private boolean isPulseReceived(FlowComponent component, int[] newPower, int[] oldPower, boolean high) {
-        return hasRedStoneFlipped(component, newPower, oldPower, high) && isTriggerPowered((ComponentMenuRedstoneSidesTrigger)component.getMenus().get(TRIGGER_REDSTONE_SIDES_ID), (ComponentMenuRedstoneStrength)component.getMenus().get(TRIGGER_REDSTONE_STRENGTH_ID), newPower, high);
-    }
 
 
 
@@ -394,101 +336,12 @@ public class TileEntityManager extends TileEntityInterface {
     public void triggerRedstone(TileEntityInput inputTrigger) {
         for (FlowComponent item : items) {
             if (item.getType() == ComponentType.TRIGGER && item.getConnectionSet() == ConnectionSet.REDSTONE) {
-                List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(this, item.getMenus().get(TRIGGER_RECEIVER_ID), ConnectionBlockType.RECEIVER);
-
-                if (receivers != null) {
-                    ComponentMenuContainer componentMenuContainer = (ComponentMenuContainer)item.getMenus().get(TRIGGER_RECEIVER_ID);
-                    int[] newPower = new int[ForgeDirection.VALID_DIRECTIONS.length];
-                    int[] oldPower = new int[ForgeDirection.VALID_DIRECTIONS.length];
-                    if (componentMenuContainer.getOption() == 0) {
-                        for (SlotInventoryHolder receiver : receivers) {
-                           TileEntityInput input = receiver.getReceiver();
-
-                            for (int i = 0; i < newPower.length; i++) {
-                                newPower[i] = Math.min(15, newPower[i] + input.getPowered()[i]);
-                                oldPower[i] = Math.min(15, oldPower[i] + input.getOldPowered()[i]);
-                            }
-                        }
-                        if (isPulseReceived(item, newPower, oldPower, true)) {
-                            activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_HIGH));
-                        }
-                        if (isPulseReceived(item, newPower, oldPower, false)) {
-                            activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_LOW));
-                        }
-                    }else {
-                        TileEntityInput trigger = componentMenuContainer.getOption() == 1 ? inputTrigger : null;
-                        if (isPulseReceived(item, receivers, trigger, true)) {
-                            activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_HIGH));
-                        }
-
-                        if (isPulseReceived(item, receivers, trigger, false)) {
-                            activateTrigger(item, EnumSet.of(ConnectionOption.REDSTONE_PULSE_LOW));
-                        }
-                    }
-
-                }
+                redstoneTrigger.onRedstoneTrigger(item, inputTrigger);
             }
         }
     }
 
-    private boolean isPulseReceived(FlowComponent component,List<SlotInventoryHolder> receivers, TileEntityInput trigger, boolean high) {
-        boolean requiresAll = trigger != null;
-        for (SlotInventoryHolder receiver : receivers) {
-            TileEntityInput input = receiver.getReceiver();
 
-
-            boolean flag;
-            if (input.equals(trigger) || !requiresAll) {
-                flag = isPulseReceived(component, input.getPowered(), input.getOldPowered(), high);
-            }else{
-                flag = isTriggerPowered((ComponentMenuRedstoneSidesTrigger)component.getMenus().get(TRIGGER_REDSTONE_SIDES_ID), (ComponentMenuRedstoneStrength)component.getMenus().get(TRIGGER_REDSTONE_STRENGTH_ID), input.getPowered(), high);
-            }
-
-            if (flag) {
-                if (!requiresAll) {
-                    return true;
-                }
-            }else if(requiresAll) {
-                return false;
-            }
-        }
-
-        return requiresAll;
-    }
-
-    private boolean isTriggerPowered(FlowComponent item, boolean high) {
-        List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(this, item.getMenus().get(TRIGGER_RECEIVER_ID), ConnectionBlockType.RECEIVER);
-
-        return receivers != null && isTriggerPowered(receivers, (ComponentMenuContainer)item.getMenus().get(TRIGGER_RECEIVER_ID), (ComponentMenuRedstoneSidesTrigger) item.getMenus().get(TRIGGER_REDSTONE_SIDES_ID), (ComponentMenuRedstoneStrength) item.getMenus().get(TRIGGER_REDSTONE_STRENGTH_ID), high);
-    }
-
-    public boolean isTriggerPowered(List<SlotInventoryHolder> receivers, ComponentMenuContainer menuContainer, ComponentMenuRedstoneSidesTrigger menuSides, ComponentMenuRedstoneStrength menuStrength, boolean high) {
-        if (menuContainer.getOption() == 0) {
-            int[] currentPower =  new int[ForgeDirection.VALID_DIRECTIONS.length];
-            for (SlotInventoryHolder receiver : receivers) {
-                IRedstoneNode node = receiver.getNode();
-                for (int i = 0; i < currentPower.length; i++) {
-                    currentPower[i] = Math.min(15, currentPower[i] + node.getPower()[i]);
-                }
-            }
-
-            return isTriggerPowered(menuSides, menuStrength, currentPower, high);
-        }else{
-            boolean requiresAll = menuContainer.getOption() == 1;
-            for (SlotInventoryHolder receiver : receivers) {
-                if (isTriggerPowered(menuSides, menuStrength, receiver.getNode().getPower(), high)) {
-                    if (!requiresAll) {
-                        return true;
-                    }
-                }else{
-                    if (requiresAll) {
-                        return false;
-                    }
-                }
-            }
-            return requiresAll;
-        }
-    }
 
 
     public void readGenericData(DataReader dr) {
@@ -637,15 +490,7 @@ public class TileEntityManager extends TileEntityInterface {
     public void triggerBUD(TileEntityBUD tileEntityBUD) {
         for (FlowComponent item : items) {
             if (item.getType() == ComponentType.TRIGGER && item.getConnectionSet() == ConnectionSet.BUD) {
-                List<SlotInventoryHolder> buds = CommandExecutor.getContainers(this, item.getMenus().get(TRIGGER_BUD_ID), ConnectionBlockType.BUD);
-
-                for (SlotInventoryHolder bud : buds) {
-                    if (bud.getBUD().equals(tileEntityBUD)) {
-                        activateTrigger(item, EnumSet.of(ConnectionOption.BUD));
-                        break;
-                    }
-                }
-
+                budTrigger.triggerBUD(item, tileEntityBUD);
             }
         }
     }

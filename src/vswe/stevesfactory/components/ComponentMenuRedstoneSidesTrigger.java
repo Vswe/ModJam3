@@ -14,12 +14,16 @@ public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSide
 
     @Override
     protected String getMessage() {
-        return "Select which block sides the redstone should be detected at";
+        if (isBUD()) {
+            return "Select which block sides updates should be detected at";
+        }else{
+            return "Select which block sides the redstone should be detected at";
+        }
     }
 
     @Override
     public boolean isVisible() {
-        return getParent().getConnectionSet() == ConnectionSet.REDSTONE;
+        return getParent().getConnectionSet() == ConnectionSet.REDSTONE || isBUD();
     }
 
     public boolean requireAll() {
@@ -28,6 +32,10 @@ public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSide
 
     @Override
     public String getName() {
-        return "Redstone Sides";
+        return isBUD() ? "Update Sides" : "Redstone Sides";
+    }
+
+    private boolean isBUD() {
+        return getParent().getConnectionSet() == ConnectionSet.BUD;
     }
 }
