@@ -33,9 +33,10 @@ public class TileEntityInput extends TileEntity implements IRedstoneNode, ISyste
             isPowered[i] = worldObj.getIndirectPowerLevelTo(direction.offsetX + this.xCoord, direction.offsetY + this.yCoord, direction.offsetZ + this.zCoord, direction.ordinal());
         }
 
-        for (TileEntityManager tileEntityManager : managerList) {
-            tileEntityManager.triggerRedstone(this);
+        for (int i = managerList.size() - 1; i >= 0; i--) {
+            managerList.get(i).triggerRedstone(this);
         }
+
 
         oldPowered = isPowered;
     }

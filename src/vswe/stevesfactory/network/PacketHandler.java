@@ -35,10 +35,15 @@ public class PacketHandler implements IPacketHandler {
             Container container = ((EntityPlayer)player).openContainer;
 
             if (container != null && container.windowId == containerId && container instanceof ContainerBase) {
-                if (player instanceof EntityPlayerMP || dr.readBoolean()) {
+                boolean onServer = player instanceof EntityPlayerMP;
+                if (onServer || dr.readBoolean()) {
                     ((ContainerBase) container).getTileEntity().readUpdatedData(dr, (EntityPlayer)player);
                 }else{
                     ((ContainerBase) container).getTileEntity().readAllData(dr , (EntityPlayer)player);
+                }
+
+                if (onServer) {
+                    ((ContainerBase) container).getTileEntity().onInventoryChanged();
                 }
             }
         }else{

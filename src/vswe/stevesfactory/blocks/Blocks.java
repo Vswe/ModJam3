@@ -65,6 +65,12 @@ public final class Blocks {
     public static final String CABLE_BUD_LOCALIZED_NAME = "Block Detector";
     public static final int CABLE_BUD_DEFAULT_ID = 1318;
 
+    private static final String CABLE_BREAKER_TILE_ENTITY_TAG = "TileEntityCableBreakerName";
+    public static int CABLE_BREAKER_ID;
+    public static final String CABLE_BREAKER_NAME_TAG = "BlockCableBreakerName";
+    public static final String CABLE_BREAKER_LOCALIZED_NAME = "Block Breaker";
+    public static final int CABLE_BREAKER_DEFAULT_ID = 1319;
+
     public static BlockManager blockManager;
     public static BlockCable blockCable;
     public static BlockCableRelay blockCableRelay;
@@ -73,6 +79,7 @@ public final class Blocks {
     public static BlockCableCreative blockCableCreative;
     public static BlockCableIntake blockCableIntake;
     public static BlockCableBUD blockCableBUD;
+    public static BlockCableBreaker blockCableBreaker;
     public static CreativeTabs creativeTab;
 
     public static void init() {
@@ -113,6 +120,10 @@ public final class Blocks {
         blockCableBUD = new BlockCableBUD(CABLE_BUD_ID);
         GameRegistry.registerBlock(blockCableBUD, CABLE_BUD_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityBUD.class, CABLE_BUD_TILE_ENTITY_TAG);
+
+        blockCableBreaker = new BlockCableBreaker(CABLE_BREAKER_ID);
+        GameRegistry.registerBlock(blockCableBreaker, CABLE_BREAKER_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityBreaker.class, CABLE_BREAKER_TILE_ENTITY_TAG);
     }
 
     public static void addNames() {
@@ -125,6 +136,7 @@ public final class Blocks {
         LanguageRegistry.addName(blockCableCreative, CABLE_CREATIVE_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableIntake, CABLE_INTAKE_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableBUD, CABLE_BUD_LOCALIZED_NAME);
+        LanguageRegistry.addName(blockCableBreaker, CABLE_BREAKER_LOCALIZED_NAME);
         LanguageRegistry.instance().addStringLocalization(creativeTab.getTranslatedTabLabel(), "en_US", "Steve's Factory Manager");
     }
 

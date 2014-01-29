@@ -17,18 +17,18 @@ import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.StevesFactoryManager;
 
 //This is indeed not a subclass to the cable, you can't relay signals through this block
-public class BlockCableIntake extends BlockContainer {
-    public BlockCableIntake(int id) {
+public class BlockCableBreaker extends BlockContainer {
+    public BlockCableBreaker(int id) {
         super(id, Material.iron);
         setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
-        setUnlocalizedName(Blocks.CABLE_INTAKE_NAME_TAG);
+        setUnlocalizedName(Blocks.CABLE_BREAKER_NAME_TAG);
         setHardness(1.2F);
     }
 
     @Override
     public TileEntity createNewTileEntity(World world) {
-        return new TileEntityIntake();
+        return new TileEntityBreaker();
     }
 
     @SideOnly(Side.CLIENT)
@@ -37,8 +37,8 @@ public class BlockCableIntake extends BlockContainer {
     @SideOnly(Side.CLIENT)
     @Override
     public void registerIcons(IconRegister register) {
-        blockIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_intake");
-        outIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_intake_out");
+        blockIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_idle");
+        outIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_breaker");
     }
 
     @SideOnly(Side.CLIENT)

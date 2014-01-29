@@ -29,9 +29,10 @@ public class TileEntityBUD extends TileEntity implements ISystemListener, ITrigg
     public void onTrigger() {
         updateData();
 
-        for (TileEntityManager tileEntityManager : managerList) {
-            tileEntityManager.triggerBUD(this);
+        for (int i = managerList.size() - 1; i >= 0; i--) {
+            managerList.get(i).triggerBUD(this);
         }
+
 
         makeOld();
     }
