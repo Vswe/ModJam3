@@ -17,4 +17,10 @@ public class ComponentMenuBUDs extends ComponentMenuContainer {
     public boolean isVisible() {
         return getParent().getConnectionSet() == ConnectionSet.BUD;
     }
+
+    @Override
+    protected void initRadioButtons() {
+        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(0, "Require all targets"));
+        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(1, "Require one target"));
+    }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 
 public abstract class TriggerHelper {
     public static final int TRIGGER_INTERVAL_ID = 2;
-   // public static final int TRIGGER_BUD_BLOCK_ID = 5;
+
 
     protected boolean canUseMergedDetection;
     protected int containerId;
@@ -92,6 +92,45 @@ public abstract class TriggerHelper {
         return requiresAll;
     }
 
+    protected boolean isSpecialPulseReceived(FlowComponent component, boolean high) {
+        List<SlotInventoryHolder> containers = CommandExecutor.getContainers(component.getManager(), component.getMenus().get(containerId), blockType);
+
+        if (containers != null) {
+            ComponentMenuContainer componentMenuContainer = (ComponentMenuContainer)component.getMenus().get(containerId);
+
+            boolean requiresAll = componentMenuContainer.getOption() == 0;
+            boolean foundPulse = false;
+
+            for (SlotInventoryHolder container : containers) {
+                ITriggerNode input = container.getTrigger();
+
+
+                boolean flag;
+
+                flag = isPulseReceived(component, input.getData(), input.getOldData(), high);
+                if (flag) {
+                    foundPulse = true;
+                }else{
+                    flag = isTriggerPowered(component, input.getData(), high);
+                }
+
+
+
+                if (foundPulse) {
+                    if (!requiresAll) {
+                        return true;
+                    }
+                }else if(requiresAll && !flag) {
+                    return false;
+                }
+            }
+
+            return requiresAll && foundPulse;
+        }else{
+            return false;
+        }
+    }
+
     protected boolean isTriggerPowered(FlowComponent item, boolean high) {
         List<SlotInventoryHolder> receivers = CommandExecutor.getContainers(item.getManager(), item.getMenus().get(containerId), blockType);
 
@@ -113,7 +152,14 @@ public abstract class TriggerHelper {
         }else{
             boolean requiresAll = menuContainer.getOption() == 0 || (menuContainer.getOption() == 1 && canUseMergedDetection);
             for (SlotInventoryHolder receiver : receivers) {
-                if (isTriggerPowered(component, receiver.getNode().getPower(), high)) {
+                int[] data;
+                if (receiver.getTile() instanceof ITriggerNode) {
+                    data = receiver.getTrigger().getData();
+                }else{
+                    data = receiver.getNode().getPower();
+                }
+
+                if (isTriggerPowered(component, data, high)) {
                     if (!requiresAll) {
                         return true;
                     }

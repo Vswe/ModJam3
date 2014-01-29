@@ -289,6 +289,9 @@ public class TileEntityManager extends TileEntityInterface {
                     if (item.getType() == ComponentType.TRIGGER) {
                         ComponentMenuInterval componentMenuInterval = (ComponentMenuInterval)item.getMenus().get(TriggerHelper.TRIGGER_INTERVAL_ID);
                         int interval = componentMenuInterval.getInterval();
+                        if (interval == 0) {
+                            continue;
+                        }
                         item.setCurrentInterval(item.getCurrentInterval() + 1);
                         if (item.getCurrentInterval() >= interval) {
                             item.setCurrentInterval(0);
@@ -453,6 +456,7 @@ public class TileEntityManager extends TileEntityInterface {
     }
 
     private IComponentNetworkReader getNetworkReaderForComponentPacket(DataReader dr, TileEntityManager jam) {
+
         int componentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
         if (componentId >= 0 && componentId < jam.getFlowItems().size()) {
             FlowComponent component = jam.getFlowItems().get(componentId);

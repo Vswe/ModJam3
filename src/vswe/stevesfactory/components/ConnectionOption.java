@@ -12,9 +12,11 @@ public enum ConnectionOption {
     CONDITION_TRUE("True", ConnectionType.OUTPUT),
     CONDITION_FALSE("False", ConnectionType.OUTPUT),
     FOR_EACH("For each", ConnectionType.SIDE),
-    BUD("On update", ConnectionType.OUTPUT),
-    BUD_PULSE("On update pulse", ConnectionType.OUTPUT),
-    BUD_MATCH("While matching", ConnectionType.OUTPUT);
+    BUD("On block update", ConnectionType.OUTPUT),
+    BUD_PULSE_HIGH("On high pulse", ConnectionType.OUTPUT),
+    BUD_HIGH("While high signal", ConnectionType.OUTPUT),
+    BUD_PULSE_LOW("On low pulse", ConnectionType.OUTPUT),
+    BUD_LOW("While low signal", ConnectionType.OUTPUT);
 
     private String name;
     private ConnectionType type;

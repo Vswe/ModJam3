@@ -56,7 +56,13 @@ public enum DataBitHelper {
     CONTAINER_MODE(3),
     VARIABLE_TYPE(4),
     ORDER_TYPES(2),
-    ORDER_AMOUNT(7);
+    ORDER_AMOUNT(7),
+
+    BLOCK_ID(12),
+    BLOCK_META(4),
+    BUD_SYNC_TYPE(2),
+    BUD_SYNC_SUB_TYPE_LONG(3),
+    BUD_SYNC_SUB_TYPE_SHORT(2);;
 
 
 

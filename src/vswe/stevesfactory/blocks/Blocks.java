@@ -62,7 +62,7 @@ public final class Blocks {
     private static final String CABLE_BUD_TILE_ENTITY_TAG = "TileEntityCableBUDName";
     public static int CABLE_BUD_ID;
     public static final String CABLE_BUD_NAME_TAG = "BlockCableBUDName";
-    public static final String CABLE_BUD_LOCALIZED_NAME = "BUD Detector";
+    public static final String CABLE_BUD_LOCALIZED_NAME = "Block Detector";
     public static final int CABLE_BUD_DEFAULT_ID = 1318;
 
     public static BlockManager blockManager;
@@ -177,6 +177,13 @@ public final class Blocks {
                 Block.hopperBlock,
                 Block.hopperBlock,
                 Block.dropper
+        );
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableBUD, 1),
+                blockCable,
+                Item.netherQuartz,
+                Item.netherQuartz,
+                Item.netherQuartz
         );
     }
 

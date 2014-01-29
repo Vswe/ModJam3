@@ -1,6 +1,8 @@
 package vswe.stevesfactory.components;
 
 
+import java.util.List;
+
 public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSides {
     public ComponentMenuRedstoneSidesTrigger(FlowComponent parent) {
         super(parent);
@@ -37,5 +39,12 @@ public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSide
 
     private boolean isBUD() {
         return getParent().getConnectionSet() == ConnectionSet.BUD;
+    }
+
+    @Override
+    public void addErrors(List<String> errors) {
+        if (isVisible() && selection == 0) {
+            errors.add("No sides selected");
+        }
     }
 }
