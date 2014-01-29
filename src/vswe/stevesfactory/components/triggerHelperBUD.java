@@ -41,7 +41,6 @@ public class TriggerHelperBUD extends TriggerHelper {
                         count++;
                     }
                 }
-                System.out.println(meta + "|" + settingMeta);
                 boolean metaMatch = setting.lowerTextBox.getNumber() <= settingMeta && settingMeta <= setting.higherTextBox.getNumber();
                 if (setting.inverted == metaMatch) {
                     return false;
