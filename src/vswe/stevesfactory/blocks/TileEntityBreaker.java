@@ -5,8 +5,10 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.FakePlayerFactory;
 import net.minecraftforge.common.ForgeDirection;
 
 import java.util.ArrayList;
@@ -80,38 +82,81 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
 
     @Override
     public int getSizeInventory() {
-        return getInventory().size();
+        return getInventory().size() + 1;
     }
 
     @Override
     public ItemStack getStackInSlot(int id) {
-        return getInventory().get(id);
-    }
-
-    @Override
-    public ItemStack decrStackSize(int id, int count) {
-        ItemStack item = getStackInSlot(id);
-        if (item != null) {
-            if (item.stackSize <= count) {
-                setInventorySlotContents(id, null);
-                return item;
-            }
-
-            ItemStack ret = item.splitStack(count);
-
-            if (item.stackSize == 0) {
-                setInventorySlotContents(id, null);
-            }
-
-            return ret;
+        if (id < getInventory().size()) {
+            return getInventory().get(id);
         }else{
             return null;
         }
     }
 
     @Override
+    public ItemStack decrStackSize(int id, int count) {
+
+        ItemStack item = getStackInSlot(id);
+        if (item != null) {
+            if (item.stackSize <= count) {
+                getInventory().set(id, null);
+                return item;
+            }
+
+            ItemStack ret = item.splitStack(count);
+
+            if (item.stackSize == 0) {
+                getInventory().set(id, null);
+            }
+
+            return ret;
+        }else{
+            return null;
+        }
+
+    }
+
+    private static final int[] ROTATION_SIDE_MAPPING = {0, 0, 2, 0, 1, 3};
+
+    @Override
     public void setInventorySlotContents(int id, ItemStack itemstack) {
-        getInventory().set(id, itemstack);
+        if (id < getInventory().size() && itemstack == null) {
+            getInventory().set(id, null);
+        }else if(itemstack != null) {
+
+
+
+            ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
+
+            int x = xCoord;
+            int y = yCoord;
+            int z = zCoord;
+            int side = direction.ordinal();
+            float hitX = 0.5F + direction.offsetX * 0.5F;
+            float hitY = 0.5F + direction.offsetY * 0.5F;
+            float hitZ = 0.5F + direction.offsetZ * 0.5F;
+
+
+            EntityPlayer player = FakePlayerFactory.get(worldObj, "[SFM_PLAYER]");
+            int rotationSide = ROTATION_SIDE_MAPPING[side];
+            player.rotationYaw = rotationSide * 90;
+
+            if (itemstack.getItem() != null && itemstack.stackSize > 0) {
+                itemstack.getItem().onItemUse(itemstack, player, worldObj, x, y, z, side, hitX, hitY, hitZ);
+
+                if (itemstack.stackSize > 0) {
+                    if (id <  getInventory().size()) {
+                        getInventory().set(id, itemstack);
+                    }else{
+                        getInventory().add(itemstack);
+                        if (inventoryCopy != null) {
+                            inventoryCopy.add(itemstack.copy());
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -151,7 +196,7 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-        return false;
+        return true;
     }
 
     @Override
