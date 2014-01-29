@@ -4,6 +4,7 @@ package vswe.stevesfactory.blocks;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -53,14 +54,14 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
 
     @Override
     public void updateEntity() {
-        if (inventory != null && inventoryCopy == null) {
+        if (inventory != null) {
             ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
 
             double x = xCoord + direction.offsetX;
             double y = yCoord + direction.offsetY;
             double z = zCoord + direction.offsetZ;
 
-            for (ItemStack itemStack : inventory) {
+            for (ItemStack itemStack : getInventoryForDrop()) {
                 if (itemStack != null) {
                     double spawnX = x + rand.nextDouble() * 0.8 + 0.1;
                     double spawnY = y + rand.nextDouble() * 0.8 + 0.1;
@@ -78,6 +79,41 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
         }
         inventory = null;
         inventoryCopy = null;
+    }
+
+    private List<ItemStack> getInventoryForDrop() {
+        List<ItemStack> ret = new ArrayList<ItemStack>();
+        for (ItemStack itemStack : inventory) {
+            if (itemStack != null) {
+                ItemStack newStack = itemStack.copy();
+
+                if (inventoryCopy != null) {
+                    for (int i = 0; i < inventoryCopy.size(); i++) {
+                        ItemStack copyStack = inventoryCopy.get(i);
+
+                        if (copyStack != null && newStack.isItemEqual(copyStack) && ItemStack.areItemStackTagsEqual(newStack, copyStack)) {
+                            int max = Math.min(copyStack.stackSize, newStack.stackSize);
+
+                            copyStack.stackSize -= max;
+                            if (copyStack.stackSize == 0) {
+                                inventoryCopy.set(0, null);
+                            }
+
+                            newStack.stackSize -= max;
+                            if (newStack.stackSize == 0) {
+                                newStack = null;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (newStack != null) {
+                    ret.add(newStack);
+                }
+            }
+        }
+        return ret;
     }
 
     @Override
@@ -121,6 +157,7 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
 
     @Override
     public void setInventorySlotContents(int id, ItemStack itemstack) {
+
         if (id < getInventory().size() && itemstack == null) {
             getInventory().set(id, null);
         }else if(itemstack != null) {
@@ -137,24 +174,25 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
             float hitY = 0.5F + direction.offsetY * 0.5F;
             float hitZ = 0.5F + direction.offsetZ * 0.5F;
 
-
-            EntityPlayer player = FakePlayerFactory.get(worldObj, "[SFM_PLAYER]");
+            EntityPlayerMP player = FakePlayerFactory.get(worldObj, "[SFM_PLAYER]");
             int rotationSide = ROTATION_SIDE_MAPPING[side];
             player.rotationYaw = rotationSide * 90;
 
             if (itemstack.getItem() != null && itemstack.stackSize > 0) {
-                itemstack.getItem().onItemUse(itemstack, player, worldObj, x, y, z, side, hitX, hitY, hitZ);
+                player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, side, hitX, hitY, hitZ);
 
-                if (itemstack.stackSize > 0) {
-                    if (id <  getInventory().size()) {
-                        getInventory().set(id, itemstack);
-                    }else{
-                        getInventory().add(itemstack);
-                        if (inventoryCopy != null) {
-                            inventoryCopy.add(itemstack.copy());
-                        }
+                if (id <  getInventory().size()) {
+                    if (itemstack.stackSize == 0) {
+                        itemstack = null;
+                    }
+                    getInventory().set(id, itemstack);
+                }else if(itemstack.stackSize > 0){
+                    getInventory().add(itemstack);
+                    if (inventoryCopy != null) {
+                        inventoryCopy.add(null);
                     }
                 }
+
             }
         }
     }
@@ -209,7 +247,7 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
                 ItemStack itemStack = inventory.get(i);
                 ItemStack itemStackCopy = inventoryCopy.get(i);
 
-                if (!ItemStack.areItemStacksEqual(itemStack, itemStackCopy)) {
+                if (itemStackCopy != null && (itemStack == null || itemStack.itemID != itemStackCopy.itemID || itemStack.getItemDamage() != itemStackCopy.getItemDamage() || !ItemStack.areItemStackTagsEqual(itemStack, itemStackCopy) || itemStack.stackSize < itemStackCopy.stackSize)) {
                     match = false;
                     break;
                 }

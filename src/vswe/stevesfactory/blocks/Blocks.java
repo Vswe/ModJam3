@@ -68,7 +68,7 @@ public final class Blocks {
     private static final String CABLE_BREAKER_TILE_ENTITY_TAG = "TileEntityCableBreakerName";
     public static int CABLE_BREAKER_ID;
     public static final String CABLE_BREAKER_NAME_TAG = "BlockCableBreakerName";
-    public static final String CABLE_BREAKER_LOCALIZED_NAME = "Block Breaker";
+    public static final String CABLE_BREAKER_LOCALIZED_NAME = "Block Gate";
     public static final int CABLE_BREAKER_DEFAULT_ID = 1319;
 
     public static BlockManager blockManager;
@@ -196,6 +196,13 @@ public final class Blocks {
                 Item.netherQuartz,
                 Item.netherQuartz,
                 Item.netherQuartz
+        );
+
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableBreaker, 1),
+                blockCable,
+                Item.pickaxeIron,
+                Block.dispenser
         );
     }
 
