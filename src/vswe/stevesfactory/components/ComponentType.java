@@ -38,10 +38,10 @@ public enum ComponentType {
     FOR_EACH(11, "For Each", "For Each Loop",
             new ConnectionSet[]{ConnectionSet.FOR_EACH},
             ComponentMenuVariableLoop.class, ComponentMenuContainerTypes.class, ComponentMenuListOrder.class, ComponentMenuResult.class),
-
-    ;/*AUTO_CRAFTING(X, "Crafter", "Auto Crafter",
+    AUTO_CRAFTING(12, "Crafter", "Auto Crafter",
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuCrafting.class, ComponentMenuResult.class); */
+            ComponentMenuCrafting.class, ComponentMenuResult.class);
+
 
 
     private Class<? extends ComponentMenu>[] classes;

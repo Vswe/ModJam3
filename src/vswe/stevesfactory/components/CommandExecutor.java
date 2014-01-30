@@ -161,6 +161,9 @@ public class CommandExecutor {
                     updateForLoop(command, (ComponentMenuVariableLoop)command.getMenus().get(0), (ComponentMenuContainerTypes)command.getMenus().get(1), (ComponentMenuListOrder)command.getMenus().get(2));
                     executeChildCommands(command, EnumSet.of(ConnectionOption.STANDARD_OUTPUT));
                     return;
+                case  AUTO_CRAFTING:
+
+                    break;
             }
 
 
@@ -580,39 +583,20 @@ public class CommandExecutor {
 
                         ItemStack itemInSlot = inventory.getStackInSlot(slot.getSlot());
 
-                        if (itemInSlot == null) {
-                            ItemStack temp = itemStack.copy();
-                            int moveCount = Math.min(holder.getSizeLeft(), inventory.getInventoryStackLimit());
+
+                        if (itemInSlot == null || (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable())){
+                            int itemCountInSlot = itemInSlot == null ? 0 : itemInSlot.stackSize;
+
+                            int moveCount = Math.min(holder.getSizeLeft(), Math.min(inventory.getInventoryStackLimit(), itemStack.getMaxStackSize()) - itemCountInSlot);
                             moveCount = itemBufferElement.retrieveItemCount(moveCount);
                             moveCount = outputItemCounter.retrieveItemCount(moveCount);
                             if (moveCount > 0) {
-                                itemBufferElement.decreaseStackSize(moveCount);
-                                outputItemCounter.modifyStackSize(moveCount);
-                                temp.stackSize = moveCount;
-                                holder.reduceAmount(moveCount);
-                                inventory.setInventorySlotContents(slot.getSlot(), temp);
-
-                                boolean done = false;
-                                if (holder.getSizeLeft() == 0) {
-                                    if (itemStack.stackSize == 0) {
-                                        removeItemFromBuffer(holder);
-                                    }
-                                    itemIterator.remove();
-                                    done = true;
+                                if (itemInSlot == null) {
+                                    itemInSlot = itemStack.copy();
+                                    itemInSlot.stackSize = 0;
+                                    inventory.setInventorySlotContents(slot.getSlot(), itemInSlot);
                                 }
 
-                                inventory.onInventoryChanged();
-                                holder.getInventory().onInventoryChanged();
-
-                                if (done) {
-                                    break;
-                                }
-                            }
-                        }else if (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable()){
-                            int moveCount = Math.min(holder.getSizeLeft(), Math.min(inventory.getInventoryStackLimit(), itemInSlot.getMaxStackSize()) - itemInSlot.stackSize);
-                            moveCount = itemBufferElement.retrieveItemCount(moveCount);
-                            moveCount = outputItemCounter.retrieveItemCount(moveCount);
-                            if (moveCount > 0) {
                                 itemBufferElement.decreaseStackSize(moveCount);
                                 outputItemCounter.modifyStackSize(moveCount);
                                 itemInSlot.stackSize += moveCount;
@@ -634,6 +618,7 @@ public class CommandExecutor {
                                 }
                             }
                         }
+
                     }
                 }
 

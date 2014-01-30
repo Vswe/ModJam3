@@ -58,7 +58,7 @@ public class ComponentMenuCrafting extends ComponentMenuItem {
 
     @Override
     protected int getItemsPerRow() {
-        return 3;
+        return isSearching() ? super.getItemsPerRow() : 3;
     }
 
     @Override
