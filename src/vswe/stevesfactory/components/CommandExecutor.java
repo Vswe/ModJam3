@@ -21,8 +21,9 @@ import java.util.*;
 public class CommandExecutor {
 
     private TileEntityManager manager;
-    private List<ItemBufferElement> itemBuffer;
-    private List<LiquidBufferElement> liquidBuffer;
+    List<ItemBufferElement> itemBuffer;
+    List<CraftingBufferElement> craftingBuffer;
+    List<LiquidBufferElement> liquidBuffer;
     private List<Integer> usedCommands;
 
     public static final int MAX_FLUID_TRANSFER = 10000000;
@@ -31,13 +32,15 @@ public class CommandExecutor {
     public CommandExecutor(TileEntityManager manager) {
         this.manager = manager;
         itemBuffer = new ArrayList<ItemBufferElement>();
+        craftingBuffer = new ArrayList<CraftingBufferElement>();
         liquidBuffer = new ArrayList<LiquidBufferElement>();
         usedCommands = new ArrayList<Integer>();
     }
 
-    private CommandExecutor(TileEntityManager manager, List<ItemBufferElement> itemBufferSplit, List<LiquidBufferElement> liquidBufferSplit, List<Integer> usedCommandCopy) {
+    private CommandExecutor(TileEntityManager manager, List<ItemBufferElement> itemBufferSplit, List<CraftingBufferElement> craftingBufferSplit, List<LiquidBufferElement> liquidBufferSplit, List<Integer> usedCommandCopy) {
         this.manager = manager;
         this.itemBuffer = itemBufferSplit;
+        this.craftingBuffer = craftingBufferSplit;
         this.usedCommands = usedCommandCopy;
         this.liquidBuffer = liquidBufferSplit;
     }
@@ -162,7 +165,7 @@ public class CommandExecutor {
                     executeChildCommands(command, EnumSet.of(ConnectionOption.STANDARD_OUTPUT));
                     return;
                 case  AUTO_CRAFTING:
-
+                    craftingBuffer.add(new CraftingBufferElement(this, (ComponentMenuCrafting)command.getMenus().get(0)));
                     break;
             }
 
@@ -546,89 +549,86 @@ public class CommandExecutor {
                 outputCounters.clear();
             }
 
-            IInventory inventory = inventoryHolder.getInventory();
-            Iterator<ItemBufferElement> bufferIterator = itemBuffer.iterator();
-            while(bufferIterator.hasNext()) {
-                ItemBufferElement itemBufferElement = bufferIterator.next();
-
-
-                Iterator<SlotStackInventoryHolder> itemIterator = itemBufferElement.getHolders().iterator();
-                while (itemIterator.hasNext()) {
-                    SlotStackInventoryHolder holder = itemIterator.next();
-                    ItemStack itemStack = holder.getItemStack();
-
-                    Setting setting = isItemValid(componentMenu, itemStack);
-
-                    if ((menuItem.useWhiteList() == (setting == null)) &&  (setting == null || !setting.isLimitedByAmount())) {
-                        continue;
-                    }
-
-                    OutputItemCounter outputItemCounter = null;
-                    for (OutputItemCounter e : outputCounters) {
-                        if (e.areSettingsSame(setting)) {
-                            outputItemCounter = e;
-                            break;
-                        }
-                    }
-
-                    if (outputItemCounter == null) {
-                        outputItemCounter = new OutputItemCounter(itemBuffer, inventories, inventory, setting, menuItem.useWhiteList());
-                        outputCounters.add(outputItemCounter);
-                    }
-
-                    for (SlotSideTarget slot : inventoryHolder.getValidSlots().values()) {
-                        if (!isSlotValid(inventory, itemStack, slot, false)) {
-                            continue;
-                        }
-
-                        ItemStack itemInSlot = inventory.getStackInSlot(slot.getSlot());
-                        if (itemInSlot == null || (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable())){
-                            int itemCountInSlot = itemInSlot == null ? 0 : itemInSlot.stackSize;
-
-                            int moveCount = Math.min(holder.getSizeLeft(), Math.min(inventory.getInventoryStackLimit(), itemStack.getMaxStackSize()) - itemCountInSlot);
-                            moveCount = itemBufferElement.retrieveItemCount(moveCount);
-                            moveCount = outputItemCounter.retrieveItemCount(moveCount);
-                            if (moveCount > 0) {
-                                if (itemInSlot == null) {
-                                    itemInSlot = itemStack.copy();
-                                    itemInSlot.stackSize = 0;
-                                    inventory.setInventorySlotContents(slot.getSlot(), itemInSlot);
-                                }
-
-                                itemBufferElement.decreaseStackSize(moveCount);
-                                outputItemCounter.modifyStackSize(moveCount);
-                                itemInSlot.stackSize += moveCount;
-                                holder.reduceAmount(moveCount);
-                                boolean done = false;
-                                if (holder.getSizeLeft() == 0) {
-                                    if (itemStack.stackSize == 0) {
-                                        removeItemFromBuffer(holder);
-                                    }
-                                    itemIterator.remove();
-                                    done = true;
-                                }
-
-                                inventory.onInventoryChanged();
-                                holder.getInventory().onInventoryChanged();
-
-                                if (done) {
-                                    break;
-                                }
-                            }
-                        }
-
-                    }
-                }
-
+            for (ItemBufferElement itemBufferElement : itemBuffer) {
+                insertItemsFromInputBufferElement(menuItem, inventories, outputCounters, inventoryHolder, itemBufferElement);
             }
-
+            for (CraftingBufferElement craftingBufferElement : craftingBuffer) {
+                insertItemsFromInputBufferElement(menuItem, inventories, outputCounters, inventoryHolder, craftingBufferElement);
+            }
         }
 
     }
 
-    private void removeItemFromBuffer(SlotStackInventoryHolder holder) {
-        holder.getInventory().setInventorySlotContents(holder.getSlot(), null);
+    private void insertItemsFromInputBufferElement(ComponentMenuStuff menuItem, List<SlotInventoryHolder> inventories, List<OutputItemCounter> outputCounters, SlotInventoryHolder inventoryHolder, IItemBufferElement itemBufferElement) {
+        IInventory inventory = inventoryHolder.getInventory();
+
+        IItemBufferSubElement subElement;
+        itemBufferElement.prepareSubElements();
+        while ((subElement = itemBufferElement.getSubElement()) != null) {
+            ItemStack itemStack = subElement.getItemStack();
+
+            Setting setting = isItemValid(menuItem, itemStack);
+
+            if ((menuItem.useWhiteList() == (setting == null)) &&  (setting == null || !setting.isLimitedByAmount())) {
+                continue;
+            }
+
+            OutputItemCounter outputItemCounter = null;
+            for (OutputItemCounter e : outputCounters) {
+                if (e.areSettingsSame(setting)) {
+                    outputItemCounter = e;
+                    break;
+                }
+            }
+
+            if (outputItemCounter == null) {
+                outputItemCounter = new OutputItemCounter(itemBuffer, inventories, inventory, setting, menuItem.useWhiteList());
+                outputCounters.add(outputItemCounter);
+            }
+
+            for (SlotSideTarget slot : inventoryHolder.getValidSlots().values()) {
+                if (!isSlotValid(inventory, itemStack, slot, false)) {
+                    continue;
+                }
+
+                ItemStack itemInSlot = inventory.getStackInSlot(slot.getSlot());
+                if (itemInSlot == null || (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable())){
+                    int itemCountInSlot = itemInSlot == null ? 0 : itemInSlot.stackSize;
+
+                    int moveCount = Math.min(subElement.getSizeLeft(), Math.min(inventory.getInventoryStackLimit(), itemStack.getMaxStackSize()) - itemCountInSlot);
+                    moveCount = itemBufferElement.retrieveItemCount(moveCount);
+                    moveCount = outputItemCounter.retrieveItemCount(moveCount);
+                    if (moveCount > 0) {
+                        if (itemInSlot == null) {
+                            itemInSlot = itemStack.copy();
+                            itemInSlot.stackSize = 0;
+                            inventory.setInventorySlotContents(slot.getSlot(), itemInSlot);
+                        }
+
+                        itemBufferElement.decreaseStackSize(moveCount);
+                        outputItemCounter.modifyStackSize(moveCount);
+                        itemInSlot.stackSize += moveCount;
+                        subElement.reduceAmount(moveCount);
+                        boolean done = false;
+                        if (subElement.getSizeLeft() == 0) {
+                            subElement.remove();
+                            itemBufferElement.removeSubElement();
+                            done = true;
+                        }
+
+                        inventory.onInventoryChanged();
+                        subElement.onUpdate();
+
+                        if (done) {
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
     }
+
 
     private void insertLiquids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
         ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
@@ -853,7 +853,7 @@ public class CommandExecutor {
                         usedCommandCopy.add(usedCommand);
                     }
 
-                    CommandExecutor newExecutor = new CommandExecutor(manager, itemBufferSplit, liquidBufferSplit, usedCommandCopy);
+                    CommandExecutor newExecutor = new CommandExecutor(manager, itemBufferSplit, new ArrayList<CraftingBufferElement>(craftingBuffer), liquidBufferSplit, usedCommandCopy);
                     newExecutor.executeCommand(manager.getFlowItems().get(connection.getComponentId()));
                     usedId++;
                 }

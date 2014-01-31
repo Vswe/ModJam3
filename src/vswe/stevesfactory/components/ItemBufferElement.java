@@ -4,9 +4,10 @@ package vswe.stevesfactory.components;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class ItemBufferElement {
+public class ItemBufferElement implements IItemBufferElement {
     private ItemSetting setting;
     private FlowComponent component;
     private boolean useWhiteList;
@@ -56,8 +57,28 @@ public class ItemBufferElement {
         return setting;
     }
 
-    public List<SlotStackInventoryHolder> getHolders() {
+    public List<SlotStackInventoryHolder> getSubElements() {
         return holders;
+    }
+
+    private Iterator<SlotStackInventoryHolder> iterator;
+    @Override
+    public void prepareSubElements() {
+        iterator = holders.iterator();
+    }
+
+    @Override
+    public IItemBufferSubElement getSubElement() {
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }else{
+            return null;
+        }
+    }
+
+    @Override
+    public void removeSubElement() {
+        iterator.remove();
     }
 
     public int retrieveItemCount(int desiredItemCount) {
@@ -101,7 +122,7 @@ public class ItemBufferElement {
     public int getBufferSize(Setting outputSetting) {
         int bufferSize = 0;
         if (setting != null){
-            for (SlotStackInventoryHolder holder : getHolders()) {
+            for (SlotStackInventoryHolder holder : holders) {
                 ItemStack item = holder.getItemStack();
                 if (((ItemSetting)setting).isEqualForCommandExecutor(item)) {
                     bufferSize += item.stackSize;
@@ -126,7 +147,7 @@ public class ItemBufferElement {
         ItemBufferElement element = new ItemBufferElement(this.component, this.setting, this.inventoryHolder, this.useWhiteList);
         element.holders = new ArrayList<SlotStackInventoryHolder>();
         for (SlotStackInventoryHolder holder : holders) {
-            element.addTarget(holder.getSplitElement(elementAmount, id, fair));
+            element.addTarget((holder).getSplitElement(elementAmount, id, fair));
         }
         if (useWhiteList) {
             element.sharedBy = sharedBy * elementAmount;

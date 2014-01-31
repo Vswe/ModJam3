@@ -17,6 +17,7 @@ import java.util.Random;
 
 public class TileEntityBreaker extends TileEntity implements IInventory {
 
+    private static final String FAKE_PLAYER_NAME = "[SFM_PLAYER]";
     private List<ItemStack> inventory;
     private List<ItemStack> inventoryCache;
     private boolean broken;
@@ -29,12 +30,9 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
             int x = xCoord + direction.offsetX;
             int y = yCoord + direction.offsetY;
             int z = zCoord + direction.offsetZ;
-
-            if (!worldObj.isAirBlock(x, y, z)) {
-                Block block = Block.blocksList[worldObj.getBlockId(x, y, z)];
-                if (block != null) {
-                    inventory = block.getBlockDropped(worldObj, x, y, z, worldObj.getBlockMetadata(x, y, z), 0);
-                }
+            Block block = Block.blocksList[worldObj.getBlockId(x, y, z)];
+            if (canBreakBlock(block, x, y, z)) {
+                inventory = block.getBlockDropped(worldObj, x, y, z, worldObj.getBlockMetadata(x, y, z), 0);
             }
             if (inventory == null) {
                 inventory = new ArrayList<ItemStack>();
@@ -60,7 +58,7 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
         float hitY = 0.5F + direction.offsetY * 0.5F;
         float hitZ = 0.5F + direction.offsetZ * 0.5F;
 
-        EntityPlayerMP player = FakePlayerFactory.get(worldObj, "[SFM_PLAYER]");
+        EntityPlayerMP player = FakePlayerFactory.get(worldObj, FAKE_PLAYER_NAME);
         int rotationSide = ROTATION_SIDE_MAPPING[side];
         player.rotationYaw = rotationSide * 90;
 
@@ -190,43 +188,6 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
             getInventory().add(itemstack);
             inventoryCache.add(null);
         }
-
-        /*if (id < getInventory().size() && itemstack == null) {
-            getInventory().set(id, null);
-        }else if(itemstack != null) {
-
-            ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
-
-            int x = xCoord;
-            int y = yCoord;
-            int z = zCoord;
-            int side = direction.ordinal();
-            float hitX = 0.5F + direction.offsetX * 0.5F;
-            float hitY = 0.5F + direction.offsetY * 0.5F;
-            float hitZ = 0.5F + direction.offsetZ * 0.5F;
-
-            EntityPlayerMP player = FakePlayerFactory.get(worldObj, "[SFM_PLAYER]");
-            int rotationSide = ROTATION_SIDE_MAPPING[side];
-            player.rotationYaw = rotationSide * 90;
-
-            if (itemstack.getItem() != null && itemstack.stackSize > 0) {
-                player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, side, hitX, hitY, hitZ);
-
-                if (id <  getInventory().size()) {
-                    if (itemstack.stackSize == 0) {
-                        itemstack = null;
-                    }
-                    getInventory().set(id, itemstack);
-                }else if(itemstack.stackSize > 0){
-                    getInventory().add(itemstack);
-                    if (inventoryCache != null) {
-                        inventoryCache.add(null);
-                    }
-                }
-
-
-            }
-        } */
     }
 
     @Override
@@ -286,24 +247,28 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
             }
 
            if (!match) {
-               broken = true;
                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
 
                int x = xCoord + direction.offsetX;
                int y = yCoord + direction.offsetY;
                int z = zCoord + direction.offsetZ;
 
-               if (!worldObj.isAirBlock(x, y, z)) {
-                   Block block = Block.blocksList[worldObj.getBlockId(x, y, z)];
-                   if (block != null) {
-                       int meta = worldObj.getBlockMetadata(x, y, z);
-                       block.breakBlock(worldObj, x, y, z, block.blockID, meta);
-                       worldObj.playAuxSFX(2001, x, y, z, block.blockID + (meta << 12));
-                       worldObj.setBlockToAir(x, y, z);
-                   }
+               Block block = Block.blocksList[worldObj.getBlockId(x, y, z)];
+
+
+               if (canBreakBlock(block, x, y, z)) {
+                   broken = true;
+                   int meta = worldObj.getBlockMetadata(x, y, z);
+                   block.breakBlock(worldObj, x, y, z, block.blockID, meta);
+                   worldObj.playAuxSFX(2001, x, y, z, block.blockID + (meta << 12));
+                   worldObj.setBlockToAir(x, y, z);
                }
 
            }
         }
+    }
+
+    private boolean canBreakBlock(Block block, int x, int y, int z) {
+        return block != null && block.blockID != Block.bedrock.blockID && block.getBlockHardness(worldObj, x, y, z) >= 0;
     }
 }

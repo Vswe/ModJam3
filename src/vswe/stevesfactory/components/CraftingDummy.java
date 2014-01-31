@@ -3,9 +3,14 @@ package vswe.stevesfactory.components;
 
 
 import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.world.World;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CraftingDummy extends InventoryCrafting
 {
@@ -22,21 +27,22 @@ public class CraftingDummy extends InventoryCrafting
     }
 
     @Override
-    public int getSizeInventory()
-    {
+    public int getSizeInventory() {
         return 9;
     }
 
     @Override
-    public ItemStack getStackInSlot(int id)
-    {
-        return id < 0 || id >= this.getSizeInventory() ? null : ((CraftingSetting)crafting.getSettings().get(id)).getItem();
+    public ItemStack getStackInSlot(int id) {
+        if (overrideMap != null && overrideMap.get(id) != null && overrideMap.get(id).stackSize > 0) {
+            return overrideMap.get(id);
+        }else{
+            return id < 0 || id >= this.getSizeInventory() ? null : ((CraftingSetting)crafting.getSettings().get(id)).getItem();
+        }
     }
 
 
     @Override
-    public ItemStack getStackInRowAndColumn(int par1, int par2)
-    {
+    public ItemStack getStackInRowAndColumn(int par1, int par2) {
         if (par1 >= 0 && par1 < this.inventoryWidth){
             int k = par1 + par2 * this.inventoryWidth;
             return this.getStackInSlot(k);
@@ -64,7 +70,8 @@ public class CraftingDummy extends InventoryCrafting
     }
 
     public ItemStack getResult() {
-        return CraftingManager.getInstance().findMatchingRecipe(this, crafting.getParent().getManager().worldObj);
+        IRecipe recipe = getRecipe();
+        return recipe == null ? null : recipe.getCraftingResult(this);
     }
 
     public IRecipe getRecipe() {
@@ -81,4 +88,14 @@ public class CraftingDummy extends InventoryCrafting
         return null;
     }
 
+    private Map<Integer, ItemStack> overrideMap;
+    public boolean isItemValidForRecipe(IRecipe recipe, ItemStack result, Map<Integer, ItemStack> overrideMap) {
+        this.overrideMap = overrideMap;
+        if (!recipe.matches(this, crafting.getParent().getManager().worldObj)) {
+            return false;
+        }
+        ItemStack itemStack = recipe.getCraftingResult(this);
+        this.overrideMap = null;
+        return ItemStack.areItemStacksEqual(result, itemStack);
+    }
 }

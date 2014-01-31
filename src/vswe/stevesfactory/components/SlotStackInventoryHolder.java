@@ -4,7 +4,7 @@ package vswe.stevesfactory.components;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
-public class SlotStackInventoryHolder {
+public class SlotStackInventoryHolder implements IItemBufferSubElement {
     private ItemStack itemStack;
     private IInventory inventory;
     private int slot;
@@ -29,6 +29,18 @@ public class SlotStackInventoryHolder {
 
     public int getSlot() {
         return slot;
+    }
+
+    @Override
+    public void remove() {
+        if (itemStack.stackSize == 0) {
+            getInventory().setInventorySlotContents(getSlot(), null);
+        }
+    }
+
+    @Override
+    public void onUpdate() {
+        getInventory().onInventoryChanged();
     }
 
     public int getSizeLeft() {

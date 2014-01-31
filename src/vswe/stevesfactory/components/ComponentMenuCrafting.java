@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.interfaces.GuiManager;
 
@@ -79,5 +80,10 @@ public class ComponentMenuCrafting extends ComponentMenuItem {
     @Override
     protected void onSettingContentChange() {
         resultItem = dummy.getResult();
+    }
+
+
+    public CraftingDummy getDummy() {
+        return dummy;
     }
 }
