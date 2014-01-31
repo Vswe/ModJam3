@@ -582,8 +582,6 @@ public class CommandExecutor {
                         }
 
                         ItemStack itemInSlot = inventory.getStackInSlot(slot.getSlot());
-
-
                         if (itemInSlot == null || (itemInSlot.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, itemInSlot) && itemStack.isStackable())){
                             int itemCountInSlot = itemInSlot == null ? 0 : itemInSlot.stackSize;
 

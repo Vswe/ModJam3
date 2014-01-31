@@ -100,20 +100,23 @@ public class ItemBufferElement {
 
     public int getBufferSize(Setting outputSetting) {
         int bufferSize = 0;
-        for (SlotStackInventoryHolder holder : getHolders()) {
-            ItemStack item = holder.getItemStack();
-            if (((ItemSetting)setting).isEqualForCommandExecutor(item)) {
-                bufferSize += item.stackSize;
+        if (setting != null){
+            for (SlotStackInventoryHolder holder : getHolders()) {
+                ItemStack item = holder.getItemStack();
+                if (((ItemSetting)setting).isEqualForCommandExecutor(item)) {
+                    bufferSize += item.stackSize;
+                }
             }
-        }
-        if (setting != null && setting.isLimitedByAmount()){
+
+            if (setting.isLimitedByAmount()) {
             int maxSize;
-            if (useWhiteList) {
-                maxSize = setting.getItem().stackSize;
-            }else{
-                maxSize = totalStackSize - setting.getItem().stackSize;
+                if (useWhiteList) {
+                    maxSize = setting.getItem().stackSize;
+                }else{
+                    maxSize = totalStackSize - setting.getItem().stackSize;
+                }
+                bufferSize = Math.min(bufferSize, maxSize);
             }
-            bufferSize = Math.min(bufferSize, maxSize);
         }
         return bufferSize;
     }

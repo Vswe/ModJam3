@@ -409,6 +409,18 @@ public class TileEntityRelay extends TileEntityInterface implements IInventory, 
     }
 
 
+    @Override
+    public void onInventoryChanged() {
+        //super.onInventoryChanged();
+        try {
+            IInventory inventory = getInventory();
+
+            inventory.onInventoryChanged();
+        }finally {
+            unBlockUsage();
+        }
+    }
+
     private void blockUsage() {
         blockingUsage = true;
     }
@@ -760,4 +772,5 @@ public class TileEntityRelay extends TileEntityInterface implements IInventory, 
             }
         }
     }
+
 }

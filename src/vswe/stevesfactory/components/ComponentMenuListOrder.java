@@ -151,9 +151,9 @@ public class ComponentMenuListOrder extends ComponentMenu {
     }
 
     private void sendClientData(ContainerManager container, UpdateType type) {
-        DataWriter dw = getWriterForServerComponentPacket();
+        DataWriter dw = getWriterForClientComponentPacket(container);
         writeData(dw, type);
-        PacketHandler.sendDataToServer(dw);
+        PacketHandler.sendDataToListeningClients(container, dw);
     }
 
     private void writeData(DataWriter dw, UpdateType type) {
