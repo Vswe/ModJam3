@@ -415,7 +415,9 @@ public class TileEntityRelay extends TileEntityInterface implements IInventory, 
         try {
             IInventory inventory = getInventory();
 
-            inventory.onInventoryChanged();
+            if (inventory != null) {
+                inventory.onInventoryChanged();
+            }
         }finally {
             unBlockUsage();
         }
