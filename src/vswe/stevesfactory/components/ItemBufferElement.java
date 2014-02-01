@@ -81,6 +81,11 @@ public class ItemBufferElement implements IItemBufferElement {
         iterator.remove();
     }
 
+    @Override
+    public void releaseSubElements() {
+        iterator = null;
+    }
+
     public int retrieveItemCount(int desiredItemCount) {
         if (setting == null || !setting.isLimitedByAmount()) {
             return desiredItemCount;

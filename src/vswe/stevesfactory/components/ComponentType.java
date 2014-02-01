@@ -40,7 +40,7 @@ public enum ComponentType {
             ComponentMenuVariableLoop.class, ComponentMenuContainerTypes.class, ComponentMenuListOrder.class, ComponentMenuResult.class),
     AUTO_CRAFTING(12, "Crafter", "Auto Crafter",
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuCrafting.class, ComponentMenuResult.class);
+            ComponentMenuCrafting.class, ComponentMenuContainerScrap.class, ComponentMenuResult.class);
 
 
 

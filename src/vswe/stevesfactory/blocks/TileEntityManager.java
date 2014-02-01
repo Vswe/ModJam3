@@ -504,7 +504,7 @@ public class TileEntityManager extends TileEntityInterface {
 
         protected Button(String mouseOver) {
             this.x = 5;
-            this.y = 5 + buttons.size() * 18;
+            this.y = 5 + buttons.size() * 17;
             this.mouseOver = mouseOver;
         }
 

@@ -165,7 +165,7 @@ public class CommandExecutor {
                     executeChildCommands(command, EnumSet.of(ConnectionOption.STANDARD_OUTPUT));
                     return;
                 case  AUTO_CRAFTING:
-                    craftingBuffer.add(new CraftingBufferElement(this, (ComponentMenuCrafting)command.getMenus().get(0)));
+                    craftingBuffer.add(new CraftingBufferElement(this, (ComponentMenuCrafting)command.getMenus().get(0), (ComponentMenuContainerScrap)command.getMenus().get(1)));
                     break;
             }
 
@@ -596,8 +596,9 @@ public class CommandExecutor {
                     int itemCountInSlot = itemInSlot == null ? 0 : itemInSlot.stackSize;
 
                     int moveCount = Math.min(subElement.getSizeLeft(), Math.min(inventory.getInventoryStackLimit(), itemStack.getMaxStackSize()) - itemCountInSlot);
-                    moveCount = itemBufferElement.retrieveItemCount(moveCount);
+
                     moveCount = outputItemCounter.retrieveItemCount(moveCount);
+                    moveCount = itemBufferElement.retrieveItemCount(moveCount);
                     if (moveCount > 0) {
                         if (itemInSlot == null) {
                             itemInSlot = itemStack.copy();
@@ -627,6 +628,7 @@ public class CommandExecutor {
 
             }
         }
+        itemBufferElement.releaseSubElements();
     }
 
 

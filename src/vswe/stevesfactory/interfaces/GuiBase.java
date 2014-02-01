@@ -172,6 +172,13 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
 
     }
 
+    public void drawItemAmount(ItemStack itemstack, int x, int y) {
+        itemRenderer.renderItemOverlayIntoGUI(fontRenderer, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
+        bindTexture(getComponentResource());
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glDisable(GL11.GL_LIGHTING);
+    }
+
     public void drawItemStack(ItemStack itemstack, int x, int y) {
         GL11.glPushMatrix();
 
@@ -352,5 +359,6 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
         }
         GL11.glColor4f(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
     }
+
 
 }

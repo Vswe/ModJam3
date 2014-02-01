@@ -9,4 +9,5 @@ public interface IItemBufferElement {
     void removeSubElement();
     int retrieveItemCount(int moveCount);
     void decreaseStackSize(int moveCount);
+    void releaseSubElements();
 }
