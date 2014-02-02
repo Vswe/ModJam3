@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.FakePlayerFactory;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.ForgeHooks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,6 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
                 inventoryCache.add(itemStack.copy());
             }
         }
-
 
         return inventory;
     }
