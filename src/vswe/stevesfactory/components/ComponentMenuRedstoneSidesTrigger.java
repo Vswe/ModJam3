@@ -1,6 +1,8 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
+
 import java.util.List;
 
 public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSides {
@@ -10,8 +12,8 @@ public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSide
 
     @Override
     protected void initRadioButtons() {
-        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, "Requires all"));
-        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, "If any"));
+        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, Localization.REQUIRES_ALL));
+        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, Localization.IF_ANY));
     }
 
     @Override

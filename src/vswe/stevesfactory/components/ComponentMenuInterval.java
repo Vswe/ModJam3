@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -30,7 +31,8 @@ public class ComponentMenuInterval extends ComponentMenu {
 
     private static final int TEXT_BOX_X = 15;
     private static final int TEXT_BOX_Y = 35;
-    private static final int TEXT_X = 5;
+    private static final int MENU_WIDTH = 120;
+    private static final int TEXT_MARGIN_X = 5;
     private static final int TEXT_Y = 10;
     private static final int TEXT_Y2 = 15;
 
@@ -39,7 +41,7 @@ public class ComponentMenuInterval extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Interval";
+        return Localization.INTERVAL_MENU.toString();
     }
 
     private TextBoxNumberList textBoxes;
@@ -48,9 +50,8 @@ public class ComponentMenuInterval extends ComponentMenu {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
-        gui.drawString("Time between this command",TEXT_X, TEXT_Y, 0.7F, 0x404040);
-        gui.drawString("is triggered",TEXT_X, TEXT_Y2, 0.7F, 0x404040);
-        gui.drawString("second(s)",TEXT_SECONDS_X, TEXT_SECOND_Y, 0.7F, 0x404040);
+        gui.drawSplitString(Localization.INTERVAL_INFO.toString(), TEXT_MARGIN_X, TEXT_Y, MENU_WIDTH - TEXT_MARGIN_X * 2, 0.7F, 0x404040);
+        gui.drawString(Localization.SECOND.toString(),TEXT_SECONDS_X, TEXT_SECOND_Y, 0.7F, 0x404040);
         textBoxes.draw(gui, mX, mY);
     }
 

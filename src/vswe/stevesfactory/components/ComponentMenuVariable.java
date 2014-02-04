@@ -55,12 +55,13 @@ public class ComponentMenuVariable extends ComponentMenu {
         for (int i = 0; i < VariableMode.values().length; i++) {
             final VariableMode mode = VariableMode.values()[i];
             int id = mode.declaration ? declarationCount++ : modificationCount++;
-            radioButtons.add(new RadioButton(RADIO_BUTTON_X, RADIO_BUTTON_Y + id * RADIO_BUTTON_SPACING, mode.toString()) {
+            //TODO
+            /*radioButtons.add(new RadioButton(RADIO_BUTTON_X, RADIO_BUTTON_Y + id * RADIO_BUTTON_SPACING, mode.toString()) {
                 @Override
                 public boolean isVisible() {
                     return mode.declaration == isDeclaration();
                 }
-            });
+            }); */
         }
 
         radioButtons.setSelectedOption(getDefaultId());

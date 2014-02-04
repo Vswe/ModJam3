@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -17,7 +18,7 @@ public class ComponentMenuPulse extends ComponentMenu {
         super(parent);
 
         checkBoxes = new CheckBoxList();
-        checkBoxes.addCheckBox(new CheckBox("Do emit pulse", CHECK_BOX_X, CHECK_BOX_Y) {
+        checkBoxes.addCheckBox(new CheckBox(Localization.DO_EMIT_PULSE, CHECK_BOX_X, CHECK_BOX_Y) {
             @Override
             public void setValue(boolean val) {
                 usePulse = val;
@@ -47,7 +48,8 @@ public class ComponentMenuPulse extends ComponentMenu {
             int x = i % 2;
             int y = i / 2;
 
-            radioButtons.add(new RadioButton(RADIO_BUTTON_X + x * RADIO_BUTTON_SPACING_X, RADIO_BUTTON_Y + y * RADIO_BUTTON_SPACING_Y, PULSE_OPTIONS.values()[i].toString()));
+            //TODO
+            //radioButtons.add(new RadioButton(RADIO_BUTTON_X + x * RADIO_BUTTON_SPACING_X, RADIO_BUTTON_Y + y * RADIO_BUTTON_SPACING_Y, PULSE_OPTIONS.values()[i].toString()));
         }
 
 

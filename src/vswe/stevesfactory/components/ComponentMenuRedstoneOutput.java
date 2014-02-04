@@ -51,7 +51,8 @@ public class ComponentMenuRedstoneOutput extends ComponentMenu {
             int x = RADIO_BUTTON_X + ix * RADIO_SPACING_X;
             int y = RADIO_BUTTON_Y + iy * RADIO_SPACING_Y;
 
-            radioButtons.add(new RadioButton(x, y, Settings.values()[i].toString()));
+            //TODO
+            //radioButtons.add(new RadioButton(x, y, Settings.values()[i].toString()));
         }
     }
 

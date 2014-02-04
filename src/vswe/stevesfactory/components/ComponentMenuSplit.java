@@ -3,6 +3,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -24,8 +25,8 @@ public class ComponentMenuSplit extends ComponentMenu {
             }
         };
 
-        radioButtons.add(new RadioButton(RADIO_X, RADIO_Y, "Sequential"));
-        radioButtons.add(new RadioButton(RADIO_X, RADIO_Y + SPACING_Y, "Split"));
+        radioButtons.add(new RadioButton(RADIO_X, RADIO_Y, Localization.SEQUENTIAL));
+        radioButtons.add(new RadioButton(RADIO_X, RADIO_Y + SPACING_Y, Localization.SPLIT));
 
         checkBoxes = new CheckBoxList();
 

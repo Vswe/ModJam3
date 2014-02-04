@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import vswe.stevesfactory.StevesFactoryManager;
 
 
 public class ItemRelay extends ItemBlock {
@@ -18,7 +19,7 @@ public class ItemRelay extends ItemBlock {
 
     @Override
     public String getUnlocalizedName(ItemStack item) {
-        return Blocks.blockCableRelay.isAdvanced(item.getItemDamage()) ? Blocks.CABLE_ADVANCED_RELAY_NAME_TAG : Blocks.CABLE_RELAY_NAME_TAG;
+        return "tile." + StevesFactoryManager.UNLOCALIZED_START + (Blocks.blockCableRelay.isAdvanced(item.getItemDamage()) ? Blocks.CABLE_ADVANCED_RELAY_UNLOCALIZED_NAME : Blocks.CABLE_RELAY_UNLOCALIZED_NAME);
     }
 
 }

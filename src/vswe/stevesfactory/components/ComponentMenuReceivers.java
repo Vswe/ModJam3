@@ -1,5 +1,6 @@
 package vswe.stevesfactory.components;
 
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 
 import java.util.List;
@@ -26,9 +27,9 @@ public class ComponentMenuReceivers extends ComponentMenuContainer {
 
     @Override
     protected void initRadioButtons() {
-        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(0, "Run a shared command once"));
-        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(1, "Require all targets"));
-        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(2, "Require one target"));
+        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(0, Localization.RUN_SHARED_ONCE));
+        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(1, Localization.REQUIRE_ALL_TARGETS));
+        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(2, Localization.REQUIRE_ONE_TARGET));
     }
 
     @Override

@@ -1,6 +1,8 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
+
 public class ComponentMenuListOrderVariable extends ComponentMenuListOrder {
     public ComponentMenuListOrderVariable(FlowComponent parent) {
         super(parent);
@@ -13,6 +15,6 @@ public class ComponentMenuListOrderVariable extends ComponentMenuListOrder {
 
     @Override
     public String getName() {
-        return "Value Order";
+        return Localization.VALUE_ORDER_MENU.toString();
     }
 }

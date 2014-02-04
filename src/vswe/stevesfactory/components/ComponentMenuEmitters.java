@@ -1,6 +1,7 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 
 import java.util.List;
@@ -12,13 +13,13 @@ public class ComponentMenuEmitters extends ComponentMenuContainer {
 
     @Override
     public String getName() {
-        return "Emitters";
+        return Localization.EMITTER_MENU.toString();
     }
 
     @Override
     public void addErrors(List<String> errors) {
         if (selectedInventories.isEmpty()) {
-            errors.add("No emitter selected");
+            errors.add(Localization.NO_EMITTER_ERROR.toString());
         }
     }
 

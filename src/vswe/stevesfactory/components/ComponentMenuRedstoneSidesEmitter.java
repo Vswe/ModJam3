@@ -1,6 +1,8 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
+
 public class ComponentMenuRedstoneSidesEmitter extends ComponentMenuRedstoneSides {
     public ComponentMenuRedstoneSidesEmitter(FlowComponent parent) {
         super(parent);
@@ -8,8 +10,8 @@ public class ComponentMenuRedstoneSidesEmitter extends ComponentMenuRedstoneSide
 
     @Override
     protected void initRadioButtons() {
-        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, "Strong power"));
-        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, "Weak power"));
+        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, Localization.STRONG_POWER));
+        radioButtonList.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, Localization.WEAK_POWER));
     }
 
     @Override

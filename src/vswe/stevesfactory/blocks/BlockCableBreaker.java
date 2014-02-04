@@ -22,7 +22,7 @@ public class BlockCableBreaker extends BlockContainer {
         super(id, Material.iron);
         setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
-        setUnlocalizedName(Blocks.CABLE_BREAKER_NAME_TAG);
+        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + Blocks.CABLE_BREAKER_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
 

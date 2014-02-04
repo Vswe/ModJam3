@@ -197,7 +197,7 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
 
     @Override
     public String getInvName() {
-        return Blocks.CABLE_BREAKER_LOCALIZED_NAME;
+        return Blocks.blockCableBreaker.getLocalizedName();
     }
 
     @Override

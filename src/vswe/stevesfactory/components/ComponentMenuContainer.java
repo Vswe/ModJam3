@@ -6,6 +6,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import vswe.stevesfactory.CollisionHelper;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlock;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.TileEntityManager;
@@ -74,13 +75,13 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     }
 
     protected void initRadioButtons() {
-        radioButtons.add(new RadioButtonInventory(0, "Run a shared command once"));
-        radioButtons.add(new RadioButtonInventory(1, "Run command once per target"));
+        radioButtons.add(new RadioButtonInventory(0, Localization.RUN_SHARED_ONCE));
+        radioButtons.add(new RadioButtonInventory(1, Localization.RUN_ONE_PER_TARGET));
     }
 
     protected class RadioButtonInventory extends RadioButton {
 
-        public RadioButtonInventory(int id, String text) {
+        public RadioButtonInventory(int id, Localization text) {
             super(RADIO_BUTTON_X, RADIO_BUTTON_Y + id * RADIO_BUTTON_SPACING, text);
         }
     }
@@ -144,7 +145,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                     String str = inventories.get(i).getDescription(gui);
 
                     if (selectedInventories.contains(inventories.get(i).getId())) {
-                        str += "\n" + Color.GREEN + "[Selected]";
+                        str += "\n" + Color.GREEN + Localization.SELECTED.toString();
                     }
 
                     gui.drawMouseOver(str, mX, mY);

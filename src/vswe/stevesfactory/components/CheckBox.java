@@ -1,11 +1,13 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
+
 public abstract class CheckBox {
     private int x, y;
-    private String name;
+    private Localization name;
 
-    public CheckBox( String name, int x, int y) {
+    public CheckBox(Localization name, int x, int y) {
         this.x = x;
         this.y = y;
         this.name = name;
@@ -25,7 +27,7 @@ public abstract class CheckBox {
     }
 
     public String getName() {
-        return name;
+        return name.toString();
     }
 
     public boolean isVisible() {

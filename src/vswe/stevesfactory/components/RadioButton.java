@@ -1,12 +1,14 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
+
 public class RadioButton {
     private int x;
     private int y;
-    private String text;
+    private Localization text;
 
-    public RadioButton(int x, int y, String text) {
+    public RadioButton(int x, int y, Localization text) {
         this.x = x;
         this.y = y;
         this.text = text;
@@ -21,7 +23,7 @@ public class RadioButton {
     }
 
     public String getText() {
-        return text;
+        return text.toString();
     }
 
     public boolean isVisible() {

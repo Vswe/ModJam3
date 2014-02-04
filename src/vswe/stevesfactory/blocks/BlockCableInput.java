@@ -17,7 +17,7 @@ public class BlockCableInput extends BlockContainer {
         super(id, Material.iron);
         setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
-        setUnlocalizedName(Blocks.CABLE_INPUT_NAME_TAG);
+        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + Blocks.CABLE_INPUT_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
 

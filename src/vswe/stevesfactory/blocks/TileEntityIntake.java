@@ -131,7 +131,7 @@ public class TileEntityIntake extends TileEntity implements IInventory {
 
     @Override
     public String getInvName() {
-        return Blocks.CABLE_INTAKE_LOCALIZED_NAME;
+        return Blocks.blockCable.getLocalizedName();
     }
 
     @Override

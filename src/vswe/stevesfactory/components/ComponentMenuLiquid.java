@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -59,8 +60,8 @@ public class ComponentMenuLiquid extends ComponentMenuStuff {
     @Override
     protected void drawInfoMenuContent(GuiManager gui, int mX, int mY) {
         if (selectedSetting.isLimitedByAmount()) {
-            gui.drawCenteredString("Buckets", amountTextBoxBuckets.getX(), amountTextBoxBuckets.getY() - 7, 0.7F, amountTextBoxBuckets.getWidth(), 0x404040);
-            gui.drawCenteredString("Milli Buckets", amountTextBoxMilli.getX(), amountTextBoxMilli.getY() - 7, 0.55F, amountTextBoxMilli.getWidth(), 0x404040);
+            gui.drawCenteredString(Localization.BUCKETS.toString(), amountTextBoxBuckets.getX(), amountTextBoxBuckets.getY() - 7, 0.7F, amountTextBoxBuckets.getWidth(), 0x404040);
+            gui.drawCenteredString(Localization.MILLI_BUCKETS.toString(), amountTextBoxMilli.getX(), amountTextBoxMilli.getY() - 7, 0.55F, amountTextBoxMilli.getWidth(), 0x404040);
         }
     }
 
@@ -127,7 +128,7 @@ public class ComponentMenuLiquid extends ComponentMenuStuff {
 
     @Override
     public String getName() {
-        return "Liquids";
+        return Localization.LIQUIDS_MENU.toString();
     }
 
     protected LiquidSetting getSelectedSetting() {

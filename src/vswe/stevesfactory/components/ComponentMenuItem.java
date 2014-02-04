@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import vswe.stevesfactory.CollisionHelper;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -97,14 +98,14 @@ public class ComponentMenuItem extends ComponentMenuStuff {
 
     @Override
     public String getName() {
-        return "Items";
+        return Localization.ITEM_MENU.toString();
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     protected void drawInfoMenuContent(GuiManager gui, int mX, int mY) {
         if (getSelectedSetting().getFuzzyMode() != FuzzyMode.FUZZY) {
-            gui.drawString("Damage value", DMG_VAL_TEXT_X, DMG_VAL_TEXT_Y, 0.7F, 0x404040);
+            gui.drawString(Localization.DAMAGE_VALUE.toString(), DMG_VAL_TEXT_X, DMG_VAL_TEXT_Y, 0.7F, 0x404040);
         }
 
         for (int i = 0; i < 2; i++) {

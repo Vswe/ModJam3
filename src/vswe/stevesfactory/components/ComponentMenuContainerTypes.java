@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
@@ -59,7 +60,7 @@ public class ComponentMenuContainerTypes extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Container Types";
+        return Localization.CONTAINER_TYPE_MENU.toString();
     }
 
     private static final int CHECK_BOX_X = 5;

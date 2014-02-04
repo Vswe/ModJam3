@@ -1,6 +1,7 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public class ComponentMenuBUDs extends ComponentMenuContainer {
 
     @Override
     public String getName() {
-        return "Update Detectors";
+        return Localization.DETECTOR_MENU.toString();
     }
 
     @Override
@@ -22,14 +23,14 @@ public class ComponentMenuBUDs extends ComponentMenuContainer {
 
     @Override
     protected void initRadioButtons() {
-        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(0, "Require all targets"));
-        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(1, "Require one target"));
+        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(0, Localization.REQUIRE_ALL_TARGETS));
+        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(1, Localization.REQUIRE_ONE_TARGET));
     }
 
     @Override
     public void addErrors(List<String> errors) {
         if (selectedInventories.isEmpty()) {
-            errors.add("No detector selected");
+            errors.add(Localization.NO_DETECTOR_ERROR.toString());
         }
     }
 }

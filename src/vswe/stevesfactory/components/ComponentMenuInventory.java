@@ -1,6 +1,7 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 
 import java.util.List;
@@ -12,13 +13,13 @@ public class ComponentMenuInventory extends ComponentMenuContainer {
 
     @Override
     public String getName() {
-        return "Inventories";
+        return Localization.INVENTORY_MENU.toString();
     }
 
     @Override
     public void addErrors(List<String> errors) {
         if (selectedInventories.isEmpty()) {
-            errors.add("No inventory selected");
+            errors.add(Localization.NO_INVENTORY_ERROR.toString());
         }
     }
 }

@@ -3,6 +3,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -28,12 +29,12 @@ public class ComponentMenuListOrder extends ComponentMenu {
         for (int i = 0; i < LoopOrder.values().length; i++) {
             int x = RADIO_BUTTON_X;
             int y = RADIO_BUTTON_Y + i * RADIO_SPACING_Y;
-
-            radioButtons.add(new RadioButton(x, y, LoopOrder.values()[i].toString()));
+             //TODO
+           // radioButtons.add(new RadioButton(x, y, LoopOrder.values()[i].toString()));
         }
 
         checkBoxes = new CheckBoxList();
-        checkBoxes.addCheckBox(new CheckBox("Use all", CHECK_BOX_X, CHECK_BOX_AMOUNT_Y) {
+        checkBoxes.addCheckBox(new CheckBox(Localization.USE_ALL, CHECK_BOX_X, CHECK_BOX_AMOUNT_Y) {
             @Override
             public void setValue(boolean val) {
                 all = val;
@@ -50,7 +51,7 @@ public class ComponentMenuListOrder extends ComponentMenu {
             }
         });
 
-        checkBoxes.addCheckBox(new CheckBox("Reversed", CHECK_BOX_X, CHECK_BOX_REVERSE_Y) {
+        checkBoxes.addCheckBox(new CheckBox(Localization.REVERSED, CHECK_BOX_X, CHECK_BOX_REVERSE_Y) {
             @Override
             public void setValue(boolean val) {
                 reversed = val;
@@ -92,7 +93,7 @@ public class ComponentMenuListOrder extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Loop Order";
+        return Localization.LOOP_ORDER_MENU.toString();
     }
 
     private static final int RADIO_BUTTON_X = 5;

@@ -1,0 +1,74 @@
+# ======================================
+#				BLOCKS
+# ======================================
+
+tile.sfm.BlockMachineManager.name=Machine Inventory Manager
+tile.sfm.BlockCable.name=Inventory Cable
+tile.sfm.BlockCableRelay.name=Inventory Relay
+tile.sfm.BlockAdvancedCableRelay.name=Advanced Inventory Relay
+tile.sfm.BlockCableOutput.name=Redstone Emitter
+tile.sfm.BlockCableInput.name=Redstone Receiver
+tile.sfm.BlockCableCreative.name=Creative Supplier
+tile.sfm.BlockCableIntake.name=Item Valve
+tile.sfm.BlockCableBUD.name=Block Detector
+tile.sfm.BlockCableBreaker.name=Block Gate
+
+# ======================================
+#				INTERFACE
+# ======================================
+
+gui.sfm.DetectorMenu=Update Detectors
+gui.sfm.RequireAllTargets=Require all targets
+gui.sfm.RequireOneTarget=Require one target
+gui.sfm.RunSharedOnce=Run a shared command once
+gui.sfm.RunOnePerTarget=Run command once per target
+gui.sfm.Selected=[Selected]
+gui.sfm.OverflowMenu=Excess Inventories
+gui.sfm.NoDetectorError=No detector selected
+gui.sfm.NoOverflowError=No excess inventory selected
+gui.sfm.OverflowInfo=These inventories will be used if some of the crafted items don't fit. It will also be used for container items, such as buckets.
+gui.sfm.ContainerTypeMenu=Container Types
+gui.sfm.CraftingMenu=Crafting
+gui.sfm.EmitterMenu=Emitters
+gui.sfm.NoEmitterError=No emitter selected
+gui.sfm.RequiresAll=Requires all
+gui.sfm.IfAny=If Any
+gui.sfm.WhiteList=White list
+gui.sfm.BlackList=Black list
+gui.sfm.EmptyTank=Empty tank
+gui.sfm.FilledTank=Filled tank
+gui.sfm.StrongPower=Strong power
+gui.sfm.WeakPower=Weak power
+gui.sfm.Sequential=Sequential
+gui.sfm.Split=Split
+gui.sfm.IntervalMenu=Interval
+gui.sfm.IntervalInfo=Time between this command is triggered
+gui.sfm.Second=second(s)
+gui.sfm.InventoryMenu=Inventories
+gui.sfm.NoInventoryError=No inventory selected
+gui.sfm.ItemMenu=Items
+gui.sfm.DamageValue=Damage value
+gui.sfm.NoConditionError=No condition selected
+gui.sfm.Buckets=Buckets
+gui.sfm.MilliBuckets=Milli Buckets
+gui.sfm.LiquidsMenu=Liquids
+gui.sfm.UseAll=Use all
+gui.sfm.Reversed=Reversed
+gui.sfm.LoopOrderMenu=Loop Order
+gui.sfm.ValueOrderMenu=Value Order
+gui.sfm.RedstoneNodeMenu=Redstone Nodes
+gui.sfm.NoNodeError=No nodes selected
+gui.sfm.DoEmitPulse=Do emit pulse
+gui.sfm.Seconds=Seconds
+gui.sfm.Ticks=Ticks
+
+
+
+
+
+
+# ======================================
+#				OTHER
+# ======================================
+
+itemGroup.sfm=Steve's Factory Manager

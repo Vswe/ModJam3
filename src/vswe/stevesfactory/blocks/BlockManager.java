@@ -25,7 +25,7 @@ public class BlockManager extends BlockContainer {
     public BlockManager(int id) {
         super(id, Material.iron);
 
-        setUnlocalizedName(Blocks.MANAGER_NAME_TAG);
+        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + Blocks.MANAGER_UNLOCALIZED_NAME);
         setStepSound(Block.soundMetalFootstep);
         setCreativeTab(Blocks.creativeTab);
         setHardness(2F);

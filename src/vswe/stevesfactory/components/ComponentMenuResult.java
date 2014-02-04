@@ -39,7 +39,8 @@ public class ComponentMenuResult extends ComponentMenu {
         };
 
         for (int i = 0; i < sets.length; i++) {
-            radioButtons.add(new RadioButton(RADIO_X, RADIO_Y + i * RADIO_MARGIN, sets[i].toString()));
+            //TODO
+            //radioButtons.add(new RadioButton(RADIO_X, RADIO_Y + i * RADIO_MARGIN, sets[i].toString()));
         }
 
         for (int i = 0; i < sets.length; i++) {

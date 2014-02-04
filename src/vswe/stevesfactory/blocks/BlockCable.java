@@ -21,7 +21,7 @@ public class BlockCable extends Block {
         super(id, Material.iron);
         setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
-        setUnlocalizedName(Blocks.CABLE_NAME_TAG);
+        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + Blocks.CABLE_UNLOCALIZED_NAME);
         setHardness(0.4F);
     }
 

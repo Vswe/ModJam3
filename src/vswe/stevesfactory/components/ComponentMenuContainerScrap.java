@@ -2,6 +2,7 @@ package vswe.stevesfactory.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.interfaces.GuiManager;
 
@@ -15,7 +16,7 @@ public class ComponentMenuContainerScrap extends ComponentMenuContainer {
 
     @Override
     public String getName() {
-        return "Excess Inventories";
+        return Localization.OVERFLOW_MENU.toString();
     }
 
     private static final int MENU_WIDTH = 120;
@@ -27,13 +28,13 @@ public class ComponentMenuContainerScrap extends ComponentMenuContainer {
     public void draw(GuiManager gui, int mX, int mY) {
         super.draw(gui, mX, mY);
 
-        gui.drawSplitString("These inventories will be used if some of the crafted items don't fit. It will also be used for container items, such as buckets.", TEXT_MARGIN_X, TEXT_Y, MENU_WIDTH - TEXT_MARGIN_X * 2,  0.7F, 0x404040);
+        gui.drawSplitString(Localization.OVERFLOW_INFO.toString(), TEXT_MARGIN_X, TEXT_Y, MENU_WIDTH - TEXT_MARGIN_X * 2,  0.7F, 0x404040);
     }
 
     @Override
     public void addErrors(List<String> errors) {
         if (selectedInventories.isEmpty()) {
-            errors.add("No excess inventory selected");
+            errors.add(Localization.NO_OVERFLOW_ERROR.toString());
         }
     }
 

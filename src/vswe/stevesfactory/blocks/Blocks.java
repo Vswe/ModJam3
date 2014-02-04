@@ -18,12 +18,12 @@ public final class Blocks {
     private static final String MANAGER_TILE_ENTITY_TAG = "TileEntityMachineManagerName";
     public static int MANAGER_ID;
     public static final String MANAGER_NAME_TAG = "BlockMachineManagerName";
-    public static final String MANAGER_LOCALIZED_NAME = "Machine Inventory Manager";
+    public static final String MANAGER_UNLOCALIZED_NAME = "BlockMachineManager";
     public static final int MANAGER_DEFAULT_ID = 1311;
 
     public static int CABLE_ID;
     public static final String CABLE_NAME_TAG = "BlockCableName";
-    public static final String CABLE_LOCALIZED_NAME = "Inventory Cable";
+    public static final String CABLE_UNLOCALIZED_NAME = "BlockCable";
     public static final int CABLE_DEFAULT_ID = 1312;
 
 
@@ -31,44 +31,44 @@ public final class Blocks {
     public static int CABLE_RELAY_ID;
     public static final String CABLE_RELAY_NAME_TAG = "BlockCableRelayName";
     public static final String CABLE_ADVANCED_RELAY_NAME_TAG = "BlockAdvancedCableRelayName";
-    public static final String CABLE_RELAY_LOCALIZED_NAME = "Inventory Relay";
-    public static final String CABLE_ADVANCED_RELAY_LOCALIZED_NAME = "Advanced Inventory Relay";
+    public static final String CABLE_RELAY_UNLOCALIZED_NAME = "BlockCableRelay";
+    public static final String CABLE_ADVANCED_RELAY_UNLOCALIZED_NAME = "BlockAdvancedCableRelay";
     public static final int CABLE_RELAY_DEFAULT_ID = 1313;
 
     private static final String CABLE_OUTPUT_TILE_ENTITY_TAG = "TileEntityCableOutputName";
     public static int CABLE_OUTPUT_ID;
     public static final String CABLE_OUTPUT_NAME_TAG = "BlockCableOutputName";
-    public static final String CABLE_OUTPUT_LOCALIZED_NAME = "Redstone Emitter";
+    public static final String CABLE_OUTPUT_UNLOCALIZED_NAME = "BlockCableOutput";
     public static final int CABLE_OUTPUT_DEFAULT_ID = 1314;
 
     private static final String CABLE_INPUT_TILE_ENTITY_TAG = "TileEntityCableInputName";
     public static int CABLE_INPUT_ID;
     public static final String CABLE_INPUT_NAME_TAG = "BlockCableInputName";
-    public static final String CABLE_INPUT_LOCALIZED_NAME = "Redstone Receiver";
+    public static final String CABLE_INPUT_UNLOCALIZED_NAME = "BlockCableInput";
     public static final int CABLE_INPUT_DEFAULT_ID = 1315;
 
     private static final String CABLE_CREATIVE_TILE_ENTITY_TAG = "TileEntityCableCreativeName";
     public static int CABLE_CREATIVE_ID;
     public static final String CABLE_CREATIVE_NAME_TAG = "BlockCableCreativeName";
-    public static final String CABLE_CREATIVE_LOCALIZED_NAME = "Creative Supplier";
+    public static final String CABLE_CREATIVE_UNLOCALIZED_NAME = "BlockCableCreative";
     public static final int CABLE_CREATIVE_DEFAULT_ID = 1316;
 
     private static final String CABLE_INTAKE_TILE_ENTITY_TAG = "TileEntityCableIntakeName";
     public static int CABLE_INTAKE_ID;
     public static final String CABLE_INTAKE_NAME_TAG = "BlockCableIntakeName";
-    public static final String CABLE_INTAKE_LOCALIZED_NAME = "Item Valve";
+    public static final String CABLE_INTAKE_UNLOCALIZED_NAME = "BlockCableIntake";
     public static final int CABLE_INTAKE_DEFAULT_ID = 1317;
 
     private static final String CABLE_BUD_TILE_ENTITY_TAG = "TileEntityCableBUDName";
     public static int CABLE_BUD_ID;
     public static final String CABLE_BUD_NAME_TAG = "BlockCableBUDName";
-    public static final String CABLE_BUD_LOCALIZED_NAME = "Block Detector";
+    public static final String CABLE_BUD_UNLOCALIZED_NAME = "BlockCableBUD";
     public static final int CABLE_BUD_DEFAULT_ID = 1318;
 
     private static final String CABLE_BREAKER_TILE_ENTITY_TAG = "TileEntityCableBreakerName";
     public static int CABLE_BREAKER_ID;
     public static final String CABLE_BREAKER_NAME_TAG = "BlockCableBreakerName";
-    public static final String CABLE_BREAKER_LOCALIZED_NAME = "Block Gate";
+    public static final String CABLE_BREAKER_UNLOCALIZED_NAME = "BlockCableBreaker";
     public static final int CABLE_BREAKER_DEFAULT_ID = 1319;
 
     public static BlockManager blockManager;
@@ -83,7 +83,7 @@ public final class Blocks {
     public static CreativeTabs creativeTab;
 
     public static void init() {
-        creativeTab = new CreativeTabs("SFM") {
+        creativeTab = new CreativeTabs("sfm") {
             @Override
             public ItemStack getIconItemStack() {
                 return new ItemStack(blockManager);
@@ -127,7 +127,7 @@ public final class Blocks {
     }
 
     public static void addNames() {
-        LanguageRegistry.addName(blockManager, MANAGER_LOCALIZED_NAME);
+        /*LanguageRegistry.addName(blockManager, MANAGER_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCable, CABLE_LOCALIZED_NAME);
         LanguageRegistry.addName(new ItemStack(blockCableRelay, 1 , 0), CABLE_RELAY_LOCALIZED_NAME);
         LanguageRegistry.addName(new ItemStack(blockCableRelay, 1 , 8), CABLE_ADVANCED_RELAY_LOCALIZED_NAME);
@@ -136,8 +136,8 @@ public final class Blocks {
         LanguageRegistry.addName(blockCableCreative, CABLE_CREATIVE_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableIntake, CABLE_INTAKE_LOCALIZED_NAME);
         LanguageRegistry.addName(blockCableBUD, CABLE_BUD_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCableBreaker, CABLE_BREAKER_LOCALIZED_NAME);
-        LanguageRegistry.instance().addStringLocalization(creativeTab.getTranslatedTabLabel(), "en_US", "Steve's Factory Manager");
+        LanguageRegistry.addName(blockCableBreaker, CABLE_BREAKER_LOCALIZED_NAME);*/
+        //LanguageRegistry.instance().addStringLocalization(creativeTab.getTranslatedTabLabel(), "en_US", "Steve's Factory Manager");
     }
 
     public static void addRecipes() {

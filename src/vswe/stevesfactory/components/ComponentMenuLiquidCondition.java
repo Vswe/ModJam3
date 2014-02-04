@@ -1,6 +1,8 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
+
 import java.util.List;
 
 public class ComponentMenuLiquidCondition extends ComponentMenuLiquid implements IConditionStuffMenu {
@@ -11,8 +13,8 @@ public class ComponentMenuLiquidCondition extends ComponentMenuLiquid implements
 
     @Override
     protected void initRadioButtons() {
-        radioButtons.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, "Requires all"));
-        radioButtons.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, "If any"));
+        radioButtons.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, Localization.REQUIRES_ALL));
+        radioButtons.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, Localization.IF_ANY));
     }
 
     public boolean requiresAll() {
@@ -27,6 +29,6 @@ public class ComponentMenuLiquidCondition extends ComponentMenuLiquid implements
             }
         }
 
-        errors.add("No condition selected");
+        errors.add(Localization.NO_CONDITION_ERROR.toString());
     }
 }
