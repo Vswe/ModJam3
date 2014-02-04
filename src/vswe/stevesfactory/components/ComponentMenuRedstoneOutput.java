@@ -52,8 +52,8 @@ public class ComponentMenuRedstoneOutput extends ComponentMenu {
             int x = RADIO_BUTTON_X + ix * RADIO_SPACING_X;
             int y = RADIO_BUTTON_Y + iy * RADIO_SPACING_Y;
 
-            //TODO
-            //radioButtons.add(new RadioButton(x, y, Settings.values()[i].toString()));
+
+            radioButtons.add(new RadioButton(x, y, Settings.values()[i].getName()));
         }
     }
 
@@ -66,18 +66,28 @@ public class ComponentMenuRedstoneOutput extends ComponentMenu {
     }
 
     public static enum Settings {
-        FIXED,
-        TOGGLE,
-        MAX,
-        MIN,
-        INCREASE,
-        DECREASE,
-        FORWARD,
-        BACKWARD;
+        FIXED(Localization.FIXED),
+        TOGGLE(Localization.TOGGLE),
+        MAX(Localization.MAX),
+        MIN(Localization.MIN),
+        INCREASE(Localization.INCREASE),
+        DECREASE(Localization.DECREASE),
+        FORWARD(Localization.FORWARD),
+        BACKWARD(Localization.BACKWARD);
+
+        private Localization name;
+
+        private Settings(Localization name) {
+            this.name = name;
+        }
+
+        public Localization getName() {
+            return name;
+        }
 
         @Override
         public String toString() {
-            return super.toString().charAt(0) + super.toString().substring(1).toLowerCase();
+            return name.toString();
         }
 
 

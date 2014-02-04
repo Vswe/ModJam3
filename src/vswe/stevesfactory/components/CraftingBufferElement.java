@@ -9,7 +9,6 @@ import vswe.stevesfactory.blocks.TileEntityManager;
 
 import java.util.*;
 
-//TODO implement this!
 public class CraftingBufferElement implements IItemBufferElement, IItemBufferSubElement {
 
     private static final ItemStack DUMMY_ITEM = new ItemStack(1, 0, 0);

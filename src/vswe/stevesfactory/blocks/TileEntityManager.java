@@ -9,6 +9,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.components.*;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
@@ -51,7 +52,7 @@ public class TileEntityManager extends TileEntityInterface {
             buttons.add(new ButtonCreate(ComponentType.values()[i]));
         }
 
-        buttons.add(new Button("Delete [Drop command here]") {
+        buttons.add(new Button(Localization.DELETE_COMMAND) {
             @Override
             protected void onClick(DataReader dr) {
                 int idToRemove = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
@@ -500,9 +501,9 @@ public class TileEntityManager extends TileEntityInterface {
     public abstract class Button {
         private int x;
         private int y;
-        private String mouseOver;
+        private Localization mouseOver;
 
-        protected Button(String mouseOver) {
+        protected Button(Localization mouseOver) {
             this.x = 5;
             this.y = 5 + buttons.size() * 17;
             this.mouseOver = mouseOver;
@@ -520,7 +521,7 @@ public class TileEntityManager extends TileEntityInterface {
         }
 
         public String getMouseOver() {
-            return mouseOver;
+            return mouseOver.toString();
         }
 
         public boolean activateOnRelease() {
@@ -533,7 +534,7 @@ public class TileEntityManager extends TileEntityInterface {
         private ComponentType type;
 
         protected ButtonCreate(ComponentType type) {
-            super("Create " + type.getLongName());
+            super(type.getLongUnLocalizedName());
 
             this.type = type;
         }
@@ -553,9 +554,9 @@ public class TileEntityManager extends TileEntityInterface {
         @Override
         public String getMouseOver() {
             if (getFlowItems().size() == MAX_COMPONENT_AMOUNT) {
-                return "Maximum component amount reached";
+                return Localization.MAXIMUM_COMPONENT_ERROR.toString();
             }else{
-                return super.getMouseOver();
+                return Localization.CREATE_COMMAND.toString() + " " + super.getMouseOver();
             }
         }
     }

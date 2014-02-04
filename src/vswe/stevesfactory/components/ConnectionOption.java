@@ -1,28 +1,30 @@
 package vswe.stevesfactory.components;
 
 
-public enum ConnectionOption {
-    STANDARD_INPUT("Input", ConnectionType.INPUT),
-    STANDARD_OUTPUT("Output", ConnectionType.OUTPUT),
-    INTERVAL("Interval", ConnectionType.OUTPUT),
-    REDSTONE_PULSE_HIGH("On high pulse", ConnectionType.OUTPUT),
-    REDSTONE_PULSE_LOW("On low pulse", ConnectionType.OUTPUT),
-    REDSTONE_HIGH("While high signal", ConnectionType.OUTPUT),
-    REDSTONE_LOW("While low signal", ConnectionType.OUTPUT),
-    CONDITION_TRUE("True", ConnectionType.OUTPUT),
-    CONDITION_FALSE("False", ConnectionType.OUTPUT),
-    FOR_EACH("For each", ConnectionType.SIDE),
-    BUD("On block update", ConnectionType.OUTPUT),
-    BUD_PULSE_HIGH("On high pulse", ConnectionType.OUTPUT),
-    BUD_HIGH("While high signal", ConnectionType.OUTPUT),
-    BUD_PULSE_LOW("On low pulse", ConnectionType.OUTPUT),
-    BUD_LOW("While low signal", ConnectionType.OUTPUT);
+import vswe.stevesfactory.Localization;
 
-    private String name;
+public enum ConnectionOption {
+    STANDARD_INPUT(Localization.CONNECTION_INPUT, ConnectionType.INPUT),
+    STANDARD_OUTPUT(Localization.CONNECTION_OUTPUT, ConnectionType.OUTPUT),
+    INTERVAL(Localization.CONNECTION_INTERVAL, ConnectionType.OUTPUT),
+    REDSTONE_PULSE_HIGH(Localization.CONNECTION_ON_HIGH_REDSTONE_PULSE, ConnectionType.OUTPUT),
+    REDSTONE_PULSE_LOW(Localization.CONNECTION_ON_LOW_REDSTONE_PULSE, ConnectionType.OUTPUT),
+    REDSTONE_HIGH(Localization.CONNECTION_WHILE_HIGH_REDSTONE, ConnectionType.OUTPUT),
+    REDSTONE_LOW(Localization.CONNECTION_WHILE_LOW_REDSTONE, ConnectionType.OUTPUT),
+    CONDITION_TRUE(Localization.CONNECTION_TRUE, ConnectionType.OUTPUT),
+    CONDITION_FALSE(Localization.CONNECTION_FALSE, ConnectionType.OUTPUT),
+    FOR_EACH(Localization.CONNECTION_FOR_EACH, ConnectionType.SIDE),
+    BUD(Localization.CONNECTION_ON_BLOCK_UPDATE, ConnectionType.OUTPUT),
+    BUD_PULSE_HIGH(Localization.CONNECTION_ON_HIGH_BLOCK_PULSE, ConnectionType.OUTPUT),
+    BUD_HIGH(Localization.CONNECTION_WHILE_HIGH_BLOCK, ConnectionType.OUTPUT),
+    BUD_PULSE_LOW(Localization.CONNECTION_ON_LOW_BLOCK_PULSE, ConnectionType.OUTPUT),
+    BUD_LOW(Localization.CONNECTION_WHILE_LOW_BLOCK, ConnectionType.OUTPUT);
+
+    private Localization name;
     private ConnectionType type;
 
 
-    private ConnectionOption(String name, ConnectionType type) {
+    private ConnectionOption(Localization name, ConnectionType type) {
         this.name = name;
         this.type = type;
     }
@@ -38,7 +40,7 @@ public enum ConnectionOption {
 
     @Override
     public String toString() {
-        return name;
+        return name.toString();
     }
 
     public enum ConnectionType {

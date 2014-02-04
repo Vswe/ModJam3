@@ -1,44 +1,46 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
+
 public enum ComponentType {
-    TRIGGER(0, "Trigger", "Trigger",
+    TRIGGER(0, Localization.TRIGGER_SHORT, Localization.TRIGGER_LONG,
             new ConnectionSet[] {ConnectionSet.CONTINUOUSLY, ConnectionSet.REDSTONE, ConnectionSet.BUD},
             ComponentMenuReceivers.class, ComponentMenuBUDs.class, ComponentMenuInterval.class, ComponentMenuRedstoneSidesTrigger.class, ComponentMenuRedstoneStrength.class, ComponentMenuUpdateBlock.class, ComponentMenuResult.class),
-    INPUT(1, "Input", "Input",
+    INPUT(1, Localization.INPUT_SHORT, Localization.INPUT_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuInventory.class, ComponentMenuTargetInventory.class, ComponentMenuItem.class, ComponentMenuResult.class),
-    OUTPUT(2, "Output", "Output",
+    OUTPUT(2, Localization.OUTPUT_SHORT, Localization.OUTPUT_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuInventory.class, ComponentMenuTargetInventory.class, ComponentMenuItemOutput.class, ComponentMenuResult.class),
-    CONDITION(3, "Condition", "Condition",
+    CONDITION(3, Localization.CONDITION_SHORT, Localization.CONDITION_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
             ComponentMenuInventoryCondition.class, ComponentMenuTargetInventory.class, ComponentMenuItemCondition.class, ComponentMenuResult.class),
-    FLOW_CONTROL(4, "Flow", "Flow Control",
+    FLOW_CONTROL(4, Localization.FLOW_CONTROL_SHORT, Localization.FLOW_CONTROL_LONG,
             new ConnectionSet[]{ConnectionSet.MULTIPLE_INPUT_2, ConnectionSet.MULTIPLE_INPUT_5, ConnectionSet.MULTIPLE_OUTPUT_2, ConnectionSet.MULTIPLE_OUTPUT_5},
             ComponentMenuSplit.class, ComponentMenuResult.class),
-    LIQUID_INPUT(5, "Input (L)", "Liquid Input",
+    LIQUID_INPUT(5, Localization.LIQUID_INPUT_SHORT, Localization.LIQUID_INPUT_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuLiquid.class, ComponentMenuResult.class),
-    LIQUID_OUTPUT(6, "Output (L)", "Liquid Output",
+    LIQUID_OUTPUT(6, Localization.LIQUID_OUTPUT_SHORT, Localization.LIQUID_OUTPUT_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuTank.class, ComponentMenuTargetTank.class, ComponentMenuLiquidOutput.class, ComponentMenuResult.class),
-    LIQUID_CONDITION(7, "Condition (L)", "Liquid Condition",
+    LIQUID_CONDITION(7, Localization.LIQUID_CONDITION_SHORT, Localization.LIQUID_CONDITION_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
             ComponentMenuTankCondition.class, ComponentMenuTargetTank.class, ComponentMenuLiquidCondition.class, ComponentMenuResult.class),
-    REDSTONE_EMITTER(8, "Emitter", "Redstone Emitter",
+    REDSTONE_EMITTER(8, Localization.REDSTONE_EMITTER_SHORT, Localization.REDSTONE_EMITTER_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuEmitters.class, ComponentMenuRedstoneSidesEmitter.class, ComponentMenuRedstoneOutput.class, ComponentMenuPulse.class, ComponentMenuResult.class),
-    REDSTONE_CONDITION(9, "Condition (R)", "Redstone Condition",
+    REDSTONE_CONDITION(9, Localization.REDSTONE_CONDITION_SHORT, Localization.REDSTONE_CONDITION_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD_CONDITION},
             ComponentMenuNodes.class, ComponentMenuRedstoneSidesNodes.class, ComponentMenuRedstoneStrengthNodes.class, ComponentMenuResult.class),
-    VARIABLE(10, "Variable", "Container Variable",
+    VARIABLE(10, Localization.CONTAINER_VARIABLE_SHORT, Localization.CONTAINER_VARIABLE_LONG,
             new ConnectionSet[]{ConnectionSet.EMPTY, ConnectionSet.STANDARD},
             ComponentMenuVariable.class, ComponentMenuContainerTypesVariable.class, ComponentMenuVariableContainers.class, ComponentMenuListOrderVariable.class, ComponentMenuResult.class),
-    FOR_EACH(11, "For Each", "For Each Loop",
+    FOR_EACH(11, Localization.FOR_EACH_LOOP_SHORT, Localization.FOR_EACH_LOOP_LONG,
             new ConnectionSet[]{ConnectionSet.FOR_EACH},
             ComponentMenuVariableLoop.class, ComponentMenuContainerTypes.class, ComponentMenuListOrder.class, ComponentMenuResult.class),
-    AUTO_CRAFTING(12, "Crafter", "Auto Crafter",
+    AUTO_CRAFTING(12, Localization.AUTO_CRAFTER_SHORT, Localization.AUTO_CRAFTER_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuCrafting.class, ComponentMenuContainerScrap.class, ComponentMenuResult.class);
 
@@ -47,10 +49,10 @@ public enum ComponentType {
     private Class<? extends ComponentMenu>[] classes;
     private int id;
     private ConnectionSet[] sets;
-    private String name;
-    private String longName;
+    private Localization name;
+    private Localization longName;
 
-    private ComponentType(int id, String name, String longName, ConnectionSet[] sets, Class<? extends ComponentMenu> ... classes) {
+    private ComponentType(int id, Localization name, Localization longName, ConnectionSet[] sets, Class<? extends ComponentMenu> ... classes) {
         this.classes = classes;
         this.id = id;
         this.sets = sets;
@@ -81,15 +83,19 @@ public enum ComponentType {
 
 
     public String getName() {
-        return name;
+        return name.toString();
     }
 
     public String getLongName() {
-        return longName;
+        return longName.toString();
     }
 
     @Override
     public String toString() {
-        return name + "[" + longName + "]";
+        return getName() + "[" + getLongName() + "]";
+    }
+
+    public Localization getLongUnLocalizedName() {
+        return longName;
     }
 }

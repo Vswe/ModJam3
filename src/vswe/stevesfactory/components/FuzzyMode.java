@@ -1,21 +1,23 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
+
 public enum FuzzyMode {
-    PRECISE("Precise detection"),
-    NBT_FUZZY("NBT independent detection"),
-    FUZZY("Fuzzy detection"),
-    ORE_DICTIONARY("Ore dictionary support");
+    PRECISE(Localization.DETECTION_PRECISE),
+    NBT_FUZZY(Localization.DETECTION_NBT_FUZZY),
+    FUZZY(Localization.DETECTION_FUZZY),
+    ORE_DICTIONARY(Localization.DETECTION_ORE_DICTIONARY);
 
-    private String text;
+    private Localization text;
 
-    private FuzzyMode(String text) {
+    private FuzzyMode(Localization text) {
         this.text = text;
     }
 
     @Override
     public String toString() {
-        return text;
+        return text.toString();
     }
 
 

@@ -3,19 +3,22 @@ package vswe.stevesfactory.blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.IFluidHandler;
+import vswe.stevesfactory.Localization;
 
 public enum ConnectionBlockType {
-    INVENTORY(IInventory.class, false),
-    TANK(IFluidHandler.class, false),
-    EMITTER(TileEntityOutput.class, false),
-    RECEIVER(TileEntityInput.class, false),
-    NODE(IRedstoneNode.class, true),
-    BUD(TileEntityBUD.class, false);
+    INVENTORY(Localization.TYPE_INVENTORY, IInventory.class, false),
+    TANK(Localization.TYPE_TANK, IFluidHandler.class, false),
+    EMITTER(Localization.TYPE_EMITTER, TileEntityOutput.class, false),
+    RECEIVER(Localization.TYPE_RECEIVER, TileEntityInput.class, false),
+    NODE(Localization.TYPE_NODE, IRedstoneNode.class, true),
+    BUD(Localization.TYPE_BUD, TileEntityBUD.class, false);
 
+    private Localization name;
     private Class clazz;
     private boolean group;
 
-    private ConnectionBlockType(Class clazz, boolean group) {
+    private ConnectionBlockType(Localization name, Class clazz, boolean group) {
+        this.name = name;
         this.clazz = clazz;
         this.group = group;
     }
@@ -32,9 +35,12 @@ public enum ConnectionBlockType {
         return group;
     }
 
+    public Localization getName() {
+        return name;
+    }
 
     @Override
     public String toString() {
-        return super.toString().charAt(0) + super.toString().substring(1).toLowerCase();
+        return name.toString();
     }
 }

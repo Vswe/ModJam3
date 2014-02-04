@@ -27,7 +27,7 @@ public abstract class CheckBox {
     }
 
     public String getName() {
-        return name.toString();
+        return name == null ? null : name.toString();
     }
 
     public boolean isVisible() {

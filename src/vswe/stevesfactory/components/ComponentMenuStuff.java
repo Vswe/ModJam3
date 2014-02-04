@@ -238,7 +238,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             }
 
             if (isScrollingVisible()) {
-                gui.drawString("Found " + result.size(), AMOUNT_TEXT_X, AMOUNT_TEXT_Y, 0.7F, 0x404040);
+                gui.drawString(Localization.ITEMS_FOUND.toString() + " " + result.size(), AMOUNT_TEXT_X, AMOUNT_TEXT_Y, 0.7F, 0x404040);
 
                 List<Point> points = getItemCoordinates();
                 for (Point point : points) {

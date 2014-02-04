@@ -103,7 +103,7 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
             GL11.glPushMatrix();
             GL11.glEnable(GL11.GL_BLEND);
             int color =  selectedDirectionId != -1 && selectedDirectionId != i ? 0x70404040 : 0x404040;
-            gui.drawString(direction.toString().charAt(0) + direction.toString().substring(1).toLowerCase(), x + DIRECTION_TEXT_X, y + DIRECTION_TEXT_Y, color);
+            gui.drawString(Localization.getForgeDirectionLocalization(i).toString(), x + DIRECTION_TEXT_X, y + DIRECTION_TEXT_Y, color);
             GL11.glPopMatrix();
         }
 

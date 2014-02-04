@@ -59,8 +59,7 @@ public abstract class ComponentMenuRedstoneSides extends ComponentMenu {
     private class CheckBoxSide extends CheckBox {
         private int id;
         public CheckBoxSide(int id) {
-            //TODO
-            super(Localization.SPLIT/*ForgeDirection.VALID_DIRECTIONS[id].toString().charAt(0) + ForgeDirection.VALID_DIRECTIONS[id].toString().toLowerCase().substring(1)*/, CHECKBOX_X + CHECKBOX_SPACING_X * (id % 2), CHECKBOX_Y + CHECKBOX_SPACING_Y * (id / 2));
+            super(Localization.getForgeDirectionLocalization(id), CHECKBOX_X + CHECKBOX_SPACING_X * (id % 2), CHECKBOX_Y + CHECKBOX_SPACING_Y * (id / 2));
 
             this.id = id;
         }

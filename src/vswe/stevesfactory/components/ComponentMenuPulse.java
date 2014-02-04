@@ -48,8 +48,8 @@ public class ComponentMenuPulse extends ComponentMenu {
             int x = i % 2;
             int y = i / 2;
 
-            //TODO
-            //radioButtons.add(new RadioButton(RADIO_BUTTON_X + x * RADIO_BUTTON_SPACING_X, RADIO_BUTTON_Y + y * RADIO_BUTTON_SPACING_Y, PULSE_OPTIONS.values()[i].toString()));
+
+            radioButtons.add(new RadioButton(RADIO_BUTTON_X + x * RADIO_BUTTON_SPACING_X, RADIO_BUTTON_Y + y * RADIO_BUTTON_SPACING_Y, PULSE_OPTIONS.values()[i].getName()));
         }
 
 
@@ -76,17 +76,25 @@ public class ComponentMenuPulse extends ComponentMenu {
     }
 
     public enum PULSE_OPTIONS {
-        EXTEND_OLD,
-        KEEP_ALL,
-        KEEP_OLD,
-        KEEP_NEW;
+        EXTEND_OLD(Localization.EXTEND_OLD),
+        KEEP_ALL(Localization.KEEP_ALL),
+        KEEP_OLD(Localization.KEEP_OLD),
+        KEEP_NEW(Localization.KEEP_NEW);
+
+        private Localization name;
+
+        private PULSE_OPTIONS(Localization name) {
+            this.name = name;
+        }
 
         @Override
         public String toString() {
-            return super.toString().charAt(0) + super.toString().substring(1).replace("_", " ").toLowerCase();
+            return name.toString();
         }
 
-
+        public Localization getName() {
+            return name;
+        }
     }
     private static final int CHECK_BOX_X = 5;
     private static final int CHECK_BOX_Y = 5;

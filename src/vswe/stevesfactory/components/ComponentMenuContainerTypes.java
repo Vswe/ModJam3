@@ -35,7 +35,7 @@ public class ComponentMenuContainerTypes extends ComponentMenu {
         checkBoxes = new CheckBoxList();
         for (int i = 0; i  < types.size(); i++) {
             final int id = i;
-            checkBoxes.addCheckBox(new CheckBox(types.get(i).toString(), CHECK_BOX_X, CHECK_BOX_Y + CHECK_BOX_SPACING * i) {
+            checkBoxes.addCheckBox(new CheckBox(types.get(i).getName(), CHECK_BOX_X, CHECK_BOX_Y + CHECK_BOX_SPACING * i) {
                 @Override
                 public void setValue(boolean val) {
                     checked[id] = val;

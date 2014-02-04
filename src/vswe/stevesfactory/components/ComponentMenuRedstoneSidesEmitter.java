@@ -16,7 +16,7 @@ public class ComponentMenuRedstoneSidesEmitter extends ComponentMenuRedstoneSide
 
     @Override
     protected String getMessage() {
-        return "Select which block sides the redstone should be emitted at";
+        return Localization.REDSTONE_EMITTER_SIDES_INFO.toString();
     }
 
     public boolean useStrongSignal() {
@@ -25,6 +25,6 @@ public class ComponentMenuRedstoneSidesEmitter extends ComponentMenuRedstoneSide
 
     @Override
     public String getName() {
-        return "Sides";
+        return Localization.REDSTONE_EMITTER_SIDES_MENU.toString();
     }
 }

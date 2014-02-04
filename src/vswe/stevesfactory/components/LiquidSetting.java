@@ -9,6 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataReader;
@@ -38,15 +39,15 @@ public class LiquidSetting extends Setting {
         List<String> ret = new ArrayList<String>();
 
         if (fluid == null) {
-            ret.add("[No liquid selected]");
+            ret.add(Localization.NO_LIQUID_SELECTED.toString());
         }else{
             ret.add(ComponentMenuLiquid.getDisplayName(fluid));
         }
 
         ret.add("");
-        ret.add("Left click to change liquid");
+        ret.add(Localization.CHANGE_LIQUID.toString());
         if (fluid != null) {
-            ret.add("Right click to edit settings");
+            ret.add(Localization.EDIT_SETTING.toString());
         }
 
         return ret;

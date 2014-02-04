@@ -56,13 +56,13 @@ public class ComponentMenuVariable extends ComponentMenu {
         for (int i = 0; i < VariableMode.values().length; i++) {
             final VariableMode mode = VariableMode.values()[i];
             int id = mode.declaration ? declarationCount++ : modificationCount++;
-            //TODO
-            /*radioButtons.add(new RadioButton(RADIO_BUTTON_X, RADIO_BUTTON_Y + id * RADIO_BUTTON_SPACING, mode.toString()) {
+
+            radioButtons.add(new RadioButton(RADIO_BUTTON_X, RADIO_BUTTON_Y + id * RADIO_BUTTON_SPACING, mode.getName()) {
                 @Override
                 public boolean isVisible() {
                     return mode.declaration == isDeclaration();
                 }
-            }); */
+            });
         }
 
         radioButtons.setSelectedOption(getDefaultId());
@@ -277,18 +277,23 @@ public class ComponentMenuVariable extends ComponentMenu {
     }
 
     public enum VariableMode {
-        GLOBAL(true),
-        LOCAL(true),
-        ADD(false),
-        REMOVE(false),
-        SET(false);
+        GLOBAL(Localization.GLOBAL, true),
+        LOCAL(Localization.LOCAL, true),
+        ADD(Localization.ADD, false),
+        REMOVE(Localization.REMOVE, false),
+        SET(Localization.SET, false);
 
         private boolean declaration;
+        private Localization name;
 
-        private VariableMode(boolean declaration) {
+        private VariableMode(Localization name, boolean declaration) {
+            this.name = name;
             this.declaration = declaration;
         }
 
+        public Localization getName() {
+            return name;
+        }
 
         @Override
         public String toString() {

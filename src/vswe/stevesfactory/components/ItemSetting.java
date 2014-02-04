@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataReader;
@@ -32,16 +33,16 @@ public class ItemSetting extends Setting {
         List<String> ret = new ArrayList<String>();
 
         if (item == null) {
-            ret.add("[No item selected]");
+            ret.add(Localization.NO_ITEM_SELECTED.toString());
         }else{
             ret.add(ComponentMenuItem.getDisplayName(item));
         }
 
         ret.add("");
-        ret.add("Left click to change item");
+        ret.add(Localization.CHANGE_ITEM.toString());
         if (item != null) {
-            ret.add("Right click to edit settings");
-            ret.add("Hold shift to see the item's full description");
+            ret.add(Localization.EDIT_SETTING.toString());
+            ret.add(Localization.FULL_DESCRIPTION.toString());
         }
 
         return ret;

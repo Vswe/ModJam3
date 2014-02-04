@@ -126,20 +126,6 @@ public final class Blocks {
         GameRegistry.registerTileEntity(TileEntityBreaker.class, CABLE_BREAKER_TILE_ENTITY_TAG);
     }
 
-    public static void addNames() {
-        /*LanguageRegistry.addName(blockManager, MANAGER_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCable, CABLE_LOCALIZED_NAME);
-        LanguageRegistry.addName(new ItemStack(blockCableRelay, 1 , 0), CABLE_RELAY_LOCALIZED_NAME);
-        LanguageRegistry.addName(new ItemStack(blockCableRelay, 1 , 8), CABLE_ADVANCED_RELAY_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCableOutput, CABLE_OUTPUT_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCableInput, CABLE_INPUT_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCableCreative, CABLE_CREATIVE_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCableIntake, CABLE_INTAKE_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCableBUD, CABLE_BUD_LOCALIZED_NAME);
-        LanguageRegistry.addName(blockCableBreaker, CABLE_BREAKER_LOCALIZED_NAME);*/
-        //LanguageRegistry.instance().addStringLocalization(creativeTab.getTranslatedTabLabel(), "en_US", "Steve's Factory Manager");
-    }
-
     public static void addRecipes() {
         GameRegistry.addRecipe(new ItemStack(blockManager),
                 "III",

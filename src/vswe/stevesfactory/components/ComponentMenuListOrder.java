@@ -29,8 +29,8 @@ public class ComponentMenuListOrder extends ComponentMenu {
         for (int i = 0; i < LoopOrder.values().length; i++) {
             int x = RADIO_BUTTON_X;
             int y = RADIO_BUTTON_Y + i * RADIO_SPACING_Y;
-             //TODO
-           // radioButtons.add(new RadioButton(x, y, LoopOrder.values()[i].toString()));
+
+            radioButtons.add(new RadioButton(x, y, LoopOrder.values()[i].getName()));
         }
 
         checkBoxes = new CheckBoxList();
@@ -288,20 +288,20 @@ public class ComponentMenuListOrder extends ComponentMenu {
     }
 
     public enum LoopOrder {
-        NORMAL("Standard", null),
-        CABLE("Cable order", new Comparator<Integer>() {
+        NORMAL(Localization.ORDER_STANDARD, null),
+        CABLE(Localization.ORDER_CABLE, new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
                 return o1 < o2 ? -1 : 1;
             }
         }),
-        RANDOM("Randomize", null);
+        RANDOM(Localization.ORDER_RANDOM, null);
 
-        private String name;
+        private Localization name;
         private Comparator<Integer> comparator;
         private Comparator<Integer> reversedComparator;
 
-        private LoopOrder(String name, final Comparator<Integer> comparator) {
+        private LoopOrder(Localization name, final Comparator<Integer> comparator) {
             this.name = name;
             this.comparator = comparator;
             if (comparator != null) {
@@ -317,10 +317,13 @@ public class ComponentMenuListOrder extends ComponentMenu {
 
         @Override
         public String toString() {
-            return name;
+            return name.toString();
         }
 
 
+        public Localization getName() {
+            return name;
+        }
     }
 
     private boolean canReverse() {

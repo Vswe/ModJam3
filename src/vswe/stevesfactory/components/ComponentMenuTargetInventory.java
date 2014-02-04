@@ -165,7 +165,7 @@ public class ComponentMenuTargetInventory extends ComponentMenuTarget {
     public void addErrors(List<String> errors) {
         for (int i = 0; i < directions.length; i++) {
             if (isActive(i) && getStart(i) > getEnd(i)) {
-                errors.add(directions[i].toString().charAt(0) + directions[i].toString().toLowerCase().substring(1) + " " + Localization.INVALID_RANGE.toString());
+                errors.add(Localization.getForgeDirectionLocalization(i).toString() + " " + Localization.INVALID_RANGE.toString());
             }
         }
 

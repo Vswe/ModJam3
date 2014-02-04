@@ -47,7 +47,7 @@ public class Variable implements IContainerSelection {
 
         String name;
         if (getDeclaration() == null || getDeclaration().getComponentName() == null) {
-            name = color.toString() + " Variable";
+            name = color.toString();
         }else{
             name = getDeclaration().getComponentName();
         }
