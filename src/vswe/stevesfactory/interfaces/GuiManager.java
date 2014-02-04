@@ -89,10 +89,12 @@ public class GuiManager extends GuiBase {
         bindTexture(COMPONENTS);
         for (int i = 0; i < manager.buttons.size(); i++) {
             TileEntityManager.Button button = manager.buttons.get(i);
-            int srcButtonY = CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y) ? 1 : 0;
+            if (button.isVisible()) {
+                int srcButtonY = CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y) ? 1 : 0;
 
-            drawTexture(button.getX(), button.getY(), TileEntityManager.BUTTON_SRC_X, TileEntityManager.BUTTON_SRC_Y + srcButtonY * TileEntityManager.BUTTON_SIZE_H, TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H);
-            drawTexture(button.getX() + 1, button.getY() + 1, TileEntityManager.BUTTON_INNER_SRC_X, TileEntityManager.BUTTON_INNER_SRC_Y + i * TileEntityManager.BUTTON_INNER_SIZE_H, TileEntityManager.BUTTON_INNER_SIZE_W, TileEntityManager.BUTTON_INNER_SIZE_H);
+                drawTexture(button.getX(), button.getY(), TileEntityManager.BUTTON_SRC_X, TileEntityManager.BUTTON_SRC_Y + srcButtonY * TileEntityManager.BUTTON_SIZE_H, TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H);
+                drawTexture(button.getX() + 1, button.getY() + 1, TileEntityManager.BUTTON_INNER_SRC_X, TileEntityManager.BUTTON_INNER_SRC_Y + i * TileEntityManager.BUTTON_INNER_SIZE_H, TileEntityManager.BUTTON_INNER_SIZE_W, TileEntityManager.BUTTON_INNER_SIZE_H);
+            }
         }
 
         int zLevel = Z_LEVEL_COMPONENT_START;
@@ -100,35 +102,39 @@ public class GuiManager extends GuiBase {
         for (int i = 0; i < manager.getZLevelRenderingList().size(); i++) {
             FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
 
-            if (itemBase.isOpen() && openCount == Z_LEVEL_OPEN_MAXIMUM) {
-                itemBase.close();
-            }
- 
-            if (itemBase.isOpen()) {
-                zLevel -= Z_LEVEL_COMPONENT_OPEN_DIFFERENCE;
-                openCount++;
-            }else{
-                zLevel -= Z_LEVEL_COMPONENT_CLOSED_DIFFERENCE;
-            }
-			itemBase.draw(this, x, y, zLevel);
-			
-            if (itemBase.isBeingMoved() || CollisionHelper.inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
-                CollisionHelper.disableInBoundsCheck = true;
+            if (itemBase.isVisible()) {
+                if (itemBase.isOpen() && openCount == Z_LEVEL_OPEN_MAXIMUM) {
+                    itemBase.close();
+                }
+
+                if (itemBase.isOpen()) {
+                    zLevel -= Z_LEVEL_COMPONENT_OPEN_DIFFERENCE;
+                    openCount++;
+                }else{
+                    zLevel -= Z_LEVEL_COMPONENT_CLOSED_DIFFERENCE;
+                }
+                itemBase.draw(this, x, y, zLevel);
+
+                if (itemBase.isBeingMoved() || CollisionHelper.inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
+                    CollisionHelper.disableInBoundsCheck = true;
+                }
             }
         }
         CollisionHelper.disableInBoundsCheck = false;
 
         if (!StevesFactoryManager.GREEN_SCREEN_MODE) {
             for (TileEntityManager.Button button : manager.buttons) {
-                if (CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y)) {
+                if (button.isVisible() && CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y)) {
                     drawMouseOver(button.getMouseOver(), x, y);
                 }
             }
 
             for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
-                itemBase.drawMouseOver(this, x, y);
-                if (itemBase.isBeingMoved() || CollisionHelper.inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
-                    CollisionHelper.disableInBoundsCheck = true;
+                if (itemBase.isVisible()) {
+                    itemBase.drawMouseOver(this, x, y);
+                    if (itemBase.isBeingMoved() || CollisionHelper.inBounds(itemBase.getX(), itemBase.getY(), itemBase.getComponentWidth(), itemBase.getComponentHeight(), x, y)) {
+                        CollisionHelper.disableInBoundsCheck = true;
+                    }
                 }
             }
         }
@@ -148,7 +154,7 @@ public class GuiManager extends GuiBase {
 
         for (int i = 0; i < manager.getZLevelRenderingList().size(); i++) {
             FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
-            if (itemBase.onClick(x, y, button)) {
+            if (itemBase.isVisible() && itemBase.onClick(x, y, button)) {
                 manager.getZLevelRenderingList().remove(i);
                 manager.getZLevelRenderingList().add(0, itemBase);
                 break;
@@ -162,11 +168,12 @@ public class GuiManager extends GuiBase {
     private void onClickButtonCheck(int x, int y, boolean release) {
         for (int i = 0; i < manager.buttons.size(); i++) {
             TileEntityManager.Button guiButton = manager.buttons.get(i);
-            if (CollisionHelper.inBounds(guiButton.getX(), guiButton.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y) && guiButton.activateOnRelease() == release) {
+            if (guiButton.isVisible() && CollisionHelper.inBounds(guiButton.getX(), guiButton.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y) && guiButton.activateOnRelease() == release) {
                 DataWriter dw = PacketHandler.getButtonPacketWriter();
                 dw.writeData(i, DataBitHelper.GUI_BUTTON_ID);
-                guiButton.onClick(dw);
-                PacketHandler.sendDataToServer(dw);
+                if(guiButton.onClick(dw)) {
+                    PacketHandler.sendDataToServer(dw);
+                }
                 break;
             }
         }
@@ -183,7 +190,9 @@ public class GuiManager extends GuiBase {
         y -= guiTop;
 
         for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
-            itemBase.onDrag(x, y);
+            if (itemBase.isVisible()) {
+                itemBase.onDrag(x, y);
+            }
         }
     }
 
@@ -201,7 +210,9 @@ public class GuiManager extends GuiBase {
 
         if (!manager.justSentServerComponentRemovalPacket) {
             for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
-                itemBase.onRelease(x, y, button);
+                if (itemBase.isVisible()) {
+                    itemBase.onRelease(x, y, button);
+                }
             }
         }
 
@@ -210,7 +221,7 @@ public class GuiManager extends GuiBase {
     @Override
     protected void keyTyped(char c, int k) {
         for (FlowComponent itemBase : manager.getFlowItems()) {
-            if (itemBase.onKeyStroke(this, c, k) && k != 1) {
+            if (itemBase.isVisible() && itemBase.onKeyStroke(this, c, k) && k != 1) {
                 return;
             }
         }

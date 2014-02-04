@@ -30,6 +30,8 @@ public enum Localization {
     FOR_EACH_LOOP_LONG,
     AUTO_CRAFTER_SHORT,
     AUTO_CRAFTER_LONG,
+    GROUP_SHORT,
+    GROUP_LONG,
 
     CONNECTION_INPUT,
     CONNECTION_OUTPUT,
@@ -226,6 +228,7 @@ public enum Localization {
     EAST,
 
     DELETE_COMMAND,
+    EXIT_GROUP,
     CREATE_COMMAND,
     MAXIMUM_COMPONENT_ERROR,
 

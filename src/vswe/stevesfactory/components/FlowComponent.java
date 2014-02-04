@@ -118,6 +118,7 @@ public class FlowComponent implements IComponentNetworkReader {
         openMenuId = -1;
         connections = new HashMap<Integer, Connection>();
         textBox = new TextBoxLogic(TEXT_MAX_LENGTH, TEXT_SPACE);
+        children = new ArrayList<FlowComponent>();
     }
 
     private int x;
@@ -137,6 +138,8 @@ public class FlowComponent implements IComponentNetworkReader {
     private boolean isEditing;
     private TextBoxLogic textBox;
     private String name;
+    private FlowComponent parent;
+    private List<FlowComponent> children;
 
 
     public int getCurrentInterval() {
@@ -172,7 +175,7 @@ public class FlowComponent implements IComponentNetworkReader {
             int oldLength = this.connectionSet.getConnections().length;
             int newLength = connectionSet.getConnections().length;
 
-            for (int i = 0; i < newLength; i++) {
+            for (int i = 0; i < Math.min(oldLength, newLength); i++) {
                 Connection connection = connections.get(i);
                 if (connection != null && this.connectionSet.getConnections()[i].isInput() != connectionSet.getConnections()[i].isInput()) {
                     removeConnection(i);
@@ -835,10 +838,20 @@ public class FlowComponent implements IComponentNetworkReader {
 
     @Override
     public void readNetworkComponent(DataReader dr) {
+        //might need some clean up
         if (dr.readBoolean()) {
             if (dr.readBoolean()) {
-                x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
-                y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+                if (dr.readBoolean()) {
+                    x = dr.readData(DataBitHelper.FLOW_CONTROL_X);
+                    y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
+                }else{
+                    if (dr.readBoolean()) {
+                        setParent(getManager().getFlowItems().get(dr.readData(DataBitHelper.FLOW_CONTROL_COUNT)));
+                    }else{
+                        setParent(null);
+                    }
+                }
+
             }else{
                 name = dr.readString(DataBitHelper.NAME_LENGTH);
             }
@@ -901,9 +914,23 @@ public class FlowComponent implements IComponentNetworkReader {
 
     private void writeLocationData(DataWriter dw) {
         dw.writeBoolean(true); //component specific
+        dw.writeBoolean(true); //location
         dw.writeBoolean(true); //position
         dw.writeData(x, DataBitHelper.FLOW_CONTROL_X);
         dw.writeData(y, DataBitHelper.FLOW_CONTROL_Y);
+    }
+
+
+    private void writeParentData(DataWriter dw) {
+        dw.writeBoolean(true); //component specific
+        dw.writeBoolean(true); //location
+        dw.writeBoolean(false); //parent
+        if (parent != null) {
+            dw.writeBoolean(true);
+            dw.writeData(parent.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
+        }else {
+            dw.writeBoolean(false);
+        }
     }
 
     public FlowComponent copy() {
@@ -975,6 +1002,18 @@ public class FlowComponent implements IComponentNetworkReader {
 
             DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null);
             writeLocationData(dw);
+            PacketHandler.sendDataToListeningClients(container, dw);
+        }
+
+        if (((parent == null) != (newData.parent == null)) || (parent != null && parent.getId() != newData.parent.getId())) {
+            if (newData.parent == null) {
+                setParent(null);
+            }else{
+                setParent(getManager().getFlowItems().get(newData.parent.getId()));
+            }
+
+            DataWriter dw = PacketHandler.getWriterForClientComponentPacket(container, this, null);
+            writeParentData(dw);
             PacketHandler.sendDataToListeningClients(container, dw);
         }
 
@@ -1082,6 +1121,9 @@ public class FlowComponent implements IComponentNetworkReader {
                     connection.setComponentId(connection.getComponentId() - 1);
                 }
             }
+        }
+        if (parent != null && parent.getId() == idToRemove) {
+            setParent(null);
         }
     }
 
@@ -1269,5 +1311,41 @@ public class FlowComponent implements IComponentNetworkReader {
 
     public void setComponentName(String name) {
         this.name = name;
+    }
+
+    public FlowComponent getParent() {
+        return parent;
+    }
+
+    public void setParent(FlowComponent parent) {
+        if (this.parent != null) {
+            this.parent.children.remove(this);
+        }
+        this.parent = parent;
+        if (this.parent != null) {
+            this.parent.children.add(this);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FlowComponent component = (FlowComponent) o;
+
+        if (id != component.id) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    public boolean isVisible() {
+        FlowComponent selectedComponent = getManager().getSelectedComponent();
+        return (selectedComponent == null && parent == null) || (parent != null && parent.equals(selectedComponent));
     }
 }

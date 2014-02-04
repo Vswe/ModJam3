@@ -37,6 +37,7 @@ public class TileEntityManager extends TileEntityInterface {
     public boolean justSentServerComponentRemovalPacket;
     private List<FlowComponent> zLevelRenderingList;
     private Variable[] variables;
+    private FlowComponent selectedComponent;
 
     public TileEntityManager() {
         items = new ArrayList<FlowComponent>();
@@ -60,19 +61,38 @@ public class TileEntityManager extends TileEntityInterface {
             }
 
             @Override
-            public void onClick(DataWriter dw) {
+            public boolean onClick(DataWriter dw) {
                 justSentServerComponentRemovalPacket = true;
                 for (FlowComponent item : items) {
                     if (item.isBeingMoved()) {
                         dw.writeData(item.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
-                        return;
+                        return false;
                     }
                 }
+                return true;
             }
 
             @Override
             public boolean activateOnRelease() {
                 return true;
+            }
+        });
+
+        buttons.add(new Button(Localization.EXIT_GROUP) {
+            @Override
+            protected void onClick(DataReader dr) {
+
+            }
+
+            @Override
+            public boolean onClick(DataWriter dw) {
+                selectedComponent = selectedComponent.getParent();
+                return false;
+            }
+
+            @Override
+            public boolean isVisible() {
+                return selectedComponent != null;
             }
         });
     }
@@ -81,10 +101,11 @@ public class TileEntityManager extends TileEntityInterface {
 
     public void removeFlowComponent(int idToRemove, List<FlowComponent> items) {
         for (int i =  items.size() - 1; i >= 0; i--) {
+            FlowComponent component = items.get(i);
             if (i == idToRemove) {
+                component.setParent(null); //unlink it
                 items.remove(i);
             }else{
-                FlowComponent component = items.get(i);
                 component.updateConnectionIdsAtRemoval(idToRemove);
                 if (i > idToRemove) {
                     component.decreaseId();
@@ -92,7 +113,9 @@ public class TileEntityManager extends TileEntityInterface {
             }
         }
 
-
+        if (selectedComponent.getId() == idToRemove) {
+            selectedComponent = null;
+        }
     }
 
     public void removeFlowComponent(int idToRemove) {
@@ -356,7 +379,10 @@ public class TileEntityManager extends TileEntityInterface {
         }else{
             int buttonId = dr.readData(DataBitHelper.GUI_BUTTON_ID);
             if (buttonId >= 0 && buttonId < buttons.size()) {
-                buttons.get(buttonId).onClick(dr);
+                Button button = buttons.get(buttonId);
+                if (button.isVisible()) {
+                    button.onClick(dr);
+                }
             }
         }
     }
@@ -382,6 +408,7 @@ public class TileEntityManager extends TileEntityInterface {
 
     @Override
     public void readAllData(DataReader dr, EntityPlayer player) {
+        selectedComponent = null;
         updateInventories();
         int flowControlCount = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
         getFlowItems().clear();
@@ -398,6 +425,13 @@ public class TileEntityManager extends TileEntityInterface {
 
         FlowComponent flowComponent = new FlowComponent(this, x, y, ComponentType.getTypeFromId(id));
         flowComponent.setComponentName(dr.readString(DataBitHelper.NAME_LENGTH));
+
+        boolean hasParent = dr.readBoolean();
+        if (hasParent) {
+            flowComponent.setParent(items.get(dr.readData(DataBitHelper.FLOW_CONTROL_COUNT)));
+        }else{
+            flowComponent.setParent(null);
+        }
 
         for (ComponentMenu menu : flowComponent.getMenus()) {
             menu.readData(dr);
@@ -498,6 +532,15 @@ public class TileEntityManager extends TileEntityInterface {
         }
     }
 
+    public FlowComponent getSelectedComponent() {
+        return selectedComponent;
+    }
+
+    public void setSelectedComponent(FlowComponent selectedComponent) {
+        this.selectedComponent = selectedComponent;
+    }
+
+
     public abstract class Button {
         private int x;
         private int y;
@@ -510,7 +553,7 @@ public class TileEntityManager extends TileEntityInterface {
         }
 
         protected abstract void onClick(DataReader dr);
-        public abstract void onClick(DataWriter dw);
+        public abstract boolean onClick(DataWriter dw);
 
         public int getX() {
             return x;
@@ -527,6 +570,10 @@ public class TileEntityManager extends TileEntityInterface {
         public boolean activateOnRelease() {
             return false;
         }
+
+        public boolean isVisible() {
+            return true;
+        }
     }
 
     private class ButtonCreate extends Button {
@@ -542,13 +589,26 @@ public class TileEntityManager extends TileEntityInterface {
         @Override
         protected void onClick(DataReader dr) {
             if (getFlowItems().size() < MAX_COMPONENT_AMOUNT) {
-                getFlowItems().add(new FlowComponent(self, 50, 50, type));
+                FlowComponent component = new FlowComponent(self, 50, 50, type);
+
+                boolean hasParent = dr.readBoolean();
+                if (hasParent) {
+                    component.setParent(items.get(dr.readData(DataBitHelper.FLOW_CONTROL_COUNT)));
+                }
+                getFlowItems().add(component);
             }
         }
 
         @Override
-        public void onClick(DataWriter dw) {
+        public boolean onClick(DataWriter dw) {
+            if (selectedComponent != null) {
+                dw.writeBoolean(true);
+                dw.writeData(selectedComponent.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
+            }else{
+                dw.writeBoolean(false);
+            }
 
+            return true;
         }
 
         @Override
