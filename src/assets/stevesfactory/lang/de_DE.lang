@@ -56,19 +56,19 @@ gui.sfm.AutoCrafterLong=Auto-Hersteller
 
 gui.sfm.ConnectionInput=Input
 gui.sfm.ConnectionOutput=Output
-gui.sfm.ConnectionInterval=Interval
-gui.sfm.ConnectionOnHighRedstonePulse=On high pulse
-gui.sfm.ConnectionOnLowRedstonePulse=On low pulse
-gui.sfm.ConnectionWhileHighRedstone=While high signal
-gui.sfm.ConnectionWhileLowRedstone=While low signal
-gui.sfm.ConnectionTrue=True
-gui.sfm.ConnectionFalse=False
-gui.sfm.ConnectionForEach=For each
-gui.sfm.ConnectionOnBlockUpdate=On block update
-gui.sfm.ConnectionOnHighBlockPulse=On high pulse
-gui.sfm.ConnectionWhileHighBlock=While high signal
-gui.sfm.ConnectionOnLowBlockPulse=On low pulse
-gui.sfm.ConnectionWhileLowBlock=While low signal
+gui.sfm.ConnectionInterval=Intervall
+gui.sfm.ConnectionOnHighRedstonePulse=Bei hohem Puls
+gui.sfm.ConnectionOnLowRedstonePulse=Bei niedrigen Puls
+gui.sfm.ConnectionWhileHighRedstone=Während hohem Signal
+gui.sfm.ConnectionWhileLowRedstone=Während niedrigem Signal
+gui.sfm.ConnectionTrue=Wahr
+gui.sfm.ConnectionFalse=Falsch
+gui.sfm.ConnectionForEach=Jeweils
+gui.sfm.ConnectionOnBlockUpdate=Bei Blockupdate
+gui.sfm.ConnectionOnHighBlockPulse=Bei hohem Puls
+gui.sfm.ConnectionWhileHighBlock=Während hohem Signal
+gui.sfm.ConnectionOnLowBlockPulse=Bei niedrigen Puls
+gui.sfm.ConnectionWhileLowBlock=Während niedrigem Signal
 
 
 # ======================================
@@ -76,16 +76,16 @@ gui.sfm.ConnectionWhileLowBlock=While low signal
 # ======================================
 
 gui.sfm.ConnectionSetStandard=Standard
-gui.sfm.ConnectionSetInterval=On interval
-gui.sfm.ConnectionSetRedstone=Redstone controlled
-gui.sfm.ConnectionSetCondition=Condition
-gui.sfm.ConnectionSetCollector2=Collector - 2 inputs
-gui.sfm.ConnectionSetCollector5=Collector - 5 inputs
-gui.sfm.ConnectionSetSplit2=Split - 2 outputs
-gui.sfm.ConnectionSetSplit5=Split - 5 outputs
-gui.sfm.ConnectionSetDeclaration=Declaration
-gui.sfm.ConnectionSetForEach=For each
-gui.sfm.ConnectionSetBud=Block update detector
+gui.sfm.ConnectionSetInterval=Auf Intervall
+gui.sfm.ConnectionSetRedstone=Redstone-kontrolliert
+gui.sfm.ConnectionSetCondition=Bedingung
+gui.sfm.ConnectionSetCollector2=Kollektor - 2 Inputs
+gui.sfm.ConnectionSetCollector5=Kollektor - 5 Inputs
+gui.sfm.ConnectionSetSplit2=Aufteilung - 2 Outputs
+gui.sfm.ConnectionSetSplit5=Aufteilung - 5 Outputs
+gui.sfm.ConnectionSetDeclaration=Deklaration
+gui.sfm.ConnectionSetForEach=Jeweils
+gui.sfm.ConnectionSetBud=Block-Update-Detektor
 
 # ======================================
 #			COMPONENT MENUS
