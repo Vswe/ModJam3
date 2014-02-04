@@ -84,11 +84,11 @@ gui.sfm.ConnectionSetBud=Blok update detector
 #			COMPONENT MENUS
 # ======================================
 
-gui.sfm.DetectorMenu=Update Detectors
+gui.sfm.DetectorMenu=Update Detector
 gui.sfm.RequireAllTargets=Vereist alle doelen
 gui.sfm.RequireOneTarget=Vereist een doel
-gui.sfm.RunSharedOnce=Voer een gedeelde commando één keer uit
-gui.sfm.RunOnePerTarget=Voer een commando één keer uit per doel
+gui.sfm.RunSharedOnce=Voer een gedeelde opdacht één keer uit
+gui.sfm.RunOnePerTarget=Voer een opdacht één keer uit per doel
 gui.sfm.Selected=[Geselecteerd]
 gui.sfm.OverflowMenu=Overmatige Inventarissen
 gui.sfm.NoDetectorError=Geen detector geselecteerd
@@ -109,7 +109,7 @@ gui.sfm.WeakPower=Zwakke stroom
 gui.sfm.Sequential=sequentiële
 gui.sfm.Split=Split
 gui.sfm.IntervalMenu=Interval
-gui.sfm.IntervalInfo=Tijd tussen deze commando is getriggerd 
+gui.sfm.IntervalInfo=Tijd tussen deze opdacht is getriggerd 
 gui.sfm.Second=seconde(n)
 gui.sfm.InventoryMenu=Inventarissen
 gui.sfm.NoInventoryError=Geen inventaris geselecteerd
@@ -209,7 +209,6 @@ gui.sfm.ChangeLiquid=Links klik om vloeistof te wisselen
 gui.sfm.EditSetting=Rechts klik om instellingen te bewerken
 gui.sfm.NoItemSelected=[Geen voorwerp geselecteerd]
 gui.sfm.ChangeItem=Links klik om voorwerp te veranderen
-gui.sfm.FullDescription=Hold shift to see the item's full description
 gui.sfm.FullDescription=Houd shift ingedrukt om de volledige voorwerp omschrijving te zien
 gui.sfm.DetectionPrecise=Precieze detectie
 gui.sfm.DetectionNbtFuzzy=NBT onafhankelijke detectie
@@ -217,7 +216,6 @@ gui.sfm.DetectionFuzzy=Nevilige detectie
 gui.sfm.DetectionOreDictionary=Ore woordenboek ondersteuning
 gui.sfm.ItemsFound=Gevonden
 gui.sfm.RedstoneEmitterSidesMenu=Zijden
-gui.sfm.RedstoneEmitterSidesInfo=Select which block sides the redstone should be emitted at
 gui.sfm.RedstoneEmitterSidesInfo=Selecteer aan welke blok zijde het redstone signaal uitgezonden moet worden
 gui.sfm.TypeInventory=Inventaris
 gui.sfm.TypeTank=Tank
@@ -256,43 +254,43 @@ gui.sfm.East=Oost
 #		  OTHER MANAGER INTERFACE
 # ======================================
 
-gui.sfm.DeleteCommand=Delete [Drop command here]
-gui.sfm.CreateCommand=Create
-gui.sfm.MaximumComponentError=Maximum component amount reached
+gui.sfm.DeleteCommand=Verwijder [Plaats opdacht hier]
+gui.sfm.CreateCommand=Creëer
+gui.sfm.MaximumComponentError=Maximale component hoeveelheid bereikt
 
 
 # ======================================
 #		 ADVANCED RELAY INTERFACE
 # ======================================
-gui.sfm.GivePermission=Give permission
-gui.sfm.RevokePermission=Revoke permission
-gui.sfm.ActivateUser=Activate
-gui.sfm.DeactivateUser=Deactivate
-gui.sfm.DeleteUser=Delete user
-gui.sfm.MakeEditor=Make editor
-gui.sfm.RemoveEditor=Remove editor
-gui.sfm.ShowListToAll=Show list to all
-gui.sfm.ShowToEditors=Show to editors
-gui.sfm.EnableCreativeMode=Enable creative mode
-gui.sfm.DisableCreativeMode=Disable creative mode
-gui.sfm.Page=Page
-gui.sfm.Of=of
-gui.sfm.NoAccess=NO ACCESS
-gui.sfm.EditorDescriptionShort=You may define who this block can access, people need to give you permission first though.
-gui.sfm.UserDescriptionShort=You are not allowed to control this block. You have access to read the settings though.
-gui.sfm.EditorDescriptionLong=As an editor you can decide which players this block should interact with. You can only choose among the players who have given their permission.
-gui.sfm.UserDescriptionLong=This block will be able to access players' inventories, among other inventories. For this block to be able to access your inventory you will have to give it permission to do so. An editor can then decide whether the block should interact with your inventory or not.
-gui.sfm.PermissionOwner=Owner
-gui.sfm.PermissionEditor=Editor
-gui.sfm.PermissionUser=Read only
-gui.sfm.PermissionRestricted=Restricted access
-gui.sfm.PermissionCreative=Creative access
-gui.sfm.PermissionInventory=Inventory access
-gui.sfm.PermissionDenied=No access
+gui.sfm.GivePermission=Geef permissie
+gui.sfm.RevokePermission=Trek permissie in
+gui.sfm.ActivateUser=Activeer
+gui.sfm.DeactivateUser=Deactiveer
+gui.sfm.DeleteUser=Verwijder gebruiker
+gui.sfm.MakeEditor=Maak bewerker
+gui.sfm.RemoveEditor=Verwijder bewerker
+gui.sfm.ShowListToAll=Laat lijst aan allen zien
+gui.sfm.ShowToEditors=Laat zijn aan bewerkers
+gui.sfm.EnableCreativeMode=Zet creatieve modus aan
+gui.sfm.DisableCreativeMode=Zet creatieve modus uit
+gui.sfm.Page=Pagina
+gui.sfm.Of=van
+gui.sfm.NoAccess=GEEN TOEGANG
+gui.sfm.EditorDescriptionShort=Je mag defineren wie toegang heeft tot deze blok, maar mensen moeten jou eerst permissie geven.
+gui.sfm.UserDescriptionShort=Je bent niet bevoegd om deze blok te gebruiken. Je hebt wel toegang tot het lezen van de instellingen.
+gui.sfm.EditorDescriptionLong=Als een bewerker kan je bapalen met welke spelers deze blok moet omgaan. Je kan alleen kiezen tussen de spelers die permissie hebben gegeven.
+gui.sfm.UserDescriptionLong=Deze blok zal in staat zijn om toegang te krijgen tot de inventarissen van spelers, naast andere inventarissen. Om deze blok toegang te geven tot jouw inventaris moet je het permissie geven om dat te doen. Een bewerker kan dan bepalen of het blok om zou moeten gaan met jou inventaris of niet. 
+gui.sfm.PermissionOwner=Eigenaar
+gui.sfm.PermissionEditor=Bewerker
+gui.sfm.PermissionUser=Alleen lezen
+gui.sfm.PermissionRestricted=Beperkte toegang
+gui.sfm.PermissionCreative=Creatieve toegang
+gui.sfm.PermissionInventory=Inventaris toegang
+gui.sfm.PermissionDenied=Geen toegang
 
 
 # ======================================
 #				OTHER
 # ======================================
 
-itemGroup.sfm=Steve's Factory Manager
+itemGroup.sfm=Steve's Fabriek Manager
