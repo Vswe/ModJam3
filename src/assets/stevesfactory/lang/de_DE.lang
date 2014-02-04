@@ -2,7 +2,7 @@
 # Created 2/4/2014, 7:19AM
 # Main translator: Galaxy_2Alex
 # Helpers: [None at the moment]
-# I'm open to suggestions, please post them over at [Page in preparation]
+# I'm open to suggestions, please post them over at https://trello.com/b/WBMMdLU9/steve-s-factory-manager-german-translation (Yes, registration needed ,#DealWithIt)
 # As I'm already the translator of SC2, I've got priority with this translation. Also, I kind of promised it to Vswe (https://twitter.com/Galaxy2Alex/status/418021561874915329)
 
 # ======================================
@@ -91,16 +91,17 @@ gui.sfm.ConnectionSetBud=Block-Update-Detektor
 #			COMPONENT MENUS
 # ======================================
 
-gui.sfm.DetectorMenu=Update Detectors
-gui.sfm.RequireAllTargets=Require all targets
-gui.sfm.RequireOneTarget=Require one target
-gui.sfm.RunSharedOnce=Run a shared command once
-gui.sfm.RunOnePerTarget=Run command once per target
-gui.sfm.Selected=[Selected]
-gui.sfm.OverflowMenu=Excess Inventories
-gui.sfm.NoDetectorError=No detector selected
-gui.sfm.NoOverflowError=No excess inventory selected
-gui.sfm.OverflowInfo=These inventories will be used if some of the crafted items don't fit. It will also be used for container items, such as buckets.
+gui.sfm.DetectorMenu=Updatedetektors
+gui.sfm.RequireAllTargets=Benötigt alle Ziele
+gui.sfm.RequireOneTarget=Benötigt ein Ziel
+gui.sfm.RunSharedOnce=Gemeinsamer Befehl einmal ausführen
+gui.sfm.RunOnePerTarget=Befehl einmal pro Ziel ausfhren
+gui.sfm.Selected=[Ausgewählt]
+gui.sfm.OverflowMenu=Überschussinventare
+gui.sfm.NoDetectorError=Kein Detektor ausgewählt
+gui.sfm.NoOverflowError=Kein Überschussinventar gewählt
+gui.sfm.OverflowInfo=Diese Inventare werden genutzt wenn die hergestellten Items nicht passen, außerdem wird es f
+These inventories will be used if some of the crafted items don't fit. It will also be used for container items, such as buckets.
 gui.sfm.ContainerTypeMenu=Container Types
 gui.sfm.CraftingMenu=Crafting
 gui.sfm.EmitterMenu=Emitters
