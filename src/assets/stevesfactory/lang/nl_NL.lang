@@ -2,15 +2,15 @@
 #				BLOCKS
 # ======================================
 
-tile.sfm.BlockMachineManager.name=Machine Inventory Manager
-tile.sfm.BlockCable.name=Inventory Cable
-tile.sfm.BlockCableRelay.name=Inventory Relay
-tile.sfm.BlockAdvancedCableRelay.name=Advanced Inventory Relay
+tile.sfm.BlockMachineManager.name=Machine Inventaris Manager
+tile.sfm.BlockCable.name=Inventaris Kabel
+tile.sfm.BlockCableRelay.name=Inventaris Relais
+tile.sfm.BlockAdvancedCableRelay.name=Geadvanceerde Inventaris Relais
 tile.sfm.BlockCableOutput.name=Redstone Emitter
-tile.sfm.BlockCableInput.name=Redstone Receiver
-tile.sfm.BlockCableCreative.name=Creative Supplier
-tile.sfm.BlockCableIntake.name=Item Valve
-tile.sfm.BlockCableBUD.name=Block Detector
+tile.sfm.BlockCableInput.name=Redstone Ontvanger
+tile.sfm.BlockCableCreative.name=Creative Leverancier
+tile.sfm.BlockCableIntake.name=Voorwerp Klep
+tile.sfm.BlockCableBUD.name=Blok Detector
 tile.sfm.BlockCableBreaker.name=Block Gate
 
 # ======================================
@@ -18,28 +18,28 @@ tile.sfm.BlockCableBreaker.name=Block Gate
 # ======================================
 gui.sfm.TriggerShort=Trigger
 gui.sfm.TriggerLong=Trigger
-gui.sfm.InputShort=Input
-gui.sfm.InputLong=Input
-gui.sfm.OutputShort=Output
-gui.sfm.OutputLong=Output
-gui.sfm.ConditionShort=Condition
-gui.sfm.ConditionLong=Condition
-gui.sfm.FlowControlShort=Flow
-gui.sfm.FlowControlLong=Flow Control
-gui.sfm.LiquidInputShort=Input (L)
-gui.sfm.LiquidInputLong=Liquid Input
-gui.sfm.LiquidOutputShort=Output (L)
-gui.sfm.LiquidOutputLong=Liquid Output
-gui.sfm.LiquidConditionShort=Condition (L)
-gui.sfm.LiquidConditionLong=Liquid Condition
+gui.sfm.InputShort=Invoer
+gui.sfm.InputLong=Invoer
+gui.sfm.OutputShort=Uitvoer
+gui.sfm.OutputLong=Uitvoer
+gui.sfm.ConditionShort=Voorwaarde
+gui.sfm.ConditionLong=Voorwaarde
+gui.sfm.FlowControlShort=Stroom
+gui.sfm.FlowControlLong=Stroom Control
+gui.sfm.LiquidInputShort=Invoer (L)
+gui.sfm.LiquidInputLong=Vloeistofinvoer
+gui.sfm.LiquidOutputShort=Afvoer (L)
+gui.sfm.LiquidOutputLong=Vloeistofafvoer
+gui.sfm.LiquidConditionShort=Voorwaarde (L)
+gui.sfm.LiquidConditionLong=Vloeistofvoowaarde
 gui.sfm.RedstoneEmitterShort=Emitter
 gui.sfm.RedstoneEmitterLong=Redstone Emitter
-gui.sfm.RedstoneConditionShort=Condition (R)
-gui.sfm.RedstoneConditionLong=Redstone Condition
-gui.sfm.ContainerVariableShort=Variable
-gui.sfm.ContainerVariableLong=Container Variable
-gui.sfm.ForEachLoopShort=For Each
-gui.sfm.ForEachLoopLong=For Each Loop
+gui.sfm.RedstoneConditionShort=Voorwaarde (R)
+gui.sfm.RedstoneConditionLong=Redstone Voorwaarde
+gui.sfm.ContainerVariableShort=Variabel
+gui.sfm.ContainerVariableLong=Container Variabel
+gui.sfm.ForEachLoopShort=Voor Elk
+gui.sfm.ForEachLoopLong=Voor Elk Lus
 gui.sfm.AutoCrafterShort=Crafter
 gui.sfm.AutoCrafterLong=Auto Crafter
 
