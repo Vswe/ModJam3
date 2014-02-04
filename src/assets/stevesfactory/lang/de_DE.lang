@@ -23,32 +23,32 @@ tile.sfm.BlockCableBreaker.name=Blockschranke
 # ======================================
 #			COMPONENT TYPES
 # ======================================
-gui.sfm.TriggerShort=Trigger
-gui.sfm.TriggerLong=Trigger
+gui.sfm.TriggerShort=Auslöser
+gui.sfm.TriggerLong=Auslöser
 gui.sfm.InputShort=Input
 gui.sfm.InputLong=Input
 gui.sfm.OutputShort=Output
 gui.sfm.OutputLong=Output
-gui.sfm.ConditionShort=Condition
-gui.sfm.ConditionLong=Condition
-gui.sfm.FlowControlShort=Flow
-gui.sfm.FlowControlLong=Flow Control
-gui.sfm.LiquidInputShort=Input (L)
-gui.sfm.LiquidInputLong=Liquid Input
-gui.sfm.LiquidOutputShort=Output (L)
-gui.sfm.LiquidOutputLong=Liquid Output
-gui.sfm.LiquidConditionShort=Condition (L)
-gui.sfm.LiquidConditionLong=Liquid Condition
-gui.sfm.RedstoneEmitterShort=Emitter
-gui.sfm.RedstoneEmitterLong=Redstone Emitter
-gui.sfm.RedstoneConditionShort=Condition (R)
-gui.sfm.RedstoneConditionLong=Redstone Condition
-gui.sfm.ContainerVariableShort=Variable
-gui.sfm.ContainerVariableLong=Container Variable
-gui.sfm.ForEachLoopShort=For Each
-gui.sfm.ForEachLoopLong=For Each Loop
-gui.sfm.AutoCrafterShort=Crafter
-gui.sfm.AutoCrafterLong=Auto Crafter
+gui.sfm.ConditionShort=Bedingung
+gui.sfm.ConditionLong=Bedingung
+gui.sfm.FlowControlShort=Fluss
+gui.sfm.FlowControlLong=Flusskontrolle
+gui.sfm.LiquidInputShort=Input (F)
+gui.sfm.LiquidInputLong=Flüssigkeitsinput
+gui.sfm.LiquidOutputShort=Output (F)
+gui.sfm.LiquidOutputLong=Flüssigkeitsoutput
+gui.sfm.LiquidConditionShort=Bedingung (F)
+gui.sfm.LiquidConditionLong=Flüssigkeitsbedingung
+gui.sfm.RedstoneEmitterShort=Sender
+gui.sfm.RedstoneEmitterLong=Redstone-Sender
+gui.sfm.RedstoneConditionShort=Bedingung (R)
+gui.sfm.RedstoneConditionLong=Redstone-Bedingung
+gui.sfm.ContainerVariableShort=Variabel
+gui.sfm.ContainerVariableLong=Behältervariable
+gui.sfm.ForEachLoopShort=Jeweils
+gui.sfm.ForEachLoopLong=für jede Schleife
+gui.sfm.AutoCrafterShort=Hersteller
+gui.sfm.AutoCrafterLong=Auto-Hersteller
 
 # ======================================
 #			CONNECTION OPTIONS
