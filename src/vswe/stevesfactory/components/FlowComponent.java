@@ -172,6 +172,13 @@ public class FlowComponent implements IComponentNetworkReader {
             int oldLength = this.connectionSet.getConnections().length;
             int newLength = connectionSet.getConnections().length;
 
+            for (int i = 0; i < newLength; i++) {
+                Connection connection = connections.get(i);
+                if (connection != null && this.connectionSet.getConnections()[i].isInput() != connectionSet.getConnections()[i].isInput()) {
+                    removeConnection(i);
+                }
+            }
+
             for (int i = newLength; i < oldLength; i++) {
                 Connection connection = connections.get(i);
                 if (connection != null) {
