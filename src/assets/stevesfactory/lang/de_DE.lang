@@ -4,20 +4,21 @@
 # Helpers: [None at the moment]
 # I'm open to suggestions, please post them over at [Page in preparation]
 # As I'm already the translator of SC2, I've got priority with this translation. Also, I kind of promised it to Vswe (https://twitter.com/Galaxy2Alex/status/418021561874915329)
+
 # ======================================
 #				BLOCKS
 # ======================================
 
-tile.sfm.BlockMachineManager.name=Machine Inventory Manager
-tile.sfm.BlockCable.name=Inventory Cable
-tile.sfm.BlockCableRelay.name=Inventory Relay
-tile.sfm.BlockAdvancedCableRelay.name=Advanced Inventory Relay
-tile.sfm.BlockCableOutput.name=Redstone Emitter
-tile.sfm.BlockCableInput.name=Redstone Receiver
-tile.sfm.BlockCableCreative.name=Creative Supplier
-tile.sfm.BlockCableIntake.name=Item Valve
-tile.sfm.BlockCableBUD.name=Block Detector
-tile.sfm.BlockCableBreaker.name=Block Gate
+tile.sfm.BlockMachineManager.name=Machineninventarmanager
+tile.sfm.BlockCable.name=Invaentarkabel
+tile.sfm.BlockCableRelay.name=Inventarrelais
+tile.sfm.BlockAdvancedCableRelay.name=Fortgeschrittenes Inventarrelais
+tile.sfm.BlockCableOutput.name=Redstone-Sender
+tile.sfm.BlockCableInput.name=Redstone-Empfänger
+tile.sfm.BlockCableCreative.name=Kreativversorger
+tile.sfm.BlockCableIntake.name=Itemventil
+tile.sfm.BlockCableBUD.name=Blockdetector
+tile.sfm.BlockCableBreaker.name=Blockschranke
 
 # ======================================
 #			COMPONENT TYPES
