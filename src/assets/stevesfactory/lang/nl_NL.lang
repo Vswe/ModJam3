@@ -47,38 +47,38 @@ gui.sfm.AutoCrafterLong=Auto Crafter
 #			CONNECTION OPTIONS
 # ======================================
 
-gui.sfm.ConnectionInput=Input
-gui.sfm.ConnectionOutput=Output
+gui.sfm.ConnectionInput=Invoer
+gui.sfm.ConnectionOutput=Uitvoer
 gui.sfm.ConnectionInterval=Interval
-gui.sfm.ConnectionOnHighRedstonePulse=On high pulse
-gui.sfm.ConnectionOnLowRedstonePulse=On low pulse
-gui.sfm.ConnectionWhileHighRedstone=While high signal
-gui.sfm.ConnectionWhileLowRedstone=While low signal
-gui.sfm.ConnectionTrue=True
-gui.sfm.ConnectionFalse=False
-gui.sfm.ConnectionForEach=For each
-gui.sfm.ConnectionOnBlockUpdate=On block update
-gui.sfm.ConnectionOnHighBlockPulse=On high pulse
-gui.sfm.ConnectionWhileHighBlock=While high signal
-gui.sfm.ConnectionOnLowBlockPulse=On low pulse
-gui.sfm.ConnectionWhileLowBlock=While low signal
+gui.sfm.ConnectionOnHighRedstonePulse=Op hoge puls
+gui.sfm.ConnectionOnLowRedstonePulse=Op lage puls
+gui.sfm.ConnectionWhileHighRedstone=Zolang een hoog signaal
+gui.sfm.ConnectionWhileLowRedstone=Zolang een laag signaal
+gui.sfm.ConnectionTrue=Waar
+gui.sfm.ConnectionFalse=Onwaar
+gui.sfm.ConnectionForEach=Voor elk
+gui.sfm.ConnectionOnBlockUpdate=Op blok update
+gui.sfm.ConnectionOnHighBlockPulse=Op hoge puls
+gui.sfm.ConnectionWhileHighBlock=Zolang een hoog signaal
+gui.sfm.ConnectionOnLowBlockPulse=Op lage puls
+gui.sfm.ConnectionWhileLowBlock=Zolang een laag signaal
 
 
 # ======================================
 #			CONNECTION SETS
 # ======================================
 
-gui.sfm.ConnectionSetStandard=Standard
-gui.sfm.ConnectionSetInterval=On interval
-gui.sfm.ConnectionSetRedstone=Redstone controlled
-gui.sfm.ConnectionSetCondition=Condition
-gui.sfm.ConnectionSetCollector2=Collector - 2 inputs
-gui.sfm.ConnectionSetCollector5=Collector - 5 inputs
+gui.sfm.ConnectionSetStandard=Standaard
+gui.sfm.ConnectionSetInterval=Op interval
+gui.sfm.ConnectionSetRedstone=Redstone gecontroleerd
+gui.sfm.ConnectionSetCondition=Voorwaarde
+gui.sfm.ConnectionSetCollector2=Verzamelaar - 2 inputs
+gui.sfm.ConnectionSetCollector5=Verzamelaar - 5 inputs
 gui.sfm.ConnectionSetSplit2=Split - 2 outputs
 gui.sfm.ConnectionSetSplit5=Split - 5 outputs
-gui.sfm.ConnectionSetDeclaration=Declaration
+gui.sfm.ConnectionSetDeclaration=Declaratie
 gui.sfm.ConnectionSetForEach=For each
-gui.sfm.ConnectionSetBud=Block update detector
+gui.sfm.ConnectionSetBud=Blok update detector
 
 # ======================================
 #			COMPONENT MENUS
