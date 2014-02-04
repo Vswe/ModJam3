@@ -109,7 +109,7 @@ public class ComponentMenuPulse extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Pulse";
+        return Localization.PULSE_MENU.toString();
     }
 
     @SideOnly(Side.CLIENT)
@@ -120,8 +120,8 @@ public class ComponentMenuPulse extends ComponentMenu {
             radioButtons.draw(gui, mX, mY);
             textBoxes.draw(gui, mX, mY);
 
-            gui.drawCenteredString("Seconds", secondsTextBox.getX(), secondsTextBox.getY() - 7, 0.7F, secondsTextBox.getWidth(), 0x404040);
-            gui.drawCenteredString("Ticks", ticksTextBox.getX(), ticksTextBox.getY() - 7, 0.7F, ticksTextBox.getWidth(), 0x404040);
+            gui.drawCenteredString(Localization.SECONDS.toString(), secondsTextBox.getX(), secondsTextBox.getY() - 7, 0.7F, secondsTextBox.getWidth(), 0x404040);
+            gui.drawCenteredString(Localization.TICKS.toString(), ticksTextBox.getX(), ticksTextBox.getY() - 7, 0.7F, ticksTextBox.getWidth(), 0x404040);
         }
     }
 

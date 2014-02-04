@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -95,17 +96,17 @@ public class ComponentMenuRedstoneOutput extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Output";
+        return Localization.REDSTONE_OUTPUT_MENU.toString();
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
         if (useStrengthSetting()) {
-            gui.drawString("Redstone strength", TEXT_X, TEXT_Y, 0.7F, 0x404040);
+            gui.drawString(Localization.REDSTONE_STRENGTH.toString(), TEXT_X, TEXT_Y, 0.7F, 0x404040);
             textBoxes.draw(gui, mX, mY);
         }else{
-            gui.drawString("Digital signal toggle", TEXT_X, TEXT_Y, 0.7F, 0x404040);
+            gui.drawString(Localization.DIGITAL_TOGGLE.toString(), TEXT_X, TEXT_Y, 0.7F, 0x404040);
         }
         radioButtons.draw(gui, mX, mY);
     }

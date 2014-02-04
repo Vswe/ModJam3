@@ -3,6 +3,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -18,7 +19,7 @@ public class ComponentMenuRedstoneStrength extends ComponentMenu {
         super(parent);
 
         checkBoxes = new CheckBoxList();
-        checkBoxes.addCheckBox(new CheckBox("Invert selection", CHECK_BOX_X, CHECK_BOX_Y) {
+        checkBoxes.addCheckBox(new CheckBox(Localization.INVERT_SELECTION, CHECK_BOX_X, CHECK_BOX_Y) {
 
             @Override
             public void setValue(boolean val) {
@@ -87,14 +88,14 @@ public class ComponentMenuRedstoneStrength extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Analog Redstone";
+        return Localization.REDSTONE_STRENGTH_MENU.toString();
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
-        gui.drawSplitString("Select the strength range required for the redstone signal", TEXT_MARGIN_X, TEXT_Y, MENU_WIDTH - 2 * TEXT_MARGIN_X, 0.7F, 0x404040);
-        gui.drawString("through", TEXT_BOX_TEXT_X, TEXT_BOX_TEXT_Y, 0.7F, 0x404040);
+        gui.drawSplitString(Localization.REDSTONE_STRENGTH_INFO.toString(), TEXT_MARGIN_X, TEXT_Y, MENU_WIDTH - 2 * TEXT_MARGIN_X, 0.7F, 0x404040);
+        gui.drawString(Localization.THROUGH.toString(), TEXT_BOX_TEXT_X, TEXT_BOX_TEXT_Y, 0.7F, 0x404040);
 
         checkBoxes.draw(gui, mX, mY);
         textBoxes.draw(gui, mX, mY);
@@ -248,9 +249,9 @@ public class ComponentMenuRedstoneStrength extends ComponentMenu {
     @Override
     public void addErrors(List<String> errors) {
         if (getLow() > getHigh()) {
-            errors.add("Invalid strength range");
+            errors.add(Localization.INVALID_REDSTONE_RANGE_ERROR.toString());
         }else if(getLow() == 0 && getHigh() == 15) {
-            errors.add("Redundant strength range");
+            errors.add(Localization.REDUNDANT_REDSTONE_RANGE_ERROR.toString());
         }
     }
 }

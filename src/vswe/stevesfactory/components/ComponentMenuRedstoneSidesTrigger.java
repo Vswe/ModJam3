@@ -19,9 +19,9 @@ public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSide
     @Override
     protected String getMessage() {
         if (isBUD()) {
-            return "Select which block sides updates should be detected at";
+            return Localization.UPDATE_SIDES_INFO.toString();
         }else{
-            return "Select which block sides the redstone should be detected at";
+            return Localization.REDSTONE_SIDES_INFO.toString();
         }
     }
 
@@ -36,7 +36,7 @@ public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSide
 
     @Override
     public String getName() {
-        return isBUD() ? "Update Sides" : "Redstone Sides";
+        return isBUD() ? Localization.UPDATE_SIDES_MENU.toString() : Localization.REDSTONE_SIDES_MENU_TRIGGER.toString();
     }
 
     private boolean isBUD() {
@@ -46,7 +46,7 @@ public class ComponentMenuRedstoneSidesTrigger extends ComponentMenuRedstoneSide
     @Override
     public void addErrors(List<String> errors) {
         if (isVisible() && selection == 0) {
-            errors.add("No sides selected");
+            errors.add(Localization.NO_SIDES_ERROR.toString());
         }
     }
 }

@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -62,7 +63,7 @@ public class ComponentMenuResult extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Connections";
+        return Localization.CONNECTIONS_MENU.toString();
     }
     @SideOnly(Side.CLIENT)
     @Override

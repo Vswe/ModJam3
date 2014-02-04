@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -58,7 +59,8 @@ public abstract class ComponentMenuRedstoneSides extends ComponentMenu {
     private class CheckBoxSide extends CheckBox {
         private int id;
         public CheckBoxSide(int id) {
-            super(ForgeDirection.VALID_DIRECTIONS[id].toString().charAt(0) + ForgeDirection.VALID_DIRECTIONS[id].toString().toLowerCase().substring(1), CHECKBOX_X + CHECKBOX_SPACING_X * (id % 2), CHECKBOX_Y + CHECKBOX_SPACING_Y * (id / 2));
+            //TODO
+            super(Localization.SPLIT/*ForgeDirection.VALID_DIRECTIONS[id].toString().charAt(0) + ForgeDirection.VALID_DIRECTIONS[id].toString().toLowerCase().substring(1)*/, CHECKBOX_X + CHECKBOX_SPACING_X * (id % 2), CHECKBOX_Y + CHECKBOX_SPACING_Y * (id / 2));
 
             this.id = id;
         }
@@ -226,7 +228,7 @@ public abstract class ComponentMenuRedstoneSides extends ComponentMenu {
     @Override
     public void addErrors(List<String> errors) {
         if (isVisible() && selection == 0) {
-            errors.add("No redstone sides selected");
+            errors.add(Localization.NO_REDSTONE_SIDES_ERROR.toString());
         }
     }
 }

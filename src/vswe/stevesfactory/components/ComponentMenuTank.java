@@ -1,5 +1,6 @@
 package vswe.stevesfactory.components;
 
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 
 import java.util.List;
@@ -12,13 +13,13 @@ public class ComponentMenuTank extends ComponentMenuContainer {
 
     @Override
     public String getName() {
-        return "Tanks";
+        return Localization.TANK_MENU.toString();
     }
 
     @Override
     public void addErrors(List<String> errors) {
         if (selectedInventories.isEmpty()) {
-            errors.add("No tank selected");
+            errors.add(Localization.NO_TANK_ERROR.toString());
         }
     }
 }

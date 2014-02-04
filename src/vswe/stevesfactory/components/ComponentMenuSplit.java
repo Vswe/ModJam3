@@ -30,7 +30,7 @@ public class ComponentMenuSplit extends ComponentMenu {
 
         checkBoxes = new CheckBoxList();
 
-        checkBoxes.addCheckBox(new CheckBox("Use fair split", CHECK_BOX_X, RADIO_Y + 2 * SPACING_Y) {
+        checkBoxes.addCheckBox(new CheckBox(Localization.FAIR_SPLIT, CHECK_BOX_X, RADIO_Y + 2 * SPACING_Y) {
             @Override
             public void setValue(boolean val) {
                 setFair(val);
@@ -47,7 +47,7 @@ public class ComponentMenuSplit extends ComponentMenu {
             }
         });
 
-        checkBoxes.addCheckBox(new CheckBox("Include empty pins", CHECK_BOX_X, RADIO_Y + 3 * SPACING_Y) {
+        checkBoxes.addCheckBox(new CheckBox(Localization.EMPTY_PINS, CHECK_BOX_X, RADIO_Y + 3 * SPACING_Y) {
             @Override
             public void setValue(boolean val) {
                 setEmpty(val);
@@ -76,7 +76,7 @@ public class ComponentMenuSplit extends ComponentMenu {
     private static final int SPACING_Y = 15 ;
     @Override
     public String getName() {
-        return "Split";  //To change body of implemented methods use File | Settings | File Templates.
+        return Localization.SPLIT_MENU.toString();
     }
 
     @SideOnly(Side.CLIENT)

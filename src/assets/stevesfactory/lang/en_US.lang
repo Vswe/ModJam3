@@ -14,7 +14,12 @@ tile.sfm.BlockCableBUD.name=Block Detector
 tile.sfm.BlockCableBreaker.name=Block Gate
 
 # ======================================
-#				INTERFACE
+#			COMPONENT TYPES
+# ======================================
+
+
+# ======================================
+#			COMPONENT MENUS
 # ======================================
 
 gui.sfm.DetectorMenu=Update Detectors
@@ -61,7 +66,66 @@ gui.sfm.NoNodeError=No nodes selected
 gui.sfm.DoEmitPulse=Do emit pulse
 gui.sfm.Seconds=Seconds
 gui.sfm.Ticks=Ticks
-
+gui.sfm.PulseMenu=Pulse
+gui.sfm.ReceiversMenu=Redstone Receivers
+gui.sfm.NoReceiverError=No receivers selected
+gui.sfm.RedstoneOutputMenu=Output
+gui.sfm.RedstoneStrength=Redstone strength
+gui.sfm.DigitalToggle=Digital signal toggle
+gui.sfm.NoRedstoneSidesError=No redstone sides selected
+gui.sfm.RedstoneSidesMenu=Sides
+gui.sfm.RedstoneSidesInfo=Select which block sides the redstone should be detected at
+gui.sfm.UpdateSidesInfo=Select which block sides updates should be detected at
+gui.sfm.RedstoneSidesMenuTrigger=Redstone Sides
+gui.sfm.UpdateSidesMenu=Update Sides
+gui.sfm.NoSidesError=No sides selected
+gui.sfm.InvertSelection=Invert selection
+gui.sfm.RedstoneStrengthMenu=Analog Redstone
+gui.sfm.RedstoneStrengthInfo=Select the strength range required for the redstone signal
+gui.sfm.Through=through
+gui.sfm.InvalidRedstoneRangeError=Invalid strength range
+gui.sfm.RedundantRedstoneRangeError=Redundant strength range
+gui.sfm.RedstoneStrengthMenuCondition=Strength
+gui.sfm.ConnectionsMenu=Connections
+gui.sfm.FairSplit=UseFairSplit
+gui.sfm.EmptyPins=Include empty pins
+gui.sfm.SplitMenu=Split
+gui.sfm.SpecifyAmount=Specify amount?
+gui.sfm.Delete=Delete
+gui.sfm.DeleteItemSelection=Delete this item selection
+gui.sfm.GoBack=Go back
+gui.sfm.Cancel=Cancel
+gui.sfm.EmptyWhiteListError=The whitelist is empty
+gui.sfm.TankMenu=Tanks
+gui.sfm.NoTankError=No tank selected
+gui.sfm.Activate=Activate
+gui.sfm.Deactivate=Deactivate
+gui.sfm.ActivateLong=Click to use this side
+gui.sfm.DeactivateLong=Click to prevent this side from being used
+gui.sfm.NoDirectionError=No direction is active
+gui.sfm.AllSlots=Use all slots
+gui.sfm.IdRange=Use id range
+gui.sfm.AllSlotsLong=Click to use all slots for this side instead
+gui.sfm.IdRangeLong=Click to use a slot id range for this specific side
+gui.sfm.InvalidRange=range is invalid
+gui.sfm.AdvancedMode=Advanced mode
+gui.sfm.SimpleMode=Simple mode
+gui.sfm.AdvancedModeLong=Click to use advanced mode for this side instead
+gui.sfm.SimpleModeLong=Click to use simple mode for this side instead
+gui.sfm.UseId=Use id
+gui.sfm.Invert=Invert
+gui.sfm.UpdateBlockMenu=Update Block
+gui.sfm.Meta=Meta
+gui.sfm.GlobalValueSet=Global value set
+gui.sfm.VariableMenu=Variable
+gui.sfm.NotDeclaredError=This variable hasn't been declared
+gui.sfm.AlreadyDeclaredError=This variable has already been declared
+gui.sfm.VariableContainersMenu=Containers
+gui.sfm.VariableList=List
+gui.sfm.VariableElement=Element
+gui.sfm.LoopVariableMenu=Variables
+gui.sfm.ListNotDeclared=List variable hasn't been declared
+gui.sfm.ElementNotDeclared=Element variable hasn't been declared
 
 
 

@@ -4,11 +4,12 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import vswe.stevesfactory.CollisionHelper;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.GuiManager;
 
 public abstract class VariableDisplay {
 
-    private String name;
+    private Localization name;
     private int x;
     private int y;
 
@@ -25,7 +26,7 @@ public abstract class VariableDisplay {
     private static final int TEXT_X = -40;
     private static final int TEXT_Y = 5;
 
-    protected VariableDisplay(String name, int x, int y) {
+    protected VariableDisplay(Localization name, int x, int y) {
         this.name = name;
         this.x = x;
         this.y = y;
@@ -34,7 +35,7 @@ public abstract class VariableDisplay {
     @SideOnly(Side.CLIENT)
     public void draw(GuiManager gui, int mX, int mY) {
         if (name != null) {
-            gui.drawString(name, x + TEXT_X, y + TEXT_Y, 0x404040);
+            gui.drawString(name.toString(), x + TEXT_X, y + TEXT_Y, 0x404040);
         }
 
         gui.getManager().getVariables()[getValue()].draw(gui, x + VARIABLE_X, y);

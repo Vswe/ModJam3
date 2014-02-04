@@ -15,13 +15,13 @@ public class ComponentMenuReceivers extends ComponentMenuContainer {
 
     @Override
     public String getName() {
-        return "Redstone Receivers";
+        return Localization.RECEIVERS_MENU.toString();
     }
 
     @Override
     public void addErrors(List<String> errors) {
         if (selectedInventories.isEmpty() && isVisible()) {
-            errors.add("No receivers selected");
+            errors.add(Localization.NO_RECEIVER_ERROR.toString());
         }
     }
 

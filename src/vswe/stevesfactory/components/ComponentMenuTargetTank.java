@@ -45,12 +45,12 @@ public class ComponentMenuTargetTank extends ComponentMenuTarget {
         return new Button(27) {
             @Override
             protected String getLabel() {
-                return useAdvancedSetting(selectedDirectionId) ? "Advanced mode" : "Simple mode";
+                return useAdvancedSetting(selectedDirectionId) ? Localization.ADVANCED_MODE.toString() : Localization.SIMPLE_MODE.toString();
             }
 
             @Override
             protected String getMouseOverText() {
-                return useAdvancedSetting(selectedDirectionId) ? "Click to use simple mode for this side instead" : "Click to use advanced mode for this side instead";
+                return useAdvancedSetting(selectedDirectionId) ? Localization.SIMPLE_MODE_LONG.toString() : Localization.ADVANCED_MODE_LONG.toString();
             }
 
             @Override

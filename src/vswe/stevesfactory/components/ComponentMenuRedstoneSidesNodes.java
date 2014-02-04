@@ -1,6 +1,8 @@
 package vswe.stevesfactory.components;
 
 
+import vswe.stevesfactory.Localization;
+
 public class ComponentMenuRedstoneSidesNodes extends ComponentMenuRedstoneSidesTrigger{
 
     public ComponentMenuRedstoneSidesNodes(FlowComponent parent) {
@@ -9,7 +11,7 @@ public class ComponentMenuRedstoneSidesNodes extends ComponentMenuRedstoneSidesT
 
     @Override
     public String getName() {
-        return "Sides";
+        return Localization.REDSTONE_SIDES_MENU.toString();
     }
 
     @Override

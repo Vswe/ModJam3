@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 import vswe.stevesfactory.CollisionHelper;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -50,12 +51,12 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
     private Button[] buttons = {new Button(5) {
         @Override
         protected String getLabel() {
-            return isActive(selectedDirectionId) ? "Deactivate" : "Activate";
+            return isActive(selectedDirectionId) ? Localization.DEACTIVATE.toString() : Localization.ACTIVATE.toString();
         }
 
         @Override
         protected String getMouseOverText() {
-            return isActive(selectedDirectionId) ? "Click to prevent this side from being used" : "Click to use this side";
+            return isActive(selectedDirectionId) ? Localization.DEACTIVATE_LONG.toString() : Localization.ACTIVATE_LONG.toString();
         }
 
         @Override
@@ -398,6 +399,6 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
             }
         }
 
-        errors.add("No direction is active");
+        errors.add(Localization.NO_DIRECTION_ERROR.toString());
     }
 }

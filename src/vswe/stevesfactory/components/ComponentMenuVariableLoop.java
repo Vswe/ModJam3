@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -17,7 +18,7 @@ public class ComponentMenuVariableLoop extends ComponentMenu {
     public ComponentMenuVariableLoop(FlowComponent parent) {
         super(parent);
 
-        listDisplay = new VariableDisplay("List", DISPLAY_X, DISPLAY_Y_TOP) {
+        listDisplay = new VariableDisplay(Localization.VARIABLE_LIST, DISPLAY_X, DISPLAY_Y_TOP) {
             @Override
             public int getValue() {
                 return selectedList;
@@ -34,7 +35,7 @@ public class ComponentMenuVariableLoop extends ComponentMenu {
             }
         };
 
-        elementDisplay = new VariableDisplay("Element", DISPLAY_X, DISPLAY_Y_BOT) {
+        elementDisplay = new VariableDisplay(Localization.VARIABLE_ELEMENT, DISPLAY_X, DISPLAY_Y_BOT) {
             @Override
             public int getValue() {
                 return selectedElement;
@@ -57,7 +58,7 @@ public class ComponentMenuVariableLoop extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Variables";
+        return Localization.LOOP_VARIABLE_MENU.toString();
     }
 
     private static final int DISPLAY_X = 45;
@@ -186,11 +187,11 @@ public class ComponentMenuVariableLoop extends ComponentMenu {
     @Override
     public void addErrors(List<String> errors) {
         if (!getListVariable().isValid()) {
-            errors.add("List variable hasn't been declared");
+            errors.add(Localization.LIST_NOT_DECLARED.toString());
         }
 
         if (!getElementVariable().isValid()) {
-            errors.add("Element variable hasn't been declared");
+            errors.add(Localization.ELEMENT_NOT_DECLARED.toString());
         }
     }
 }

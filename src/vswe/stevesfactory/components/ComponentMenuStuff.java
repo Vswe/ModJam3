@@ -68,7 +68,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
         checkBoxes = new CheckBoxList();
         if (settings.get(0).isAmountSpecific()) {
-            checkBoxes.addCheckBox(new CheckBox("Specify amount?", 5, 25) {
+            checkBoxes.addCheckBox(new CheckBox(Localization.SPECIFY_AMOUNT, 5, 25) {
                 @Override
                 public void setValue(boolean val) {
                     selectedSetting.setLimitedByAmount(val);
@@ -226,7 +226,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
             int srcDeleteY = inDeleteBounds(mX, mY) ? 1 : 0;
             gui.drawTexture(DELETE_X, DELETE_Y, DELETE_SRC_X, DELETE_SRC_Y + srcDeleteY * DELETE_SIZE_H, DELETE_SIZE_W, DELETE_SIZE_H);
-            gui.drawCenteredString("Delete", DELETE_X, DELETE_Y + DELETE_TEXT_Y, 0.7F, DELETE_SIZE_W, 0xBB4040);
+            gui.drawCenteredString(Localization.DELETE.toString(), DELETE_X, DELETE_Y + DELETE_TEXT_Y, 0.7F, DELETE_SIZE_W, 0xBB4040);
         }else if (isSearching()) {
             int srcBoxY = selected ? 1 : 0;
 
@@ -348,7 +348,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             if (CollisionHelper.inBounds(EDIT_ITEM_X, EDIT_ITEM_Y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 drawSettingObjectMouseOver(gui, selectedSetting, mX, mY);
             }else if(inDeleteBounds(mX, mY)) {
-                gui.drawMouseOver("Delete this item selection", mX, mY);
+                gui.drawMouseOver(Localization.DELETE_ITEM_SELECTION.toString(), mX, mY);
             }
         }
 
@@ -368,7 +368,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         }
 
         if (selectedSetting != null && inBackBounds(mX, mY)) {
-            gui.drawMouseOver(isEditing() ? "Go back" : "Cancel", mX, mY);
+            gui.drawMouseOver(isEditing() ? Localization.GO_BACK.toString() : Localization.CANCEL.toString(), mX, mY);
         }
     }
 
@@ -794,7 +794,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                     return;
                 }
             }
-            errors.add("The whitelist is empty");
+            errors.add(Localization.EMPTY_WHITE_LIST_ERROR.toString());
         }
     }
 

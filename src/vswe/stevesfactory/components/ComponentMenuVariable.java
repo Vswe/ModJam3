@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -88,7 +89,7 @@ public class ComponentMenuVariable extends ComponentMenu {
         };
 
         checkBoxes = new CheckBoxList();
-        checkBoxes.addCheckBox(new CheckBox("Global value set", CHECK_BOX_X, CHECK_BOX_Y) {
+        checkBoxes.addCheckBox(new CheckBox(Localization.GLOBAL_VALUE_SET, CHECK_BOX_X, CHECK_BOX_Y) {
             @Override
             public void setValue(boolean val) {
                 executed = val;
@@ -116,7 +117,7 @@ public class ComponentMenuVariable extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Variable";
+        return Localization.VARIABLE_MENU.toString();
     }
 
 
@@ -312,9 +313,9 @@ public class ComponentMenuVariable extends ComponentMenu {
     public void addErrors(List<String> errors) {
         Variable variable = getParent().getManager().getVariables()[selectedVariable];
         if (!variable.isValid()) {
-            errors.add("This variable hasn't been declared");
+            errors.add(Localization.NOT_DECLARED_ERROR.toString());
         }else if(isDeclaration() && variable.getDeclaration().getId() != getParent().getId()) {
-            errors.add("This variable has already been declared");
+            errors.add(Localization.ALREADY_DECLARED_ERROR.toString());
         }
     }
 }

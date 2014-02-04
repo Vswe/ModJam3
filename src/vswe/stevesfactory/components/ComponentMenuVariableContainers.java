@@ -1,5 +1,6 @@
 package vswe.stevesfactory.components;
 
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 
 import java.util.EnumSet;
@@ -17,7 +18,7 @@ public class ComponentMenuVariableContainers extends ComponentMenuContainer {
 
     @Override
     public String getName() {
-        return "Containers";
+        return Localization.VARIABLE_CONTAINERS_MENU.toString();
     }
 
     @Override

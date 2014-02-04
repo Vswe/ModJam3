@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -22,7 +23,7 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
         checkBoxes = new CheckBoxList();
 
-        checkBoxes.addCheckBox(new CheckBox("Use id", ID_START_X, ID_START_Y + CHECKBOX_OFFSET) {
+        checkBoxes.addCheckBox(new CheckBox(Localization.USE_ID, ID_START_X, ID_START_Y + CHECKBOX_OFFSET) {
             @Override
             public void setValue(boolean val) {
                 useId = val;
@@ -56,7 +57,7 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
             }
         });
 
-        checkBoxes.addCheckBox(new CheckBox("Invert", ID_START_X + META_INVERTED_OFFSET, ID_START_Y + CHECKBOX_OFFSET) {
+        checkBoxes.addCheckBox(new CheckBox(Localization.INVERT, ID_START_X + META_INVERTED_OFFSET, ID_START_Y + CHECKBOX_OFFSET) {
             @Override
             public void setValue(boolean val) {
                 idInverted = val;
@@ -141,7 +142,7 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
                 }
             });
 
-            checkBoxes.addCheckBox(new CheckBox("Invert", META_START_X + META_INVERTED_OFFSET, META_START_Y + CHECKBOX_OFFSET + setting * META_SPACING) {
+            checkBoxes.addCheckBox(new CheckBox(Localization.INVERT, META_START_X + META_INVERTED_OFFSET, META_START_Y + CHECKBOX_OFFSET + setting * META_SPACING) {
                 @Override
                 public void setValue(boolean val) {
                     settings[setting].inverted = val;
@@ -241,7 +242,7 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Update Block";
+        return Localization.UPDATE_BLOCK_MENU.toString();
     }
 
     @SideOnly(Side.CLIENT)
@@ -249,7 +250,7 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
     public void draw(GuiManager gui, int mX, int mY) {
         textBoxes.draw(gui, mX, mY);
         checkBoxes.draw(gui, mX, mY);
-        gui.drawString("Meta", META_TEXT_X, META_TEXT_Y, 0.7F, 0x404040);
+        gui.drawString(Localization.META.toString(), META_TEXT_X, META_TEXT_Y, 0.7F, 0x404040);
     }
 
     @SideOnly(Side.CLIENT)

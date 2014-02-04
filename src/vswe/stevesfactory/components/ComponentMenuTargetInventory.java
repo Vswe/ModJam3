@@ -4,6 +4,7 @@ package vswe.stevesfactory.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataBitHelper;
@@ -47,12 +48,12 @@ public class ComponentMenuTargetInventory extends ComponentMenuTarget {
         return new Button(27) {
             @Override
             protected String getLabel() {
-                return useAdvancedSetting(selectedDirectionId) ? "Use all slots" : "Use id range";
+                return useAdvancedSetting(selectedDirectionId) ? Localization.ALL_SLOTS.toString() : Localization.ID_RANGE.toString();
             }
 
             @Override
             protected String getMouseOverText() {
-                return useAdvancedSetting(selectedDirectionId) ? "Click to use all slots for this side instead" : "Click to use a slot id range for this specific side";
+                return useAdvancedSetting(selectedDirectionId) ? Localization.ALL_SLOTS_LONG.toString() : Localization.ID_RANGE_LONG.toString();
             }
 
             @Override
@@ -164,7 +165,7 @@ public class ComponentMenuTargetInventory extends ComponentMenuTarget {
     public void addErrors(List<String> errors) {
         for (int i = 0; i < directions.length; i++) {
             if (isActive(i) && getStart(i) > getEnd(i)) {
-                errors.add("The " + directions[i].toString().charAt(0) + directions[i].toString().toLowerCase().substring(1) + " range is invalid");
+                errors.add(directions[i].toString().charAt(0) + directions[i].toString().toLowerCase().substring(1) + " " + Localization.INVALID_RANGE.toString());
             }
         }
 
