@@ -1,0 +1,296 @@
+# ======================================
+#				BLOCKS
+# ======================================
+
+tile.sfm.BlockMachineManager.name=Maskin Inventar Manager
+tile.sfm.BlockCable.name=Inventar Kabel
+tile.sfm.BlockCableRelay.name=Inventar Relé
+tile.sfm.BlockAdvancedCableRelay.name=Avangsert Inventar Relé
+tile.sfm.BlockCableOutput.name=Redstone Sender
+tile.sfm.BlockCableInput.name=Redstone Mottaker
+tile.sfm.BlockCableCreative.name=Kreativmodus forskyner 
+tile.sfm.BlockCableIntake.name=Item Brønn
+tile.sfm.BlockCableBUD.name=Block Detektor
+tile.sfm.BlockCableBreaker.name=Block Port
+
+# ======================================
+#			COMPONENT TYPES
+# ======================================
+gui.sfm.TriggerShort=Utløser
+gui.sfm.TriggerLong=Utløser
+gui.sfm.InputShort=Inngang
+gui.sfm.InputLong=Inngang
+gui.sfm.OutputShort=Utgang
+gui.sfm.OutputLong=Utgang
+gui.sfm.ConditionShort=Tilstand
+gui.sfm.ConditionLong=Tilstand
+gui.sfm.FlowControlShort=Strøm
+gui.sfm.FlowControlLong=Strøm Kontroll
+gui.sfm.LiquidInputShort=Utgang (Venstre)
+gui.sfm.LiquidInputLong=Veske Inngang
+gui.sfm.LiquidOutputShort=Utgang (Venstre)
+gui.sfm.LiquidOutputLong=Veske Utgang
+gui.sfm.LiquidConditionShort=Tilstand (Venstre)
+gui.sfm.LiquidConditionLong=Veske Tilstand
+gui.sfm.RedstoneEmitterShort=Sender
+gui.sfm.RedstoneEmitterLong=Redstone Sender
+gui.sfm.RedstoneConditionShort=Tilstand (Høyre)
+gui.sfm.RedstoneConditionLong=Redstone Tilstand
+gui.sfm.ContainerVariableShort=Variabel
+gui.sfm.ContainerVariableLong=Beholder Variabel
+gui.sfm.ForEachLoopShort=For Hver
+gui.sfm.ForEachLoopLong=For Hver Loop
+gui.sfm.AutoCrafterShort=Bygger
+gui.sfm.AutoCrafterLong=Automatisk Bygger
+
+# ======================================
+#			CONNECTION OPTIONS
+# ======================================
+
+gui.sfm.ConnectionInput=Ingang
+gui.sfm.ConnectionOutput=Utgang
+gui.sfm.ConnectionInterval=Intervall
+gui.sfm.ConnectionOnHighRedstonePulse=Ved Høy Puls
+gui.sfm.ConnectionOnLowRedstonePulse=Ved Lav Puls
+gui.sfm.ConnectionWhileHighRedstone=Så Lenge Høyt Signal
+gui.sfm.ConnectionWhileLowRedstone=Så Lenge Høyt Signal
+gui.sfm.ConnectionTrue=Sant
+gui.sfm.ConnectionFalse=Usant
+gui.sfm.ConnectionForEach=For Hver
+gui.sfm.ConnectionOnBlockUpdate=Ved Block Oppdatering 
+gui.sfm.ConnectionOnHighBlockPulse=Ved Høy Puls
+gui.sfm.ConnectionWhileHighBlock=Så Lenge Høyt Signal
+gui.sfm.ConnectionOnLowBlockPulse=Ved Lav Puls
+gui.sfm.ConnectionWhileLowBlock=Så Lenge Lavt Signall
+
+
+# ======================================
+#			CONNECTION SETS
+# ======================================
+
+gui.sfm.ConnectionSetStandard=Standar
+gui.sfm.ConnectionSetInterval=På intervall
+gui.sfm.ConnectionSetRedstone=Redstone Kontrollert
+gui.sfm.ConnectionSetCondition=Tilstand
+gui.sfm.ConnectionSetCollector2=Samler - 2 innganger
+gui.sfm.ConnectionSetCollector5=Samler - 5 innganger
+gui.sfm.ConnectionSetSplit2=Splittet - 2 utganger
+gui.sfm.ConnectionSetSplit5=Splittet - 5 utganger
+gui.sfm.ConnectionSetDeclaration=Erklæring
+gui.sfm.ConnectionSetForEach=For Hver
+gui.sfm.ConnectionSetBud=Block Oppdaterings Detektor (BUD)
+
+# ======================================
+#			COMPONENT MENUS
+# ======================================
+
+gui.sfm.DetectorMenu=Update Detectors
+gui.sfm.RequireAllTargets=Trenger Alle Målene
+gui.sfm.RequireOneTarget=Trenger Et Mål
+gui.sfm.RunSharedOnce=Kjør en felles kommando en gang
+gui.sfm.RunOnePerTarget=Kjør en kommando en gang per mål
+gui.sfm.Selected=[Valgt]
+gui.sfm.OverflowMenu=Få Tilgang Til Inventar
+gui.sfm.NoDetectorError=Ingen Detektor Valgt
+gui.sfm.NoOverflowError=Ikke Tilgang Inventar Valgt
+gui.sfm.OverflowInfo=Disse inventarene vil bli brukt om den lagde gjenstanden ikke har plass. Den vil også bli brukt for oppbevarings utstyr som bøtter osv.  
+gui.sfm.ContainerTypeMenu=Oppbevaringsmeny
+gui.sfm.CraftingMenu=Bygging
+gui.sfm.EmitterMenu=Sender
+gui.sfm.NoEmitterError=Ingen sendere valgt
+gui.sfm.RequiresAll=Trenger alle
+gui.sfm.IfAny=Hvis noen
+gui.sfm.WhiteList=Hvitlistet
+gui.sfm.BlackList=Sortelistet
+gui.sfm.EmptyTank=Tom tank
+gui.sfm.FilledTank=Full tank
+gui.sfm.StrongPower=Sterk kraft
+gui.sfm.WeakPower=Svak kraft
+gui.sfm.Sequential=Sekvensiellt
+gui.sfm.Split=Splittet
+gui.sfm.IntervalMenu=Intervall
+gui.sfm.IntervalInfo=Tid mellom denne kommandoen er blitt aktivert
+gui.sfm.Second=sekunder(s)
+gui.sfm.InventoryMenu=Inventarer
+gui.sfm.NoInventoryError=Ingen inventar valgt
+gui.sfm.ItemMenu=Ting
+gui.sfm.DamageValue=Skade verdi
+gui.sfm.NoConditionError=Ingen tilstand valgt
+gui.sfm.Buckets=Bøtters
+gui.sfm.MilliBuckets=Melke bøtter
+gui.sfm.LiquidsMenu=Vesker
+gui.sfm.UseAll=Bruk Alle
+gui.sfm.Reversed=Reservert
+gui.sfm.LoopOrderMenu=Loop Rekkefølge
+gui.sfm.ValueOrderMenu=Vedi Rekkefølge
+gui.sfm.RedstoneNodeMenu=Redstone Knutepunkter
+gui.sfm.NoNodeError=Ingen knutepunkter valgt 
+gui.sfm.DoEmitPulse=Send puls
+gui.sfm.Seconds=Sekunder
+gui.sfm.Ticks=Tikk
+gui.sfm.PulseMenu=Puls
+gui.sfm.ReceiversMenu=Redstone Mottakere
+gui.sfm.NoReceiverError=Ingen mottakere funnet
+gui.sfm.RedstoneOutputMenu=Utgang
+gui.sfm.RedstoneStrength=Redstone styke
+gui.sfm.DigitalToggle=Digitalt signal på
+gui.sfm.NoRedstoneSidesError=Ingen Redstone sider valgt
+gui.sfm.RedstoneSidesMenu=Sider
+gui.sfm.RedstoneSidesInfo=Velg hvem side Redstonen skal bli funnet på.
+gui.sfm.UpdateSidesInfo=Velg hvem side oppdateringer skal bli funnet på
+gui.sfm.RedstoneSidesMenuTrigger=Redstone Sider
+gui.sfm.UpdateSidesMenu=Oppdaterings Sider
+gui.sfm.NoSidesError=Ingen sider valgt
+gui.sfm.InvertSelection=Inverter
+gui.sfm.RedstoneStrengthMenu=Analog Redstone
+gui.sfm.RedstoneStrengthInfo=Velg styrkeverdi for Redstone signal
+gui.sfm.Through=gjennom
+gui.sfm.InvalidRedstoneRangeError=Feil stryke verdi
+gui.sfm.RedundantRedstoneRangeError=Redusert styrkeverdi
+gui.sfm.RedstoneStrengthMenuCondition=Styrke
+gui.sfm.ConnectionsMenu=Tilkoling
+gui.sfm.FairSplit=Bruk virkelig splitter
+gui.sfm.EmptyPins=Inkluder tomme pin
+gui.sfm.SplitMenu=Splitter
+gui.sfm.SpecifyAmount=Spesielt antall?
+gui.sfm.Delete=Slett
+gui.sfm.DeleteItemSelection=Slett denne item utvalget
+gui.sfm.GoBack=Gå tilbake
+gui.sfm.Cancel=Avbryt
+gui.sfm.EmptyWhiteListError=Denne hvitlisten er tom
+gui.sfm.TankMenu=Tanker
+gui.sfm.NoTankError=Ingen tank valgt
+gui.sfm.Activate=Aktiver
+gui.sfm.Deactivate=Deaktiver
+gui.sfm.ActivateLong=Klikk for å bruke denne siden
+gui.sfm.DeactivateLong=Klikk for å forhindre at denne siden blir brukt
+gui.sfm.NoDirectionError=Ingen sider er aktive
+gui.sfm.AllSlots=Bruk alle lommer
+gui.sfm.IdRange=Bruk ID nivå
+gui.sfm.AllSlotsLong=Klikk for å bruke alle lommer fra denne siden
+gui.sfm.IdRangeLong=Klikk for å bruke alle lomme ID’er fra denne siden
+gui.sfm.InvalidRange=nivå er ikke brukbart
+gui.sfm.AdvancedMode=Avangstert modus
+gui.sfm.SimpleMode=Enkelt modus
+gui.sfm.AdvancedModeLong=Klikk for å bruke avangstertmodus på denne siden isteden
+gui.sfm.SimpleModeLong=Klikk for å bruke enkeltmodus på denne siden isteden
+gui.sfm.UseId=Bruk ID
+gui.sfm.Invert=Inverter
+gui.sfm.UpdateBlockMenu=Oppdater Block
+gui.sfm.Meta=Meta
+gui.sfm.GlobalValueSet=Global verdisetter
+gui.sfm.VariableMenu=Variabel
+gui.sfm.NotDeclaredError=Denne variabelen har ikke blitt erklært
+gui.sfm.AlreadyDeclaredError=Denne variabelen har allerede erklært
+gui.sfm.VariableContainersMenu=Beholder
+gui.sfm.VariableList=Liste
+gui.sfm.VariableElement=Element
+gui.sfm.LoopVariableMenu=Variabler
+gui.sfm.ListNotDeclared=Liste variabel har ikke blitt erklært
+gui.sfm.ElementNotDeclared=Element variabel har ikke blitt erklært
+gui.sfm.VariableWhite=Hvit variabel
+gui.sfm.VariableOrange=Oransje variabel
+gui.sfm.VariableMagenta= Magenta variabel
+gui.sfm.VariableLightBlue=Lyse blå variabel
+gui.sfm.VariableYellow=Gul variabel
+gui.sfm.VariableLime=Lime Grønn variabel
+gui.sfm.VariablePink=Rosa variabel
+gui.sfm.VariableGray=Grå variabell
+gui.sfm.VariableLightGray=Lyse grå variabel
+gui.sfm.VariableCyan=Turkis variabel
+gui.sfm.VariablePurple=Lilla variabel
+gui.sfm.VariableBlue=Blå variabel
+gui.sfm.VariableBrown=Brun variable
+gui.sfm.VariableGreen=Grønn variabel
+gui.sfm.VariableRed=Rød variabel
+gui.sfm.VariableBlack=Sort variabel
+gui.sfm.NoLiquidSelected=[Ingen veske valgt]
+gui.sfm.ChangeLiquid=Vestreklikk for å bytte veske
+gui.sfm.EditSetting=Høyreklikk for å endre innstillinger
+gui.sfm.NoItemSelected=[Ingen item valgt]
+gui.sfm.ChangeItem=Venstreklikk for å bytte item
+gui.sfm.FullDescription=Hold shift for å vise full beskrivelse
+gui.sfm.DetectionPrecise=Presis vei
+gui.sfm.DetectionNbtFuzzy=NBT vei
+gui.sfm.DetectionFuzzy=Fuzzy vei
+gui.sfm.DetectionOreDictionary=Ore dictionary støtte
+gui.sfm.ItemsFound=Found
+gui.sfm.RedstoneEmitterSidesMenu=Sider
+gui.sfm.RedstoneEmitterSidesInfo=Velg hvem block side Redstone skal sende mot
+gui.sfm.TypeInventory=Inventar
+gui.sfm.TypeTank=Tank
+gui.sfm.TypeEmitter=Sender
+gui.sfm.TypeReceiver=Mottaker
+gui.sfm.TypeNode=Knutepunkt
+gui.sfm.TypeBud=BUD
+gui.sfm.OrderStandard=Standar
+gui.sfm.OrderCable=Kabel Rekkefølge
+gui.sfm.OrderRandom=Tilfeldiggjør
+gui.sfm.ExtendOld=Utvid gammel
+gui.sfm.KeepAll=Behold alle
+gui.sfm.KeepOld=Behold gammel
+gui.sfm.KeepNew=Behold ny
+gui.sfm.Fixed=Fiksa
+gui.sfm.Toggle=Aktiver
+gui.sfm.Max=Maks
+gui.sfm.Min=Minimum
+gui.sfm.Increase=Øk
+gui.sfm.Decrease=Reduser
+gui.sfm.Forward=Fremover
+gui.sfm.Backward=Bakover
+gui.sfm.Global=Global
+gui.sfm.Local=Lokal
+gui.sfm.Add=Legg til
+gui.sfm.Remove=Fjern
+gui.sfm.Set=Sett
+gui.sfm.Down=Ned
+gui.sfm.Up=Opp
+gui.sfm.North=Nord
+gui.sfm.South=Sør
+gui.sfm.West=Vest
+gui.sfm.East=Øst
+
+# ======================================
+#		  OTHER MANAGER INTERFACE
+# ======================================
+
+gui.sfm.DeleteCommand=Delete [Slipp kommando her]
+gui.sfm.CreateCommand=Lag
+gui.sfm.MaximumComponentError=Maksimum komponent antall nådd
+
+
+# ======================================
+#		 ADVANCED RELAY INTERFACE
+# ======================================
+gui.sfm.GivePermission=Gi tillatelse
+gui.sfm.RevokePermission=Tilbakekall tilatelse
+gui.sfm.ActivateUser=Aktiver
+gui.sfm.DeactivateUser=Deactiver
+gui.sfm.DeleteUser=Slett bruker
+gui.sfm.MakeEditor=Lag editor
+gui.sfm.RemoveEditor=Fjern editor
+gui.sfm.ShowListToAll=Vis listen til alle
+gui.sfm.ShowToEditors=Vis til editors
+gui.sfm.EnableCreativeMode=Slå på kreativ modus
+gui.sfm.DisableCreativeMode=Skru av kreativ modus
+gui.sfm.Page=Side
+gui.sfm.Of=av
+gui.sfm.NoAccess=INGEN ADGANG!
+gui.sfm.EditorDescriptionShort=Du må definere hvem som kan bruke denne blocken, husk at du må gi dem adgang først
+gui.sfm.UserDescriptionShort=Du har ikke tillatelse til å kontrollere blocken, men du kan lese om innstillingene.
+gui.sfm.EditorDescriptionLong=Du kan redigere hvem spillere som har tillatelse, du kan bare velge mellom spillere som har gitt deg tillatelse.
+gui.sfm.UserDescriptionLong=Denne blokken vil kunne få tilgang til spillernes inventarer, blant annet inventarer. For denne blokken for å kunne få tilgang til din beholdning må du gi det tillatelse til å gjøre det. En redaktør kan deretter bestemme om blokken bør samhandle med inventaret eller ikke.
+gui.sfm.PermissionOwner=Eier
+gui.sfm.PermissionEditor=Editor
+gui.sfm.PermissionUser=Les bare
+gui.sfm.PermissionRestricted=Begrenset adgang
+gui.sfm.PermissionCreative=Kreativ adgang
+gui.sfm.PermissionInventory=Inventar adgang
+gui.sfm.PermissionDenied=Ingen adgang
+
+
+# ======================================
+#				OTHER
+# ======================================
+
+itemGroup.sfm=Steve's Factory Manager
