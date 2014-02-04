@@ -261,39 +261,39 @@ gui.sfm.East=Ost
 #		  OTHER MANAGER INTERFACE
 # ======================================
 
-gui.sfm.DeleteCommand=Delete [Drop command here]
-gui.sfm.CreateCommand=Create
-gui.sfm.MaximumComponentError=Maximum component amount reached
+gui.sfm.DeleteCommand=Löschen [Befehl hier droppen]
+gui.sfm.CreateCommand=Erstellt
+gui.sfm.MaximumComponentError=Maximale Komponentenanzahl erreicht
 
 
 # ======================================
 #		 ADVANCED RELAY INTERFACE
 # ======================================
-gui.sfm.GivePermission=Give permission
-gui.sfm.RevokePermission=Revoke permission
-gui.sfm.ActivateUser=Activate
-gui.sfm.DeactivateUser=Deactivate
-gui.sfm.DeleteUser=Delete user
-gui.sfm.MakeEditor=Make editor
-gui.sfm.RemoveEditor=Remove editor
-gui.sfm.ShowListToAll=Show list to all
-gui.sfm.ShowToEditors=Show to editors
-gui.sfm.EnableCreativeMode=Enable creative mode
-gui.sfm.DisableCreativeMode=Disable creative mode
-gui.sfm.Page=Page
-gui.sfm.Of=of
-gui.sfm.NoAccess=NO ACCESS
-gui.sfm.EditorDescriptionShort=You may define who this block can access, people need to give you permission first though.
-gui.sfm.UserDescriptionShort=You are not allowed to control this block. You have access to read the settings though.
-gui.sfm.EditorDescriptionLong=As an editor you can decide which players this block should interact with. You can only choose among the players who have given their permission.
-gui.sfm.UserDescriptionLong=This block will be able to access players' inventories, among other inventories. For this block to be able to access your inventory you will have to give it permission to do so. An editor can then decide whether the block should interact with your inventory or not.
-gui.sfm.PermissionOwner=Owner
+gui.sfm.GivePermission=Gibt Erlaubnis
+gui.sfm.RevokePermission=Entzieht Erlaubnis
+gui.sfm.ActivateUser=Aktiviert
+gui.sfm.DeactivateUser=Deaktiviert
+gui.sfm.DeleteUser=Löscht Benutzer
+gui.sfm.MakeEditor=Erstelle Editor
+gui.sfm.RemoveEditor=Entferne Editor
+gui.sfm.ShowListToAll=Zeigt Liste allen
+gui.sfm.ShowToEditors=Editoren zeigen
+gui.sfm.EnableCreativeMode=Aktiviere Kreativmodus
+gui.sfm.DisableCreativeMode=Deaktiviere Kreativmodus
+gui.sfm.Page=Seite
+gui.sfm.Of=von
+gui.sfm.NoAccess=KEIN ZUTRITT
+gui.sfm.EditorDescriptionShort=Du kannst den Zugriff zu diesem Block sperren, um nur bestimmten Personen Zugang zu gewähren.
+gui.sfm.UserDescriptionShort=Du hast nicht die Erlaubnis diesen Block zu kontrollieren, hast aber die Möglichkeit, die Einstellungen zu lesen.
+gui.sfm.EditorDescriptionLong=Als Editor kannst du entscheiden mit welchen Spielern der Block interagieren soll. Du kannst jedoch nur den erlaubten Spielern wählen.
+gui.sfm.UserDescriptionLong=Dieser Block hat nun die Möglichkeit, jegliche Art von Inventar zu benutzen, inklusive Spielerinventare. Damit der Block dein Inventar benutzen kann, musst du ihm Befehle geben, damit dies erlaubt ist. Ein Editor kann entscheiden ob der Block mit deinem Inventar interagieren soll oder nicht.
+gui.sfm.PermissionOwner=Eigentümer
 gui.sfm.PermissionEditor=Editor
-gui.sfm.PermissionUser=Read only
-gui.sfm.PermissionRestricted=Restricted access
-gui.sfm.PermissionCreative=Creative access
-gui.sfm.PermissionInventory=Inventory access
-gui.sfm.PermissionDenied=No access
+gui.sfm.PermissionUser=Read-only
+gui.sfm.PermissionRestricted=Beschränkter Zugang
+gui.sfm.PermissionCreative=Kreativzugang
+gui.sfm.PermissionInventory=Inventarzugang
+gui.sfm.PermissionDenied=Kein Zugang
 
 
 # ======================================
