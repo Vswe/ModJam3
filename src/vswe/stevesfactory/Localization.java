@@ -64,6 +64,7 @@ public enum Localization {
     CONNECTION_SET_BUD,
     CONNECTION_SET_OUTPUT_NODE,
     CONNECTION_SET_INPUT_NODE,
+    CONNECTION_SET_DYNAMIC,
 
     DETECTOR_MENU,
     REQUIRE_ALL_TARGETS,
@@ -230,6 +231,7 @@ public enum Localization {
     SOUTH,
     WEST,
     EAST,
+    GROUP_MENU,
 
     DELETE_COMMAND,
     EXIT_GROUP,

@@ -42,6 +42,10 @@ gui.sfm.ForEachLoopShort=For Each
 gui.sfm.ForEachLoopLong=For Each Loop
 gui.sfm.AutoCrafterShort=Crafter
 gui.sfm.AutoCrafterLong=Auto Crafter
+gui.sfm.GroupShort=Group
+gui.sfm.GroupLong=Command Group
+gui.sfm.NodeShort=Node
+gui.sfm.NodeLong=Group Node
 
 # ======================================
 #			CONNECTION OPTIONS
@@ -79,6 +83,9 @@ gui.sfm.ConnectionSetSplit5=Split - 5 outputs
 gui.sfm.ConnectionSetDeclaration=Declaration
 gui.sfm.ConnectionSetForEach=For each
 gui.sfm.ConnectionSetBud=Block update detector
+gui.sfm.ConnectionSetOutputNode=Output Node
+gui.sfm.ConnectionSetInputNode=Input Node
+gui.sfm.ConnectionSetDynamic=Dynamic
 
 # ======================================
 #			COMPONENT MENUS
@@ -249,6 +256,7 @@ gui.sfm.North=North
 gui.sfm.South=South
 gui.sfm.West=West
 gui.sfm.East=East
+gui.sfm.GroupMenu=Content
 
 # ======================================
 #		  OTHER MANAGER INTERFACE
@@ -257,6 +265,7 @@ gui.sfm.East=East
 gui.sfm.DeleteCommand=Delete [Drop command here]
 gui.sfm.CreateCommand=Create
 gui.sfm.MaximumComponentError=Maximum component amount reached
+gui.sfm.ExitGroup=Close group
 
 
 # ======================================

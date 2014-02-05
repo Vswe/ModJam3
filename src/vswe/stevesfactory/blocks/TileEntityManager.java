@@ -66,10 +66,10 @@ public class TileEntityManager extends TileEntityInterface {
                 for (FlowComponent item : items) {
                     if (item.isBeingMoved()) {
                         dw.writeData(item.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
-                        return false;
+                        return true;
                     }
                 }
-                return true;
+                return false;
             }
 
             @Override
@@ -107,14 +107,16 @@ public class TileEntityManager extends TileEntityInterface {
                 items.remove(i);
             }else{
                 component.updateConnectionIdsAtRemoval(idToRemove);
-                if (i > idToRemove) {
-                    component.decreaseId();
-                }
             }
         }
 
         if (selectedComponent != null && selectedComponent.getId() == idToRemove) {
             selectedComponent = null;
+        }
+
+        //do this afterwards so the new ids won't mess anything up
+        for (int i = idToRemove; i < items.size(); i++) {
+            items.get(i).decreaseId();
         }
     }
 

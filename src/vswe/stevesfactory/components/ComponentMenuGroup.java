@@ -2,6 +2,7 @@ package vswe.stevesfactory.components;
 
 import net.minecraft.nbt.NBTTagCompound;
 import vswe.stevesfactory.CollisionHelper;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.DataReader;
@@ -15,7 +16,7 @@ public class ComponentMenuGroup extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Options"; //TODO LOCALIZATION
+        return Localization.GROUP_MENU.toString();
     }
 
     @Override
