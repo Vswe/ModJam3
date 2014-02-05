@@ -2,7 +2,7 @@ package vswe.stevesfactory.network;
 
 
 public enum DataBitHelper {
-    FLOW_CONTROL_COUNT(7),
+    FLOW_CONTROL_COUNT(9),
     FLOW_CONTROL_X(9),
     FLOW_CONTROL_Y(8),
     FLOW_CONTROL_TYPE_ID(4),
@@ -25,12 +25,12 @@ public enum DataBitHelper {
     MENU_ITEM_SETTING_ID(5),
     MENU_ITEM_TYPE_HEADER(3),
 
-    CONNECTION_ID(3),
+    CONNECTION_ID(4),
     NODE_ID(4),
 
     CLIENT_HEADER(2),
     WORLD_COORDINATE(32),
-    GUI_BUTTON_ID(4),
+    GUI_BUTTON_ID(5),
 
     MENU_FLUID_ID(10) //Actually an int, but I think 10 bits is too much anyways. If someone has over 1024 fluids I have a problem
     ,

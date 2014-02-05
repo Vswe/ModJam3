@@ -45,9 +45,9 @@ public enum ConnectionOption {
         if (name != null) {
             return name.toString();
         }else if (this == DYNAMIC_INPUT){
-            return  component.getChildrenInputNodes().get(id).getName();
+            return id < component.getChildrenInputNodes().size() ? component.getChildrenInputNodes().get(id).getName() : "";
         }else {
-            return component.getChildrenOutputNodes().get(id).getName();
+            return id < component.getChildrenOutputNodes().size() ? component.getChildrenOutputNodes().get(id).getName() : "";
         }
     }
 

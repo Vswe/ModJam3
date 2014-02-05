@@ -122,6 +122,9 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     private int y;
     private int mouseDragX;
     private int mouseDragY;
+    private int mouseStartX;
+    private int mouseStartY;
+    private int resetTimer;
     private boolean isDragging;
     private boolean isLarge;
     private List<ComponentMenu> menus;
@@ -166,9 +169,9 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     public ConnectionSet getConnectionSet() {
         return connectionSet;
     }
-
+    private boolean isLoading;
     public void setConnectionSet(ConnectionSet connectionSet) {
-        if (this.connections != null) {
+        if (this.connections != null && this.connectionSet !=  null && !isLoading) {
             int oldLength = this.connectionSet.getConnections().length;
             int newLength = connectionSet.getConnections().length;
 
@@ -187,6 +190,17 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             }
         }
         this.connectionSet = connectionSet;
+    }
+
+    public void update() {
+        if (resetTimer > 0) {
+            if (resetTimer == 1) {
+                x = mouseStartX;
+                y = mouseStartY;
+            }
+
+            resetTimer--;
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -387,7 +401,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     }
 
     @SideOnly(Side.CLIENT)
-    String getName() {
+    public String getName() {
          return textBox.getText() == null ? name == null ||GuiScreen.isCtrlKeyDown() ? getType().getName() : name : textBox.getText();
     }
 
@@ -476,8 +490,8 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
            int internalY = mY - y;
 
             if (internalX <= DRAGGABLE_SIZE && internalY <= DRAGGABLE_SIZE) {
-                mouseDragX = mX;
-                mouseDragY = mY;
+                mouseStartX = mouseDragX = mX;
+                mouseStartY = mouseDragY = mY;
                 isDragging = true;
             }else if(inArrowBounds(internalX, internalY)) {
                 isLarge = !isLarge;
@@ -678,7 +692,16 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
         PacketHandler.sendDataToServer(dw);
     }
 
-    private void removeConnection(int id) {
+    public void removeAllConnections() {
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            Connection connection = connections.get(i);
+            if (connection != null) {
+                removeConnection(i);
+            }
+        }
+    }
+
+    public void removeConnection(int id) {
         Connection connection = connections.get(id);
 
         addConnection(id, null);
@@ -706,7 +729,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
         if (isDragging) {
             writeLocationData();
         }
-        isDragging = false;
+
 
         for (int i = 0; i < menus.size(); i++) {
             ComponentMenu menu = menus.get(i);
@@ -729,6 +752,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             }
         }
 
+    }
+
+    public void postRelease() {
+        isDragging = false;
     }
 
     private void followMouse(int mX, int mY) {
@@ -787,8 +814,9 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     private int[] getConnectionLocation(ConnectionOption connection, int inputCount, int outputCount, int sideCount) {
         int id = inputCount + outputCount + sideCount;
         if (!connection.isInput()) {
-            id -= childrenInputNodes.size();
+            id -=  Math.min(connectionSet.getInputCount(), childrenInputNodes.size());
         }
+
         if (!connection.isValid(this, id)) {
             return null;
         }
@@ -808,19 +836,20 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
             if (connection.isInput()) {
                 currentCount = inputCount;
+
+                totalCount = connectionSet.getInputCount();
                 if (getConnectionSet() == ConnectionSet.DYNAMIC) {
-                    totalCount = childrenInputNodes.size();
-                }else{
-                    totalCount = connectionSet.getInputCount();
+                    totalCount = Math.min(totalCount, childrenInputNodes.size());
                 }
+
                 srcConnectionY = 1;
                 targetY = y - CONNECTION_SIZE_H;
             }else{
                 currentCount = outputCount;
+
+                totalCount = connectionSet.getOutputCount();
                 if (getConnectionSet() == ConnectionSet.DYNAMIC) {
-                    totalCount = childrenOutputNodes.size();
-                }else{
-                    totalCount = connectionSet.getOutputCount();
+                    totalCount = Math.min(totalCount, childrenOutputNodes.size());
                 }
                 srcConnectionY = 0;
                 targetY = y + getComponentHeight();
@@ -1186,84 +1215,106 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     private static final String NBT_MENUS = "Menus";
     private static final String NBT_NODES = "Nodes";
     private static final String NBT_NAME = "Name";
+    private static final String NBT_PARENT = "Parent";
 
     public static FlowComponent readFromNBT(TileEntityManager jam, NBTTagCompound nbtTagCompound, int version, boolean pickup) {
-        int x = nbtTagCompound.getShort(NBT_POS_X);
-        int y = nbtTagCompound.getShort(NBT_POS_Y);
-        int typeId = nbtTagCompound.getByte(NBT_TYPE);
+        FlowComponent component = null;
+        try {
+            int x = nbtTagCompound.getShort(NBT_POS_X);
+            int y = nbtTagCompound.getShort(NBT_POS_Y);
+            int typeId = nbtTagCompound.getByte(NBT_TYPE);
 
-        FlowComponent component = new FlowComponent(jam, x, y, ComponentType.getTypeFromId(typeId));
+            component = new FlowComponent(jam, x, y, ComponentType.getTypeFromId(typeId));
+            component.isLoading = true;
 
-        if (nbtTagCompound.hasKey(NBT_NAME)) {
-            component.name = nbtTagCompound.getString(NBT_NAME);
-        }else{
-            component.name = null;
-        }
+            if (nbtTagCompound.hasKey(NBT_NAME)) {
+                component.name = nbtTagCompound.getString(NBT_NAME);
+            }else{
+                component.name = null;
+            }
 
-        NBTTagList connections = nbtTagCompound.getTagList(NBT_CONNECTION);
-        for (int i = 0; i < connections.tagCount(); i++) {
-            NBTTagCompound connectionTag = (NBTTagCompound)connections.tagAt(i);
+            if (nbtTagCompound.hasKey(NBT_PARENT)) {
+                component.parentLoadId = nbtTagCompound.getShort(NBT_PARENT);
+            }
 
-            Connection connection = new Connection(connectionTag.getByte(NBT_CONNECTION_TARGET_COMPONENT), connectionTag.getByte(NBT_CONNECTION_TARGET_CONNECTION));
+            NBTTagList connections = nbtTagCompound.getTagList(NBT_CONNECTION);
+            for (int i = 0; i < connections.tagCount(); i++) {
+                NBTTagCompound connectionTag = (NBTTagCompound)connections.tagAt(i);
 
-            if (connectionTag.hasKey(NBT_NODES)) {
-                connection.getNodes().clear();
-                NBTTagList nodes = connectionTag.getTagList(NBT_NODES);
-                for (int j = 0; j < nodes.tagCount(); j++) {
-                    NBTTagCompound nodeTag = (NBTTagCompound)nodes.tagAt(j);
+                Connection connection = new Connection(connectionTag.getByte(NBT_CONNECTION_TARGET_COMPONENT), connectionTag.getByte(NBT_CONNECTION_TARGET_CONNECTION));
 
-                    connection.getNodes().add(new Point(nodeTag.getShort(NBT_POS_X), nodeTag.getShort(NBT_POS_Y)));
+                if (connectionTag.hasKey(NBT_NODES)) {
+                    connection.getNodes().clear();
+                    NBTTagList nodes = connectionTag.getTagList(NBT_NODES);
+                    for (int j = 0; j < nodes.tagCount(); j++) {
+                        NBTTagCompound nodeTag = (NBTTagCompound)nodes.tagAt(j);
+
+                        connection.getNodes().add(new Point(nodeTag.getShort(NBT_POS_X), nodeTag.getShort(NBT_POS_Y)));
+                    }
                 }
+
+                component.connections.put((int)connectionTag.getByte(NBT_CONNECTION_POS), connection);
             }
 
-            component.connections.put((int)connectionTag.getByte(NBT_CONNECTION_POS), connection);
+            if (component.type == ComponentType.TRIGGER) {
+                component.currentInterval = nbtTagCompound.getShort(NBT_INTERVAL);
+            }
+
+            NBTTagList menuTagList = nbtTagCompound.getTagList(NBT_MENUS);
+            int menuId = 0;
+            for (int i = 0; i < menuTagList.tagCount(); i++) {
+                NBTTagCompound menuTag = (NBTTagCompound)menuTagList.tagAt(i);
+
+
+
+                //added an extra menu to the triggers
+                if (component.type == ComponentType.TRIGGER && i == 1 && version < 1) {
+                    menuId++;
+                }
+
+                //added a second extra menu to the triggers
+                if (component.type == ComponentType.TRIGGER && i == 2 && version < 5) {
+                    menuId++;
+                }
+
+                //added a third extra menu to the triggers
+                if (component.type == ComponentType.TRIGGER && i == 0 && version < 6) {
+                    menuId++;
+                }
+
+
+                //added the bud menus to the triggers
+                if (component.type == ComponentType.TRIGGER && i == 1 && version < 8) {
+                    menuId++;
+                }
+                if (component.type == ComponentType.TRIGGER && i == 4 && version < 8) {
+                    menuId++;
+                }
+
+                //added an extra menu to the flow controls
+                if (component.type == ComponentType.FLOW_CONTROL && i == 0 && version < 4) {
+                    menuId++;
+                }
+
+                component.menus.get(menuId).readFromNBT(menuTag, version, pickup);
+                menuId++;
+            }
+
+            return component;
+        }finally {
+            if (component != null) {
+                component.isLoading = false;
+            }
         }
+    }
 
-        if (component.type == ComponentType.TRIGGER) {
-            component.currentInterval = nbtTagCompound.getShort(NBT_INTERVAL);
+    private int parentLoadId = -1;
+    public void linkParentAfterLoad() {
+        if (parentLoadId != -1) {
+            setParent(getManager().getFlowItems().get(parentLoadId));
+        }else{
+            setParent(null);
         }
-
-        NBTTagList menuTagList = nbtTagCompound.getTagList(NBT_MENUS);
-        int menuId = 0;
-        for (int i = 0; i < menuTagList.tagCount(); i++) {
-            NBTTagCompound menuTag = (NBTTagCompound)menuTagList.tagAt(i);
-
-
-
-            //added an extra menu to the triggers
-            if (component.type == ComponentType.TRIGGER && i == 1 && version < 1) {
-                menuId++;
-            }
-
-            //added a second extra menu to the triggers
-            if (component.type == ComponentType.TRIGGER && i == 2 && version < 5) {
-                menuId++;
-            }
-
-            //added a third extra menu to the triggers
-            if (component.type == ComponentType.TRIGGER && i == 0 && version < 6) {
-                menuId++;
-            }
-
-
-            //added the bud menus to the triggers
-            if (component.type == ComponentType.TRIGGER && i == 1 && version < 8) {
-                menuId++;
-            }
-            if (component.type == ComponentType.TRIGGER && i == 4 && version < 8) {
-                menuId++;
-            }
-
-            //added an extra menu to the flow controls
-            if (component.type == ComponentType.FLOW_CONTROL && i == 0 && version < 4) {
-                menuId++;
-            }
-
-            component.menus.get(menuId).readFromNBT(menuTag, version, pickup);
-            menuId++;
-        }
-
-        return component;
     }
 
     public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
@@ -1272,6 +1323,9 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
         nbtTagCompound.setByte(NBT_TYPE, (byte)type.getId());
         if (name != null) {
             nbtTagCompound.setString(NBT_NAME, name);
+        }
+        if (parent != null) {
+            nbtTagCompound.setShort(NBT_PARENT, (short)parent.getId());
         }
         NBTTagList connections = new NBTTagList();
         for (int i = 0; i < connectionSet.getConnections().length; i++) {
@@ -1401,5 +1455,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     @Override
     public int compareTo(FlowComponent o) {
         return ((Integer)id).compareTo((Integer)o.id);
+    }
+
+
+    public void resetPosition() {
+        resetTimer = 20;
     }
 }

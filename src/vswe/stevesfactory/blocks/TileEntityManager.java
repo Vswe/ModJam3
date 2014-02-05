@@ -81,18 +81,55 @@ public class TileEntityManager extends TileEntityInterface {
         buttons.add(new Button(Localization.EXIT_GROUP) {
             @Override
             protected void onClick(DataReader dr) {
-
+                int id = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+                FlowComponent component = items.get(id);
+                boolean moveCluster = dr.readBoolean();
+                if (component.getParent() != null) {
+                    ComponentMenuGroup.moveComponents(component, component.getParent().getParent(), moveCluster);
+                }
             }
 
             @Override
             public boolean onClick(DataWriter dw) {
+                for (FlowComponent item : items) {
+                    if (item.isBeingMoved()) {
+                        //For the server only
+                        justSentServerComponentRemovalPacket = true;
+                        dw.writeData(item.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
+                        dw.writeBoolean(GuiScreen.isShiftKeyDown());
+                        item.resetPosition();
+                        return true;
+                    }
+                }
+
+                //Client only
                 selectedComponent = selectedComponent.getParent();
                 return false;
             }
 
             @Override
             public boolean isVisible() {
-                return selectedComponent != null;
+                return !worldObj.isRemote || selectedComponent != null;
+            }
+
+            @Override
+            public boolean activateOnRelease() {
+                for (FlowComponent item : items) {
+                    if (item.isBeingMoved()) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String getMouseOver() {
+                for (FlowComponent item : items) {
+                    if (item.isBeingMoved()) {
+                        return Localization.EXIT_GROUP_DROP.toString();
+                    }
+                }
+                return super.getMouseOver();
             }
         });
     }
@@ -149,8 +186,8 @@ public class TileEntityManager extends TileEntityInterface {
         return inventories;
     }
 
-    public static final int MAX_CABLE_LENGTH = 64;
-    public static final int MAX_COMPONENT_AMOUNT = 127;
+    public static final int MAX_CABLE_LENGTH = 128;
+    public static final int MAX_COMPONENT_AMOUNT = 511;
     public static final int MAX_CONNECTED_INVENTORIES = 1023;
 
     private boolean firstInventoryUpdate = true;
@@ -654,6 +691,10 @@ public class TileEntityManager extends TileEntityInterface {
             NBTTagCompound component = (NBTTagCompound)components.tagAt(i);
 
             items.add(FlowComponent.readFromNBT(this, component, version, pickup));
+        }
+
+        for (FlowComponent item : items) {
+            item.linkParentAfterLoad();
         }
 
         NBTTagList variablesTag = nbtTagCompound.getTagList(NBT_VARIABLES);

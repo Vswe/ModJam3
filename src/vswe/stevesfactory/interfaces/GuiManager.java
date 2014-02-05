@@ -21,6 +21,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import vswe.stevesfactory.CollisionHelper;
+import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.StevesFactoryManager;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.FlowComponent;
@@ -97,6 +98,11 @@ public class GuiManager extends GuiBase {
             }
         }
 
+        //update components completely independent on their visibility
+        for (FlowComponent component : manager.getFlowItems()) {
+            component.update();
+        }
+
         int zLevel = Z_LEVEL_COMPONENT_START;
         int openCount = 0;
         for (int i = 0; i < manager.getZLevelRenderingList().size(); i++) {
@@ -123,6 +129,8 @@ public class GuiManager extends GuiBase {
         CollisionHelper.disableInBoundsCheck = false;
 
         if (!StevesFactoryManager.GREEN_SCREEN_MODE) {
+            drawString(getInfo(), 5, ySize - 13, 1F, 0x606060);
+
             for (TileEntityManager.Button button : manager.buttons) {
                 if (button.isVisible() && CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y)) {
                     drawMouseOver(button.getMouseOver(), x, y);
@@ -140,6 +148,29 @@ public class GuiManager extends GuiBase {
         }
         CollisionHelper.disableInBoundsCheck = false;
 
+    }
+
+    private String getInfo() {
+        String ret = Localization.COMMANDS.toString() + ": " + manager.getFlowItems().size() + "  ";
+
+        String path = "";
+        FlowComponent component = manager.getSelectedComponent();
+
+        if (component != null) {
+            ret += "|";
+        }
+        while (component != null) {
+            String nextPath = "> " + component.getName() + " " + path;
+            if (getStringWidth(ret + nextPath) > xSize - 15) {
+                path = "... " + path;
+                break;
+            }
+            path = nextPath;
+            component = component.getParent();
+        }
+        ret += path;
+
+        return ret;
     }
 
     @Override
@@ -213,6 +244,12 @@ public class GuiManager extends GuiBase {
                 if (itemBase.isVisible()) {
                     itemBase.onRelease(x, y, button);
                 }
+            }
+        }
+
+        for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
+            if (itemBase.isVisible()) {
+                itemBase.postRelease();
             }
         }
 
