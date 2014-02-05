@@ -72,7 +72,6 @@ public class CommandExecutor {
     private void executeCommand(FlowComponent command, int connectionId) {
         //a loop has occurred
         if (usedCommands.contains(command.getId())) {
-            System.out.println("LOOP");
             return;
         }
 
@@ -171,28 +170,21 @@ public class CommandExecutor {
                 case GROUP:
                     if (connectionId < command.getChildrenInputNodes().size()) {
                         executeChildCommands(command.getChildrenInputNodes().get(connectionId), EnumSet.allOf(ConnectionOption.class));
-                        System.out.println("Execute " + connectionId);
-                    }else{
-                        System.out.println("Invalid " + connectionId);
                     }
-                    System.out.println("Inputs " + command.getChildrenInputNodes().size());
                     return;
                 case NODE:
                     FlowComponent parent = command.getParent();
                     if (parent != null) {
                         for (int i = 0; i < parent.getChildrenOutputNodes().size(); i++) {
                             if (command.equals(parent.getChildrenOutputNodes().get(i))) {
-                                System.out.println("Output " + i);
-                                Connection connection = parent.getConnection(parent.getChildrenInputNodes().size() + i);
+                                Connection connection = parent.getConnection(parent.getConnectionSet().getInputCount() + i);
                                 if (connection != null) {
-                                    System.out.println("Output Connection " + i);
                                     executeCommand(manager.getFlowItems().get(connection.getComponentId()), connection.getConnectionId());
                                 }
                                 break;
                             }
                         }
                     }
-                    System.out.println("Outputs " + command.getChildrenOutputNodes().size());
                     return;
             }
 

@@ -1352,6 +1352,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             if (getConnectionSet() == ConnectionSet.INPUT_NODE || getConnectionSet() == ConnectionSet.OUTPUT_NODE) {
                 this.parent.childrenInputNodes.remove(this);
                 this.parent.childrenOutputNodes.remove(this);
+                Collections.sort(this.parent.childrenInputNodes);
                 Collections.sort(this.parent.childrenOutputNodes);
             }
         }
