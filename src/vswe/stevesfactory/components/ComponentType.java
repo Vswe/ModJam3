@@ -44,8 +44,11 @@ public enum ComponentType {
             new ConnectionSet[]{ConnectionSet.STANDARD},
             ComponentMenuCrafting.class, ComponentMenuContainerScrap.class, ComponentMenuResult.class),
     GROUP(13, Localization.GROUP_SHORT, Localization.GROUP_LONG,
-            new ConnectionSet[]{ConnectionSet.EMPTY},
-            ComponentMenuGroup.class, ComponentMenuResult.class);
+            new ConnectionSet[]{ConnectionSet.DYNAMIC},
+            ComponentMenuGroup.class, ComponentMenuResult.class),
+    NODE(14, Localization.NODE_SHORT, Localization.NODE_LONG,
+            new ConnectionSet[]{ConnectionSet.INPUT_NODE, ConnectionSet.OUTPUT_NODE},
+            ComponentMenuResult.class);
 
 
 

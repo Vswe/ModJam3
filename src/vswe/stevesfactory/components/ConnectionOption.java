@@ -18,8 +18,9 @@ public enum ConnectionOption {
     BUD_PULSE_HIGH(Localization.CONNECTION_ON_HIGH_BLOCK_PULSE, ConnectionType.OUTPUT),
     BUD_HIGH(Localization.CONNECTION_WHILE_HIGH_BLOCK, ConnectionType.OUTPUT),
     BUD_PULSE_LOW(Localization.CONNECTION_ON_LOW_BLOCK_PULSE, ConnectionType.OUTPUT),
-    BUD_LOW(Localization.CONNECTION_WHILE_LOW_BLOCK, ConnectionType.OUTPUT);
-
+    BUD_LOW(Localization.CONNECTION_WHILE_LOW_BLOCK, ConnectionType.OUTPUT),
+    DYNAMIC_INPUT(null, ConnectionType.INPUT),
+    DYNAMIC_OUTPUT(null, ConnectionType.OUTPUT);
     private Localization name;
     private ConnectionType type;
 
@@ -38,9 +39,20 @@ public enum ConnectionOption {
         return type;
     }
 
-    @Override
-    public String toString() {
-        return name.toString();
+
+    public String getName(FlowComponent component, int id) {
+
+        if (name != null) {
+            return name.toString();
+        }else if (this == DYNAMIC_INPUT){
+            return  component.getChildrenInputNodes().get(id).getName();
+        }else {
+            return component.getChildrenOutputNodes().get(id).getName();
+        }
+    }
+
+    public boolean isValid(FlowComponent component, int id) {
+        return name != null || (this == DYNAMIC_INPUT ? id < component.getChildrenInputNodes().size() : id < component.getChildrenOutputNodes().size());
     }
 
     public enum ConnectionType {

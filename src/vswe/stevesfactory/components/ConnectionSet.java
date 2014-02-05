@@ -14,8 +14,11 @@ public enum ConnectionSet {
     MULTIPLE_OUTPUT_5(Localization.CONNECTION_SET_SPLIT_5,  ConnectionOption.STANDARD_INPUT,  ConnectionOption.STANDARD_OUTPUT, ConnectionOption.STANDARD_OUTPUT, ConnectionOption.STANDARD_OUTPUT, ConnectionOption.STANDARD_OUTPUT, ConnectionOption.STANDARD_OUTPUT),
     EMPTY(Localization.CONNECTION_SET_DECLARATION),
     FOR_EACH(Localization.CONNECTION_SET_FOR_EACH, ConnectionOption.STANDARD_INPUT, ConnectionOption.FOR_EACH, ConnectionOption.STANDARD_OUTPUT),
-    BUD(Localization.CONNECTION_SET_BUD, ConnectionOption.BUD_PULSE_HIGH, ConnectionOption.BUD_HIGH, ConnectionOption.BUD, ConnectionOption.BUD_LOW, ConnectionOption.BUD_PULSE_LOW);
-
+    BUD(Localization.CONNECTION_SET_BUD, ConnectionOption.BUD_PULSE_HIGH, ConnectionOption.BUD_HIGH, ConnectionOption.BUD, ConnectionOption.BUD_LOW, ConnectionOption.BUD_PULSE_LOW),
+    OUTPUT_NODE(Localization.CONNECTION_SET_OUTPUT_NODE, ConnectionOption.STANDARD_INPUT),
+    INPUT_NODE(Localization.CONNECTION_SET_INPUT_NODE, ConnectionOption.STANDARD_OUTPUT),
+    DYNAMIC(Localization.CONNECTION_SET_INPUT_NODE, ConnectionOption.DYNAMIC_INPUT, ConnectionOption.DYNAMIC_INPUT, ConnectionOption.DYNAMIC_INPUT, ConnectionOption.DYNAMIC_INPUT, ConnectionOption.DYNAMIC_INPUT, ConnectionOption.DYNAMIC_OUTPUT, ConnectionOption.DYNAMIC_OUTPUT, ConnectionOption.DYNAMIC_OUTPUT, ConnectionOption.DYNAMIC_OUTPUT, ConnectionOption.DYNAMIC_OUTPUT);
+     //TODO localization
 
     private ConnectionOption[] connections;
     private int outputCount;

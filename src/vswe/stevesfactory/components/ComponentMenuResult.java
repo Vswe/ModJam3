@@ -35,6 +35,8 @@ public class ComponentMenuResult extends ComponentMenu {
 
                 if (getParent().getType() == ComponentType.VARIABLE) {
                     getParent().getManager().updateVariables();
+                }else if(getParent().getType() == ComponentType.NODE) {
+                    getParent().setParent(getParent().getParent());
                 }
             }
         };

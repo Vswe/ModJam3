@@ -113,7 +113,7 @@ public class TileEntityManager extends TileEntityInterface {
             }
         }
 
-        if (selectedComponent.getId() == idToRemove) {
+        if (selectedComponent != null && selectedComponent.getId() == idToRemove) {
             selectedComponent = null;
         }
     }
@@ -547,8 +547,9 @@ public class TileEntityManager extends TileEntityInterface {
         private Localization mouseOver;
 
         protected Button(Localization mouseOver) {
-            this.x = 5;
-            this.y = 5 + buttons.size() * 17;
+            int id = buttons.size();
+            this.x = 5 + (id / 13) * 18  ;
+            this.y = 5 + (id % 13) * 18;
             this.mouseOver = mouseOver;
         }
 

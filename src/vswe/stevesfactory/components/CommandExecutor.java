@@ -49,7 +49,7 @@ public class CommandExecutor {
         for (Variable variable : manager.getVariables()) {
             if (variable.isValid()) {
                 if (!variable.hasBeenExecuted() || ((ComponentMenuVariable)variable.getDeclaration().getMenus().get(0)).getVariableMode() == ComponentMenuVariable.VariableMode.LOCAL)  {
-                    executeCommand(variable.getDeclaration());
+                    executeCommand(variable.getDeclaration(), 0);
                     variable.setExecuted(true);
                 }
             }
@@ -63,15 +63,16 @@ public class CommandExecutor {
             Connection connection = command.getConnection(i);
             ConnectionOption option = command.getConnectionSet().getConnections()[i];
             if (connection != null && !option.isInput() && validTriggerOutputs.contains(option)) {
-                executeCommand(manager.getFlowItems().get(connection.getComponentId()));
+                executeCommand(manager.getFlowItems().get(connection.getComponentId()), connection.getConnectionId());
             }
         }
     }
 
 
-    private void executeCommand(FlowComponent command) {
+    private void executeCommand(FlowComponent command, int connectionId) {
         //a loop has occurred
         if (usedCommands.contains(command.getId())) {
+            System.out.println("LOOP");
             return;
         }
 
@@ -167,6 +168,32 @@ public class CommandExecutor {
                 case  AUTO_CRAFTING:
                     craftingBuffer.add(new CraftingBufferElement(this, (ComponentMenuCrafting)command.getMenus().get(0), (ComponentMenuContainerScrap)command.getMenus().get(1)));
                     break;
+                case GROUP:
+                    if (connectionId < command.getChildrenInputNodes().size()) {
+                        executeChildCommands(command.getChildrenInputNodes().get(connectionId), EnumSet.allOf(ConnectionOption.class));
+                        System.out.println("Execute " + connectionId);
+                    }else{
+                        System.out.println("Invalid " + connectionId);
+                    }
+                    System.out.println("Inputs " + command.getChildrenInputNodes().size());
+                    return;
+                case NODE:
+                    FlowComponent parent = command.getParent();
+                    if (parent != null) {
+                        for (int i = 0; i < parent.getChildrenOutputNodes().size(); i++) {
+                            if (command.equals(parent.getChildrenOutputNodes().get(i))) {
+                                System.out.println("Output " + i);
+                                Connection connection = parent.getConnection(parent.getChildrenInputNodes().size() + i);
+                                if (connection != null) {
+                                    System.out.println("Output Connection " + i);
+                                    executeCommand(manager.getFlowItems().get(connection.getComponentId()), connection.getConnectionId());
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    System.out.println("Outputs " + command.getChildrenOutputNodes().size());
+                    return;
             }
 
 
@@ -869,7 +896,7 @@ public class CommandExecutor {
                     }
 
                     CommandExecutor newExecutor = new CommandExecutor(manager, itemBufferSplit, new ArrayList<CraftingBufferElement>(craftingBuffer), liquidBufferSplit, usedCommandCopy);
-                    newExecutor.executeCommand(manager.getFlowItems().get(connection.getComponentId()));
+                    newExecutor.executeCommand(manager.getFlowItems().get(connection.getComponentId()), connection.getConnectionId());
                     usedId++;
                 }
             }
