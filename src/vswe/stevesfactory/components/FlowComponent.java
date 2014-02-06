@@ -1461,4 +1461,8 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     public void resetPosition() {
         resetTimer = 20;
     }
+
+    public void setParentLoadId(int i) {
+        parentLoadId = i;
+    }
 }

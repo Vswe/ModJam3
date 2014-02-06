@@ -455,6 +455,9 @@ public class TileEntityManager extends TileEntityInterface {
         for (int i = 0; i < flowControlCount; i++) {
             readAllComponentData(dr);
         }
+        for (FlowComponent item : items) {
+            item.linkParentAfterLoad();
+        }
     }
 
     private void readAllComponentData(DataReader dr) {
@@ -467,9 +470,9 @@ public class TileEntityManager extends TileEntityInterface {
 
         boolean hasParent = dr.readBoolean();
         if (hasParent) {
-            flowComponent.setParent(items.get(dr.readData(DataBitHelper.FLOW_CONTROL_COUNT)));
+            flowComponent.setParentLoadId(dr.readData(DataBitHelper.FLOW_CONTROL_COUNT));
         }else{
-            flowComponent.setParent(null);
+            flowComponent.setParentLoadId(-1);
         }
 
         for (ComponentMenu menu : flowComponent.getMenus()) {
@@ -504,6 +507,7 @@ public class TileEntityManager extends TileEntityInterface {
         boolean isNew = worldObj.isRemote && dr.readBoolean();
         if (isNew) {
             readAllComponentData(dr);
+            items.get(items.size() - 1).linkParentAfterLoad();
         }else{
             boolean isSpecificComponent = dr.readBoolean();
             if (isSpecificComponent) {
