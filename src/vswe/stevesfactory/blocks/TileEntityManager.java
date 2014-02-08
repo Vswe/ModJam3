@@ -697,6 +697,25 @@ public class TileEntityManager extends TileEntityInterface {
             items.add(FlowComponent.readFromNBT(this, component, version, pickup));
         }
 
+        if (version == 8) {
+            for (FlowComponent item : items) {
+                for (int i = 0; i < item.getConnectionSet().getConnections().length; i++) {
+                    Connection connection = item.getConnection(i);
+                    if (connection != null) {
+                        if (connection.getComponentId() < 0 || connection.getComponentId() >= items.size()) {
+                            item.setConnection(i, null);
+                        }else{
+                            FlowComponent otherItem = getFlowItems().get(connection.getComponentId());
+                            Connection otherConnection = otherItem.getConnection(connection.getConnectionId());
+                            if (otherConnection == null || otherConnection.getComponentId() < 0 || otherConnection.getComponentId() >= items.size()) {
+                                otherItem.setConnection(connection.getConnectionId(), new Connection(item.getId(), i));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         for (FlowComponent item : items) {
             item.linkParentAfterLoad();
         }

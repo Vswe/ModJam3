@@ -285,7 +285,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             Connection connectedConnection = connections.get(i);
             if (connectedConnection != null) {
                 hasConnection = true;
-                if (id < connectedConnection.getComponentId()) {
+                if (id < connectedConnection.getComponentId() && connectedConnection.getComponentId() < manager.getFlowItems().size()) {
                     int[] otherLocation = manager.getFlowItems().get(connectedConnection.getComponentId()).getConnectionLocationFromId(connectedConnection.getConnectionId());
                     if (otherLocation == null) {
                         continue;
@@ -681,7 +681,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     }
 
     private void addConnection(int id, Connection connection) {
-        if (getManager().worldObj.isRemote) {
+        if (getManager().worldObj != null && getManager().worldObj.isRemote) {
             DataWriter dw = PacketHandler.getWriterForServerComponentPacket(this, null);
             if (connection != null) {
                 writeConnectionData(dw, id, true, connection.getComponentId(), connection.getConnectionId());
@@ -706,7 +706,9 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
         Connection connection = connections.get(id);
 
         addConnection(id, null);
-        manager.getFlowItems().get(connection.getComponentId()).addConnection(connection.getConnectionId(), null);
+        if (connection.getComponentId() >= 0 && connection.getComponentId() < getManager().getFlowItems().size()) {
+            manager.getFlowItems().get(connection.getComponentId()).addConnection(connection.getConnectionId(), null);
+        }
     }
 
     public void onDrag(int mX, int mY) {
@@ -1244,7 +1246,13 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             for (int i = 0; i < connections.tagCount(); i++) {
                 NBTTagCompound connectionTag = (NBTTagCompound)connections.tagAt(i);
 
-                Connection connection = new Connection(connectionTag.getByte(NBT_CONNECTION_TARGET_COMPONENT), connectionTag.getByte(NBT_CONNECTION_TARGET_CONNECTION));
+                int componentId;
+                if (version < 9) {
+                    componentId = connectionTag.getByte(NBT_CONNECTION_TARGET_COMPONENT);
+                }else{
+                    componentId = connectionTag.getShort(NBT_CONNECTION_TARGET_COMPONENT);
+                }
+                Connection connection = new Connection(componentId, connectionTag.getByte(NBT_CONNECTION_TARGET_CONNECTION));
 
                 if (connectionTag.hasKey(NBT_NODES)) {
                     connection.getNodes().clear();
@@ -1337,7 +1345,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             if (connection != null) {
                 NBTTagCompound connectionTag = new NBTTagCompound();
                 connectionTag.setByte(NBT_CONNECTION_POS, (byte)i);
-                connectionTag.setByte(NBT_CONNECTION_TARGET_COMPONENT, (byte)connection.getComponentId());
+                connectionTag.setShort(NBT_CONNECTION_TARGET_COMPONENT, (short)connection.getComponentId());
                 connectionTag.setByte(NBT_CONNECTION_TARGET_CONNECTION, (byte)connection.getConnectionId());
 
 

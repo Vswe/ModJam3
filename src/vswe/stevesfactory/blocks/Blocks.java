@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 
 public final class Blocks {
 
-    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 8;
+    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 9;
     public static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
 
     private static final String MANAGER_TILE_ENTITY_TAG = "TileEntityMachineManagerName";
