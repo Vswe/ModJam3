@@ -90,12 +90,12 @@ public class ComponentMenuContainerTypes extends ComponentMenu {
     }
 
     @Override
-    public void onDrag(int mX, int mY) {
+    public void onDrag(int mX, int mY, boolean isMenuOpen) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void onRelease(int mX, int mY) {
+    public void onRelease(int mX, int mY, boolean isMenuOpen) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

@@ -30,7 +30,6 @@ public final class Blocks {
     private static final String CABLE_RELAY_TILE_ENTITY_TAG = "TileEntityCableRelayName";
     public static int CABLE_RELAY_ID;
     public static final String CABLE_RELAY_NAME_TAG = "BlockCableRelayName";
-    public static final String CABLE_ADVANCED_RELAY_NAME_TAG = "BlockAdvancedCableRelayName";
     public static final String CABLE_RELAY_UNLOCALIZED_NAME = "BlockCableRelay";
     public static final String CABLE_ADVANCED_RELAY_UNLOCALIZED_NAME = "BlockAdvancedCableRelay";
     public static final int CABLE_RELAY_DEFAULT_ID = 1313;
@@ -57,6 +56,7 @@ public final class Blocks {
     public static int CABLE_INTAKE_ID;
     public static final String CABLE_INTAKE_NAME_TAG = "BlockCableIntakeName";
     public static final String CABLE_INTAKE_UNLOCALIZED_NAME = "BlockCableIntake";
+    public static final String CABLE_INSTANT_INTAKE_UNLOCALIZED_NAME = "BlockInstantCableIntake";
     public static final int CABLE_INTAKE_DEFAULT_ID = 1317;
 
     private static final String CABLE_BUD_TILE_ENTITY_TAG = "TileEntityCableBUDName";
@@ -114,7 +114,7 @@ public final class Blocks {
         GameRegistry.registerTileEntity(TileEntityCreative.class, CABLE_CREATIVE_TILE_ENTITY_TAG);
 
         blockCableIntake = new BlockCableIntake(CABLE_INTAKE_ID);
-        GameRegistry.registerBlock(blockCableIntake, CABLE_INTAKE_NAME_TAG);
+        GameRegistry.registerBlock(blockCableIntake, ItemIntake.class, CABLE_INTAKE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityIntake.class, CABLE_INTAKE_TILE_ENTITY_TAG);
 
         blockCableBUD = new BlockCableBUD(CABLE_BUD_ID);
@@ -170,7 +170,7 @@ public final class Blocks {
                 new ItemStack(Item.dyePowder, 1, 4)
         );
 
-        GameRegistry.addShapelessRecipe(new ItemStack(blockCableIntake, 1),
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableIntake, 1, 0),
                 blockCable,
                 Block.hopperBlock,
                 Block.hopperBlock,
@@ -189,6 +189,11 @@ public final class Blocks {
                 blockCable,
                 Item.pickaxeIron,
                 Block.dispenser
+        );
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableIntake, 1, 8),
+                new ItemStack(blockCableIntake, 1, 0),
+                Item.ingotGold
         );
     }
 

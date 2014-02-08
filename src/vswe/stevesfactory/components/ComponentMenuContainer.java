@@ -207,12 +207,12 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     }
 
     @Override
-    public void onDrag(int mX, int mY) {
+    public void onDrag(int mX, int mY, boolean isMenuOpen) {
 
     }
 
     @Override
-    public void onRelease(int mX, int mY) {
+    public void onRelease(int mX, int mY, boolean isMenuOpen) {
         clicked = false;
     }
 

@@ -681,15 +681,16 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     }
 
     private void addConnection(int id, Connection connection) {
-        DataWriter dw = PacketHandler.getWriterForServerComponentPacket(this, null);
-        if (connection != null) {
-            writeConnectionData(dw, id, true, connection.getComponentId(), connection.getConnectionId());
-        }else{
-            writeConnectionData(dw, id, false, 0, 0);
+        if (getManager().worldObj.isRemote) {
+            DataWriter dw = PacketHandler.getWriterForServerComponentPacket(this, null);
+            if (connection != null) {
+                writeConnectionData(dw, id, true, connection.getComponentId(), connection.getConnectionId());
+            }else{
+                writeConnectionData(dw, id, false, 0, 0);
+            }
+            PacketHandler.sendDataToServer(dw);
         }
         connections.put(id, connection);
-
-        PacketHandler.sendDataToServer(dw);
     }
 
     public void removeAllConnections() {
@@ -713,8 +714,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
         for (int i = 0; i < menus.size(); i++) {
             ComponentMenu menu = menus.get(i);
-            menu.onDrag(mX - getMenuAreaX(), mY - getMenuAreaY(i));
+
+            menu.onDrag(mX - getMenuAreaX(), mY - getMenuAreaY(i), i == openMenuId);
         }
+
 
         for (int i = 0; i < connectionSet.getConnections().length; i++) {
             Connection connection = connections.get(i);
@@ -733,7 +736,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
         for (int i = 0; i < menus.size(); i++) {
             ComponentMenu menu = menus.get(i);
-            menu.onRelease(mX - getMenuAreaX(), mY - getMenuAreaY(i));
+            menu.onRelease(mX - getMenuAreaX(), mY - getMenuAreaY(i), isLarge && i == openMenuId);
         }
 
 

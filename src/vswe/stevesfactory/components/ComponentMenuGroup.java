@@ -49,13 +49,13 @@ public class ComponentMenuGroup extends ComponentMenu {
     }
 
     @Override
-    public void onDrag(int mX, int mY) {
+    public void onDrag(int mX, int mY, boolean isMenuOpen) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void onRelease(int mX, int mY) {
-        if (inBounds(mX, mY)) {
+    public void onRelease(int mX, int mY, boolean isMenuOpen) {
+        if (isMenuOpen && inBounds(mX, mY)) {
             for (FlowComponent component : getParent().getManager().getFlowItems()) {
                 if (component.isBeingMoved()) {
                     if (!component.equals(getParent())) {

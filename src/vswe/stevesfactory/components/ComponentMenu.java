@@ -31,8 +31,8 @@ public abstract class ComponentMenu implements IComponentNetworkReader {
     public abstract void drawMouseOver(GuiManager gui, int mX, int mY);
 
     public abstract void onClick(int mX, int mY, int button);
-    public abstract void onDrag(int mX, int mY);
-    public abstract void onRelease(int mX, int mY);
+    public abstract void onDrag(int mX, int mY, boolean isMenuOpen);
+    public abstract void onRelease(int mX, int mY, boolean isMenuOpen);
 
     @SideOnly(Side.CLIENT)
     public boolean onKeyStroke(GuiManager gui, char c, int k) {

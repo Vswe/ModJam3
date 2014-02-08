@@ -27,7 +27,7 @@ public class TileEntityIntake extends TileEntity implements IInventory {
     public ItemStack getStackInSlot(int id) {
         updateInventory();
         id--;
-        if (id < 0 || items.get(id).isDead || items.get(id).delayBeforeCanPickup > 0) {
+        if (id < 0 || !canPickUp(items.get(id))) {
             return null;
         }else{
             return items.get(id).getEntityItem();
@@ -59,9 +59,9 @@ public class TileEntityIntake extends TileEntity implements IInventory {
     public void setInventorySlotContents(int id, ItemStack itemstack) {
         updateInventory();
         id--;
-        if (id < 0 || items.get(id).isDead || items.get(id).delayBeforeCanPickup > 0) {
+        if (id < 0 || !canPickUp(items.get(id))) {
             if (itemstack != null) {
-                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
+                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[Blocks.blockCableIntake.getSideMeta(getBlockMetadata()) % ForgeDirection.VALID_DIRECTIONS.length];
 
                 double posX = xCoord + 0.5 + direction.offsetX * 0.75;
                 double posY = yCoord + 0.5 + direction.offsetY * 0.75;
@@ -117,7 +117,7 @@ public class TileEntityIntake extends TileEntity implements IInventory {
             //remove items we can't use right away, this check is done when we interact with items too, to make sure it hasn't changed
             for (Iterator<EntityItem> iterator = items.iterator(); iterator.hasNext(); ) {
                 EntityItem next = iterator.next();
-                if (next.isDead || next.delayBeforeCanPickup > 0) {
+                if (!canPickUp(next)) {
                     iterator.remove();
                 }
             }
@@ -167,5 +167,9 @@ public class TileEntityIntake extends TileEntity implements IInventory {
     @Override
     public void updateEntity() {
         items = null;
+    }
+
+    private boolean canPickUp(EntityItem item) {
+        return !item.isDead && (item.delayBeforeCanPickup == 0 || Blocks.blockCableIntake.isAdvanced(getBlockMetadata()));
     }
 }
