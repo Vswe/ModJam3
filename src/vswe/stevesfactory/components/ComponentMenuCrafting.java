@@ -16,6 +16,10 @@ public class ComponentMenuCrafting extends ComponentMenuItem {
         super(parent, CraftingSetting.class);
 
         dummy = new CraftingDummy(this);
+
+        scrollControllerSelected.setItemsPerRow(3);
+        scrollControllerSelected.setVisibleRows(3);
+        scrollControllerSelected.setItemUpperLimit(2);
     }
 
     @Override
@@ -40,7 +44,7 @@ public class ComponentMenuCrafting extends ComponentMenuItem {
         super.drawMouseOver(gui, mX, mY);
         if (!isEditing() && !isSearching() && resultItem != null) {
             if (CollisionHelper.inBounds(getResultX(), getResultY(), ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                drawResultObjectMouseOver(gui, resultItem, mX, mY);
+                gui.drawMouseOver(getResultObjectMouseOver(resultItem), mX, mY);
             }
         }
     }
@@ -50,7 +54,7 @@ public class ComponentMenuCrafting extends ComponentMenuItem {
     }
 
     private int getResultY() {
-        return getScrollingStartY() + ITEM_SIZE_WITH_MARGIN;
+        return scrollControllerSelected.getScrollingStartY() + ITEM_SIZE_WITH_MARGIN;
     }
 
     @Override
@@ -58,20 +62,6 @@ public class ComponentMenuCrafting extends ComponentMenuItem {
         return 9;
     }
 
-    @Override
-    protected int getItemsPerRow() {
-        return isSearching() ? super.getItemsPerRow() : 3;
-    }
-
-    @Override
-    protected int getVisibleRows() {
-        return 3;
-    }
-
-    @Override
-    protected int getItemUpperLimit() {
-        return 2;
-    }
 
     @Override
     protected void initRadioButtons() {

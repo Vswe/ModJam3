@@ -134,14 +134,14 @@ public class ComponentMenuItem extends ComponentMenuStuff {
 
     @SideOnly(Side.CLIENT)
     @Override
-    protected void drawResultObjectMouseOver(GuiManager gui, Object obj, int x, int y) {
-        gui.drawMouseOver(getToolTip((ItemStack)obj), x, y);
+    protected List<String> getResultObjectMouseOver(Object o) {
+        return getToolTip((ItemStack)o);
     }
 
     @SideOnly(Side.CLIENT)
     @Override
-    protected void drawSettingObjectMouseOver(GuiManager gui, Setting setting, int x, int y) {
-        drawResultObjectMouseOver(gui, ((ItemSetting)setting).getItem(), x, y);
+    protected List<String> getSettingObjectMouseOver(Setting setting) {
+        return getResultObjectMouseOver(((ItemSetting)setting).getItem());
     }
 
     @Override
@@ -229,10 +229,10 @@ public class ComponentMenuItem extends ComponentMenuStuff {
 
     @SideOnly(Side.CLIENT)
     @Override
-    protected void updateSearch(boolean showAll) {
-        result.clear();
+    protected List updateSearch(String search, boolean showAll) {
+        List ret = new ArrayList();
 
-        if (textBox.getText().toLowerCase().equals(".inv")) {
+        if (search.equals(".inv")) {
             IInventory inventory = Minecraft.getMinecraft().thePlayer.inventory;
             int itemLength = inventory.getSizeInventory();
             for (int i = 0; i < itemLength; i++) {
@@ -241,7 +241,7 @@ public class ComponentMenuItem extends ComponentMenuStuff {
                     item = item.copy();
                     item.stackSize = 1;
                     boolean exists = false;
-                    for (Object other : result) {
+                    for (Object other : ret) {
                         if (ItemStack.areItemStacksEqual(item, (ItemStack)other)) {
                             exists = true;
                             break;
@@ -249,7 +249,7 @@ public class ComponentMenuItem extends ComponentMenuStuff {
                     }
 
                     if (!exists) {
-                        result.add(item);
+                        ret.add(item);
                     }
                 }
             }
@@ -261,13 +261,12 @@ public class ComponentMenuItem extends ComponentMenuStuff {
                 Item item = items[i];
 
                 if (item != null && item.getCreativeTab() != null) {
-                    item.getSubItems(item.itemID, null, result);
+                    item.getSubItems(item.itemID, null, ret);
                 }
             }
 
             if (!showAll) {
-                Iterator<ItemStack> itemIterator = result.iterator();
-                String searchString = textBox.getText().toLowerCase();
+                Iterator<ItemStack> itemIterator = ret.iterator();
 
                 while (itemIterator.hasNext()) {
 
@@ -288,7 +287,7 @@ public class ComponentMenuItem extends ComponentMenuStuff {
 
                     while (descriptionIterator.hasNext()) {
                         String line = descriptionIterator.next().toLowerCase();
-                        if (line.contains(searchString)) {
+                        if (line.contains(search)) {
                             foundSequence = true;
                             break;
                         }
@@ -301,7 +300,7 @@ public class ComponentMenuItem extends ComponentMenuStuff {
             }
         }
 
-        updateScrolling();
+        return ret;
     }
 
     @SideOnly(Side.CLIENT)

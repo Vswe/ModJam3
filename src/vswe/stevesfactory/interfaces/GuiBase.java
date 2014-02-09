@@ -107,7 +107,9 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
     }
 
     public void drawMouseOver(List lst, int x, int y) {
-        drawHoveringText(lst, x + guiLeft, y + guiTop, fontRenderer);
+        if (lst != null) {
+            drawHoveringText(lst, x + guiLeft, y + guiTop, fontRenderer);
+        }
     }
 
 

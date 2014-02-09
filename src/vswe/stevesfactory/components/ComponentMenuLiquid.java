@@ -17,6 +17,7 @@ import vswe.stevesfactory.network.DataWriter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class ComponentMenuLiquid extends ComponentMenuStuff {
     public ComponentMenuLiquid(FlowComponent parent) {
@@ -78,13 +79,15 @@ public class ComponentMenuLiquid extends ComponentMenuStuff {
     }
 
     @Override
-    protected void drawResultObjectMouseOver(GuiManager gui, Object obj, int x, int y) {
-        gui.drawMouseOver(getDisplayName((Fluid) obj), x, y);
+    protected List<String> getResultObjectMouseOver(Object obj) {
+        List<String> ret = new ArrayList<String>();
+        ret.add(getDisplayName((Fluid) obj));
+        return ret;
     }
 
     @Override
-    protected void drawSettingObjectMouseOver(GuiManager gui, Setting setting, int x, int y) {
-        drawResultObjectMouseOver(gui, ((LiquidSetting)setting).getFluid(), x, y);
+    protected List<String> getSettingObjectMouseOver(Setting setting) {
+        return getResultObjectMouseOver(((LiquidSetting)setting).getFluid());
     }
 
     @Override
@@ -137,24 +140,23 @@ public class ComponentMenuLiquid extends ComponentMenuStuff {
 
     @SideOnly(Side.CLIENT)
     @Override
-    protected void updateSearch(boolean showAll) {
-        result = new ArrayList(FluidRegistry.getRegisteredFluids().values());
+    protected List updateSearch(String search, boolean showAll) {
+        List ret = new ArrayList(FluidRegistry.getRegisteredFluids().values());
 
-        Iterator<Fluid> itemIterator = result.iterator();
-        String searchString = textBox.getText().toLowerCase();
+        Iterator<Fluid> itemIterator = ret.iterator();
 
         if (!showAll) {
             while (itemIterator.hasNext()) {
 
                 Fluid fluid = itemIterator.next();
 
-                if (!getDisplayName(fluid).toLowerCase().contains(searchString)) {
+                if (!getDisplayName(fluid).toLowerCase().contains(search)) {
                     itemIterator.remove();
                 }
             }
         }
 
-        updateScrolling();
+        return ret;
     }
 
     public static String getDisplayName(Fluid fluid) {

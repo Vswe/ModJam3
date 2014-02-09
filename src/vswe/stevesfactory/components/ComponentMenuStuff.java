@@ -25,21 +25,9 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     public ComponentMenuStuff(FlowComponent parent, Class<? extends Setting> settingClass) {
         super(parent);
 
-        textBox = new TextBoxLogic(Integer.MAX_VALUE, TEXT_BOX_SIZE_W - TEXT_BOX_TEXT_X * 2) {
-            @Override
-            protected void textChanged() {
-                if (getText().length() > 0) {
-                    updateSearch(getText().toLowerCase().equals(".all"));
-                }else{
-                    result.clear();
-                    updateScrolling();
-                }
-            }
-        };
 
-        textBox.setText("");
 
-        result = new ArrayList();
+
         settings = new ArrayList<Setting>();
         for (int i = 0; i < getSettingCount(); i++) {
             try {
@@ -85,7 +73,84 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 }
             });
         }
-        updateScrolling();
+
+        final ComponentMenuStuff self = this;
+        scrollControllerSearch = new ScrollController(true) {
+            @Override
+            protected List updateSearch(String search, boolean all) {
+                if (search.equals("")) {
+                    return new ArrayList();
+                }
+
+                return self.updateSearch(search, all);
+            }
+
+            @Override
+            protected void onClick(Object o, int button) {
+                selectedSetting.setContent(o);
+                writeServerData(DataTypeHeader.SET_ITEM);
+                selectedSetting = null;
+                updateScrolling();
+            }
+
+            @Override
+            protected void draw(GuiManager gui, Object o, int x, int y, boolean hover) {
+                drawResultObject(gui, o, x, y);
+            }
+
+            @Override
+            protected List<String> getMouseOver(Object o) {
+                if (o == null) {
+                    return null;
+                }
+
+                return getResultObjectMouseOver(o);
+            }
+        };
+
+        scrollControllerSelected = new ScrollController<Setting>(false) {
+            @Override
+            protected List<Setting> updateSearch(String search, boolean all) {
+                return settings;
+            }
+
+            @Override
+            protected void onClick(Setting setting, int button) {
+                selectedSetting = setting;
+                editSetting = button == 1;
+
+
+                if (editSetting && !selectedSetting.isValid()) {
+                    selectedSetting = null;
+                    editSetting = false;
+                }else{
+                    if (editSetting) {
+                        updateTextBoxes();
+                    }
+                    updateScrolling();
+                }
+            }
+
+            @Override
+            protected void draw(GuiManager gui, Setting setting, int x, int y, boolean hover) {
+                int srcSettingX = setting.isValid() ? 0 : 1;
+                int srcSettingY = hover ? 1 : 0;
+
+                gui.drawTexture(x, y, SETTING_SRC_X + srcSettingX * ITEM_SIZE, SETTING_SRC_Y + srcSettingY * ITEM_SIZE, ITEM_SIZE, ITEM_SIZE);
+                if (setting.isValid()) {
+                    drawSettingObject(gui, setting, x, y);
+                }
+            }
+
+            @Override
+            protected List<String> getMouseOver(Setting setting) {
+                if (!setting.isValid()) {
+                    return null;
+                }
+
+                return getSettingObjectMouseOver(setting);
+            }
+        };
     }
 
     protected void initRadioButtons() {
@@ -97,61 +162,12 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     protected static final int RADIO_BUTTON_X_RIGHT = 65;
     protected static final int RADIO_BUTTON_Y = 5;
 
-    private static final int TEXT_BOX_SIZE_W = 64;
-    private static final int TEXT_BOX_SIZE_H = 12;
-    private static final int TEXT_BOX_SRC_X = 0;
-    private static final int TEXT_BOX_SRC_Y = 165;
-    private static final int TEXT_BOX_X = 5;
-    private static final int TEXT_BOX_Y = 5;
-    private static final int TEXT_BOX_TEXT_X = 3;
-    private static final int TEXT_BOX_TEXT_Y = 3;
-    private static final int CURSOR_X = 2;
-    private static final int CURSOR_Y = 0;
-    private static final int CURSOR_Z = 5;
-    private static final int AMOUNT_TEXT_X = 75;
-    private static final int AMOUNT_TEXT_Y = 9;
-
-    private static final int ARROW_SIZE_W = 10;
-    private static final int ARROW_SIZE_H = 6;
-    private static final int ARROW_SRC_X = 64;
-    private static final int ARROW_SRC_Y = 165;
-    private static final int ARROW_X = 105;
-    private static final int ARROW_Y_UP = 32;
-    private static final int ARROW_Y_DOWN = 42;
-
-
-
-    protected int getItemsPerRow() {
-        return 5;
-    }
-
-    protected int getVisibleRows() {
-        return 2;
-    }
 
     protected int getSettingCount() {
         return 30;
     }
 
-    protected final int getScrollingStartY() {
-        return getScrollingUpperLimit() + 3;
-    }
 
-    protected int getItemUpperLimit() {
-        return getScrollingDefaultUpperLimit();
-    }
-
-    private int getScrollingDefaultUpperLimit() {
-        return TEXT_BOX_Y + TEXT_BOX_SIZE_H;
-    }
-
-    private int getScrollingUpperLimit() {
-        if (isSearching()) {
-            return getScrollingDefaultUpperLimit();
-        }else{
-            return getItemUpperLimit();
-        }
-    }
 
     protected static final int ITEM_SIZE = 16;
     protected static final int ITEM_SIZE_WITH_MARGIN = 20;
@@ -180,15 +196,8 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     private static final int DELETE_Y = 3;
     private static final int DELETE_TEXT_Y = 3;
 
-    private int offsetItems;
-    private int offsetSettings;
-    private boolean canScroll;
-    private int dir;
-    private boolean clicked;
-    private boolean selected;
-    protected TextBoxLogic textBox;
-
-    protected List result;
+    protected ScrollController scrollControllerSearch;
+    protected ScrollController<Setting> scrollControllerSelected;
     protected List<Setting> settings;
     protected Setting selectedSetting;
     private boolean editSetting;
@@ -207,10 +216,10 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     protected abstract void drawSettingObject(GuiManager gui, Setting setting, int x, int y);
 
     @SideOnly(Side.CLIENT)
-    protected abstract void drawResultObjectMouseOver(GuiManager gui, Object obj, int x, int y);
+    protected abstract List<String> getResultObjectMouseOver(Object obj);
 
     @SideOnly(Side.CLIENT)
-    protected abstract void drawSettingObjectMouseOver(GuiManager gui, Setting setting, int x, int y);
+    protected abstract List<String> getSettingObjectMouseOver(Setting setting);
 
     @SideOnly(Side.CLIENT)
     @Override
@@ -227,58 +236,11 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             int srcDeleteY = inDeleteBounds(mX, mY) ? 1 : 0;
             gui.drawTexture(DELETE_X, DELETE_Y, DELETE_SRC_X, DELETE_SRC_Y + srcDeleteY * DELETE_SIZE_H, DELETE_SIZE_W, DELETE_SIZE_H);
             gui.drawCenteredString(Localization.DELETE.toString(), DELETE_X, DELETE_Y + DELETE_TEXT_Y, 0.7F, DELETE_SIZE_W, 0xBB4040);
-        }else if (isSearching()) {
-            int srcBoxY = selected ? 1 : 0;
-
-            gui.drawTexture(TEXT_BOX_X, TEXT_BOX_Y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + srcBoxY * TEXT_BOX_SIZE_H, TEXT_BOX_SIZE_W, TEXT_BOX_SIZE_H);
-            gui.drawString(textBox.getText(), TEXT_BOX_X + TEXT_BOX_TEXT_X, TEXT_BOX_Y + TEXT_BOX_TEXT_Y, 0xFFFFFF);
-
-            if (selected) {
-                gui.drawCursor(TEXT_BOX_X + textBox.getCursorPosition(gui) + CURSOR_X, TEXT_BOX_Y + CURSOR_Y, CURSOR_Z, 0xFFFFFFFF);
-            }
-
-            if (isScrollingVisible()) {
-                gui.drawString(Localization.ITEMS_FOUND.toString() + " " + result.size(), AMOUNT_TEXT_X, AMOUNT_TEXT_Y, 0.7F, 0x404040);
-
-                List<Point> points = getItemCoordinates();
-                for (Point point : points) {
-                    drawResultObject(gui, result.get(point.id), point.x, point.y);
-                }
-            }
         }else{
-
-            radioButtons.draw(gui, mX, mY);
-
-            List<Point> points = getItemCoordinates();
-            for (Point point : points) {
-                Setting setting = settings.get(point.id);
-
-                int srcSettingX = setting.isValid() ? 0 : 1;
-                int srcSettingY = CollisionHelper.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY) ? 1 : 0;
-
-                gui.drawTexture(point.x, point.y, SETTING_SRC_X + srcSettingX * ITEM_SIZE, SETTING_SRC_Y + srcSettingY * ITEM_SIZE, ITEM_SIZE, ITEM_SIZE);
-                if (setting.isValid()) {
-                    drawSettingObject(gui, setting, point.x, point.y);
-                }
+            if (!isSearching()) {
+                radioButtons.draw(gui, mX, mY);
             }
-
-        }
-
-        if (isScrollingVisible()) {
-            drawArrow(gui, true, mX, mY);
-            drawArrow(gui, false, mX, mY);
-
-            if (clicked && canScroll) {
-                setOffset(getOffset() + dir);
-                int min = 0;
-                int max = ((int)(Math.ceil(((float)getScrollingList().size() / getItemsPerRow())) - getVisibleRows())) * ITEM_SIZE_WITH_MARGIN - (ITEM_SIZE_WITH_MARGIN - ITEM_SIZE);
-                if (getOffset() < min) {
-                    setOffset(min);
-                }else if(getOffset() > max) {
-                    setOffset(max);
-                }
-
-            }
+            getScrollingList().draw(gui, mX, mY);
         }
 
         if (selectedSetting != null) {
@@ -296,76 +258,31 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         return CollisionHelper.inBounds(DELETE_X, DELETE_Y, DELETE_SIZE_W, DELETE_SIZE_H, mX, mY);
     }
 
-    private boolean isScrollingVisible() {
-        return !isEditing() && getScrollingList().size() > 0;
+    private ScrollController getScrollingList() {
+        return isSearching() ? scrollControllerSearch : scrollControllerSelected;
     }
 
-    private List getScrollingList() {
-        return isSearching() ? result : settings;
-    }
 
-    private int getOffset() {
-        return isSearching() ? offsetItems : offsetSettings;
-    }
 
-    private void setOffset(int val) {
-        if (isSearching()) {
-            offsetItems = val;
-        }else{
-            offsetSettings = val;
-        }
-    }
 
-    protected void updateScrolling() {
-        canScroll = getScrollingList().size() > getItemsPerRow() * getVisibleRows();
-        if (!canScroll) {
-            setOffset(0);
-        }
-    }
 
-    private int getFirstRow() {
-        return (getScrollingUpperLimit() + getOffset() - getScrollingStartY()) / ITEM_SIZE_WITH_MARGIN;
-    }
 
-    @SideOnly(Side.CLIENT)
-    private void drawArrow(GuiManager gui, boolean down, int mX, int mY) {
-        if (canScroll || isSearching()) {
-            int srcArrowX = canScroll ? clicked && down == (dir == 1) ? 2 : inArrowBounds(down, mX, mY) ? 1 : 0 : 3;
-            int srcArrowY = down ? 1 : 0;
 
-            gui.drawTexture(ARROW_X, down ? ARROW_Y_DOWN : ARROW_Y_UP, ARROW_SRC_X + srcArrowX * ARROW_SIZE_W, ARROW_SRC_Y + srcArrowY * ARROW_SIZE_H, ARROW_SIZE_W, ARROW_SIZE_H);
-        }
-    }
-
-    private boolean inArrowBounds(boolean down, int mX, int mY) {
-        return CollisionHelper.inBounds(ARROW_X, down ? ARROW_Y_DOWN : ARROW_Y_UP, ARROW_SIZE_W, ARROW_SIZE_H, mX, mY);
-    }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
         if (isEditing()) {
             if (CollisionHelper.inBounds(EDIT_ITEM_X, EDIT_ITEM_Y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                drawSettingObjectMouseOver(gui, selectedSetting, mX, mY);
+                gui.drawMouseOver(scrollControllerSelected.getMouseOver(selectedSetting), mX, mY);
             }else if(inDeleteBounds(mX, mY)) {
                 gui.drawMouseOver(Localization.DELETE_ITEM_SELECTION.toString(), mX, mY);
             }
+        }else{
+            getScrollingList().drawMouseOver(gui, mX, mY);
         }
 
-        if (isScrollingVisible()) {
-            List<Point> points = getItemCoordinates();
-            for (Point point : points) {
-                if (CollisionHelper.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    if (isSearching()) {
-                        drawResultObjectMouseOver(gui, result.get(point.id), mX, mY);
-                    }else{
-                        gui.drawMouseOver(settings.get(point.id).getMouseOver(), mX, mY);
-                    }
 
-
-                }
-            }
-        }
 
         if (selectedSetting != null && inBackBounds(mX, mY)) {
             gui.drawMouseOver(isEditing() ? Localization.GO_BACK.toString() : Localization.CANCEL.toString(), mX, mY);
@@ -373,24 +290,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     }
 
 
-    private List<Point> getItemCoordinates() {
-        List<Point> points = new ArrayList<Point>();
 
-        int start = getFirstRow();
-        for (int row = start; row < start + getVisibleRows() + 1; row++) {
-            for (int col = 0; col < getItemsPerRow(); col++) {
-                int id = row * getItemsPerRow() + col;
-                if (id >= 0 && id < getScrollingList().size())  {
-                    int y = getScrollingStartY() + row * ITEM_SIZE_WITH_MARGIN - getOffset();
-                    if (y > getScrollingUpperLimit() && y + ITEM_SIZE < FlowComponent.getMenuOpenSize()) {
-                        points.add(new Point(id, ITEM_X + ITEM_SIZE_WITH_MARGIN * col, y));
-                    }
-                }
-            }
-        }
-
-        return points;
-    }
 
     @Override
     public void onClick(int mX, int mY, int button) {
@@ -403,60 +303,18 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
                 selectedSetting.clear();
                 writeServerData(DataTypeHeader.CLEAR);
                 selectedSetting = null;
-                updateScrolling();
-            }
-        }else if (isSearching()) {
-            if (CollisionHelper.inBounds(TEXT_BOX_X, TEXT_BOX_Y, TEXT_BOX_SIZE_W, TEXT_BOX_SIZE_H, mX, mY)) {
-                selected = !selected;
-            }
-
-            List<Point> points = getItemCoordinates();
-            for (Point point : points) {
-                if (CollisionHelper.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    selectedSetting.setContent(result.get(point.id));
-                    writeServerData(DataTypeHeader.SET_ITEM);
-                    selectedSetting = null;
-                    updateScrolling();
-                    break;
-                }
+                getScrollingList().updateScrolling();
             }
         }else{
-            radioButtons.onClick(mX, mY, button);
-
-            List<Point> points = getItemCoordinates();
-            for (Point point : points) {
-                if (CollisionHelper.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    selectedSetting = settings.get(point.id);
-                    editSetting = button == 1;
-
-
-                    if (editSetting && !selectedSetting.isValid()) {
-                        selectedSetting = null;
-                        editSetting = false;
-                    }else{
-                        if (editSetting) {
-                            updateTextBoxes();
-                        }
-                        updateScrolling();
-                    }
-
-                    break;
-                }
+            if (!isSearching()) {
+                radioButtons.onClick(mX, mY, button);
             }
+            getScrollingList().onClick(mX, mY, button);
         }
 
-        if (isScrollingVisible() && canScroll) {
-            if(inArrowBounds(true, mX, mY)) {
-                clicked = true;
-                dir = 1;
-            }else if (inArrowBounds(false, mX, mY)){
-                clicked = true;
-                dir = -1;
-            }
-        }
         if (selectedSetting != null && inBackBounds(mX, mY)) {
             selectedSetting = null;
-            updateScrolling();
+            getScrollingList().updateScrolling();
         }
     }
 
@@ -478,20 +336,13 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
     @Override
     public void onRelease(int mX, int mY, boolean isMenuOpen) {
-        clicked = false;
+        getScrollingList().onRelease(mX, mY);
     }
+
     @SideOnly(Side.CLIENT)
     @Override
     public boolean onKeyStroke(GuiManager gui, char c, int k) {
-        if (selected && isSearching()) {
-            textBox.onKeyStroke(gui, c, k);
-
-            return true;
-        }else if (isEditing()){
-            return numberTextBoxes.onKeyStroke(gui, c, k);
-        }else{
-            return false;
-        }
+        return isSearching() && getScrollingList().onKeyStroke(gui, c, k) || isEditing() && numberTextBoxes.onKeyStroke(gui, c, k);
     }
 
     @Override
@@ -713,20 +564,12 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
 
     @SideOnly(Side.CLIENT)
-    protected abstract void updateSearch(boolean showAll);
+    protected abstract List updateSearch(String search, boolean showAll);
 
 
 
 
-    private class Point {
-        int id, x, y;
 
-        private Point(int id, int x, int y) {
-            this.id = id;
-            this.x = x;
-            this.y = y;
-        }
-    }
 
 
 
