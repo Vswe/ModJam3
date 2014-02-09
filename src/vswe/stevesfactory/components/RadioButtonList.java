@@ -67,4 +67,8 @@ public abstract class RadioButtonList {
     public final int getRawSelectedOption() {
         return selectedOption;
     }
+
+    public int size() {
+        return radioButtonList.size();
+    }
 }

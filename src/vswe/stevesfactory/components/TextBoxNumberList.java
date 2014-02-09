@@ -13,7 +13,6 @@ public class TextBoxNumberList {
     private static final int TEXT_BOX_SIZE_H = 12;
     private static final int TEXT_BOX_SRC_X = 0;
     private static final int TEXT_BOX_SRC_Y = 221;
-    private static final int TEXT_Y = 3;
 
     private List<TextBoxNumber> textBoxes;
     private TextBoxNumber selectedTextBox;
@@ -30,7 +29,7 @@ public class TextBoxNumberList {
 
                 gui.drawTexture(textBox.getX(), textBox.getY(), TEXT_BOX_SRC_X + srcTextBoxX * textBox.getWidth(), TEXT_BOX_SRC_Y + srcTextBoxY * TEXT_BOX_SIZE_H, textBox.getWidth(), TEXT_BOX_SIZE_H);
                 String str = String.valueOf(textBox.getNumber());
-                gui.drawString(str, textBox.getX() + (textBox.getWidth() - gui.getStringWidth(str)) / 2, textBox.getY() + TEXT_Y, 0xFFFFFF);
+                gui.drawCenteredString(str, textBox.getX(), textBox.getY() + textBox.getTextY(), textBox.getTextSize(), textBox.getWidth(), 0xFFFFFF);
             }
         }
     }
@@ -54,11 +53,14 @@ public class TextBoxNumberList {
 
             if (Character.isDigit(c)) {
                 int number = Integer.parseInt(String.valueOf(c));
-                if (selectedTextBox.getNumber() < Math.pow(10, selectedTextBox.getLength() - 1)){
-                   selectedTextBox.setNumber(selectedTextBox.getNumber() * 10 + number);
+                if (Math.abs(selectedTextBox.getNumber()) < Math.pow(10, selectedTextBox.getLength() - 1)){
+                   selectedTextBox.setNumber((Math.abs(selectedTextBox.getNumber()) * 10 + number) * (selectedTextBox.getNumber() < 0 ? -1 : 1));
                    selectedTextBox.onNumberChanged();
                 }
                 return true;
+            }else if(c == '-' && selectedTextBox.allowNegative()) {
+                selectedTextBox.setNumber(selectedTextBox.getNumber() * -1);
+                selectedTextBox.onNumberChanged();
             }else if(k == 14){
                 selectedTextBox.setNumber(selectedTextBox.getNumber() / 10);
                 selectedTextBox.onNumberChanged();
@@ -75,7 +77,6 @@ public class TextBoxNumberList {
                 }
                 return true;
             }
-
         }
 
         return false;

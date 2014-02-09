@@ -219,7 +219,7 @@ public class TileEntityManager extends TileEntityInterface {
 
                             if (!visited.contains(target) && inventories.size() < MAX_CONNECTED_INVENTORIES) {
                                 visited.add(target);
-                                ConnectionBlock connection = new ConnectionBlock(worldObj.getBlockTileEntity(target.getX(), target.getY(), target.getZ()));
+                                ConnectionBlock connection = new ConnectionBlock(worldObj.getBlockTileEntity(target.getX(), target.getY(), target.getZ()), target.getDepth());
                                 boolean isValidConnection = false;
 
                                 for (ConnectionBlockType connectionBlockType : ConnectionBlockType.values()) {

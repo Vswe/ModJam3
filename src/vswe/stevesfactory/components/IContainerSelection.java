@@ -11,4 +11,7 @@ public interface IContainerSelection {
     void draw(GuiManager gui, int x, int y);
     @SideOnly(Side.CLIENT)
     String getDescription(GuiManager gui);
+    @SideOnly(Side.CLIENT)
+    String getName(GuiManager gui);
+    boolean isVariable(); //fast access
 }

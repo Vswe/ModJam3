@@ -23,8 +23,8 @@ public class ComponentMenuBUDs extends ComponentMenuContainer {
 
     @Override
     protected void initRadioButtons() {
-        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(0, Localization.REQUIRE_ALL_TARGETS));
-        radioButtons.add(new ComponentMenuContainer.RadioButtonInventory(1, Localization.REQUIRE_ONE_TARGET));
+        radioButtonsMulti.add(new ComponentMenuContainer.RadioButtonInventory(0, Localization.REQUIRE_ALL_TARGETS));
+        radioButtonsMulti.add(new ComponentMenuContainer.RadioButtonInventory(1, Localization.REQUIRE_ONE_TARGET));
     }
 
     @Override

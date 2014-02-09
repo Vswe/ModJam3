@@ -10,7 +10,6 @@ public class TextBoxNumber {
     private int number;
     private int length;
     private boolean wide;
-
     public TextBoxNumber(int x, int y, int length, boolean wide) {
         this.x = x;
         this.y = y;
@@ -40,6 +39,10 @@ public class TextBoxNumber {
         if (max != -1 && number > max) {
             number = max;
         }
+        int min = getMinNumber();
+        if (number < min) {
+            number = min;
+        }
 
         this.number = number;
     }
@@ -52,7 +55,7 @@ public class TextBoxNumber {
         return wide;
     }
 
-    public void onNumberChanged() {};
+    public void onNumberChanged() {}
 
     public int getWidth() {
         return wide ? TEXT_BOX_SIZE_W_WIDE : TEXT_BOX_SIZE_W;
@@ -60,5 +63,21 @@ public class TextBoxNumber {
 
     public int getMaxNumber() {
         return -1;
+    }
+
+    public int getMinNumber() {
+        return 0;
+    }
+
+    public final boolean allowNegative() {
+        return getMinNumber() < 0;
+    }
+
+    public float getTextSize() {
+        return 1;
+    }
+
+    public int getTextY() {
+        return 3;
     }
 }

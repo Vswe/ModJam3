@@ -58,8 +58,7 @@ public  abstract class ScrollController<T> {
                 @Override
                 protected void textChanged() {
                     if (getText().length() > 0) {
-                        result = updateSearch(getText().toLowerCase(), getText().toLowerCase().equals(".all"));
-                        updateScrolling();
+                        updateSearch();
                     }else{
                         result.clear();
                         updateScrolling();
@@ -159,7 +158,7 @@ public  abstract class ScrollController<T> {
                 gui.drawCursor(TEXT_BOX_X + textBox.getCursorPosition(gui) + CURSOR_X, TEXT_BOX_Y + CURSOR_Y, CURSOR_Z, 0xFFFFFFFF);
             }
 
-            if (textBox.getText().length() > 0) {
+            if (textBox.getText().length() > 0 || result.size() > 0) {
                 gui.drawString(Localization.ITEMS_FOUND.toString() + " " + result.size(), AMOUNT_TEXT_X, AMOUNT_TEXT_Y, 0.7F, 0x404040);
             }
         }
@@ -233,6 +232,19 @@ public  abstract class ScrollController<T> {
 
     public void setItemUpperLimit(int n) {
         scrollingUpperLimit = n;
+    }
+
+    public void updateSearch() {
+        if (hasSearchBox) {
+            result = updateSearch(textBox.getText().toLowerCase(), textBox.getText().toLowerCase().equals(".all"));
+        }else{
+            result = updateSearch("", false);
+        }
+        updateScrolling();
+    }
+
+    public List<T> getResult() {
+        return result;
     }
 
 

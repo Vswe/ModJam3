@@ -45,18 +45,27 @@ public class Variable implements IContainerSelection {
     public String getDescription(GuiManager gui) {
         VariableColor color = VariableColor.values()[id];
 
-        String name;
-        if (getDeclaration() == null || getDeclaration().getComponentName() == null) {
-            name = color.toString();
-        }else{
-            name = getDeclaration().getComponentName();
-        }
-
-
-        return color.getTextColor().toString() + name;
+        return color.getTextColor().toString() + getNameFromColor(color);
     }
 
+    @Override
+    public String getName(GuiManager gui) {
+        return getNameFromColor(VariableColor.values()[id]);
+    }
 
+    @Override
+    public boolean isVariable() {
+        return true;
+    }
+
+    private String getNameFromColor(VariableColor color) {
+        if (getDeclaration() == null || getDeclaration().getComponentName() == null) {
+            return color.toString();
+        }else{
+            return getDeclaration().getComponentName();
+        }
+
+    }
 
     public void setDeclaration(FlowComponent flowComponent) {
         if (flowComponent == null || declaration == null) {

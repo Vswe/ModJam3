@@ -20,38 +20,52 @@ import vswe.stevesfactory.network.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class ComponentMenuContainer extends ComponentMenu {
 
 
-    private static final int ARROW_SIZE_W = 6;
-    private static final int ARROW_SIZE_H = 10;
-    private static final int ARROW_SRC_X = 18;
-    private static final int ARROW_SRC_Y = 20;
-    private static final int ARROW_X_LEFT = 3;
-    private static final int ARROW_X_RIGHT = 111;
-    private static final int ARROW_Y = 7;
+    private static final int BACK_SRC_X = 46;
+    private static final int BACK_SRC_Y = 52;
+    private static final int BACK_SIZE_W = 9;
+    private static final int BACK_SIZE_H = 9;
+    private static final int BACK_X = 108;
+    private static final int BACK_Y = 57;
 
-    private static final int MAX_INVENTORIES = 5;
     private static final int INVENTORY_SIZE = 16;
-    private static final int INVENTORY_SIZE_W_WITH_MARGIN = 20;
-    private static final int INVENTORY_X = 12;
-    private static final int INVENTORY_Y = 5;
     private static final int INVENTORY_SRC_X = 30;
     private static final int INVENTORY_SRC_Y = 20;
 
-    private static final int RADIO_BUTTON_X = 2;
-    private static final int RADIO_BUTTON_Y = 27;
+    private static final int RADIO_BUTTON_MULTI_X = 2;
+    private static final int RADIO_BUTTON_MULTI_Y = 27;
     private static final int RADIO_BUTTON_SPACING = 15;
 
+    private static final int MENU_WIDTH = 120;
+    private static final int TEXT_MULTI_MARGIN_X = 5;
+    private static final int TEXT_MULTI_Y = 10;
+    private static final int TEXT_MULTI_ERROR_Y = 30;
 
-    //private int selectedInventory = -1;
+    private static final int FILTER_BUTTON_X = 90;
+    private static final int FILTER_BUTTON_Y = 0;
+    private static final int CHECK_BOX_FILTER_INVERT_Y = 55;
+    private static final int FILTER_RESET_BUTTON_X = 70;
+
+    private static final int CHECK_BOX_FILTER_Y = 5;
+    private static final int CHECK_BOX_FILTER_SPACING = 12;
+
+    private Page currentPage;
     protected List<Integer> selectedInventories;
     private List<IContainerSelection> inventories;
-    protected RadioButtonList radioButtons;
-
+    protected RadioButtonList radioButtonsMulti;
+    private ScrollController<IContainerSelection> scrollController;
     private ConnectionBlockType validType;
+    private GuiManager cachedInterface;
+    private List<Button> buttons;
+    private static final ContainerFilter filter = new ContainerFilter(); //this one is static so all of the menus will share the selection
+    private List<Variable> filterVariables;
+
+
 
     protected EnumSet<ConnectionBlockType> getValidTypes() {
         return EnumSet.of(validType);
@@ -62,7 +76,8 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         this.validType = validType;
 
         selectedInventories = new ArrayList<Integer>();
-        radioButtons = new RadioButtonList() {
+        filterVariables = new ArrayList<Variable>();
+        radioButtonsMulti = new RadioButtonList() {
             @Override
             public void updateSelectedOption(int selectedOption) {
                DataWriter dw = getWriterForServerComponentPacket();
@@ -72,17 +87,151 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         };
 
         initRadioButtons();
+
+        scrollController = new ScrollController<IContainerSelection>(true) {
+            @Override
+            protected List<IContainerSelection> updateSearch(String search, boolean all) {
+                if (search.equals("") || cachedInterface == null) {
+                    return new ArrayList<IContainerSelection>();
+                }
+
+                if (search.equals(".var")) {
+                    return new ArrayList<IContainerSelection>(filterVariables);
+                }
+
+                boolean noFilter = search.equals(".nofilter");
+
+                List<IContainerSelection> ret = new ArrayList<IContainerSelection>(inventories);
+
+                Iterator<IContainerSelection> iterator = ret.iterator();
+                while (iterator.hasNext()) {
+                    IContainerSelection element = iterator.next();
+
+                    if(!element.isVariable()) {
+                        ConnectionBlock block = (ConnectionBlock)element;
+                        if (noFilter) {
+                            continue;
+                        }else if (all || search.contains(block.getName(cachedInterface).toLowerCase())) {
+                            if (filter.matches(getParent().getManager(), selectedInventories, block)) {
+                                continue;
+                            }
+                        }
+                    }
+
+                    iterator.remove();
+                }
+
+
+                return ret;
+            }
+
+            @Override
+            protected void onClick(IContainerSelection iContainerSelection, int button) {
+                setSelectedInventoryAndSync(iContainerSelection.getId(), !selectedInventories.contains(iContainerSelection.getId()));
+            }
+
+            @Override
+            protected void draw(GuiManager gui, IContainerSelection iContainerSelection, int x, int y, boolean hover) {
+                drawContainer(gui, iContainerSelection, selectedInventories, x, y, hover);
+            }
+
+            @Override
+            protected List<String> getMouseOver(IContainerSelection iContainerSelection) {
+                return getMouseOverForContainer(iContainerSelection, selectedInventories);
+            }
+        };
+
+        buttons = new ArrayList<Button>();
+        buttons.add(new PageButton(Localization.FILTER_SHORT, Page.MAIN, Localization.FILTER_LONG, Page.FILTER, false, 102, 21));
+        buttons.add(new PageButton(Localization.MULTI_SHORT, Page.MAIN, Localization.MULTI_LONG, Page.MULTI, false, 111, 21));
+
+        ComponentMenuContainer.Page[] subFilterPages = {ComponentMenuContainer.Page.POSITION, ComponentMenuContainer.Page.DISTANCE, ComponentMenuContainer.Page.SELECTION, ComponentMenuContainer.Page.VARIABLE};
+
+        for (int i = 0; i < subFilterPages.length; i++) {
+           buttons.add(new ComponentMenuContainer.PageButton(Localization.SUB_MENU_SHORT, ComponentMenuContainer.Page.FILTER, Localization.SUB_MENU_LONG, subFilterPages[i], true, FILTER_BUTTON_X, CHECK_BOX_FILTER_Y + CHECK_BOX_FILTER_SPACING * i + FILTER_BUTTON_Y));
+        }
+        buttons.add(new ComponentMenuContainer.Button(Localization.CLEAR_SHORT, ComponentMenuContainer.Page.FILTER, Localization.CLEAR_LONG, true, FILTER_RESET_BUTTON_X, CHECK_BOX_FILTER_INVERT_Y) {
+            @Override
+            void onClick() {
+                filter.clear();
+            }
+        });
+
+        buttons.add(new Button(Localization.SELECT_ALL_SHORT, Page.MAIN, Localization.SELECT_ALL_LONG, false, 102, 51) {
+            @Override
+            void onClick() {
+                for (IContainerSelection iContainerSelection : scrollController.getResult()) {
+                    if (!selectedInventories.contains(iContainerSelection.getId())) {
+                        scrollController.onClick(iContainerSelection, 0);
+                    }
+                }
+            }
+        });
+
+        buttons.add(new Button(Localization.SELECT_NONE_SHORT, Page.MAIN, Localization.SELECT_NONE_LONG, false, 111, 51) {
+            @Override
+            void onClick() {
+                for (IContainerSelection iContainerSelection : scrollController.getResult()) {
+                    if (selectedInventories.contains(iContainerSelection.getId())) {
+                        scrollController.onClick(iContainerSelection, 0);
+                    }
+                }
+            }
+        });
+
+        buttons.add(new Button(Localization.SELECT_INVERT_SHORT, Page.MAIN, Localization.SELECT_INVERT_LONG, false, 106, 60) {
+            @Override
+            void onClick() {
+                for (IContainerSelection iContainerSelection : scrollController.getResult()) {
+                    scrollController.onClick(iContainerSelection, 0);
+                }
+            }
+        });
+
+        currentPage = Page.MAIN;
+    }
+    @SideOnly(Side.CLIENT)
+    void drawContainer(GuiManager gui, IContainerSelection iContainerSelection, List<Integer> selected, int x, int y, boolean hover) {
+        int srcInventoryX = selected.contains(iContainerSelection.getId()) ? 1 : 0;
+        int srcInventoryY = hover ? 1 : 0;
+
+        gui.drawTexture(x, y, INVENTORY_SRC_X + srcInventoryX * INVENTORY_SIZE, INVENTORY_SRC_Y + srcInventoryY * INVENTORY_SIZE, INVENTORY_SIZE, INVENTORY_SIZE);
+        iContainerSelection.draw(gui, x, y);
     }
 
+    List<String> getMouseOverForContainer(IContainerSelection iContainerSelection, List<Integer> selected) {
+        List<String> ret = new ArrayList<String>();
+        if (cachedInterface != null) {
+            String[] desc = iContainerSelection.getDescription(cachedInterface).split("\n");
+            for (String s : desc) {
+                ret.add(s);
+            }
+            if (selected.contains(iContainerSelection.getId())) {
+                ret.add(Color.GREEN + Localization.SELECTED.toString());
+            }
+        }
+        return ret;
+    }
+
+
+
     protected void initRadioButtons() {
-        radioButtons.add(new RadioButtonInventory(0, Localization.RUN_SHARED_ONCE));
-        radioButtons.add(new RadioButtonInventory(1, Localization.RUN_ONE_PER_TARGET));
+        radioButtonsMulti.add(new RadioButtonInventory(0, Localization.RUN_SHARED_ONCE));
+        radioButtonsMulti.add(new RadioButtonInventory(1, Localization.RUN_ONE_PER_TARGET));
+    }
+
+    public Page getCurrentPage() {
+        return currentPage;
+    }
+
+    public List<Variable> getFilterVariables() {
+        return filterVariables;
     }
 
     protected class RadioButtonInventory extends RadioButton {
 
         public RadioButtonInventory(int id, Localization text) {
-            super(RADIO_BUTTON_X, RADIO_BUTTON_Y + id * RADIO_BUTTON_SPACING, text);
+            super(RADIO_BUTTON_MULTI_X, RADIO_BUTTON_MULTI_Y + id * RADIO_BUTTON_SPACING, text);
         }
     }
 
@@ -91,114 +240,116 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
-        inventories = getInventories(gui.getManager());
+        cachedInterface = gui;
+        filter.currentMenu = this;
+        if (currentPage == Page.MAIN) {
+            inventories = getInventories(gui.getManager());
+            scrollController.draw(gui, mX, mY);
 
-        canScroll = inventories.size() > MAX_INVENTORIES;
+        }else if (currentPage == Page.MULTI) {
+            gui.drawCenteredString(selectedInventories.size() + " " + Localization.SELECTED_CONTAINERS.toString(), TEXT_MULTI_MARGIN_X, TEXT_MULTI_Y, 0.9F, MENU_WIDTH - TEXT_MULTI_MARGIN_X * 2, 0x404040);
+            String error = null;
 
-        if (!canScroll) {
-            offset = 0;
-        }
+            if (radioButtonsMulti.size() == 0) {
+                error = Localization.NO_MULTI_SETTING.toString();
+            }else if(!hasMultipleInventories()) {
+                error = Localization.SINGLE_SELECTED.toString();
+            }
 
-        for (int i = 0; i < inventories.size(); i++) {
-            int x = getInventoryPosition(i);
-
-            if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
-
-
-                int srcInventoryX = selectedInventories.contains(inventories.get(i).getId()) ? 1 : 0;
-                int srcInventoryY = CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY) ? 1 : 0;
-
-                gui.drawTexture(x, INVENTORY_Y, INVENTORY_SRC_X + srcInventoryX * INVENTORY_SIZE, INVENTORY_SRC_Y + srcInventoryY * INVENTORY_SIZE, INVENTORY_SIZE, INVENTORY_SIZE);
-                inventories.get(i).draw(gui, x, INVENTORY_Y);
+            if (error != null) {
+                gui.drawSplitString(error, TEXT_MULTI_MARGIN_X, TEXT_MULTI_ERROR_Y, MENU_WIDTH - TEXT_MULTI_MARGIN_X * 2, 0.7F, 0x404040);
+            }
+            if (hasMultipleInventories()) {
+                radioButtonsMulti.draw(gui, mX, mY);
+            }
+        }else if(currentPage == Page.POSITION) {
+            gui.drawString(Localization.RELATIVE_COORDINATES.toString(), 5, 60, 0.5F, 0x404040);
+        }else if(currentPage == Page.SELECTION) {
+            filter.radioButtonsSelection.draw(gui, mX, mY);
+        }else if(currentPage == Page.VARIABLE) {
+            filter.radioButtonVariable.draw(gui, mX, mY);
+            if (filter.isVariableListVisible()) {
+                inventories = getInventories(gui.getManager());
+                filter.scrollControllerVariable.draw(gui, mX, mY);
             }
         }
 
-        drawArrow(gui, false, mX, mY);
-        drawArrow(gui, true, mX, mY);
-
-        if (clicked) {
-            offset += dir;
-            int min = (inventories.size() - MAX_INVENTORIES) * -INVENTORY_SIZE_W_WITH_MARGIN;
-            int max = 0;
-
-            if (offset < min) {
-                offset = min;
-            }else if(offset > max) {
-                offset = max;
-            }
+        filter.textBoxes.draw(gui, mX, mY);
+        for (Button button : buttons) {
+            button.draw(gui, mX, mY);
         }
+        filter.checkBoxes.draw(gui, mX, mY);
 
-        if (hasMultipleInventories()) {
-            radioButtons.draw(gui, mX, mY);
+        if (currentPage.parent != null) {
+            int srcBackX = inBackBounds(mX, mY) ? 1 : 0;
+
+            gui.drawTexture(BACK_X, BACK_Y, BACK_SRC_X + srcBackX * BACK_SIZE_W, BACK_SRC_Y, BACK_SIZE_W, BACK_SIZE_H);
         }
+    }
+
+    private boolean inBackBounds(int mX, int mY) {
+        return CollisionHelper.inBounds(BACK_X, BACK_Y, BACK_SIZE_W, BACK_SIZE_H, mX, mY);
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
+        filter.currentMenu = this;
+        if (currentPage == Page.MAIN) {
+            scrollController.drawMouseOver(gui, mX, mY);
+        }else if(currentPage == Page.VARIABLE && filter.isVariableListVisible()) {
+            filter.scrollControllerVariable.drawMouseOver(gui, mX, mY);
+        }else if(currentPage == Page.POSITION) {
+            if (CollisionHelper.inBounds(5, 60, MENU_WIDTH - 20, 5, mX, mY)) {
+                String str = Localization.ABSOLUTE_RANGES.toString() + ":";
 
-        for (int i = 0; i < inventories.size(); i++) {
-            int x = getInventoryPosition(i);
+                str += "\n" + Localization.X.toString() + " (" + (filter.lowerRange[0].getNumber() + getParent().getManager().xCoord) + ", " + (filter.higherRange[0].getNumber() + getParent().getManager().xCoord) + ")";
+                str += "\n" + Localization.Y.toString() + " (" + (filter.lowerRange[1].getNumber() + getParent().getManager().yCoord) + ", " + (filter.higherRange[1].getNumber() + getParent().getManager().yCoord) + ")";
+                str += "\n" + Localization.Z.toString() + " (" + (filter.lowerRange[2].getNumber() + getParent().getManager().zCoord) + ", " + (filter.higherRange[2].getNumber() + getParent().getManager().zCoord) + ")";
 
-            if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
-                if (CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
-                    String str = inventories.get(i).getDescription(gui);
-
-                    if (selectedInventories.contains(inventories.get(i).getId())) {
-                        str += "\n" + Color.GREEN + Localization.SELECTED.toString();
-                    }
-
-                    gui.drawMouseOver(str, mX, mY);
-                }
+                gui.drawMouseOver(str, mX, mY);
             }
+        }
+
+        for (Button button : buttons) {
+            button.drawMouseOver(gui, mX, mY);
+        }
+
+        if (currentPage.parent != null && inBackBounds(mX, mY)) {
+            gui.drawMouseOver(Localization.GO_BACK.toString(), mX, mY);
         }
     }
 
-    private boolean clicked;
-    private int dir;
-    private int offset;
-    private boolean canScroll;
-
-    @SideOnly(Side.CLIENT)
-    private void drawArrow(GuiManager gui, boolean right, int mX, int mY) {
-        int srcArrowX = right ? 1 : 0;
-        int srcArrowY = canScroll ? clicked && right == (dir == -1) ? 2 : inArrowBounds(right, mX, mY) ? 1 : 0 : 3;
-
-        gui.drawTexture(right ? ARROW_X_RIGHT : ARROW_X_LEFT, ARROW_Y, ARROW_SRC_X + srcArrowX * ARROW_SIZE_W, ARROW_SRC_Y + srcArrowY * ARROW_SIZE_H, ARROW_SIZE_W, ARROW_SIZE_H);
-    }
-
-    private boolean inArrowBounds(boolean right, int mX, int mY) {
-        return CollisionHelper.inBounds(right ? ARROW_X_RIGHT : ARROW_X_LEFT, ARROW_Y, ARROW_SIZE_W, ARROW_SIZE_H, mX, mY);
-    }
 
     @Override
-    public void onClick(int mX, int mY, int button) {
-        if (canScroll) {
-            if (inArrowBounds(true, mX, mY)) {
-                clicked = true;
-                dir = -1;
-            }else if (inArrowBounds(false, mX, mY)) {
-                clicked = true;
-                dir = 1;
+    public void onClick(int mX, int mY, int b) {
+        filter.currentMenu = this;
+        if (currentPage == Page.MAIN) {
+            scrollController.onClick(mX, mY, b);
+
+        }else if(currentPage == Page.MULTI) {
+            if (hasMultipleInventories()) {
+                radioButtonsMulti.onClick(mX, mY, b);
+            }
+        }else if(currentPage == Page.SELECTION) {
+            filter.radioButtonsSelection.onClick(mX, mY, b);
+        }else if(currentPage == Page.VARIABLE) {
+            filter.radioButtonVariable.onClick(mX, mY, b);
+            if (filter.isVariableListVisible()) {
+                filter.scrollControllerVariable.onClick(mX, mY, b);
             }
         }
 
-        if (inventories != null) {
-            for (int i = 0; i < inventories.size(); i++) {
-                int x = getInventoryPosition(i);
-
-                if (x > ARROW_X_LEFT + ARROW_SIZE_W && x + INVENTORY_SIZE < ARROW_X_RIGHT) {
-                    if (CollisionHelper.inBounds(x, INVENTORY_Y, INVENTORY_SIZE, INVENTORY_SIZE, mX, mY)) {
-                        setSelectedInventoryAndSync(inventories.get(i).getId(), !selectedInventories.contains(inventories.get(i).getId()));
-
-                        break;
-                    }
-                }
+        for (Button button : buttons) {
+            if (button.inBounds(mX, mY)) {
+                button.onClick();
+                break;
             }
         }
-
-        if (hasMultipleInventories()) {
-            radioButtons.onClick(mX, mY, button);
+        filter.checkBoxes.onClick(mX, mY);
+        filter.textBoxes.onClick(mX, mY, b);
+        if (currentPage.parent != null && inBackBounds(mX, mY)) {
+            currentPage = currentPage.parent;
         }
     }
 
@@ -213,7 +364,9 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
     @Override
     public void onRelease(int mX, int mY, boolean isMenuOpen) {
-        clicked = false;
+        filter.currentMenu = this;
+        scrollController.onRelease(mX, mY); //no need to check we're on the correct menu, this makes sure the holding always stops
+        filter.scrollControllerVariable.onRelease(mX, mY);
     }
 
     @Override
@@ -315,12 +468,16 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         dw.writeBoolean(select);
     }
 
-    private int getInventoryPosition(int i) {
-        return INVENTORY_X + i * INVENTORY_SIZE_W_WITH_MARGIN + offset;
-    }
 
     public List<Integer> getSelectedInventories() {
         return selectedInventories;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public boolean onKeyStroke(GuiManager gui, char c, int k) {
+        filter.currentMenu = this;
+        return currentPage == Page.MAIN ? scrollController.onKeyStroke(gui, c, k) : filter.textBoxes.onKeyStroke(gui, c, k);
     }
 
     private static final String NBT_SELECTION = "InventorySelection";
@@ -378,22 +535,24 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     }
 
     public int getOption() {
-        return radioButtons.getSelectedOption();
+        return radioButtonsMulti.getSelectedOption();
     }
 
     protected void setOption(int val) {
-        radioButtons.setSelectedOption(val);
+        radioButtonsMulti.setSelectedOption(val);
     }
 
     private List<IContainerSelection> getInventories(TileEntityManager manager) {
         EnumSet<ConnectionBlockType> validTypes = getValidTypes();
         List<ConnectionBlock> tempInventories = manager.getConnectedInventories();
         List<IContainerSelection> ret = new ArrayList<IContainerSelection>();
+        filterVariables.clear();
 
         for (int i = 0; i < manager.getVariables().length; i++) {
             Variable variable = manager.getVariables()[i];
             if (isVariableAllowed(validTypes, i)) {
                 ret.add(variable);
+                filterVariables.add(variable);
             }
         }
 
@@ -403,6 +562,8 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
         }
 
+        scrollController.updateSearch(); //TODO only do this if the inventories have actually updated
+        filter.scrollControllerVariable.updateSearch(); //TODO ditto
 
         return ret;
     }
@@ -418,6 +579,94 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
         }
         return false;
+    }
+
+    public enum Page {
+        MAIN(null),
+        MULTI(MAIN),
+        FILTER(MAIN),
+        POSITION(FILTER),
+        DISTANCE(FILTER),
+        SELECTION(FILTER),
+        VARIABLE(FILTER);
+
+        private Page parent;
+
+        private Page(Page parent) {
+            this.parent = parent;
+        }
+    }
+
+
+    private abstract class Button {
+        int x, y;
+        Localization label;
+        Localization description;
+        Page page;
+
+
+        private final int width;
+        private final int height;
+        private final int srcX;
+        private final int srcY;
+
+
+        protected Button(Localization label, Page page, Localization description, boolean wide, int x, int y) {
+            this.x = x;
+            this.y = y;
+            this.page = page;
+            this.label = label;
+            this.description = description;
+
+            if (wide) {
+                width = 20;
+                srcX = 58;
+            }else{
+                width = 8;
+                srcX = 50;
+            }
+            height = 8;
+            srcY = 189;
+        }
+
+        abstract void onClick();
+
+        boolean inBounds(int mX, int mY) {
+            return isVisible() && CollisionHelper.inBounds(x, y, width, height, mX, mY);
+        }
+
+        @SideOnly(Side.CLIENT)
+        void draw(GuiManager gui, int mX, int mY) {
+            if (isVisible()) {
+                gui.drawTexture(x, y, srcX, srcY + (inBounds(mX, mY) ? height : 0), width, height);
+                gui.drawCenteredString(label.toString(), x + 1, y + 2, 0.7F, width - 2, 0x404040);
+            }
+        }
+
+        @SideOnly(Side.CLIENT)
+        void drawMouseOver(GuiManager gui, int mX, int mY) {
+            if (inBounds(mX, mY)) {
+                gui.drawMouseOver(description.toString(), mX, mY);
+            }
+        }
+
+        boolean isVisible() {
+            return currentPage == page;
+        }
+    }
+
+    private class PageButton extends Button {
+        private Page targetPage;
+
+        private PageButton(Localization label, Page page, Localization description, Page targetPage, boolean wide, int x, int y) {
+            super(label, page, description, wide, x, y);
+            this.targetPage = targetPage;
+        }
+
+        @Override
+        void onClick() {
+            currentPage = targetPage;
+        }
     }
 
 
