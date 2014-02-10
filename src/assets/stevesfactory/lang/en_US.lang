@@ -297,6 +297,7 @@ gui.sfm.BlockAway=block away
 gui.sfm.BlocksAway=blocks away
 gui.sfm.CableAway=cable away
 gui.sfm.CablesAway=cables away
+gui.sfm.EmptyCluster=Empty cluster
 
 # ======================================
 #		  OTHER MANAGER INTERFACE

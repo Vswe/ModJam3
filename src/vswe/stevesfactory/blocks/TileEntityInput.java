@@ -54,9 +54,7 @@ public class TileEntityInput extends TileEntityClusterElement implements IRedsto
 
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
-        super.readFromNBT(nbtTagCompound);
-
+    public void readContentFromNBT(NBTTagCompound nbtTagCompound) {
         int version = nbtTagCompound.getByte(Blocks.NBT_PROTOCOL_VERSION);
 
 
@@ -72,9 +70,7 @@ public class TileEntityInput extends TileEntityClusterElement implements IRedsto
 
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
-        super.writeToNBT(nbtTagCompound);
-
+    public void writeContentToNBT(NBTTagCompound nbtTagCompound) {
         nbtTagCompound.setByte(Blocks.NBT_PROTOCOL_VERSION, Blocks.NBT_CURRENT_PROTOCOL_VERSION);
 
         NBTTagList sidesTag = new NBTTagList();

@@ -329,7 +329,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
 
                     for (int j = 0; j < inventories.size(); j++) {
                         TileEntity inventory = inventories.get(j).getTileEntity();
-                        if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord) {
+                        if (coordinate.getX() == inventory.xCoord && coordinate.getY() == inventory.yCoord && coordinate.getZ() == inventory.zCoord && inventory.getClass().equals(coordinate.getTileEntity().getClass())) {
                             int id = j + (hasVariables ? variables.length : 0);
                             if (!newSelection.contains(id)) {
                                 newSelection.add(id);

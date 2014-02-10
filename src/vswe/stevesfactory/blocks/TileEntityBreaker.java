@@ -276,6 +276,6 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
 
     @Override
     protected EnumSet<ClusterMethodRegistration> getRegistrations() {
-        return EnumSet.noneOf(ClusterMethodRegistration.class);
+        return EnumSet.of(ClusterMethodRegistration.ON_BLOCK_PLACED_BY);
     }
 }

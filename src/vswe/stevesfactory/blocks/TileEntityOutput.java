@@ -210,9 +210,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
     private static final String NBT_PULSES = "Pulses";
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
-        super.readFromNBT(nbtTagCompound);
-
+    public void readContentFromNBT(NBTTagCompound nbtTagCompound) {
         int version = nbtTagCompound.getByte(Blocks.NBT_PROTOCOL_VERSION);
 
 
@@ -238,9 +236,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
 
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
-        super.writeToNBT(nbtTagCompound);
-
+    public void writeContentToNBT(NBTTagCompound nbtTagCompound) {
         nbtTagCompound.setByte(Blocks.NBT_PROTOCOL_VERSION, Blocks.NBT_CURRENT_PROTOCOL_VERSION);
 
         NBTTagList sidesTag = new NBTTagList();

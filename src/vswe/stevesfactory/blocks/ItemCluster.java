@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import vswe.stevesfactory.Localization;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class ItemCluster extends ItemBlock {
                 list.add(ClusterRegistry.getRegistryList().get(type).getItemStack(false).getDisplayName());
             }
         }else{
-            list.add("Empty cluster");  //TODO localization
+            list.add(Localization.EMPTY_CLUSTER.toString());
         }
     }
 }

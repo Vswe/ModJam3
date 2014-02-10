@@ -62,7 +62,9 @@ public enum DataBitHelper {
     BLOCK_META(4),
     BUD_SYNC_TYPE(2),
     BUD_SYNC_SUB_TYPE_LONG(3),
-    BUD_SYNC_SUB_TYPE_SHORT(2);;
+    BUD_SYNC_SUB_TYPE_SHORT(2),
+
+    CLUSTER_SUB_ID(4);
 
 
 

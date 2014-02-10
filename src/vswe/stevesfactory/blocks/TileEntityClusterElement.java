@@ -2,6 +2,7 @@ package vswe.stevesfactory.blocks;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
 import java.util.EnumSet;
@@ -45,5 +46,19 @@ public abstract class TileEntityClusterElement extends TileEntity {
         }
     }
 
+    @Override
+    public final void writeToNBT(NBTTagCompound tagCompound) {
+        super.writeToNBT(tagCompound);
+        writeContentToNBT(tagCompound);
+    }
+
+    @Override
+    public final void readFromNBT(NBTTagCompound tagCompound) {
+        super.readFromNBT(tagCompound);
+        readContentFromNBT(tagCompound);
+    }
+
+    protected void readContentFromNBT(NBTTagCompound tagCompound) {}
+    protected void writeContentToNBT(NBTTagCompound tagCompound) {}
     protected abstract EnumSet<ClusterMethodRegistration> getRegistrations();
 }

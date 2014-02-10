@@ -270,6 +270,7 @@ public enum Localization {
     BLOCKS_AWAY,
     CABLE_AWAY,
     CABLES_AWAY,
+    EMPTY_CLUSTER,
 
     DELETE_COMMAND,
     EXIT_GROUP,
