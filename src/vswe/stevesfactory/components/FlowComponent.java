@@ -141,6 +141,8 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     private FlowComponent parent;
     private List<FlowComponent> childrenInputNodes;
     private List<FlowComponent> childrenOutputNodes;
+    private boolean isInventoryListDirty = true;
+
 
     public int getCurrentInterval() {
         return currentInterval;
@@ -1475,5 +1477,14 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
     public void setParentLoadId(int i) {
         parentLoadId = i;
+    }
+
+
+    public boolean isInventoryListDirty() {
+        return isInventoryListDirty;
+    }
+
+    public void setInventoryListDirty(boolean inventoryListDirty) {
+        isInventoryListDirty = inventoryListDirty;
     }
 }

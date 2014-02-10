@@ -58,7 +58,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     protected List<Integer> selectedInventories;
     private List<IContainerSelection> inventories;
     protected RadioButtonList radioButtonsMulti;
-    private ScrollController<IContainerSelection> scrollController;
+    protected ScrollController<IContainerSelection> scrollController;
     private ConnectionBlockType validType;
     private GuiManager cachedInterface;
     private List<Button> buttons;
@@ -88,18 +88,24 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
         initRadioButtons();
 
-        scrollController = new ScrollController<IContainerSelection>(true) {
+        scrollController = new ScrollController<IContainerSelection>(getDefaultSearch()) {
             @Override
             protected List<IContainerSelection> updateSearch(String search, boolean all) {
                 if (search.equals("") || cachedInterface == null) {
                     return new ArrayList<IContainerSelection>();
                 }
 
+                if (inventories == null) {
+                    inventories = getInventories(getParent().getManager());
+                }
+
                 if (search.equals(".var")) {
                     return new ArrayList<IContainerSelection>(filterVariables);
                 }
 
+
                 boolean noFilter = search.equals(".nofilter");
+                boolean selected = search.equals(".selected");
 
                 List<IContainerSelection> ret = new ArrayList<IContainerSelection>(inventories);
 
@@ -107,11 +113,13 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 while (iterator.hasNext()) {
                     IContainerSelection element = iterator.next();
 
-                    if(!element.isVariable()) {
+                    if (selected && selectedInventories.contains(element.getId())) {
+                        continue;
+                    }else if(!element.isVariable()) {
                         ConnectionBlock block = (ConnectionBlock)element;
                         if (noFilter) {
                             continue;
-                        }else if (all || search.contains(block.getName(cachedInterface).toLowerCase())) {
+                        }else if (all || block.getName(cachedInterface).toLowerCase().contains(search)) {
                             if (filter.matches(getParent().getManager(), selectedInventories, block)) {
                                 continue;
                             }
@@ -190,6 +198,11 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
         currentPage = Page.MAIN;
     }
+
+    protected String getDefaultSearch() {
+        return ".all";
+    }
+
     @SideOnly(Side.CLIENT)
     void drawContainer(GuiManager gui, IContainerSelection iContainerSelection, List<Integer> selected, int x, int y, boolean hover) {
         int srcInventoryX = selected.contains(iContainerSelection.getId()) ? 1 : 0;
@@ -562,8 +575,12 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
         }
 
-        scrollController.updateSearch(); //TODO only do this if the inventories have actually updated
-        filter.scrollControllerVariable.updateSearch(); //TODO ditto
+        if (getParent().isInventoryListDirty()) {
+            getParent().setInventoryListDirty(false);
+            scrollController.updateSearch();
+        }
+        filter.scrollControllerVariable.updateSearch();
+
 
         return ret;
     }

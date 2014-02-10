@@ -268,6 +268,10 @@ public class TileEntityManager extends TileEntityInterface {
 
             if (!worldObj.isRemote) {
                 updateInventorySelection(oldCoordinates);
+            }else{
+                for (FlowComponent item : items) {
+                    item.setInventoryListDirty(true);
+                }
             }
         }
 
@@ -285,6 +289,7 @@ public class TileEntityManager extends TileEntityInterface {
                     menuInventory.setSelectedInventories(getNewSelection(oldCoordinates, oldSelection, true));
                 }
             }
+
         }
 
         for (Variable variable : variables) {

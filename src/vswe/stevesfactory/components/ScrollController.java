@@ -52,7 +52,11 @@ public  abstract class ScrollController<T> {
     private int visibleRows = 2;
     private int scrollingUpperLimit = TEXT_BOX_Y + TEXT_BOX_SIZE_H;
     public ScrollController(boolean hasSearchBox) {
-        this.hasSearchBox = hasSearchBox;
+        this(hasSearchBox ? "" : null);
+    }
+
+    public ScrollController(String defaultText) {
+        this.hasSearchBox = defaultText != null;
         if (hasSearchBox) {
             textBox = new TextBoxLogic(Integer.MAX_VALUE, TEXT_BOX_SIZE_W - TEXT_BOX_TEXT_X * 2) {
                 @Override
@@ -66,11 +70,10 @@ public  abstract class ScrollController<T> {
                 }
             };
 
-            textBox.setText("");
+            textBox.setText(defaultText);
         }
 
-        result = updateSearch("", false);
-        updateScrolling();
+        updateSearch();
     }
 
     protected abstract List<T> updateSearch(String search, boolean all);
