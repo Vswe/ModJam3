@@ -4,11 +4,15 @@ package vswe.stevesfactory.blocks;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Blocks {
 
@@ -71,6 +75,12 @@ public final class Blocks {
     public static final String CABLE_BREAKER_UNLOCALIZED_NAME = "BlockCableBreaker";
     public static final int CABLE_BREAKER_DEFAULT_ID = 1319;
 
+    private static final String CABLE_CLUSTER_TILE_ENTITY_TAG = "TileEntityCableClusterName";
+    public static int CABLE_CLUSTER_ID;
+    public static final String CABLE_CLUSTER_NAME_TAG = "BlockCableClusterName";
+    public static final String CABLE_CLUSTER_UNLOCALIZED_NAME = "BlockCableCluster";
+    public static final int CABLE_CLUSTER_DEFAULT_ID = 1320;
+
     public static BlockManager blockManager;
     public static BlockCable blockCable;
     public static BlockCableRelay blockCableRelay;
@@ -80,7 +90,10 @@ public final class Blocks {
     public static BlockCableIntake blockCableIntake;
     public static BlockCableBUD blockCableBUD;
     public static BlockCableBreaker blockCableBreaker;
+    public static BlockCableCluster blockCableCluster;
+
     public static CreativeTabs creativeTab;
+
 
     public static void init() {
         creativeTab = new CreativeTabs("sfm") {
@@ -100,30 +113,44 @@ public final class Blocks {
         blockCableRelay = new BlockCableRelay(CABLE_RELAY_ID);
         GameRegistry.registerBlock(blockCableRelay, ItemRelay.class, CABLE_RELAY_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityRelay.class, CABLE_RELAY_TILE_ENTITY_TAG);
+        ClusterRegistry.register(TileEntityRelay.class, blockCableRelay, new ItemStack(blockCableRelay, 1, 0));
+        ClusterRegistry.register(TileEntityRelay.class, blockCableRelay, new ItemStack(blockCableRelay, 1, 8));
 
         blockCableOutput = new BlockCableOutput(CABLE_OUTPUT_ID);
         GameRegistry.registerBlock(blockCableOutput, CABLE_OUTPUT_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityOutput.class, CABLE_OUTPUT_TILE_ENTITY_TAG);
+        ClusterRegistry.register(TileEntityOutput.class, blockCableOutput);
 
         blockCableInput = new BlockCableInput(CABLE_INPUT_ID);
         GameRegistry.registerBlock(blockCableInput, CABLE_INPUT_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityInput.class, CABLE_INPUT_TILE_ENTITY_TAG);
+        ClusterRegistry.register(TileEntityInput.class, blockCableInput);
 
         blockCableCreative = new BlockCableCreative(CABLE_CREATIVE_ID);
         GameRegistry.registerBlock(blockCableCreative, CABLE_CREATIVE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityCreative.class, CABLE_CREATIVE_TILE_ENTITY_TAG);
+        ClusterRegistry.register(TileEntityCreative.class, blockCableCreative);
 
         blockCableIntake = new BlockCableIntake(CABLE_INTAKE_ID);
         GameRegistry.registerBlock(blockCableIntake, ItemIntake.class, CABLE_INTAKE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityIntake.class, CABLE_INTAKE_TILE_ENTITY_TAG);
+        ClusterRegistry.register(TileEntityIntake.class, blockCableIntake, new ItemStack(blockCableIntake, 1, 0));
+        ClusterRegistry.register(TileEntityIntake.class, blockCableIntake, new ItemStack(blockCableIntake, 1, 8));
 
         blockCableBUD = new BlockCableBUD(CABLE_BUD_ID);
         GameRegistry.registerBlock(blockCableBUD, CABLE_BUD_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityBUD.class, CABLE_BUD_TILE_ENTITY_TAG);
+        ClusterRegistry.register(TileEntityBUD.class, blockCableBUD);
 
         blockCableBreaker = new BlockCableBreaker(CABLE_BREAKER_ID);
         GameRegistry.registerBlock(blockCableBreaker, CABLE_BREAKER_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityBreaker.class, CABLE_BREAKER_TILE_ENTITY_TAG);
+        ClusterRegistry.register(TileEntityBreaker.class, blockCableBreaker);
+
+        blockCableCluster = new BlockCableCluster(CABLE_CLUSTER_ID);
+        GameRegistry.registerBlock(blockCableCluster, ItemCluster.class, CABLE_CLUSTER_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityCluster.class, CABLE_CLUSTER_TILE_ENTITY_TAG);
+
     }
 
     public static void addRecipes() {
@@ -195,6 +222,8 @@ public final class Blocks {
                 new ItemStack(blockCableIntake, 1, 0),
                 Item.ingotGold
         );
+
+        GameRegistry.addRecipe(new ClusterRecipe());
     }
 
     private Blocks() {}

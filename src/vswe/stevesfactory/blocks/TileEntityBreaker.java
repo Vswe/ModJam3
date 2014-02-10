@@ -2,6 +2,7 @@ package vswe.stevesfactory.blocks;
 
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -13,10 +14,11 @@ import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ForgeHooks;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
-public class TileEntityBreaker extends TileEntity implements IInventory {
+public class TileEntityBreaker extends TileEntityClusterElement implements IInventory {
 
     private static final String FAKE_PLAYER_NAME = "[SFM_PLAYER]";
     private List<ItemStack> inventory;
@@ -270,5 +272,10 @@ public class TileEntityBreaker extends TileEntity implements IInventory {
 
     private boolean canBreakBlock(Block block, int x, int y, int z) {
         return block != null && block.blockID != Block.bedrock.blockID && block.getBlockHardness(worldObj, x, y, z) >= 0;
+    }
+
+    @Override
+    protected EnumSet<ClusterMethodRegistration> getRegistrations() {
+        return EnumSet.noneOf(ClusterMethodRegistration.class);
     }
 }

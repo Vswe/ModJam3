@@ -11,7 +11,7 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 
 
-public abstract class TileEntityInterface extends TileEntity {
+public interface ITileEntityInterface {
 
     public abstract Container getContainer(TileEntity te, InventoryPlayer inv);
     @SideOnly(Side.CLIENT)

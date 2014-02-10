@@ -1,5 +1,6 @@
 package vswe.stevesfactory.blocks;
 
+import net.minecraft.block.BlockContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -10,8 +11,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import java.util.EnumSet;
 
-public class TileEntityCreative extends TileEntity implements IInventory, IFluidHandler {
+
+public class TileEntityCreative extends TileEntityClusterElement implements IInventory, IFluidHandler {
 
 
     @Override
@@ -102,5 +105,10 @@ public class TileEntityCreative extends TileEntity implements IInventory, IFluid
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
         return true;
+    }
+
+    @Override
+    protected EnumSet<ClusterMethodRegistration> getRegistrations() {
+        return EnumSet.noneOf(ClusterMethodRegistration.class);
     }
 }

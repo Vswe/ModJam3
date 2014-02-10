@@ -52,13 +52,9 @@ public class BlockCableInput extends BlockContainer {
     }
 
     private void updateRedstone(World world, int x, int y, int z) {
-        if (!world.isRemote) {
-            TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
-            if (tileEntity != null && tileEntity instanceof TileEntityInput) {
-                TileEntityInput input = (TileEntityInput)tileEntity;
-
-                input.triggerRedstone();
-            }
+        TileEntityInput input = TileEntityCluster.getTileEntity(TileEntityInput.class, world, x, y, z);
+        if (input != null) {
+            input.triggerRedstone();
         }
     }
 }

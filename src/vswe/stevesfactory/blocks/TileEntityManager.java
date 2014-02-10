@@ -18,7 +18,7 @@ import vswe.stevesfactory.network.*;
 import java.util.*;
 
 
-public class TileEntityManager extends TileEntityInterface {
+public class TileEntityManager extends TileEntity implements ITileEntityInterface {
     public static final TriggerHelperRedstone redstoneTrigger = new TriggerHelperRedstone(3, 4);
     public static final TriggerHelperRedstone redstoneCondition = new TriggerHelperRedstone(1, 2);
     public static final TriggerHelperBUD budTrigger = new TriggerHelperBUD();
@@ -219,26 +219,20 @@ public class TileEntityManager extends TileEntityInterface {
 
                             if (!visited.contains(target) && inventories.size() < MAX_CONNECTED_INVENTORIES) {
                                 visited.add(target);
-                                ConnectionBlock connection = new ConnectionBlock(worldObj.getBlockTileEntity(target.getX(), target.getY(), target.getZ()), target.getDepth());
-                                boolean isValidConnection = false;
+                                TileEntity te = worldObj.getBlockTileEntity(target.getX(), target.getY(), target.getZ());
 
-                                for (ConnectionBlockType connectionBlockType : ConnectionBlockType.values()) {
-                                    if (connectionBlockType.isInstance(connection.getTileEntity())) {
-                                        isValidConnection = true;
-                                        connection.addType(connectionBlockType);
+                                if (te instanceof TileEntityCluster) {
+                                    for (TileEntityClusterElement tileEntityClusterElement : ((TileEntityCluster) te).getElements()) {
+                                        addInventory(tileEntityClusterElement, target);
                                     }
+                                }else{
+                                    addInventory(te, target);
                                 }
 
-                                if (isValidConnection) {
-                                    connection.setId(variables.length + inventories.size());
-                                    inventories.add(connection);
-                                    if (connection.getTileEntity() instanceof ISystemListener) {
-                                        ((ISystemListener)connection.getTileEntity()).added(this);
-                                    }
-                                }else if (element.getDepth() < MAX_CABLE_LENGTH){
-                                    if (worldObj.getBlockId(target.getX(), target.getY(), target.getZ()) == Blocks.blockCable.blockID) {
-                                        queue.add(target);
-                                    }
+
+
+                                if (element.getDepth() < MAX_CABLE_LENGTH && worldObj.getBlockId(target.getX(), target.getY(), target.getZ()) == Blocks.blockCable.blockID){
+                                     queue.add(target);
                                 }
                             }
                         }
@@ -277,6 +271,26 @@ public class TileEntityManager extends TileEntityInterface {
 
 
         firstInventoryUpdate = false;
+    }
+
+    private void addInventory(TileEntity te, WorldCoordinate target) {
+        ConnectionBlock connection = new ConnectionBlock(te, target.getDepth());
+        boolean isValidConnection = false;
+
+        for (ConnectionBlockType connectionBlockType : ConnectionBlockType.values()) {
+            if (connectionBlockType.isInstance(connection.getTileEntity())) {
+                isValidConnection = true;
+                connection.addType(connectionBlockType);
+            }
+        }
+
+        if (isValidConnection) {
+            connection.setId(variables.length + inventories.size());
+            inventories.add(connection);
+            if (connection.getTileEntity() instanceof ISystemListener) {
+                ((ISystemListener)connection.getTileEntity()).added(this);
+            }
+        }
     }
 
     private void updateInventorySelection(WorldCoordinate[] oldCoordinates) {

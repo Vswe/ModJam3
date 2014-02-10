@@ -1,5 +1,6 @@
 package vswe.stevesfactory.blocks;
 
+import net.minecraft.block.BlockContainer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -9,11 +10,12 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.ForgeDirection;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
 
-public class TileEntityIntake extends TileEntity implements IInventory {
+public class TileEntityIntake extends TileEntityClusterElement implements IInventory {
 
     private List<EntityItem> items;
 
@@ -171,5 +173,10 @@ public class TileEntityIntake extends TileEntity implements IInventory {
 
     private boolean canPickUp(EntityItem item) {
         return !item.isDead && (item.delayBeforeCanPickup == 0 || Blocks.blockCableIntake.isAdvanced(getBlockMetadata()));
+    }
+
+    @Override
+    protected EnumSet<ClusterMethodRegistration> getRegistrations() {
+        return EnumSet.of(ClusterMethodRegistration.ON_BLOCK_PLACED_BY);
     }
 }

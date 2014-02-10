@@ -1,18 +1,21 @@
 package vswe.stevesfactory.blocks;
 
+import net.minecraft.block.BlockContainer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 
-public class TileEntityInput extends TileEntity implements IRedstoneNode, ISystemListener, ITriggerNode {
+public class TileEntityInput extends TileEntityClusterElement implements IRedstoneNode, ISystemListener, ITriggerNode {
     private List<TileEntityManager> managerList = new ArrayList<TileEntityManager>();
     private int[] oldPowered = new int[ForgeDirection.VALID_DIRECTIONS.length];
     private int[] isPowered = new int[ForgeDirection.VALID_DIRECTIONS.length];
+
 
     @Override
     public void added(TileEntityManager owner) {
@@ -95,5 +98,10 @@ public class TileEntityInput extends TileEntity implements IRedstoneNode, ISyste
     @Override
     public int[] getOldData() {
         return oldPowered;
+    }
+
+    @Override
+    protected EnumSet<ClusterMethodRegistration> getRegistrations() {
+        return EnumSet.of(ClusterMethodRegistration.CAN_CONNECT_REDSTONE, ClusterMethodRegistration.ON_NEIGHBOR_BLOCK_CHANGED, ClusterMethodRegistration.ON_BLOCK_ADDED);
     }
 }

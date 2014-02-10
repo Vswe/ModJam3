@@ -64,6 +64,10 @@ public class BlockCableBreaker extends BlockContainer {
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
         int meta = BlockPistonBase.determineOrientation(world, x, y, z, entity);
-        world.setBlockMetadataWithNotify(x, y, z, meta, 2);
+
+        TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, x, y, z);
+        if (breaker != null) {
+            breaker.setMetaData(meta);
+        }
     }
 }

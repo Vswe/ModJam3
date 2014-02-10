@@ -47,16 +47,22 @@ public class BlockCableRelay extends BlockCableDirectionAdvanced {
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
         super.onBlockPlacedBy(world, x, y, z, entity, item);
 
-        if (isAdvanced(world.getBlockMetadata(x, y, z)) && !world.isRemote) {
-            TileEntityRelay relay = (TileEntityRelay)world.getBlockTileEntity(x, y, z);
+        TileEntityRelay relay = TileEntityCluster.getTileEntity(TileEntityRelay.class, world, x, y, z);
+        if (relay != null && isAdvanced(relay.getBlockMetadata()) && !world.isRemote) {
             relay.setOwner(entity);
         }
+    }
+
+    @Override
+    protected Class<? extends TileEntityClusterElement> getTeClass() {
+        return TileEntityRelay.class;
     }
 
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float xSide, float ySide, float zSide) {
-        if (isAdvanced(world.getBlockMetadata(x, y, z))) {
+        TileEntityRelay relay = TileEntityCluster.getTileEntity(TileEntityRelay.class, world, x, y, z);
+        if (relay != null && isAdvanced(relay.getBlockMetadata())) {
             if (!world.isRemote) {
                 FMLNetworkHandler.openGui(player, StevesFactoryManager.instance, 0, world, x, y, z);
             }

@@ -38,4 +38,9 @@ public class BlockCableIntake extends BlockCableDirectionAdvanced {
         return isAdvanced ? "cable_intake_instant" : "cable_intake";
     }
 
+    @Override
+    protected Class<? extends TileEntityClusterElement> getTeClass() {
+        return TileEntityIntake.class;
+    }
+
 }

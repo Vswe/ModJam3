@@ -12,8 +12,7 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.tileentity.TileEntity;
-import vswe.stevesfactory.blocks.TileEntityInterface;
-import vswe.stevesfactory.blocks.TileEntityManager;
+import vswe.stevesfactory.blocks.ITileEntityInterface;
 import vswe.stevesfactory.components.*;
 import vswe.stevesfactory.interfaces.ContainerBase;
 import vswe.stevesfactory.interfaces.ContainerManager;
@@ -43,7 +42,7 @@ public class PacketHandler implements IPacketHandler {
                 }
 
                 if (onServer) {
-                    ((ContainerBase) container).getTileEntity().onInventoryChanged();
+                    ((TileEntity)((ContainerBase) container).getTileEntity()).onInventoryChanged();
                 }
             }
         }else{
@@ -87,7 +86,7 @@ public class PacketHandler implements IPacketHandler {
     }
 
 
-    public static void sendAllData(Container container, ICrafting crafting, TileEntityInterface te) {
+    public static void sendAllData(Container container, ICrafting crafting, ITileEntityInterface te) {
         DataWriter dw = new DataWriter();
 
         dw.writeBoolean(true); //use container

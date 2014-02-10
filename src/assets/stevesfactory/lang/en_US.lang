@@ -13,6 +13,7 @@ tile.sfm.BlockCableIntake.name=Item Valve
 tile.sfm.BlockInstantCableIntake.name=Rapid Item Valve
 tile.sfm.BlockCableBUD.name=Block Detector
 tile.sfm.BlockCableBreaker.name=Block Gate
+tile.sfm.BlockCableCluster.name=Cable Cluster
 
 # ======================================
 #			COMPONENT TYPES

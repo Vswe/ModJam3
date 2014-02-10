@@ -3,6 +3,7 @@ package vswe.stevesfactory.blocks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,10 +19,11 @@ import vswe.stevesfactory.network.IPacketBlock;
 import vswe.stevesfactory.network.PacketHandler;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
-public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedstoneNode {
+public class TileEntityOutput extends TileEntityClusterElement implements IPacketBlock, IRedstoneNode {
 
     private int[] strengths;
     private boolean[] strong;
@@ -30,6 +32,7 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
     private boolean[] updatedStrong;
 
     public TileEntityOutput() {
+
         strengths = new int[ForgeDirection.VALID_DIRECTIONS.length];
         strong = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
 
@@ -127,7 +130,7 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
             }
         }
 
-        if (updateClient) {
+        if (updateClient && !isPartOfCluster()) {
             PacketHandler.sendBlockPacket(this, null, 0);
         }
     }
@@ -362,6 +365,10 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
 
     @SideOnly(Side.CLIENT)
     private void keepClientDataUpdated() {
+        if (isPartOfCluster()) {
+            return;
+        }
+
         double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
 
         if (distance > Math.pow(PacketHandler.BLOCK_UPDATE_RANGE, 2)) {
@@ -375,6 +382,11 @@ public class TileEntityOutput extends TileEntity implements IPacketBlock, IRedst
     @Override
     public int[] getPower() {
         return updatedStrength;
+    }
+
+    @Override
+    protected EnumSet<ClusterMethodRegistration> getRegistrations() {
+        return EnumSet.of(ClusterMethodRegistration.CAN_CONNECT_REDSTONE, ClusterMethodRegistration.SHOULD_CHECK_WEAK_POWER, ClusterMethodRegistration.IS_PROVIDING_WEAK_POWER, ClusterMethodRegistration.IS_PROVIDING_STRONG_POWER);
     }
 
     private class PulseTimer {

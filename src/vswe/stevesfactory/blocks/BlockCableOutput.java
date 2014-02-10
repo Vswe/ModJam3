@@ -83,12 +83,7 @@ public class BlockCableOutput extends BlockContainer {
     }
 
     private TileEntityOutput getTileEntity(IBlockAccess world, int x, int y, int z) {
-        TileEntity te = world.getBlockTileEntity(x, y, z);
-        if (te instanceof TileEntityOutput) {
-            return (TileEntityOutput)te;
-        }else{
-            return null;
-        }
+        return TileEntityCluster.getTileEntity(TileEntityOutput.class, world, x, y, z);
     }
 
     @Override

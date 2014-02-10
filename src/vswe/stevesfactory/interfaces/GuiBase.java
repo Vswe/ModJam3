@@ -21,6 +21,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import vswe.stevesfactory.StevesFactoryManager;
+import vswe.stevesfactory.blocks.TileEntityClusterElement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -137,6 +138,10 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
     }
 
     private ItemStack getItemStackFromBlock(TileEntity te) {
+        if (te instanceof TileEntityClusterElement) {
+            return ((TileEntityClusterElement)te).getItemStackFromBlock();
+        }
+
         World world = te.getWorldObj();
         Block block = te.getBlockType();
         if (world != null && block != null) {

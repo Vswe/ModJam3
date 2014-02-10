@@ -1,15 +1,17 @@
 package vswe.stevesfactory.blocks;
 
+import net.minecraft.block.BlockContainer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 
-public class TileEntityBUD extends TileEntity implements ISystemListener, ITriggerNode{
+public class TileEntityBUD extends TileEntityClusterElement implements ISystemListener, ITriggerNode{
     private List<TileEntityManager> managerList = new ArrayList<TileEntityManager>();
     private int[] oldData = new int[ForgeDirection.VALID_DIRECTIONS.length];
     private int[] data = new int[ForgeDirection.VALID_DIRECTIONS.length];
@@ -103,5 +105,10 @@ public class TileEntityBUD extends TileEntity implements ISystemListener, ITrigg
 
 
         nbtTagCompound.setTag(NBT_SIDES, sidesTag);
+    }
+
+    @Override
+    protected EnumSet<ClusterMethodRegistration> getRegistrations() {
+        return EnumSet.of(ClusterMethodRegistration.ON_NEIGHBOR_BLOCK_CHANGED);
     }
 }

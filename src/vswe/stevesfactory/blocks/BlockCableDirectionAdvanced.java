@@ -79,8 +79,14 @@ public abstract class BlockCableDirectionAdvanced extends BlockContainer {
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
         int meta = addAdvancedMeta(BlockPistonBase.determineOrientation(world, x, y, z, entity), item.getItemDamage());
-        world.setBlockMetadataWithNotify(x, y, z, meta, 2);
+
+        TileEntityClusterElement element = TileEntityCluster.getTileEntity(getTeClass(), world, x, y, z);
+        if (element != null) {
+            element.setMetaData(meta);
+        }
     }
+
+    protected abstract Class<? extends TileEntityClusterElement> getTeClass();
 
     @Override
     public void getSubBlocks(int id, CreativeTabs tabs, List list) {
@@ -102,11 +108,6 @@ public abstract class BlockCableDirectionAdvanced extends BlockContainer {
 
     private int getAdvancedMeta(int meta) {
         return addAdvancedMeta(0, meta);
-    }
-
-    @Override
-    public int getDamageValue(World world, int x, int y, int z) {
-        return getAdvancedMeta(world.getBlockMetadata(x, y, z));
     }
 
     @Override

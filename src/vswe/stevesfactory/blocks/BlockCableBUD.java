@@ -32,10 +32,8 @@ public class BlockCableBUD extends BlockContainer {
 
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, int id) {
-        TileEntity te = world.getBlockTileEntity(x, y, z);
-        if (te != null && te instanceof TileEntityBUD) {
-            TileEntityBUD bud = (TileEntityBUD)te;
-
+        TileEntityBUD bud = TileEntityCluster.getTileEntity(TileEntityBUD.class, world, x, y, z);
+        if (bud != null) {
             bud.onTrigger();
         }
     }

@@ -2,8 +2,8 @@ package vswe.stevesfactory.blocks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityHorse;
@@ -35,10 +35,11 @@ import vswe.stevesfactory.wrappers.InventoryWrapperHorse;
 import vswe.stevesfactory.wrappers.InventoryWrapperPlayer;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 
-public class TileEntityRelay extends TileEntityInterface implements IInventory, ISidedInventory, IFluidHandler {
+public class TileEntityRelay extends TileEntityClusterElement implements IInventory, ISidedInventory, IFluidHandler, ITileEntityInterface {
 
     private static final int MAX_CHAIN_LENGTH = 512;
     private int[] cachedAllSlots;
@@ -775,4 +776,8 @@ public class TileEntityRelay extends TileEntityInterface implements IInventory, 
         }
     }
 
+    @Override
+    protected EnumSet<ClusterMethodRegistration> getRegistrations() {
+        return EnumSet.of(ClusterMethodRegistration.ON_BLOCK_PLACED_BY, ClusterMethodRegistration.ON_BLOCK_ACTIVATED);
+    }
 }
