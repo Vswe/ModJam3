@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
@@ -66,6 +67,26 @@ public class BlockCableCluster extends BlockContainer {
 
     @Override
     public void breakBlock(World world, int x, int y, int z, int oldId, int oldMeta) {
+        ItemStack itemStack = getItemStack(world, x, y, z);
+
+        if (itemStack != null) {
+            dropBlockAsItem_do(world, x, y, z, itemStack);
+        }
+
+        super.breakBlock(world, x, y, z, oldId, oldMeta);
+    }
+
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
+        ItemStack itemStack = getItemStack(world, x, y, z);
+        if (itemStack != null) {
+            return itemStack;
+        }
+
+        return super.getPickBlock(target, world, x, y, z) ;
+    }
+
+    private ItemStack getItemStack(World world, int x, int y, int z) {
         TileEntity te = world.getBlockTileEntity(x, y, z);
 
         if (te != null && te instanceof  TileEntityCluster) {
@@ -76,12 +97,12 @@ public class BlockCableCluster extends BlockContainer {
             NBTTagCompound cable = new NBTTagCompound();
             compound.setCompoundTag(ItemCluster.NBT_CABLE, cable);
             cable.setByteArray(ItemCluster.NBT_TYPES, cluster.getTypes());
-
-            dropBlockAsItem_do(world, x, y, z, itemStack);
+            return itemStack;
         }
 
-        super.breakBlock(world, x, y, z, oldId, oldMeta);
+        return null;
     }
+
 
     @Override
     public ArrayList<ItemStack> getBlockDropped(World world, int x, int y, int z, int metadata, int fortune) {
