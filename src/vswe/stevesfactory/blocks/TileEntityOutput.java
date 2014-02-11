@@ -13,10 +13,7 @@ import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.components.ComponentMenuPulse;
 import vswe.stevesfactory.components.ComponentMenuRedstoneOutput;
 import vswe.stevesfactory.components.ComponentMenuRedstoneSidesEmitter;
-import vswe.stevesfactory.network.DataReader;
-import vswe.stevesfactory.network.DataWriter;
-import vswe.stevesfactory.network.IPacketBlock;
-import vswe.stevesfactory.network.PacketHandler;
+import vswe.stevesfactory.network.*;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -78,11 +75,13 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
                 updatedStrong[i] = sides.useStrongSignal();
 
 
-                if (((updatedStrength[i] > 0) != (oldStrength > 0)) || (oldStrong != updatedStrong[i])) {
+                /*if (((updatedStrength[i] > 0) != (oldStrength > 0)) || (oldStrong != updatedStrong[i])) {
+                    updateClient = true;
+                }*/
+                boolean updateBlocks = oldStrength != updatedStrength[i] || oldStrong != updatedStrong[i];
+                if (updateBlocks) {
                     updateClient = true;
                 }
-                boolean updateBlocks = oldStrength != updatedStrength[i] || oldStrong != updatedStrong[i];
-
 
 
 
@@ -273,6 +272,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
                 boolean isOn = updatedStrength[i] > 0;
                 dw.writeBoolean(isOn);
                 if (isOn) {
+                    dw.writeData(updatedStrength[i], DataBitHelper.MENU_REDSTONE_ANALOG);
                     dw.writeBoolean(updatedStrong[i]);
                 }
             }
@@ -289,9 +289,11 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
         }else{
             for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
                 boolean isOn = dr.readBoolean();
-                strengths[i] = isOn ? 15 : 0;
                 if (isOn) {
+                    strengths[i] = dr.readData(DataBitHelper.MENU_REDSTONE_ANALOG);
                     strong[i] = dr.readBoolean();
+                }else {
+                    strengths[i] = 0;
                 }
             }
             worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);

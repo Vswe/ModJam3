@@ -15,10 +15,10 @@ import net.minecraft.world.World;
 import vswe.stevesfactory.StevesFactoryManager;
 
 
-public class BlockCableCamouflage extends BlockContainer {
+public class BlockCableCamouflages extends BlockContainer {
 
 
-    protected BlockCableCamouflage(int id) {
+    protected BlockCableCamouflages(int id) {
         super(id, Material.iron);
         setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);

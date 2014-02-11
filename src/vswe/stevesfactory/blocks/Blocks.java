@@ -2,17 +2,10 @@ package vswe.stevesfactory.blocks;
 
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class Blocks {
 
@@ -97,7 +90,7 @@ public final class Blocks {
     public static BlockCableBUD blockCableBUD;
     public static BlockCableBreaker blockCableBreaker;
     public static BlockCableCluster blockCableCluster;
-    public static BlockCableCamouflage blockCableCamouflage;
+    public static BlockCableCamouflages blockCableCamouflage;
 
     public static CreativeTabs creativeTab;
 
@@ -158,7 +151,7 @@ public final class Blocks {
         GameRegistry.registerBlock(blockCableCluster, ItemCluster.class, CABLE_CLUSTER_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityCluster.class, CABLE_CLUSTER_TILE_ENTITY_TAG);
 
-        blockCableCamouflage = new BlockCableCamouflage(CABLE_CAMOUFLAGE_ID);
+        blockCableCamouflage = new BlockCableCamouflages(CABLE_CAMOUFLAGE_ID);
         GameRegistry.registerBlock(blockCableCamouflage, CABLE_CAMOUFLAGE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityCamouflage.class, CABLE_CAMOUFLAGE_TILE_ENTITY_TAG);
         ClusterRegistry.register(TileEntityCamouflage.class, blockCableCamouflage);
