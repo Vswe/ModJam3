@@ -9,8 +9,8 @@
 #				BLOCKS
 # ======================================
 
-tile.sfm.BlockMachineManager.name=Machineninventarmanager
-tile.sfm.BlockCable.name=Invaentarkabel
+tile.sfm.BlockMachineManager.name=Maschineninventarmanager
+tile.sfm.BlockCable.name=Inventarkabel
 tile.sfm.BlockCableRelay.name=Inventarrelais
 tile.sfm.BlockAdvancedCableRelay.name=Fortgeschrittenes Inventarrelais
 tile.sfm.BlockCableOutput.name=Redstone-Sender
@@ -18,7 +18,7 @@ tile.sfm.BlockCableInput.name=Redstone-Empfänger
 tile.sfm.BlockCableCreative.name=Kreativversorger
 tile.sfm.BlockCableIntake.name=Itemventil
 tile.sfm.BlockCableBUD.name=Blockdetector
-tile.sfm.BlockCableBreaker.name=Blockschranke
+tile.sfm.BlockCableBreaker.name=Blockgatter
 
 # ======================================
 #			COMPONENT TYPES
