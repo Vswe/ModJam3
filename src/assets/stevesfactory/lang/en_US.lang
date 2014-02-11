@@ -14,6 +14,7 @@ tile.sfm.BlockInstantCableIntake.name=Rapid Item Valve
 tile.sfm.BlockCableBUD.name=Block Detector
 tile.sfm.BlockCableBreaker.name=Block Gate
 tile.sfm.BlockCableCluster.name=Cable Cluster
+tile.sfm.BlockCableCamouflage.name=Cable Camouflage
 
 # ======================================
 #			COMPONENT TYPES
@@ -48,6 +49,8 @@ gui.sfm.GroupShort=Group
 gui.sfm.GroupLong=Command Group
 gui.sfm.NodeShort=Node
 gui.sfm.NodeLong=Group Node
+gui.sfm.CamouflageShort=Camouflage
+gui.sfm.CamouflageLong=Camouflage Updater
 
 # ======================================
 #			CONNECTION OPTIONS
@@ -298,6 +301,17 @@ gui.sfm.BlocksAway=blocks away
 gui.sfm.CableAway=cable away
 gui.sfm.CablesAway=cables away
 gui.sfm.EmptyCluster=Empty cluster
+gui.sfm.TypeCamouflage=Camouflage
+gui.sfm.CamouflageSidesInfo=Select which sides of the block where the camouflage should be updated
+gui.sfm.CamouflageSidesName=Sides
+gui.sfm.CamouflageItemMenu=Camouflage
+gui.sfm.CamouflageBlockMenu=Blocks
+gui.sfm.NoCamouflageBlocksError=No camouflage blocks selected
+gui.sfm.ClearCamouflage=Clear camo
+gui.sfm.SetCamouflage=Set camo
+gui.sfm.CamouflageInfo=Define whether to clear or set the camouflage. If you set the camouflage, define which block to set it to.
+gui.sfm.NoCamouflageSetting=No camouflage setting selected
+
 
 # ======================================
 #		  OTHER MANAGER INTERFACE

@@ -9,12 +9,15 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.StevesFactoryManager;
+
+import java.util.ArrayList;
 
 
 public class BlockCableCluster extends BlockContainer {
@@ -50,7 +53,39 @@ public class BlockCableCluster extends BlockContainer {
     public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
         int meta = world.getBlockMetadata(x, y, z);
 
+        TileEntity te = world.getBlockTileEntity(x, y, z);
+        if (te != null && te instanceof  TileEntityCluster) {
+            Icon icon = ((TileEntityCluster)te).getIcon(side);
+            if (icon != null) {
+                return icon;
+            }
+        }
+
         return getIconFromSideAndMeta(side, meta);
+    }
+
+    @Override
+    public void breakBlock(World world, int x, int y, int z, int oldId, int oldMeta) {
+        TileEntity te = world.getBlockTileEntity(x, y, z);
+
+        if (te != null && te instanceof  TileEntityCluster) {
+            TileEntityCluster cluster = (TileEntityCluster)te;
+            ItemStack itemStack = new ItemStack(Blocks.blockCableCluster, 1);
+            NBTTagCompound compound = new NBTTagCompound();
+            itemStack.setTagCompound(compound);
+            NBTTagCompound cable = new NBTTagCompound();
+            compound.setCompoundTag(ItemCluster.NBT_CABLE, cable);
+            cable.setByteArray(ItemCluster.NBT_TYPES, cluster.getTypes());
+
+            dropBlockAsItem_do(world, x, y, z, itemStack);
+        }
+
+        super.breakBlock(world, x, y, z, oldId, oldMeta);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getBlockDropped(World world, int x, int y, int z, int metadata, int fortune) {
+        return new ArrayList<ItemStack>(); //TODO Drop items here, not sure how to though since the TE is gone. please help
     }
 
     @SideOnly(Side.CLIENT)

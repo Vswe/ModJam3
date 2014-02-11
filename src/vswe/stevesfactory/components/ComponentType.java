@@ -48,7 +48,10 @@ public enum ComponentType {
             ComponentMenuGroup.class, ComponentMenuResult.class),
     NODE(14, Localization.NODE_SHORT, Localization.NODE_LONG,
             new ConnectionSet[]{ConnectionSet.INPUT_NODE, ConnectionSet.OUTPUT_NODE},
-            ComponentMenuResult.class);
+            ComponentMenuResult.class),
+    CAMOUFLAGE(15, Localization.CAMOUFLAGE_SHORT, Localization.CAMOUFLAGE_LONG,
+            new ConnectionSet[]{ConnectionSet.STANDARD},
+            ComponentMenuCamouflage.class, ComponentMenuCamouflageSides.class, ComponentMenuCamouflageItems.class, ComponentMenuResult.class);
 
 
 

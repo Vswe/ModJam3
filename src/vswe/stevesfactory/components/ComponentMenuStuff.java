@@ -117,7 +117,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             @Override
             protected void onClick(Setting setting, int button) {
                 selectedSetting = setting;
-                editSetting = button == 1;
+                editSetting = button == 1 && doAllowEdit();
 
 
                 if (editSetting && !selectedSetting.isValid()) {
@@ -168,6 +168,13 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     }
 
 
+    protected boolean doAllowEdit() {
+        return true;
+    }
+
+    protected boolean isListVisible() {
+        return true;
+    }
 
     protected static final int ITEM_SIZE = 16;
     protected static final int ITEM_SIZE_WITH_MARGIN = 20;
@@ -240,7 +247,9 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             if (!isSearching()) {
                 radioButtons.draw(gui, mX, mY);
             }
-            getScrollingList().draw(gui, mX, mY);
+            if (isListVisible()) {
+                getScrollingList().draw(gui, mX, mY);
+            }
         }
 
         if (selectedSetting != null) {
@@ -278,7 +287,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             }else if(inDeleteBounds(mX, mY)) {
                 gui.drawMouseOver(Localization.DELETE_ITEM_SELECTION.toString(), mX, mY);
             }
-        }else{
+        }else if (isListVisible()){
             getScrollingList().drawMouseOver(gui, mX, mY);
         }
 
@@ -309,7 +318,9 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             if (!isSearching()) {
                 radioButtons.onClick(mX, mY, button);
             }
-            getScrollingList().onClick(mX, mY, button);
+            if (isListVisible()) {
+                getScrollingList().onClick(mX, mY, button);
+            }
         }
 
         if (selectedSetting != null && inBackBounds(mX, mY)) {

@@ -81,6 +81,12 @@ public final class Blocks {
     public static final String CABLE_CLUSTER_UNLOCALIZED_NAME = "BlockCableCluster";
     public static final int CABLE_CLUSTER_DEFAULT_ID = 1320;
 
+    private static final String CABLE_CAMOUFLAGE_TILE_ENTITY_TAG = "TileEntityCableCamouflageName";
+    public static int CABLE_CAMOUFLAGE_ID;
+    public static final String CABLE_CAMOUFLAGE_NAME_TAG = "BlockCableCamouflageName";
+    public static final String CABLE_CAMOUFLAGE_UNLOCALIZED_NAME = "BlockCableCamouflage";
+    public static final int CABLE_CAMOUFLAGE_DEFAULT_ID = 1321;
+
     public static BlockManager blockManager;
     public static BlockCable blockCable;
     public static BlockCableRelay blockCableRelay;
@@ -91,6 +97,7 @@ public final class Blocks {
     public static BlockCableBUD blockCableBUD;
     public static BlockCableBreaker blockCableBreaker;
     public static BlockCableCluster blockCableCluster;
+    public static BlockCableCamouflage blockCableCamouflage;
 
     public static CreativeTabs creativeTab;
 
@@ -151,6 +158,10 @@ public final class Blocks {
         GameRegistry.registerBlock(blockCableCluster, ItemCluster.class, CABLE_CLUSTER_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityCluster.class, CABLE_CLUSTER_TILE_ENTITY_TAG);
 
+        blockCableCamouflage = new BlockCableCamouflage(CABLE_CAMOUFLAGE_ID);
+        GameRegistry.registerBlock(blockCableCamouflage, CABLE_CAMOUFLAGE_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntityCamouflage.class, CABLE_CAMOUFLAGE_TILE_ENTITY_TAG);
+        ClusterRegistry.register(TileEntityCamouflage.class, blockCableCamouflage);
     }
 
     public static void addRecipes() {
@@ -221,6 +232,20 @@ public final class Blocks {
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableIntake, 1, 8),
                 new ItemStack(blockCableIntake, 1, 0),
                 Item.ingotGold
+        );
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableCluster, 1),
+                blockCable,
+                Item.enderPearl,
+                Item.enderPearl,
+                Item.enderPearl
+        );
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableCamouflage, 1),
+                blockCable,
+                new ItemStack(Block.cloth, 1, 14),
+                new ItemStack(Block.cloth, 1, 13),
+                new ItemStack(Block.cloth, 1, 11)
         );
 
         GameRegistry.addRecipe(new ClusterRecipe());

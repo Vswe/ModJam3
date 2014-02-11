@@ -186,6 +186,24 @@ public class CommandExecutor {
                         }
                     }
                     return;
+                case CAMOUFLAGE:
+                    List<SlotInventoryHolder> camouflage = getCamouflage(command.getMenus().get(0));
+                    if (camouflage != null) {
+                        ComponentMenuCamouflageSides sides =  (ComponentMenuCamouflageSides)command.getMenus().get(1);
+                        ComponentMenuCamouflageItems items =  (ComponentMenuCamouflageItems)command.getMenus().get(2);
+
+                        if (items.isFirstRadioButtonSelected() || items.getSettings().get(0).isValid()) {
+                            ItemStack itemStack = items.isFirstRadioButtonSelected() ? null : ((ItemSetting)items.getSettings().get(0)).getItem();
+                            for (SlotInventoryHolder slotInventoryHolder : camouflage) {
+                                for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
+                                    if (sides.isSideRequired(i)) {
+                                        slotInventoryHolder.getCamouflage().setItem(itemStack, i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
             }
 
 
@@ -212,6 +230,10 @@ public class CommandExecutor {
 
     private List<SlotInventoryHolder> getNodes(ComponentMenu componentMenu) {
         return getContainers(manager, componentMenu, ConnectionBlockType.NODE);
+    }
+
+    private List<SlotInventoryHolder> getCamouflage(ComponentMenu componentMenu) {
+        return getContainers(manager, componentMenu, ConnectionBlockType.CAMOUFLAGE);
     }
 
     private List<SlotInventoryHolder> getTiles(ComponentMenu componentMenu) {

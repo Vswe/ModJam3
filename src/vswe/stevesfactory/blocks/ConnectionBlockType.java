@@ -11,7 +11,8 @@ public enum ConnectionBlockType {
     EMITTER(Localization.TYPE_EMITTER, TileEntityOutput.class, false),
     RECEIVER(Localization.TYPE_RECEIVER, TileEntityInput.class, false),
     NODE(Localization.TYPE_NODE, IRedstoneNode.class, true),
-    BUD(Localization.TYPE_BUD, TileEntityBUD.class, false);
+    BUD(Localization.TYPE_BUD, TileEntityBUD.class, false),
+    CAMOUFLAGE(Localization.TYPE_CAMOUFLAGE, TileEntityCamouflage.class, false);
 
     private Localization name;
     private Class clazz;

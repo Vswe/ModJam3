@@ -35,7 +35,9 @@ public class ComponentMenuContainerTypes extends ComponentMenu {
         checkBoxes = new CheckBoxList();
         for (int i = 0; i  < types.size(); i++) {
             final int id = i;
-            checkBoxes.addCheckBox(new CheckBox(types.get(i).getName(), CHECK_BOX_X, CHECK_BOX_Y + CHECK_BOX_SPACING * i) {
+            int x = i % 2;
+            int y = i / 2;
+            checkBoxes.addCheckBox(new CheckBox(types.get(i).getName(), CHECK_BOX_X + CHECK_BOX_SPACING_X * x, CHECK_BOX_Y + CHECK_BOX_SPACING_Y * y) {
                 @Override
                 public void setValue(boolean val) {
                     checked[id] = val;
@@ -65,7 +67,9 @@ public class ComponentMenuContainerTypes extends ComponentMenu {
 
     private static final int CHECK_BOX_X = 5;
     private static final int CHECK_BOX_Y = 5;
-    private static final int CHECK_BOX_SPACING = 12;
+    private static final int CHECK_BOX_SPACING_X = 55;
+    private static final int CHECK_BOX_SPACING_Y = 12;
+
 
     private List<ConnectionBlockType> types;
     private boolean[] checked;

@@ -49,6 +49,10 @@ public class SlotInventoryHolder {
         return (TileEntityBUD)inventory;
     }
 
+    public TileEntityCamouflage getCamouflage() {
+        return (TileEntityCamouflage)inventory;
+    }
+
     public Map<Integer, SlotSideTarget> getValidSlots() {
         if (validSlots == null) {
             validSlots = new HashMap<Integer, SlotSideTarget>();
