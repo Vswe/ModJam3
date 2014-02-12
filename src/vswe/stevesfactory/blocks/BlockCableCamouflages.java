@@ -54,4 +54,9 @@ public class BlockCableCamouflages extends BlockContainer {
 
         return super.getBlockTexture(world, x, y, z, side);
     }
+
+    @Override
+    public boolean isOpaqueCube() {
+        return false;
+    }
 }

@@ -214,5 +214,8 @@ public class BlockCableCluster extends BlockContainer {
         return false;
     }
 
-
+    @Override
+    public boolean isOpaqueCube() {
+        return false;
+    }
 }
