@@ -187,11 +187,22 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
         });
 
-        buttons.add(new Button(Localization.SELECT_INVERT_SHORT, Page.MAIN, Localization.SELECT_INVERT_LONG, false, 106, 60) {
+        buttons.add(new Button(Localization.SELECT_INVERT_SHORT, Page.MAIN, Localization.SELECT_INVERT_LONG, false, 102, 60) {
             @Override
             void onClick() {
                 for (IContainerSelection iContainerSelection : scrollController.getResult()) {
                     scrollController.onClick(iContainerSelection, 0);
+                }
+            }
+        });
+
+        buttons.add(new Button(Localization.SELECT_VARIABLE_SHORT, Page.MAIN, Localization.SELECT_VARIABLE_LONG, false, 111, 60) {
+            @Override
+            void onClick() {
+                if (scrollController.getText().equals(".var")) {
+                    scrollController.setText(".all");
+                }else{
+                    scrollController.setText(".var");
                 }
             }
         });

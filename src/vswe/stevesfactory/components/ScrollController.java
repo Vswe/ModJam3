@@ -3,6 +3,7 @@ package vswe.stevesfactory.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import sun.security.util.BigInt;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.GuiManager;
@@ -248,6 +249,15 @@ public  abstract class ScrollController<T> {
 
     public List<T> getResult() {
         return result;
+    }
+
+    public void setText(String s) {
+        textBox.setText(s);
+        updateSearch();
+    }
+
+    public String getText() {
+        return textBox.getText();
     }
 
 

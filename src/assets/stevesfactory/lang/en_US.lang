@@ -311,7 +311,8 @@ gui.sfm.ClearCamouflage=Clear camo
 gui.sfm.SetCamouflage=Set camo
 gui.sfm.CamouflageInfo=Define whether to clear or set the camouflage. If you set the camouflage, define which block to set it to.
 gui.sfm.NoCamouflageSetting=No camouflage setting selected
-
+gui.sfm.SelectVariableShort=V
+gui.sfm.SelectVariableLong=Show all variables
 
 # ======================================
 #		  OTHER MANAGER INTERFACE
