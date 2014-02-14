@@ -293,7 +293,7 @@ public class CommandExecutor {
 
     private static boolean containsTe(List<SlotInventoryHolder> lst, TileEntity te) {
         for (SlotInventoryHolder slotInventoryHolder : lst) {
-            if (slotInventoryHolder.getTile().xCoord == te.xCoord && slotInventoryHolder.getTile().yCoord == te.yCoord && slotInventoryHolder.getTile().zCoord == te.zCoord) {
+            if (slotInventoryHolder.getTile().xCoord == te.xCoord && slotInventoryHolder.getTile().yCoord == te.yCoord && slotInventoryHolder.getTile().zCoord == te.zCoord && slotInventoryHolder.getTile().getClass().equals(te.getClass())) {
                 return true;
             }
         }
