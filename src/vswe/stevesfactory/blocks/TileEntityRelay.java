@@ -2,16 +2,19 @@ package vswe.stevesfactory.blocks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -47,6 +50,8 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
     private int chainLength;
     private Entity[] cachedEntities = new Entity[2];
     private InventoryWrapper cachedInventoryWrapper;
+    private EntityPlayerMP player;
+    private List playerInventoryCache;
 
     //used by the advanced version
     private List<UserPermission> permissions = new ArrayList<UserPermission>();
@@ -409,7 +414,6 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
         }
     }
 
-
     @Override
     public void onInventoryChanged() {
         //super.onInventoryChanged();
@@ -419,6 +423,8 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
             if (inventory != null) {
                 inventory.onInventoryChanged();
             }
+
+
         }finally {
             unBlockUsage();
         }
@@ -505,8 +511,13 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
     }
 
     private InventoryWrapper getInventoryWrapper(Entity entity) {
-        if (entity instanceof EntityPlayer) {
-            return new InventoryWrapperPlayer((EntityPlayer)entity);
+        if (entity instanceof EntityPlayerMP) {
+            player = (EntityPlayerMP)entity;
+            if (player != null && player.openContainer != null && player.openContainer.equals(player.inventoryContainer)) {
+                playerInventoryCache = new ArrayList(player.openContainer.inventoryItemStacks);
+                player.playerInventoryBeingManipulated = true;
+            }
+            return new InventoryWrapperPlayer(player);
         }else if(entity instanceof EntityHorse) {
             return new InventoryWrapperHorse((EntityHorse)entity);
         }else{
@@ -532,6 +543,31 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
         cachedEntities[0] = null;
         cachedEntities[1] = null;
         cachedInventoryWrapper = null;
+
+        if (!worldObj.isRemote && playerInventoryCache != null && player != null  && player.inventoryContainer != null) {
+            player.inventoryContainer.inventoryItemStacks = playerInventoryCache;
+            player.inventoryContainer.detectAndSendChanges();
+            if (player.openContainer != null && !player.openContainer.equals(player.inventoryContainer)) {
+                player.openContainer.inventoryItemStacks.clear();
+                for (Object inventorySlot : player.openContainer.inventorySlots) {
+                    Slot slot = (Slot)inventorySlot;
+                    ItemStack itemStack;
+                    if (slot.getHasStack()) {
+                        itemStack = null;
+                    }else{
+                        itemStack = new ItemStack(Block.stone);
+                    }
+
+                    player.openContainer.inventoryItemStacks.add(itemStack);
+                }
+                player.openContainer.detectAndSendChanges();
+            }
+
+            player.playerInventoryBeingManipulated = false;
+        }
+
+        playerInventoryCache = null;
+        player = null;
     }
 
     public boolean allowPlayerInteraction(EntityPlayer player) {
