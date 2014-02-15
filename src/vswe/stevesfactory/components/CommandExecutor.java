@@ -197,6 +197,7 @@ public class CommandExecutor {
                         if (items.isFirstRadioButtonSelected() || items.getSettings().get(0).isValid()) {
                             ItemStack itemStack = items.isFirstRadioButtonSelected() ? null : ((ItemSetting)items.getSettings().get(0)).getItem();
                             for (SlotInventoryHolder slotInventoryHolder : camouflage) {
+                                slotInventoryHolder.getCamouflage().setBounds(shape);
                                 for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
                                     if (sides.isSideRequired(i)) {
                                         slotInventoryHolder.getCamouflage().setItem(itemStack, i, inside.getCurrentType());

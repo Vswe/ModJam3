@@ -50,8 +50,8 @@ public class ClusterRecipe implements IRecipe {
                 if (item != null && item.itemID != Blocks.blockCableCluster.blockID) {
                     boolean validItem = false;
                     for (int j = 0; j < ClusterRegistry.getRegistryList().size(); j++) {
-                        if (item.isItemEqual(ClusterRegistry.getRegistryList().get(j).getItemStack(false))) {
-                            if (types.contains(j) || types.contains(ClusterRegistry.getRegistryList().get(j).getParentId()) || types.contains(ClusterRegistry.getRegistryList().get(j).getChildId())) {
+                        if (item.isItemEqual(ClusterRegistry.getRegistryList().get(j).getItemStack())) {
+                            if (ClusterRegistry.getRegistryList().get(j).isChainPresentIn(types)) {
                                 return false; //duplicate item
                             }
                             types.add(j);

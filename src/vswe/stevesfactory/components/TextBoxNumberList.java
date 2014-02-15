@@ -86,6 +86,8 @@ public class TextBoxNumberList {
         textBoxes.add(textBox);
     }
 
-
+    public TextBoxNumber getTextBox(int id) {
+        return textBoxes.get(id);
+    }
 
 }

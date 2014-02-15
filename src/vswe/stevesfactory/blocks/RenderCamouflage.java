@@ -83,8 +83,8 @@ public class RenderCamouflage implements ISimpleBlockRenderingHandler {
             float minY = (float)block.getBlockBoundsMinY();
             float minZ = (float)block.getBlockBoundsMinZ();
 
-            float f = 0.0001F;
-            float f2 = 0.00015F;
+            float f = 0.0015F;
+            float f2 = 0.002F;
             block.setBlockBounds(maxX + f2, maxY - f, maxZ + f2, minX - f2, minY + f, minZ - f2);
             renderer.setRenderBoundsFromBlock(block);
             renderer.renderFaceYNeg(block, x, y, z, camouflage.getIconWithDefault(world, x, y, z, camoBlock, 1, true));

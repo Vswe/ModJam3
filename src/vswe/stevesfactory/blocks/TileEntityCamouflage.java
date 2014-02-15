@@ -13,6 +13,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.components.ComponentMenuCamouflageInside;
+import vswe.stevesfactory.components.ComponentMenuCamouflageShape;
 import vswe.stevesfactory.network.*;
 
 import java.util.EnumSet;
@@ -53,11 +54,51 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     }
 
     public void setBlockBounds(BlockCamouflageBase blockCamouflageBase) {
-        blockCamouflageBase.setBlockBounds(0, 0, 0, 1, 0.5F, 1);
+        blockCamouflageBase.setBlockBounds(bounds[0] / 32F, bounds[2] / 32F, bounds[4] / 32F, bounds[1] / 32F, bounds[3] / 32F, bounds[5] / 32F);
     }
 
+    public boolean isUseCollision() {
+        return useCollision;
+    }
+
+    public boolean isFullCollision() {
+        return fullCollision;
+    }
+
+    private boolean useCollision = true;
+    private boolean fullCollision = false;
+    private int[] bounds = {0, 32, 0, 32, 0, 32};
     private int[] ids = new int[ForgeDirection.VALID_DIRECTIONS.length * 2];
     private int[] metas = new int[ForgeDirection.VALID_DIRECTIONS.length * 2];
+
+    public void setBounds(ComponentMenuCamouflageShape menu) {
+        if (menu.shouldUpdate()) {
+            if (menu.isUseCollision() != useCollision) {
+                useCollision = menu.isUseCollision();
+                isServerDirty = true;
+            }
+
+            if (menu.isFullCollision() != fullCollision) {
+                fullCollision = menu.isFullCollision();
+                isServerDirty = true;
+            }
+
+            for (int i = 0; i < bounds.length; i++) {
+                if (bounds[i] != menu.getBounds(i)) {
+                    bounds[i] = menu.getBounds(i);
+                    isServerDirty = true;
+                }
+            }
+
+            for (int i = 0; i < bounds.length; i+=2) {
+                if (bounds[i] > bounds[i + 1]) {
+                    int tmp = bounds[i + 1];
+                    bounds[i + 1] = bounds[i];
+                    bounds[i] = tmp;
+                }
+            }
+        }
+    }
 
     public void setItem(ItemStack item, int side, ComponentMenuCamouflageInside.InsideSetType type) {
         switch (type) {
@@ -124,16 +165,42 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
         return EnumSet.of(ClusterMethodRegistration.ON_BLOCK_PLACED_BY);
     }
 
+    private int getSideCount() {
+        return getCamouflageType().useDoubleRendering() ? ids.length : ids.length / 2;
+    }
+
     @Override
     public void writeData(DataWriter dw, EntityPlayer player, boolean onServer, int id) {
         if (onServer) {
-            for (int i = 0; i < ids.length; i++) {
+            for (int i = 0; i < getSideCount(); i++) {
                 if (ids[i] == 0) {
                     dw.writeBoolean(false);
                 }else{
                     dw.writeBoolean(true);
                     dw.writeData(ids[i], DataBitHelper.BLOCK_ID);
                     dw.writeData(metas[i], DataBitHelper.BLOCK_META);
+                }
+            }
+            if (getCamouflageType().useSpecialShape()){
+                dw.writeBoolean(useCollision);
+                if (useCollision) {
+                    dw.writeBoolean(fullCollision);
+                }
+                for (int bound : bounds) {
+                    //This is done since 0 and 32 are the most common values and the final bit would only be used by 32 anyways
+                    //0 -> 01
+                    //32 -> 11
+                    //1 to 31 ->  bin(bound) << 1
+
+                    if (bound == 0) {
+                        dw.writeBoolean(true);
+                        dw.writeBoolean(false);
+                    }else if(bound == 32) {
+                        dw.writeBoolean(true);
+                        dw.writeBoolean(true);
+                    }else{
+                        dw.writeData(bound << 1, DataBitHelper.CAMOUFLAGE_BOUNDS.getBitCount());
+                    }
                 }
             }
         }else{
@@ -147,13 +214,34 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
             //respond by sending the data to the client that required it
             PacketHandler.sendBlockPacket(this, player, 0);
         }else{
-            for (int i = 0; i < ids.length; i++) {
+            for (int i = 0; i < getSideCount(); i++) {
                 if (!dr.readBoolean()) {
                     ids[i] = 0;
                     metas[i] = 0;
                 }else{
                     ids[i] = dr.readData(DataBitHelper.BLOCK_ID);
                     metas[i] = dr.readData(DataBitHelper.BLOCK_META);
+                }
+            }
+            if (getCamouflageType().useSpecialShape()) {
+                useCollision = dr.readBoolean();
+                if (useCollision) {
+                    fullCollision = dr.readBoolean();
+                }else{
+                    fullCollision = false;
+                }
+
+                for (int i = 0; i < bounds.length; i++) {
+                    //This is done since 0 and 32 are the most common values and the final bit would only be used by 32 anyways
+                    //0 -> 01
+                    //32 -> 11
+                    //1 to 31 ->  bin(bound) << 1
+
+                    if (dr.readBoolean()) {
+                        bounds[i] = dr.readBoolean() ? 32 : 0;
+                    }else{
+                        bounds[i] = dr.readData(DataBitHelper.CAMOUFLAGE_BOUNDS.getBitCount() - 1);
+                    }
                 }
             }
             worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
@@ -200,7 +288,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     @Override
     protected void writeContentToNBT(NBTTagCompound tagCompound) {
         NBTTagList list = new NBTTagList();
-        for (int i = 0; i < ids.length; i++) {
+        for (int i = 0; i < getSideCount(); i++) {
             NBTTagCompound element = new NBTTagCompound();
 
             element.setShort(NBT_ID, (short) ids[i]);

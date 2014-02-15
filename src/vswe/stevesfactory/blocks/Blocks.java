@@ -114,8 +114,8 @@ public final class Blocks {
         blockCableRelay = new BlockCableRelay(CABLE_RELAY_ID);
         GameRegistry.registerBlock(blockCableRelay, ItemRelay.class, CABLE_RELAY_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityRelay.class, CABLE_RELAY_TILE_ENTITY_TAG);
-        ClusterRegistry.register(TileEntityRelay.class, blockCableRelay, new ItemStack(blockCableRelay, 1, 0));
-        ClusterRegistry.register(TileEntityRelay.class, blockCableRelay, new ItemStack(blockCableRelay, 1, 8));
+        ClusterRegistry.register(new ClusterRegistry.ClusterRegistryAdvancedSensitive(TileEntityRelay.class, blockCableRelay, new ItemStack(blockCableRelay, 1, 0)));
+        ClusterRegistry.register(new ClusterRegistry.ClusterRegistryAdvancedSensitive(TileEntityRelay.class, blockCableRelay, new ItemStack(blockCableRelay, 1, 8)));
 
         blockCableOutput = new BlockCableOutput(CABLE_OUTPUT_ID);
         GameRegistry.registerBlock(blockCableOutput, CABLE_OUTPUT_NAME_TAG);
@@ -135,8 +135,8 @@ public final class Blocks {
         blockCableIntake = new BlockCableIntake(CABLE_INTAKE_ID);
         GameRegistry.registerBlock(blockCableIntake, ItemIntake.class, CABLE_INTAKE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityIntake.class, CABLE_INTAKE_TILE_ENTITY_TAG);
-        ClusterRegistry.register(TileEntityIntake.class, blockCableIntake, new ItemStack(blockCableIntake, 1, 0));
-        ClusterRegistry.register(TileEntityIntake.class, blockCableIntake, new ItemStack(blockCableIntake, 1, 8));
+        ClusterRegistry.register(new ClusterRegistry.ClusterRegistryAdvancedSensitive(TileEntityIntake.class, blockCableIntake, new ItemStack(blockCableIntake, 1, 0)));
+        ClusterRegistry.register(new ClusterRegistry.ClusterRegistryAdvancedSensitive(TileEntityIntake.class, blockCableIntake, new ItemStack(blockCableIntake, 1, 8)));
 
         blockCableBUD = new BlockCableBUD(CABLE_BUD_ID);
         GameRegistry.registerBlock(blockCableBUD, CABLE_BUD_NAME_TAG);
@@ -155,9 +155,10 @@ public final class Blocks {
         blockCableCamouflage = new BlockCableCamouflages(CABLE_CAMOUFLAGE_ID);
         GameRegistry.registerBlock(blockCableCamouflage, ItemCamouflage.class, CABLE_CAMOUFLAGE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityCamouflage.class, CABLE_CAMOUFLAGE_TILE_ENTITY_TAG);
-        ClusterRegistry.register(TileEntityCamouflage.class, blockCableCamouflage);
 
-        //TODO register new camouflage blocks
+        ClusterRegistry.register(new ClusterRegistry.ClusterRegistryMetaSensitive(TileEntityCamouflage.class, blockCableCamouflage, new ItemStack(blockCableCamouflage, 1, 0)));
+        ClusterRegistry.register(new ClusterRegistry.ClusterRegistryMetaSensitive(TileEntityCamouflage.class, blockCableCamouflage, new ItemStack(blockCableCamouflage, 1, 1)));
+        ClusterRegistry.register(new ClusterRegistry.ClusterRegistryMetaSensitive(TileEntityCamouflage.class, blockCableCamouflage, new ItemStack(blockCableCamouflage, 1, 2)));
     }
 
     public static void addRecipes() {

@@ -18,7 +18,7 @@ public abstract class TileEntityClusterElement extends TileEntity {
     }
 
     public ItemStack getItemStackFromBlock() {
-        return registryElement.getItemStack(Blocks.blockCableRelay.isAdvanced(getBlockMetadata()));
+        return registryElement.getItemStack(getBlockMetadata());
     }
 
     public boolean isPartOfCluster() {

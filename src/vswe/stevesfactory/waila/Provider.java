@@ -52,7 +52,7 @@ public class Provider implements IWailaDataProvider {
                     TileEntityCluster cluster = (TileEntityCluster)te;
 
                     for (byte type : cluster.getTypes()) {
-                        currenttip.add(ClusterRegistry.getRegistryList().get(type).getItemStack(false).getDisplayName());
+                        currenttip.add(ClusterRegistry.getRegistryList().get(type).getItemStack().getDisplayName());
                     }
                 }else if(te instanceof TileEntityOutput) {
                     TileEntityOutput emitter = (TileEntityOutput)te;

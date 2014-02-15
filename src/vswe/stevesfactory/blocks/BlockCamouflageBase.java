@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
@@ -12,7 +13,11 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import java.util.List;
+
 public abstract class BlockCamouflageBase extends BlockContainer {
+    public static boolean test;
+
     protected BlockCamouflageBase(int id, Material material) {
         super(id, material);
     }
@@ -27,6 +32,15 @@ public abstract class BlockCamouflageBase extends BlockContainer {
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
         setBlockBoundsBasedOnState(world, x, y, z);
+
+        TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, world, x, y, z);
+        if (camouflage != null && camouflage.getCamouflageType().useSpecialShape()) {
+            if (!camouflage.isUseCollision()) {
+                return null;
+            }else if(camouflage.isFullCollision()) {
+                setBlockBoundsForItemRender();
+            }
+        }
         return super.getCollisionBoundingBoxFromPool(world, x, y, z);
     }
 
@@ -45,6 +59,8 @@ public abstract class BlockCamouflageBase extends BlockContainer {
             setBlockBoundsForItemRender();
         }
     }
+
+
 
     @Override
     public void setBlockBoundsForItemRender() {

@@ -108,7 +108,7 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
 
     public void onBlockPlacedBy(EntityLivingBase entity, ItemStack itemStack) {
         for (ClusterRegistry blockContainer :  getRegistrations(ClusterMethodRegistration.ON_BLOCK_PLACED_BY)) {
-            blockContainer.getBlock().onBlockPlacedBy(worldObj, xCoord, yCoord, zCoord, entity, blockContainer.getItemStack(false));
+            blockContainer.getBlock().onBlockPlacedBy(worldObj, xCoord, yCoord, zCoord, entity, blockContainer.getItemStack());
         }
     }
 

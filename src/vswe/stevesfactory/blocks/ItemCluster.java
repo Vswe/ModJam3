@@ -41,7 +41,7 @@ public class ItemCluster extends ItemBlock {
             NBTTagCompound cable = compound.getCompoundTag(NBT_CABLE);
             byte[] types = cable.getByteArray(ItemCluster.NBT_TYPES);
             for (byte type : types) {
-                list.add(ClusterRegistry.getRegistryList().get(type).getItemStack(false).getDisplayName());
+                list.add(ClusterRegistry.getRegistryList().get(type).getItemStack().getDisplayName());
             }
         }else{
             list.add(Localization.EMPTY_CLUSTER.toString());

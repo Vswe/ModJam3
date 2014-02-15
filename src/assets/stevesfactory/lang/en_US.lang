@@ -15,6 +15,8 @@ tile.sfm.BlockCableBUD.name=Block Detector
 tile.sfm.BlockCableBreaker.name=Block Gate
 tile.sfm.BlockCableCluster.name=Cable Cluster
 tile.sfm.BlockCableCamouflage.name=Cable Camouflage
+tile.sfm.BlockCableInsideCamouflage.name=Cable Camouflage 2
+tile.sfm.BlockCableShapeCamouflage.name=Cable Camouflage 3
 
 # ======================================
 #			COMPONENT TYPES
@@ -318,7 +320,10 @@ gui.sfm.CamouflageOnlyInside=Only inside
 gui.sfm.CamouflageOppositeInside=Inverted inside
 gui.sfm.CamouflageSameInside=Both
 gui.sfm.CamouflageNoUpdate=Don't update
-
+gui.sfm.CamouflageBoundsUse=Update bounds
+gui.sfm.CamouflageCollisionUse=Collision
+gui.sfm.CamouflageCollisionFull=Full collision
+gui.sfm.To=to
 
 # ======================================
 #		  OTHER MANAGER INTERFACE
