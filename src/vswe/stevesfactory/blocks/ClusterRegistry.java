@@ -16,6 +16,7 @@ public class ClusterRegistry {
     private Class<? extends TileEntityClusterElement> clazz;
     private BlockContainer block;
     private ItemStack itemStack;
+    //TODO make this handle longer chains than 2 properly
     private ClusterRegistry nextSubRegistry;
     private ClusterRegistry prevSubRegistry;
     private int id;

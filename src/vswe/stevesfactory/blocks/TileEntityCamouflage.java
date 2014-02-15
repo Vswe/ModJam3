@@ -10,7 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Icon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.ForgeDirection;
+import vswe.stevesfactory.components.ComponentMenuCamouflageInside;
 import vswe.stevesfactory.network.*;
 
 import java.util.EnumSet;
@@ -18,10 +20,75 @@ import java.util.EnumSet;
 
 public class TileEntityCamouflage extends TileEntityClusterElement implements IPacketBlock {
 
-    private int[] ids = new int[ForgeDirection.VALID_DIRECTIONS.length];
-    private int[] metas = new int[ForgeDirection.VALID_DIRECTIONS.length];
+    public enum CamouflageType {
+        NORMAL("BlockCableCamouflage", false, false),
+        INSIDE("BlockCableInsideCamouflage", true, false),
+        SHAPE("BlockCableShapeCamouflage", true, true);
 
-    public void setItem(ItemStack item, int side) {
+        private String unlocalized;
+        private boolean useDouble;
+        private boolean useShape;
+
+        private CamouflageType(String unlocalized, boolean useDouble, boolean useShape) {
+            this.unlocalized = unlocalized;
+            this.useDouble = useDouble;
+            this.useShape = useShape;
+        }
+
+        public String getUnlocalized() {
+            return unlocalized;
+        }
+
+        public boolean useDoubleRendering() {
+            return useDouble;
+        }
+
+        public boolean useSpecialShape() {
+            return useShape;
+        }
+    }
+
+    public CamouflageType getCamouflageType() {
+        return CamouflageType.values()[Blocks.blockCableCamouflage.getId(getBlockMetadata())];
+    }
+
+    public void setBlockBounds(BlockCamouflageBase blockCamouflageBase) {
+        blockCamouflageBase.setBlockBounds(0, 0, 0, 1, 0.5F, 1);
+    }
+
+    private int[] ids = new int[ForgeDirection.VALID_DIRECTIONS.length * 2];
+    private int[] metas = new int[ForgeDirection.VALID_DIRECTIONS.length * 2];
+
+    public void setItem(ItemStack item, int side, ComponentMenuCamouflageInside.InsideSetType type) {
+        switch (type) {
+            case ONLY_OUTSIDE:
+                setItem(item, side);
+                break;
+            case ONLY_INSIDE:
+                setItemForInside(item, side + ForgeDirection.VALID_DIRECTIONS.length);
+                break;
+            case SAME:
+                setItem(item, side);
+                setItemForInside(item, side + ForgeDirection.VALID_DIRECTIONS.length);
+                break;
+            case OPPOSITE:
+                setItem(item, side);
+                int sidePair = side / 3;
+                int sidePairInternalId = side % 3;
+                int insideSide = sidePair * 3 + (sidePairInternalId == 0 ? 1 : 0);
+                setItemForInside(item, insideSide + ForgeDirection.VALID_DIRECTIONS.length);
+                break;
+            default:
+        }
+    }
+
+    private void setItemForInside(ItemStack item, int side) {
+        if (getCamouflageType().useDoubleRendering()) {
+            setItem(item, side);
+        }
+    }
+
+    private void setItem(ItemStack item, int side) {
         int oldId = ids[side];
         int oldMeta = metas[side];
 
@@ -54,7 +121,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
 
     @Override
     protected EnumSet<ClusterMethodRegistration> getRegistrations() {
-        return EnumSet.noneOf(ClusterMethodRegistration.class);
+        return EnumSet.of(ClusterMethodRegistration.ON_BLOCK_PLACED_BY);
     }
 
     @Override
@@ -157,7 +224,11 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     }
 
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(int side) {
+    private Icon getIcon(int side, boolean inside) {
+        if (inside) {
+            side += ForgeDirection.VALID_DIRECTIONS.length;
+        }
+
         Block block = Block.blocksList[ids[side]];
         if (block != null) {
             try {
@@ -168,5 +239,15 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
             }catch (Exception ignored) {}
         }
         return null;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public Icon getIconWithDefault(IBlockAccess world, int x, int y, int z, BlockCamouflageBase block, int side, boolean inside) {
+        Icon icon = getIcon(side, inside);
+        if (icon == null) {
+            icon = block.getDefaultIcon(side, world.getBlockMetadata(x, y, z)); //here we actually want to fetch the meta data of the block, rather then getting the tile entity version
+        }
+
+        return icon;
     }
 }

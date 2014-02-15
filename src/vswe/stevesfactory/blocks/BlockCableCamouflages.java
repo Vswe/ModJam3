@@ -4,8 +4,11 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -14,15 +17,16 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import vswe.stevesfactory.StevesFactoryManager;
 
+import java.util.List;
 
-public class BlockCableCamouflages extends BlockContainer {
+
+public class BlockCableCamouflages extends BlockCamouflageBase {
 
 
     protected BlockCableCamouflages(int id) {
         super(id, Material.iron);
         setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
-        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + Blocks.CABLE_CAMOUFLAGE_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
 
@@ -41,22 +45,31 @@ public class BlockCableCamouflages extends BlockContainer {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
-        TileEntityCamouflage te = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, world, x, y, z);
-
-        if (te != null) {
-            Icon icon = te.getIcon(side);
-
-            if (icon != null) {
-                return icon;
-            }
-        }
-
-        return super.getBlockTexture(world, x, y, z, side);
+    protected Icon getDefaultIcon(int side, int meta) {
+        return blockIcon;
     }
 
     @Override
-    public boolean isOpaqueCube() {
-        return false;
+    public void getSubBlocks(int id, CreativeTabs tabs, List list) {
+        for (int i = 0; i < TileEntityCamouflage.CamouflageType.values().length; i++) {
+            list.add(new ItemStack(id, 1, i));
+        }
+    }
+
+    public int getId(int meta) {
+        return meta % TileEntityCamouflage.CamouflageType.values().length;
+    }
+
+    @Override
+    public int damageDropped(int meta) {
+        return meta;
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
+        TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, world, x, y, z);
+        if (camouflage != null) {
+            camouflage.setMetaData(item.getItemDamage());
+        }
     }
 }

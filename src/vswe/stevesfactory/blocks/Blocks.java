@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 
 public final class Blocks {
 
-    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 9;
+    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 10;
     public static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
 
     private static final String MANAGER_TILE_ENTITY_TAG = "TileEntityMachineManagerName";
@@ -77,8 +77,8 @@ public final class Blocks {
     private static final String CABLE_CAMOUFLAGE_TILE_ENTITY_TAG = "TileEntityCableCamouflageName";
     public static int CABLE_CAMOUFLAGE_ID;
     public static final String CABLE_CAMOUFLAGE_NAME_TAG = "BlockCableCamouflageName";
-    public static final String CABLE_CAMOUFLAGE_UNLOCALIZED_NAME = "BlockCableCamouflage";
     public static final int CABLE_CAMOUFLAGE_DEFAULT_ID = 1321;
+    public static int CAMOUFLAGE_RENDER_ID;
 
     public static BlockManager blockManager;
     public static BlockCable blockCable;
@@ -93,6 +93,7 @@ public final class Blocks {
     public static BlockCableCamouflages blockCableCamouflage;
 
     public static CreativeTabs creativeTab;
+
 
 
     public static void init() {
@@ -152,9 +153,11 @@ public final class Blocks {
         GameRegistry.registerTileEntity(TileEntityCluster.class, CABLE_CLUSTER_TILE_ENTITY_TAG);
 
         blockCableCamouflage = new BlockCableCamouflages(CABLE_CAMOUFLAGE_ID);
-        GameRegistry.registerBlock(blockCableCamouflage, CABLE_CAMOUFLAGE_NAME_TAG);
+        GameRegistry.registerBlock(blockCableCamouflage, ItemCamouflage.class, CABLE_CAMOUFLAGE_NAME_TAG);
         GameRegistry.registerTileEntity(TileEntityCamouflage.class, CABLE_CAMOUFLAGE_TILE_ENTITY_TAG);
         ClusterRegistry.register(TileEntityCamouflage.class, blockCableCamouflage);
+
+        //TODO register new camouflage blocks
     }
 
     public static void addRecipes() {

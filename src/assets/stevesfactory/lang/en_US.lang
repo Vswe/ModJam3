@@ -313,6 +313,12 @@ gui.sfm.CamouflageInfo=Define whether to clear or set the camouflage. If you set
 gui.sfm.NoCamouflageSetting=No camouflage setting selected
 gui.sfm.SelectVariableShort=V
 gui.sfm.SelectVariableLong=Show all variables
+gui.sfm.CamouflageOnlyOutside=Only outside
+gui.sfm.CamouflageOnlyInside=Only inside
+gui.sfm.CamouflageOppositeInside=Inverted inside
+gui.sfm.CamouflageSameInside=Both
+gui.sfm.CamouflageNoUpdate=Don't update
+
 
 # ======================================
 #		  OTHER MANAGER INTERFACE

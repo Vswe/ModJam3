@@ -1309,6 +1309,11 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                     menuId++;
                 }
 
+                //added two extra menus to the camouflage updater
+                if (component.type == ComponentType.CAMOUFLAGE && i == 1 && version < 10) {
+                    menuId += 2;
+                }
+
                 component.menus.get(menuId).readFromNBT(menuTag, version, pickup);
                 menuId++;
             }

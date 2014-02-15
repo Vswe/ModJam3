@@ -64,7 +64,8 @@ public enum DataBitHelper {
     BUD_SYNC_SUB_TYPE_LONG(3),
     BUD_SYNC_SUB_TYPE_SHORT(2),
 
-    CLUSTER_SUB_ID(4);
+    CLUSTER_SUB_ID(4),
+    CAMOUFLAGE_INSIDE(3);
 
 
 

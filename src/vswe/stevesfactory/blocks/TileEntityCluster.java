@@ -52,15 +52,6 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         }
     }
 
-    @SideOnly(Side.CLIENT)
-    public Icon getIcon(int side) {
-        if (camouflageObject == null) {
-            return null;
-        }else{
-            return camouflageObject.getIcon(side);
-        }
-    }
-
     private void loadElements(byte[] types) {
         registryList.clear();
         elements.clear();

@@ -189,15 +189,17 @@ public class CommandExecutor {
                 case CAMOUFLAGE:
                     List<SlotInventoryHolder> camouflage = getCamouflage(command.getMenus().get(0));
                     if (camouflage != null) {
-                        ComponentMenuCamouflageSides sides =  (ComponentMenuCamouflageSides)command.getMenus().get(1);
-                        ComponentMenuCamouflageItems items =  (ComponentMenuCamouflageItems)command.getMenus().get(2);
+                        ComponentMenuCamouflageShape shape =  (ComponentMenuCamouflageShape)command.getMenus().get(1);
+                        ComponentMenuCamouflageInside inside =  (ComponentMenuCamouflageInside)command.getMenus().get(2);
+                        ComponentMenuCamouflageSides sides =  (ComponentMenuCamouflageSides)command.getMenus().get(3);
+                        ComponentMenuCamouflageItems items =  (ComponentMenuCamouflageItems)command.getMenus().get(4);
 
                         if (items.isFirstRadioButtonSelected() || items.getSettings().get(0).isValid()) {
                             ItemStack itemStack = items.isFirstRadioButtonSelected() ? null : ((ItemSetting)items.getSettings().get(0)).getItem();
                             for (SlotInventoryHolder slotInventoryHolder : camouflage) {
                                 for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
                                     if (sides.isSideRequired(i)) {
-                                        slotInventoryHolder.getCamouflage().setItem(itemStack, i);
+                                        slotInventoryHolder.getCamouflage().setItem(itemStack, i, inside.getCurrentType());
                                     }
                                 }
                             }

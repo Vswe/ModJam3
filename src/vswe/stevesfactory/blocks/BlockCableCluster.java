@@ -21,7 +21,7 @@ import vswe.stevesfactory.StevesFactoryManager;
 import java.util.ArrayList;
 
 
-public class BlockCableCluster extends BlockContainer {
+public class BlockCableCluster extends BlockCamouflageBase {
     protected BlockCableCluster(int id) {
         super(id, Material.iron);
         setCreativeTab(Blocks.creativeTab);
@@ -51,17 +51,7 @@ public class BlockCableCluster extends BlockContainer {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
-        int meta = world.getBlockMetadata(x, y, z);
-
-        TileEntity te = world.getBlockTileEntity(x, y, z);
-        if (te != null && te instanceof  TileEntityCluster) {
-            Icon icon = ((TileEntityCluster)te).getIcon(side);
-            if (icon != null) {
-                return icon;
-            }
-        }
-
+    public Icon getDefaultIcon(int side, int meta) {
         return getIconFromSideAndMeta(side, meta);
     }
 
@@ -214,8 +204,5 @@ public class BlockCableCluster extends BlockContainer {
         return false;
     }
 
-    @Override
-    public boolean isOpaqueCube() {
-        return false;
-    }
+
 }

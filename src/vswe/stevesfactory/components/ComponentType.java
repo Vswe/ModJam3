@@ -51,7 +51,7 @@ public enum ComponentType {
             ComponentMenuResult.class),
     CAMOUFLAGE(15, Localization.CAMOUFLAGE_SHORT, Localization.CAMOUFLAGE_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuCamouflage.class, ComponentMenuCamouflageSides.class, ComponentMenuCamouflageItems.class, ComponentMenuResult.class);
+            ComponentMenuCamouflage.class, ComponentMenuCamouflageShape.class, ComponentMenuCamouflageInside.class, ComponentMenuCamouflageSides.class, ComponentMenuCamouflageItems.class, ComponentMenuResult.class);
 
 
 

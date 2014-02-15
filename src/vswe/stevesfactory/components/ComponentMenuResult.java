@@ -146,4 +146,9 @@ public class ComponentMenuResult extends ComponentMenu {
         nbtTagCompound.setByte(NBT_SELECTED, (byte)radioButtons.getSelectedOption());
     }
 
+
+    @Override
+    public boolean isVisible() {
+        return sets.length > 1;
+    }
 }
