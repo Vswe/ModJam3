@@ -29,7 +29,7 @@ public abstract class ComponentMenuCamouflageAdvanced extends ComponentMenu {
     @Override
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
         if (CollisionHelper.inBounds(ERROR_X, ERROR_Y, ERROR_SIZE_W, ERROR_SIZE_H, mX , mY)) {
-            gui.drawMouseOver(getWarningText(), mX, mY);
+            gui.drawMouseOver(getWarningText(), mX, mY, 200);
         }
     }
 

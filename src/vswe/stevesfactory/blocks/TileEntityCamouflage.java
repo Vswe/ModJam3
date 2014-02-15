@@ -78,7 +78,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     private int[] metas = new int[ForgeDirection.VALID_DIRECTIONS.length * 2];
 
     public void setBounds(ComponentMenuCamouflageShape menu) {
-        if (menu.shouldUpdate()) {
+        if (getCamouflageType().useSpecialShape() && menu.shouldUpdate()) {
             if (menu.isUseCollision() != useCollision) {
                 useCollision = menu.isUseCollision();
                 isServerDirty = true;

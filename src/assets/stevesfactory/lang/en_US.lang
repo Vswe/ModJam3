@@ -15,8 +15,8 @@ tile.sfm.BlockCableBUD.name=Block Detector
 tile.sfm.BlockCableBreaker.name=Block Gate
 tile.sfm.BlockCableCluster.name=Cable Cluster
 tile.sfm.BlockCableCamouflage.name=Cable Camouflage
-tile.sfm.BlockCableInsideCamouflage.name=Cable Camouflage 2
-tile.sfm.BlockCableShapeCamouflage.name=Cable Camouflage 3
+tile.sfm.BlockCableInsideCamouflage.name=Double Sided Cable Camouflage
+tile.sfm.BlockCableShapeCamouflage.name=Transforming Cable Camouflage
 
 # ======================================
 #			COMPONENT TYPES
@@ -326,8 +326,8 @@ gui.sfm.CamouflageCollisionFull=Full collision
 gui.sfm.To=to
 gui.sfm.BoundsMenu=Bounds
 gui.sfm.InsideMenu=Inside
-gui.sfm.BoundsWarning=Bounds
-gui.sfm.InsideWarning=Inside
+gui.sfm.BoundsWarning=The collision and bounds can only be updated in Transforming Cable Camouflages
+gui.sfm.InsideWarning=The inside camouflage can only be updated in Double Sided Cable Camouflages and their upgrades
 
 # ======================================
 #		  OTHER MANAGER INTERFACE

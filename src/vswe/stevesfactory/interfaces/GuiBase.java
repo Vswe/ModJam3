@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL12;
 import vswe.stevesfactory.StevesFactoryManager;
 import vswe.stevesfactory.blocks.TileEntityClusterElement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -101,6 +102,29 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
 
     public void drawString(String str, int x, int y, int color) {
         drawString(str, x, y, 1F, color);
+    }
+
+    public void drawMouseOver(String str, int x, int y, int width) {
+        List lst = new ArrayList<String>();
+        String[] words = str.split(" ");
+        String line = "";
+        for (String word : words) {
+            String newLine;
+            if (line.equals("")) {
+                newLine = word;
+            }else{
+                newLine = line + " " + word;
+            }
+            if (getStringWidth(newLine) < width) {
+                line = newLine;
+            }else{
+                lst.add(line);
+                line = word;
+            }
+        }
+        lst.add(line);
+
+        drawMouseOver(lst, x, y);
     }
 
     public void drawMouseOver(String str, int x, int y) {
