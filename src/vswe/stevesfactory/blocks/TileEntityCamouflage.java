@@ -120,9 +120,8 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
                 break;
             case OPPOSITE:
                 setItem(item, side);
-                int sidePair = side / 3;
-                int sidePairInternalId = side % 3;
-                int insideSide = sidePair * 3 + (sidePairInternalId == 0 ? 1 : 0);
+                int sidePairInternalId = side % 2;
+                int insideSide = side + (sidePairInternalId == 0 ? 1 : -1);
                 setItemForInside(item, insideSide + ForgeDirection.VALID_DIRECTIONS.length);
                 break;
             default:
@@ -290,6 +289,14 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     private static final String NBT_SIDES = "Sides";
     private static final String NBT_ID = "Id";
     private static final String NBT_META = "Meta";
+    private static final String NBT_COLLISION = "Collision";
+    private static final String NBT_FULL = "Full";
+    private static final String NBT_MIN_X = "MinX";
+    private static final String NBT_MAX_X = "MaxX";
+    private static final String NBT_MIN_Y = "MinY";
+    private static final String NBT_MAX_Y = "MaxY";
+    private static final String NBT_MIN_Z = "MinZ";
+    private static final String NBT_MAX_Z = "MaxZ";
 
     @Override
     protected void writeContentToNBT(NBTTagCompound tagCompound) {
@@ -302,8 +309,21 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
 
             list.appendTag(element);
         }
-
         tagCompound.setTag(NBT_SIDES, list);
+
+        if (getCamouflageType().useSpecialShape()) {
+            tagCompound.setBoolean(NBT_COLLISION, useCollision);
+            tagCompound.setBoolean(NBT_FULL, fullCollision);
+
+            tagCompound.setByte(NBT_MIN_X, (byte)bounds[0]);
+            tagCompound.setByte(NBT_MAX_X, (byte)bounds[1]);
+            tagCompound.setByte(NBT_MIN_Y, (byte)bounds[2]);
+            tagCompound.setByte(NBT_MAX_Y, (byte)bounds[3]);
+            tagCompound.setByte(NBT_MIN_Z, (byte)bounds[4]);
+            tagCompound.setByte(NBT_MAX_Z, (byte)bounds[5]);
+        }
+
+
     }
 
     @Override
@@ -314,6 +334,18 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
 
             ids[i] = element.getShort(NBT_ID);
             metas[i] = element.getByte(NBT_META);
+        }
+
+        if (tagCompound.hasKey(NBT_COLLISION)) {
+            useCollision = tagCompound.getBoolean(NBT_COLLISION);
+            fullCollision = tagCompound.getBoolean(NBT_FULL);
+
+            bounds[0] = tagCompound.getByte(NBT_MIN_X);
+            bounds[1] = tagCompound.getByte(NBT_MAX_X);
+            bounds[2] = tagCompound.getByte(NBT_MIN_Y);
+            bounds[3] = tagCompound.getByte(NBT_MAX_Y);
+            bounds[4] = tagCompound.getByte(NBT_MIN_Z);
+            bounds[5] = tagCompound.getByte(NBT_MAX_Z);
         }
     }
 
