@@ -51,8 +51,8 @@ public class BlockCableCluster extends BlockCamouflageBase {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public Icon getDefaultIcon(int side, int meta) {
-        return getIconFromSideAndMeta(side, meta);
+    public Icon getDefaultIcon(int side, int blockMeta, int camoMeta) {
+        return getIconFromSideAndMeta(side, blockMeta);
     }
 
     @Override

@@ -94,5 +94,5 @@ public abstract class BlockCamouflageBase extends BlockContainer {
     }
 
     @SideOnly(Side.CLIENT)
-    protected abstract Icon getDefaultIcon(int side, int meta);
+    protected abstract Icon getDefaultIcon(int side, int blockMeta, int camoMeta);
 }

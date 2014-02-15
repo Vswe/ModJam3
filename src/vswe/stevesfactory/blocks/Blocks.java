@@ -238,11 +238,23 @@ public final class Blocks {
                 Item.enderPearl
         );
 
-        GameRegistry.addShapelessRecipe(new ItemStack(blockCableCamouflage, 1),
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableCamouflage, 1, 0),
                 blockCable,
                 new ItemStack(Block.cloth, 1, 14),
                 new ItemStack(Block.cloth, 1, 13),
                 new ItemStack(Block.cloth, 1, 11)
+        );
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableCamouflage, 1, 1),
+                new ItemStack(blockCableCamouflage, 1, 0),
+                new ItemStack(blockCableCamouflage, 1, 0),
+                Block.fenceIron,
+                Block.fenceIron
+        );
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableCamouflage, 1, 2),
+                new ItemStack(blockCableCamouflage, 1, 1),
+                Block.pistonStickyBase
         );
 
         GameRegistry.addRecipe(new ClusterRecipe());

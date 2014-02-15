@@ -62,8 +62,8 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     private static final int ERROR_Y = 8;
     private static final int ERROR_SIZE_W = 2;
     private static final int ERROR_SIZE_H = 10;
-    private static final int ERROR_SRC_X = 62;
-    private static final int ERROR_SRC_Y = 20;
+    private static final int ERROR_SRC_X = 42;
+    private static final int ERROR_SRC_Y = 212;
 
     private static final int NODE_SRC_X = 120;
     private static final int NODE_SRC_Y = 152;

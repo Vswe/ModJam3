@@ -22,22 +22,28 @@ import java.util.EnumSet;
 public class TileEntityCamouflage extends TileEntityClusterElement implements IPacketBlock {
 
     public enum CamouflageType {
-        NORMAL("BlockCableCamouflage", false, false),
-        INSIDE("BlockCableInsideCamouflage", true, false),
-        SHAPE("BlockCableShapeCamouflage", true, true);
+        NORMAL("BlockCableCamouflage", "cable_camo", false, false),
+        INSIDE("BlockCableInsideCamouflage", "cable_camo_inside", true, false),
+        SHAPE("BlockCableShapeCamouflage", "cable_camo_shape", true, true);
 
         private String unlocalized;
+        private String icon;
         private boolean useDouble;
         private boolean useShape;
 
-        private CamouflageType(String unlocalized, boolean useDouble, boolean useShape) {
+        private CamouflageType(String unlocalized, String icon, boolean useDouble, boolean useShape) {
             this.unlocalized = unlocalized;
+            this.icon = icon;
             this.useDouble = useDouble;
             this.useShape = useShape;
         }
 
         public String getUnlocalized() {
             return unlocalized;
+        }
+
+        public String getIcon() {
+            return icon;
         }
 
         public boolean useDoubleRendering() {
@@ -333,7 +339,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     public Icon getIconWithDefault(IBlockAccess world, int x, int y, int z, BlockCamouflageBase block, int side, boolean inside) {
         Icon icon = getIcon(side, inside);
         if (icon == null) {
-            icon = block.getDefaultIcon(side, world.getBlockMetadata(x, y, z)); //here we actually want to fetch the meta data of the block, rather then getting the tile entity version
+            icon = block.getDefaultIcon(side, world.getBlockMetadata(x, y, z), getBlockMetadata()); //here we actually want to fetch the meta data of the block, rather then getting the tile entity version
         }
 
         return icon;

@@ -35,18 +35,27 @@ public class BlockCableCamouflages extends BlockCamouflageBase {
         return new TileEntityCamouflage();
     }
 
-
+    @SideOnly(Side.CLIENT)
+    private Icon[] icons;
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerIcons(IconRegister register) {
-        blockIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_camo");
+        icons = new Icon[TileEntityCamouflage.CamouflageType.values().length];
+        for (int i = 0; i < icons.length; i++) {
+            icons[i] = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":" + TileEntityCamouflage.CamouflageType.values()[i].getIcon());
+        }
+    }
+    @SideOnly(Side.CLIENT)
+    @Override
+    public Icon getIcon(int side, int meta) {
+        return getDefaultIcon(side, meta, meta);
     }
 
     @SideOnly(Side.CLIENT)
     @Override
-    protected Icon getDefaultIcon(int side, int meta) {
-        return blockIcon;
+    protected Icon getDefaultIcon(int side, int blockMeta, int camoMeta) {
+        return icons[camoMeta % icons.length];
     }
 
     @Override

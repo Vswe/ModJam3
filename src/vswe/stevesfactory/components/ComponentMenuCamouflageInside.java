@@ -40,12 +40,12 @@ public class ComponentMenuCamouflageInside extends ComponentMenuCamouflageAdvanc
 
     @Override
     protected String getWarningText() {
-        return null;  //TODO
+        return Localization.INSIDE_WARNING.toString();
     }
 
     @Override
     public String getName() {
-        return "Inside"; //TODO localization
+        return Localization.INSIDE_MENU.toString();
     }
 
     @SideOnly(Side.CLIENT)

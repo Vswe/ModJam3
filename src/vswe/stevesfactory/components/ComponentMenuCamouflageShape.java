@@ -167,12 +167,12 @@ public class ComponentMenuCamouflageShape extends ComponentMenuCamouflageAdvance
 
     @Override
     protected String getWarningText() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return Localization.BOUNDS_WARNING.toString();
     }
 
     @Override
     public String getName() {
-        return "Bounds"; //TODO localization
+        return Localization.BOUNDS_MENU.toString();
     }
     private Localization[] coordinates = {Localization.X, Localization.Y, Localization.Z};
 

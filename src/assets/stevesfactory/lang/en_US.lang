@@ -324,6 +324,10 @@ gui.sfm.CamouflageBoundsUse=Update bounds
 gui.sfm.CamouflageCollisionUse=Collision
 gui.sfm.CamouflageCollisionFull=Full collision
 gui.sfm.To=to
+gui.sfm.BoundsMenu=Bounds
+gui.sfm.InsideMenu=Inside
+gui.sfm.BoundsWarning=Bounds
+gui.sfm.InsideWarning=Inside
 
 # ======================================
 #		  OTHER MANAGER INTERFACE
