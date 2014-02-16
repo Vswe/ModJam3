@@ -133,7 +133,7 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
 
     @Override
     public String getInvName() {
-        return Blocks.blockCable.getLocalizedName();
+        return Blocks.blockCableIntake.getLocalizedName();
     }
 
     @Override

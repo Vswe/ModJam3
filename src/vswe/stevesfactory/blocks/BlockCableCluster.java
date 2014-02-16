@@ -6,6 +6,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -19,6 +20,7 @@ import net.minecraftforge.common.ForgeDirection;
 import vswe.stevesfactory.StevesFactoryManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class BlockCableCluster extends BlockCamouflageBase {
@@ -26,27 +28,34 @@ public class BlockCableCluster extends BlockCamouflageBase {
         super(id, Material.iron);
         setCreativeTab(Blocks.creativeTab);
         setStepSound(soundMetalFootstep);
-        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + Blocks.CABLE_CLUSTER_UNLOCALIZED_NAME);
         setHardness(2F);
     }
 
 
 
     @SideOnly(Side.CLIENT)
+    private Icon sideIcon;
+    @SideOnly(Side.CLIENT)
     private Icon frontIcon;
+    @SideOnly(Side.CLIENT)
+    private Icon sideIconAdv;
+    @SideOnly(Side.CLIENT)
+    private Icon frontIconAdv;
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerIcons(IconRegister register) {
-        blockIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_cluster");
+        sideIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_cluster");
         frontIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_cluster_front");
+        sideIconAdv = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_cluster_adv");
+        frontIconAdv = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_cluster_adv_front");
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public Icon getIcon(int side, int meta) {
         //pretend the meta is 3
-        return getIconFromSideAndMeta(side, 3);
+        return getIconFromSideAndMeta(side, addAdvancedMeta(3, meta));
     }
 
     @SideOnly(Side.CLIENT)
@@ -57,18 +66,22 @@ public class BlockCableCluster extends BlockCamouflageBase {
 
     @Override
     public void breakBlock(World world, int x, int y, int z, int oldId, int oldMeta) {
-        ItemStack itemStack = getItemStack(world, x, y, z);
+        ItemStack itemStack = getItemStack(world, x, y, z, oldMeta);
 
         if (itemStack != null) {
             dropBlockAsItem_do(world, x, y, z, itemStack);
         }
 
         super.breakBlock(world, x, y, z, oldId, oldMeta);
+
+        if (isAdvanced(world.getBlockMetadata(x, y, z))) {
+            Blocks.blockCable.updateInventories(world, x, y, z);
+        }
     }
 
     @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
-        ItemStack itemStack = getItemStack(world, x, y, z);
+        ItemStack itemStack = getItemStack(world, x, y, z, world.getBlockMetadata(x, y, z));
         if (itemStack != null) {
             return itemStack;
         }
@@ -76,12 +89,12 @@ public class BlockCableCluster extends BlockCamouflageBase {
         return super.getPickBlock(target, world, x, y, z) ;
     }
 
-    private ItemStack getItemStack(World world, int x, int y, int z) {
+    private ItemStack getItemStack(World world, int x, int y, int z, int meta) {
         TileEntity te = world.getBlockTileEntity(x, y, z);
 
         if (te != null && te instanceof  TileEntityCluster) {
             TileEntityCluster cluster = (TileEntityCluster)te;
-            ItemStack itemStack = new ItemStack(Blocks.blockCableCluster, 1);
+            ItemStack itemStack = new ItemStack(Blocks.blockCableCluster, 1, damageDropped(meta));
             NBTTagCompound compound = new NBTTagCompound();
             itemStack.setTagCompound(compound);
             NBTTagCompound cable = new NBTTagCompound();
@@ -101,7 +114,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
 
     @SideOnly(Side.CLIENT)
     private Icon getIconFromSideAndMeta(int side, int meta) {
-        return side == meta % ForgeDirection.VALID_DIRECTIONS.length ? frontIcon : blockIcon;
+        return side == getSideMeta(meta) % ForgeDirection.VALID_DIRECTIONS.length ? isAdvanced(meta) ? frontIconAdv : frontIcon : isAdvanced(meta) ? sideIconAdv : sideIcon;
     }
 
     @Override
@@ -119,7 +132,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
 
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemStack) {
-        int meta = BlockPistonBase.determineOrientation(world, x, y, z, entity);
+        int meta = addAdvancedMeta(BlockPistonBase.determineOrientation(world, x, y, z, entity), itemStack.getItemDamage());
         world.setBlockMetadataWithNotify(x, y, z, meta, 2);
 
         TileEntityCluster cluster = getTe(world, x, y, z);
@@ -137,6 +150,10 @@ public class BlockCableCluster extends BlockCamouflageBase {
 
         if (cluster != null) {
             cluster.onNeighborBlockChange(id);
+        }
+
+        if (isAdvanced(world.getBlockMetadata(x, y, z))) {
+            Blocks.blockCable.updateInventories(world, x, y, z);
         }
     }
 
@@ -157,6 +174,10 @@ public class BlockCableCluster extends BlockCamouflageBase {
 
         if (cluster != null) {
             cluster.onBlockAdded();
+        }
+
+        if (isAdvanced(world.getBlockMetadata(x, y, z))) {
+            Blocks.blockCable.updateInventories(world, x, y, z);
         }
     }
 
@@ -204,5 +225,33 @@ public class BlockCableCluster extends BlockCamouflageBase {
         return false;
     }
 
+
+
+    @Override
+    public void getSubBlocks(int id, CreativeTabs tabs, List list) {
+        list.add(new ItemStack(id, 1, 0));
+        list.add(new ItemStack(id, 1, 8));
+    }
+
+    public boolean isAdvanced(int meta) {
+        return (meta & 8) != 0;
+    }
+
+    public int getSideMeta(int meta) {
+        return meta & 7;
+    }
+
+    private int addAdvancedMeta(int meta, int advancedMeta) {
+        return meta | (advancedMeta & 8);
+    }
+
+    private int getAdvancedMeta(int meta) {
+        return addAdvancedMeta(0, meta);
+    }
+
+    @Override
+    public int damageDropped(int meta) {
+        return getAdvancedMeta(meta);
+    }
 
 }

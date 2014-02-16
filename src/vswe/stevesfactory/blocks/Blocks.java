@@ -72,6 +72,7 @@ public final class Blocks {
     public static int CABLE_CLUSTER_ID;
     public static final String CABLE_CLUSTER_NAME_TAG = "BlockCableClusterName";
     public static final String CABLE_CLUSTER_UNLOCALIZED_NAME = "BlockCableCluster";
+    public static final String CABLE_ADVANCED_CLUSTER_UNLOCALIZED_NAME = "BlockAdvancedCableCluster";
     public static final int CABLE_CLUSTER_DEFAULT_ID = 1320;
 
     private static final String CABLE_CAMOUFLAGE_TILE_ENTITY_TAG = "TileEntityCableCamouflageName";
@@ -257,6 +258,8 @@ public final class Blocks {
                 Block.pistonStickyBase
         );
 
+
+        GameRegistry.addRecipe(new ClusterUpgradeRecipe());
         GameRegistry.addRecipe(new ClusterRecipe());
     }
 

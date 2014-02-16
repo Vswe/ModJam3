@@ -230,8 +230,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
                                 }
 
 
-
-                                if (element.getDepth() < MAX_CABLE_LENGTH && worldObj.getBlockId(target.getX(), target.getY(), target.getZ()) == Blocks.blockCable.blockID){
+                                if (element.getDepth() < MAX_CABLE_LENGTH && Blocks.blockCable.isCable(worldObj.getBlockId(target.getX(), target.getY(), target.getZ()), worldObj.getBlockMetadata(target.getX(), target.getY(), target.getZ()))){
                                      queue.add(target);
                                 }
                             }

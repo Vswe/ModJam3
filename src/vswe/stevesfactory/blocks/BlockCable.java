@@ -73,12 +73,13 @@ public class BlockCable extends Block {
                                 visited.add(target);
                                 if (element.getDepth() < TileEntityManager.MAX_CABLE_LENGTH){
                                     int id = world.getBlockId(target.getX(), target.getY(), target.getZ());
+                                    int meta = world.getBlockMetadata(target.getX(), target.getY(), target.getZ());
                                     if (id == Blocks.blockManager.blockID){
                                         TileEntity tileEntity = world.getBlockTileEntity(target.getX(), target.getY(), target.getZ());
                                         if (tileEntity != null && tileEntity instanceof TileEntityManager) {
                                             ((TileEntityManager)tileEntity).updateInventories();
                                         }
-                                    }else if (id == Blocks.blockCable.blockID && target.getDepth() < TileEntityManager.MAX_CABLE_LENGTH) {
+                                    }else if (isCable(id, meta) && target.getDepth() < TileEntityManager.MAX_CABLE_LENGTH) {
                                         queue.add(target);
                                     }
                                 }
@@ -92,5 +93,9 @@ public class BlockCable extends Block {
 
 
 
+    }
+
+    public boolean isCable(int id, int meta) {
+        return id == Blocks.blockCable.blockID || (id == Blocks.blockCableCluster.blockID && Blocks.blockCableCluster.isAdvanced(meta));
     }
 }

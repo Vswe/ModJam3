@@ -97,7 +97,7 @@ public abstract class BlockCamouflageBase extends BlockContainer {
             }
         }
 
-        return getIcon(side, 0);
+        return getDefaultIcon(side, world.getBlockMetadata(x, y, z), 0);
     }
 
     @SideOnly(Side.CLIENT)

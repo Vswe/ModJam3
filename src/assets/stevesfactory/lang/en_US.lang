@@ -14,6 +14,7 @@ tile.sfm.BlockInstantCableIntake.name=Rapid Item Valve
 tile.sfm.BlockCableBUD.name=Block Detector
 tile.sfm.BlockCableBreaker.name=Block Gate
 tile.sfm.BlockCableCluster.name=Cable Cluster
+tile.sfm.BlockAdvancedCableCluster.name=Advanced Cable Cluster
 tile.sfm.BlockCableCamouflage.name=Cable Camouflage
 tile.sfm.BlockCableInsideCamouflage.name=Double Sided Cable Camouflage
 tile.sfm.BlockCableShapeCamouflage.name=Transforming Cable Camouflage

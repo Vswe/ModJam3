@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import vswe.stevesfactory.Localization;
+import vswe.stevesfactory.StevesFactoryManager;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ public class ItemCluster extends ItemBlock {
 
     public ItemCluster(int id) {
         super(id);
+        setHasSubtypes(true);
+        setMaxDamage(0);
     }
 
     public static final String NBT_CABLE = "Cable";
@@ -48,5 +51,8 @@ public class ItemCluster extends ItemBlock {
         }
     }
 
-
+    @Override
+    public String getUnlocalizedName(ItemStack item) {
+        return "tile." + StevesFactoryManager.UNLOCALIZED_START + (Blocks.blockCableCluster.isAdvanced(item.getItemDamage()) ? Blocks.CABLE_ADVANCED_CLUSTER_UNLOCALIZED_NAME : Blocks.CABLE_CLUSTER_UNLOCALIZED_NAME);
+    }
 }

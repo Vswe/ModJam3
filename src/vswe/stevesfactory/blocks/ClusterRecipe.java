@@ -75,7 +75,7 @@ public class ClusterRecipe implements IRecipe {
                 return false; //nothing added
             }
 
-            output = new ItemStack(Blocks.blockCableCluster);
+            output = new ItemStack(Blocks.blockCableCluster, 1, cluster.getItemDamage());
             NBTTagCompound newCompound = new NBTTagCompound();
             output.setTagCompound(newCompound);
             NBTTagCompound subCompound = new NBTTagCompound();
