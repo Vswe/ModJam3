@@ -100,6 +100,12 @@ public abstract class BlockCamouflageBase extends BlockContainer {
         return getDefaultIcon(side, world.getBlockMetadata(x, y, z), 0);
     }
 
+
+    @Override
+    public boolean renderAsNormalBlock() {
+        return false;
+    }
+
     @SideOnly(Side.CLIENT)
     protected abstract Icon getDefaultIcon(int side, int blockMeta, int camoMeta);
 }

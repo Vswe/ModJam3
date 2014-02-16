@@ -36,6 +36,13 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
         return true;
     }
 
+    public int getLightOpacity() {
+        if (isNormalBlock()) {
+            return 255;
+        }else{
+            return 0;
+        }
+    }
 
 
     public enum CamouflageType {

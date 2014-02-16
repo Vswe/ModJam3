@@ -263,5 +263,5 @@ public final class Blocks {
         GameRegistry.addRecipe(new ClusterRecipe());
     }
 
-    private Blocks() {}
+   private Blocks() {}
 }

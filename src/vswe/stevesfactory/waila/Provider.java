@@ -35,7 +35,8 @@ public class Provider implements IWailaDataProvider {
                 }
             }
         }
-        return null;
+
+        return new ItemStack(accessor.getBlock(), 1, accessor.getBlock().damageDropped(accessor.getMetadata()));
     }
 
     @Override
@@ -98,5 +99,7 @@ public class Provider implements IWailaDataProvider {
         registrar.registerStackProvider(instance, Blocks.blockCableCluster.blockID);
         registrar.registerStackProvider(instance, Blocks.blockCableCamouflage.blockID);
     }
+
+
 
 }
