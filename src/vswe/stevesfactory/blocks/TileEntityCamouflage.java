@@ -21,6 +21,23 @@ import java.util.EnumSet;
 
 public class TileEntityCamouflage extends TileEntityClusterElement implements IPacketBlock {
 
+    public boolean isNormalBlock() {
+        if (getCamouflageType().useSpecialShape()) {
+            if (!useCollision) {
+                return false;
+            }else{
+                for (int i = 0; i < bounds.length; i++) {
+                    if (bounds[i] != (i % 2 == 0 ? 0 : 32)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+
+
     public enum CamouflageType {
         NORMAL("BlockCableCamouflage", "cable_camo", false, false),
         INSIDE("BlockCableInsideCamouflage", "cable_camo_inside", true, false),
@@ -316,11 +333,11 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
             tagCompound.setBoolean(NBT_FULL, fullCollision);
 
             tagCompound.setByte(NBT_MIN_X, (byte)bounds[0]);
-            tagCompound.setByte(NBT_MAX_X, (byte)bounds[1]);
-            tagCompound.setByte(NBT_MIN_Y, (byte)bounds[2]);
-            tagCompound.setByte(NBT_MAX_Y, (byte)bounds[3]);
-            tagCompound.setByte(NBT_MIN_Z, (byte)bounds[4]);
-            tagCompound.setByte(NBT_MAX_Z, (byte)bounds[5]);
+            tagCompound.setByte(NBT_MAX_X, (byte) bounds[1]);
+            tagCompound.setByte(NBT_MIN_Y, (byte) bounds[2]);
+            tagCompound.setByte(NBT_MAX_Y, (byte) bounds[3]);
+            tagCompound.setByte(NBT_MIN_Z, (byte) bounds[4]);
+            tagCompound.setByte(NBT_MAX_Z, (byte) bounds[5]);
         }
 
 

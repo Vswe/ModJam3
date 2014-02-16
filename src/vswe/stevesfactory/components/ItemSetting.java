@@ -171,12 +171,17 @@ public class ItemSetting extends Setting {
                     if (OreDictionary.getOreID(this.getItem()) == OreDictionary.getOreID(other)) {
                         return true;
                     }
+                    //note that this falls through into the precise one, this is on purpose
                 case PRECISE:
                     return this.getItem().itemID == other.itemID && this.getItem().getItemDamage() == other.getItemDamage() && ItemStack.areItemStackTagsEqual(getItem(), other);
                 case NBT_FUZZY:
                     return this.getItem().itemID == other.itemID && this.getItem().getItemDamage() == other.getItemDamage();
                 case FUZZY:
                     return this.getItem().itemID == other.itemID;
+                case MOD_GROUPING:
+                    return ModItemHelper.areItemsFromSameMod(this.getItem().getItem(), other.getItem());
+                case ALL:
+                    return true;
                 default:
                     return false;
             }

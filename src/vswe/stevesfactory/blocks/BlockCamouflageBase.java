@@ -3,9 +3,9 @@ package vswe.stevesfactory.blocks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
@@ -13,10 +13,8 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.List;
 
 public abstract class BlockCamouflageBase extends BlockContainer {
-    public static boolean test;
 
     protected BlockCamouflageBase(int id, Material material) {
         super(id, material);
@@ -43,6 +41,15 @@ public abstract class BlockCamouflageBase extends BlockContainer {
         }
         return super.getCollisionBoundingBoxFromPool(world, x, y, z);
     }
+
+
+    @Override
+    public boolean isBlockNormalCube(World world, int x, int y, int z) {
+        TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, world, x, y, z);
+
+        return camouflage == null || camouflage.isNormalBlock();
+    }
+
 
     @Override
     public MovingObjectPosition collisionRayTrace(World world, int x, int y, int z, Vec3 start, Vec3 end) {

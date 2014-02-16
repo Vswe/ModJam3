@@ -9,6 +9,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import vswe.stevesfactory.blocks.Blocks;
+import vswe.stevesfactory.components.ModItemHelper;
 import vswe.stevesfactory.configs.ConfigHandler;
 import vswe.stevesfactory.network.PacketHandler;
 import vswe.stevesfactory.proxy.CommonProxy;
@@ -50,7 +51,7 @@ public class StevesFactoryManager {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-
+        ModItemHelper.init();
     }
 
 }

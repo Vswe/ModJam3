@@ -44,7 +44,7 @@ public class ComponentMenuItem extends ComponentMenuStuff {
         numberTextBoxes.addTextBox(damageValueTextBox = new TextBoxNumber(70, 52, 5, true) {
             @Override
             public boolean isVisible() {
-                return getSelectedSetting().getFuzzyMode() != FuzzyMode.FUZZY;
+                return getSelectedSetting().getFuzzyMode().requiresMetaData();
             }
 
             @Override
@@ -104,7 +104,7 @@ public class ComponentMenuItem extends ComponentMenuStuff {
     @SideOnly(Side.CLIENT)
     @Override
     protected void drawInfoMenuContent(GuiManager gui, int mX, int mY) {
-        if (getSelectedSetting().getFuzzyMode() != FuzzyMode.FUZZY) {
+        if (getSelectedSetting().getFuzzyMode().requiresMetaData()) {
             gui.drawString(Localization.DAMAGE_VALUE.toString(), DMG_VAL_TEXT_X, DMG_VAL_TEXT_Y, 0.7F, 0x404040);
         }
 

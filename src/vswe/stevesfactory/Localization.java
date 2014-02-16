@@ -298,6 +298,8 @@ public enum Localization {
     BOUNDS_WARNING,
     INSIDE_MENU,
     INSIDE_WARNING,
+    MOD_GROUPING,
+    ALL_ITEMS,
 
     DELETE_COMMAND,
     EXIT_GROUP,

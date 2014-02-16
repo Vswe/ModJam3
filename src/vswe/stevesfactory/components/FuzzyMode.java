@@ -4,15 +4,19 @@ package vswe.stevesfactory.components;
 import vswe.stevesfactory.Localization;
 
 public enum FuzzyMode {
-    PRECISE(Localization.DETECTION_PRECISE),
-    NBT_FUZZY(Localization.DETECTION_NBT_FUZZY),
-    FUZZY(Localization.DETECTION_FUZZY),
-    ORE_DICTIONARY(Localization.DETECTION_ORE_DICTIONARY);
+    PRECISE(Localization.DETECTION_PRECISE, true),
+    NBT_FUZZY(Localization.DETECTION_NBT_FUZZY, true),
+    FUZZY(Localization.DETECTION_FUZZY, false),
+    ORE_DICTIONARY(Localization.DETECTION_ORE_DICTIONARY, true),
+    MOD_GROUPING(Localization.MOD_GROUPING, false),
+    ALL(Localization.ALL_ITEMS, false);
 
     private Localization text;
+    private boolean useMeta;
 
-    private FuzzyMode(Localization text) {
+    private FuzzyMode(Localization text, boolean useMeta) {
         this.text = text;
+        this.useMeta = useMeta;
     }
 
     @Override
@@ -21,4 +25,7 @@ public enum FuzzyMode {
     }
 
 
+    public boolean requiresMetaData() {
+        return useMeta;
+    }
 }
