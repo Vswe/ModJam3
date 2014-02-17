@@ -4,6 +4,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -17,6 +19,7 @@ import vswe.stevesfactory.components.ComponentMenuCamouflageShape;
 import vswe.stevesfactory.network.*;
 
 import java.util.EnumSet;
+import java.util.Random;
 
 
 public class TileEntityCamouflage extends TileEntityClusterElement implements IPacketBlock {
@@ -36,12 +39,49 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
         return true;
     }
 
-    public int getLightOpacity() {
-        if (isNormalBlock()) {
-            return 255;
-        }else{
-            return 0;
-        }
+    private static final Random rand = new Random();
+
+    @SideOnly(Side.CLIENT)
+    public boolean addBlockEffect(Block camoBlock, int sideHit, EffectRenderer effectRenderer) {
+        try {
+            if (ids[sideHit] != 0) {
+                Block block = Block.blocksList[ids[sideHit]];
+                if (block != null) {
+                    float f = 0.1F;
+                    double x = (double)xCoord + rand.nextDouble() * (camoBlock.getBlockBoundsMaxX() - camoBlock.getBlockBoundsMinX() - (double)(f * 2.0F)) + (double)f + camoBlock.getBlockBoundsMinX();
+                    double y = (double)yCoord + rand.nextDouble() * (camoBlock.getBlockBoundsMaxY() - camoBlock.getBlockBoundsMinY() - (double)(f * 2.0F)) + (double)f + camoBlock.getBlockBoundsMinY();
+                    double z = (double)zCoord + rand.nextDouble() * (camoBlock.getBlockBoundsMaxZ() - camoBlock.getBlockBoundsMinZ() - (double)(f * 2.0F)) + (double)f + camoBlock.getBlockBoundsMinZ();
+
+                    switch (sideHit) {
+                        case 0:
+                            y = (double)yCoord + camoBlock.getBlockBoundsMinY() - (double)f;
+                            break;
+                        case 1:
+                            y = (double)yCoord + camoBlock.getBlockBoundsMaxY() + (double)f;
+                            break;
+                        case 2:
+                            z = (double)zCoord + camoBlock.getBlockBoundsMinZ() - (double)f;
+                            break;
+                        case 3:
+                            z = (double)zCoord + camoBlock.getBlockBoundsMaxZ() + (double)f;
+                            break;
+                        case 4:
+                            x = (double)xCoord + camoBlock.getBlockBoundsMinX() - (double)f;
+                            break;
+                        case 5:
+                            x = (double)xCoord + camoBlock.getBlockBoundsMaxX() + (double)f;
+                            break;
+                    }
+
+
+
+                    effectRenderer.addEffect((new EntityDiggingFX(this.worldObj, x, y, z, 0.0D, 0.0D, 0.0D, block, metas[sideHit])).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F));
+                    return true;
+                }
+            }
+        }catch (Exception ignored) {}
+
+        return false;
     }
 
 

@@ -88,42 +88,43 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
 
                 if (updateBlocks) {
                     addBlockScheduledForUpdate(i);
+                }
 
-                    if (pulse.shouldEmitPulse()) {
-                        PulseTimer timer = new PulseTimer(oldStrength, oldStrong, pulse.getPulseTime() + 1); //add one to counter the first tick (which is the same tick as we add it)
-                        List<PulseTimer> timers = pulseTimers[i];
+                if (pulse.shouldEmitPulse()) {
+                    PulseTimer timer = new PulseTimer(oldStrength, oldStrong, pulse.getPulseTime() + 1); //add one to counter the first tick (which is the same tick as we add it)
+                    List<PulseTimer> timers = pulseTimers[i];
 
-                        if (timers.size() < 200) { //to block a huge amount of pulses at the same time
-                            switch (pulse.getSelectedPulseOverride()) {
-                                case EXTEND_OLD:
-                                    if (timers.size() > 0) {
-                                        if (timers.size() > 1) {
-                                            PulseTimer temp = timers.get(0);
-                                            timers.clear();
-                                            timers.add(temp);
-                                        }
-
-                                        PulseTimer oldTimer = timers.get(0);
-                                        oldTimer.ticks = Math.max(oldTimer.ticks, timer.ticks);
-                                    }else{
-                                        timers.add(timer);
+                    if (timers.size() < 200) { //to block a huge amount of pulses at the same time
+                        switch (pulse.getSelectedPulseOverride()) {
+                            case EXTEND_OLD:
+                                if (timers.size() > 0) {
+                                    if (timers.size() > 1) {
+                                        PulseTimer temp = timers.get(0);
+                                        timers.clear();
+                                        timers.add(temp);
                                     }
-                                    break;
-                                case KEEP_ALL:
+
+                                    PulseTimer oldTimer = timers.get(0);
+                                    oldTimer.ticks = Math.max(oldTimer.ticks, timer.ticks);
+                                }else{
                                     timers.add(timer);
-                                    break;
-                                case KEEP_NEW:
-                                    timers.clear();
+                                }
+                                break;
+                            case KEEP_ALL:
+                                timers.add(timer);
+                                break;
+                            case KEEP_NEW:
+                                timers.clear();
+                                timers.add(timer);
+                                break;
+                            case KEEP_OLD:
+                                if (timers.isEmpty()) {
                                     timers.add(timer);
-                                    break;
-                                case KEEP_OLD:
-                                    if (timers.isEmpty()) {
-                                        timers.add(timer);
-                                    }
-                            }
+                                }
                         }
                     }
                 }
+
 
 
             }
