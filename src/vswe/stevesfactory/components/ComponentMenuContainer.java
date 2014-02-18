@@ -309,10 +309,32 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
             gui.drawTexture(BACK_X, BACK_Y, BACK_SRC_X + srcBackX * BACK_SIZE_W, BACK_SRC_Y, BACK_SIZE_W, BACK_SIZE_H);
         }
+
+        hasUpdated = false;
     }
 
     private boolean inBackBounds(int mX, int mY) {
         return CollisionHelper.inBounds(BACK_X, BACK_Y, BACK_SIZE_W, BACK_SIZE_H, mX, mY);
+    }
+
+    //ugly way to make sure the filter controller isn't updating multiple times
+    private static boolean hasUpdated;
+    @Override
+    public void update(float partial) {
+        scrollController.update(partial);
+        if (!hasUpdated) {
+            filter.scrollControllerVariable.update(partial);
+            hasUpdated = true;
+        }
+    }
+
+    @Override
+    public void doScroll(int scroll) {
+        if (currentPage == Page.MAIN) {
+            scrollController.doScroll(scroll);
+        }else if(currentPage == Page.VARIABLE){
+            filter.scrollControllerVariable.doScroll(scroll);
+        }
     }
 
     @SideOnly(Side.CLIENT)

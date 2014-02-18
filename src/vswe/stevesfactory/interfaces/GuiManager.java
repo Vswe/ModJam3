@@ -2,9 +2,11 @@ package vswe.stevesfactory.interfaces;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
@@ -54,7 +56,7 @@ public class GuiManager extends GuiBase {
         }
     }
 
-
+    private long lastTicks;
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
@@ -85,9 +87,11 @@ public class GuiManager extends GuiBase {
         }
 
         //update components completely independent on their visibility
+        long ticks = Minecraft.getSystemTime();
         for (FlowComponent component : manager.getFlowItems()) {
-            component.update();
+            component.update((ticks - this.lastTicks) / 1000F);
         }
+        this.lastTicks = ticks;
 
         int zLevel = Z_LEVEL_COMPONENT_START;
         int openCount = 0;
@@ -134,6 +138,15 @@ public class GuiManager extends GuiBase {
         }
         CollisionHelper.disableInBoundsCheck = false;
 
+    }
+
+    public void handleMouseInput() {
+        super.handleMouseInput();
+
+        int scroll = Mouse.getEventDWheel();
+        if (scroll != 0 && manager.getZLevelRenderingList().size() > 0) {
+            manager.getZLevelRenderingList().get(0).doScroll(scroll);
+        }
     }
 
     private String getInfo() {

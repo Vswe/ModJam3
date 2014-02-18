@@ -69,4 +69,8 @@ public abstract class ComponentMenu implements IComponentNetworkReader {
     public boolean isVisible() {
         return true;
     }
+
+    public void update(float partial) {}
+
+    public void doScroll(int scroll) {}
 }

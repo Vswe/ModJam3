@@ -153,6 +153,16 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         };
     }
 
+
+    @Override
+    public void doScroll(int scroll) {
+        if (isSearching()) {
+            scrollControllerSearch.doScroll(scroll);
+        }else if (!isSearching() && !isEditing()) {
+            scrollControllerSelected.doScroll(scroll);
+        }
+    }
+
     protected void initRadioButtons() {
         radioButtons.add(new RadioButton(RADIO_BUTTON_X_LEFT, RADIO_BUTTON_Y, Localization.WHITE_LIST));
         radioButtons.add(new RadioButton(RADIO_BUTTON_X_RIGHT, RADIO_BUTTON_Y, Localization.BLACK_LIST));

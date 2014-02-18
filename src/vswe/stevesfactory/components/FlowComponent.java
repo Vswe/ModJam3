@@ -195,7 +195,8 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
         this.connectionSet = connectionSet;
     }
 
-    public void update() {
+    public void update(float partial) {
+        //no need for this to be precise, can ignore the partial time
         if (resetTimer > 0) {
             if (resetTimer == 1) {
                 x = mouseStartX;
@@ -203,6 +204,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             }
 
             resetTimer--;
+        }
+
+        for (ComponentMenu menu : menus) {
+            menu.update(partial);
         }
     }
 
@@ -1495,5 +1500,13 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
     public void setInventoryListDirty(boolean inventoryListDirty) {
         isInventoryListDirty = inventoryListDirty;
+    }
+
+    public void doScroll(int scroll) {
+        if (isLarge) {
+            if (openMenuId != -1) {
+                menus.get(openMenuId).doScroll(scroll);
+            }
+        }
     }
 }

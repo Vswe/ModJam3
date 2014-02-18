@@ -182,21 +182,33 @@ public  abstract class ScrollController<T> {
             drawArrow(gui, true, mX, mY);
             drawArrow(gui, false, mX, mY);
 
-            if (clicked && canScroll) {
-                offset += dir;
-                int min = 0;
-                int max = ((int)(Math.ceil(((float)result.size() / itemsPerRow)) - visibleRows)) * ITEM_SIZE_WITH_MARGIN - (ITEM_SIZE_WITH_MARGIN - ITEM_SIZE);
-                if (offset < min) {
-                    offset = min;
-                }else if(offset > max) {
-                    offset = max;
-                }
-
-            }
         }
     }
 
+    private static final int SCROLL_SPEED = 100;
 
+    private float left;
+    public void update(float partial) {
+        if (clicked && canScroll) {
+            partial += left;
+            int change = (int)(partial * SCROLL_SPEED);
+            left = partial - (change / (float)SCROLL_SPEED);
+
+
+            moveOffset(change * dir);
+        }
+    }
+
+    private void moveOffset(int change) {
+        offset += change;
+        int min = 0;
+        int max = ((int)(Math.ceil(((float)result.size() / itemsPerRow)) - visibleRows)) * ITEM_SIZE_WITH_MARGIN - (ITEM_SIZE_WITH_MARGIN - ITEM_SIZE);
+        if (offset < min) {
+            offset = min;
+        }else if(offset > max) {
+            offset = max;
+        }
+    }
 
     @SideOnly(Side.CLIENT)
     private void drawArrow(GuiManager gui, boolean down, int mX, int mY) {
@@ -267,6 +279,10 @@ public  abstract class ScrollController<T> {
 
     public void setTextAndCursor(String s) {
         textBox.setTextAndCursor(s);
+    }
+
+    public void doScroll(int scroll) {
+        moveOffset(scroll / -20);
     }
 
 
