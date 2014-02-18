@@ -73,7 +73,7 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
 
     @Override
     public String getName() {
-        return "Target";
+        return Localization.TARGET_MENU.toString();
     }
 
 
@@ -159,7 +159,7 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
             if (CollisionHelper.inBounds(getDirectionX(i), getDirectionY(i), DIRECTION_SIZE_W, DIRECTION_SIZE_H, mX, mY)) {
                 if (selectedDirectionId == i) {
                     selectedDirectionId = -1;
-                }else if (selectedDirectionId == -1) {
+                }else{
                     selectedDirectionId = i;
                     refreshAdvancedComponent();
                 }

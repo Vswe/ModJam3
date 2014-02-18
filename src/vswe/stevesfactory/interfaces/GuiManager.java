@@ -144,8 +144,13 @@ public class GuiManager extends GuiBase {
         super.handleMouseInput();
 
         int scroll = Mouse.getEventDWheel();
-        if (scroll != 0 && manager.getZLevelRenderingList().size() > 0) {
-            manager.getZLevelRenderingList().get(0).doScroll(scroll);
+        if (scroll != 0) {
+            for (FlowComponent component : manager.getZLevelRenderingList()) {
+                if (component.isVisible()) {
+                    component.doScroll(scroll);
+                    return;
+                }
+            }
         }
     }
 

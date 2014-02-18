@@ -300,6 +300,7 @@ public enum Localization {
     INSIDE_WARNING,
     MOD_GROUPING,
     ALL_ITEMS,
+    TARGET_MENU,
 
     DELETE_COMMAND,
     EXIT_GROUP,

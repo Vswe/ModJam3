@@ -153,6 +153,15 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         };
     }
 
+    private static boolean hasUpdated;
+    @Override
+    public void update(float partial) {
+        if (isSearching()) {
+            scrollControllerSearch.update(partial);
+        }else if (!isSearching() && !isEditing()) {
+            scrollControllerSelected.update(partial);
+        }
+    }
 
     @Override
     public void doScroll(int scroll) {
