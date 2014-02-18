@@ -38,7 +38,11 @@ public class TextBoxNumberList {
         for (TextBoxNumber textBox : textBoxes) {
             if (textBox.isVisible() && CollisionHelper.inBounds(textBox.getX(), textBox.getY(), textBox.getWidth(), TEXT_BOX_SIZE_H, mX, mY)) {
                 if (textBox.equals(selectedTextBox)) {
-                    selectedTextBox = null;
+                    if (button == 0) {
+                        selectedTextBox = null;
+                    }else{
+                        textBox.setNumber(0);
+                    }
                 }else{
                     selectedTextBox = textBox;
                 }

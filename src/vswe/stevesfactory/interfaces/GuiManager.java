@@ -2,24 +2,10 @@ package vswe.stevesfactory.interfaces;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.StevesFactoryManager;
@@ -29,8 +15,7 @@ import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
-import java.util.Arrays;
-import java.util.List;
+
 
 @SideOnly(Side.CLIENT)
 public class GuiManager extends GuiBase {
@@ -42,6 +27,7 @@ public class GuiManager extends GuiBase {
         ySize = 256;
 
         this.manager = manager;
+        Keyboard.enableRepeatEvents(true);
     }
 
     private static final ResourceLocation BACKGROUND_1 = registerTexture("Background1");
@@ -257,13 +243,20 @@ public class GuiManager extends GuiBase {
 
     @Override
     protected void keyTyped(char c, int k) {
-        for (FlowComponent itemBase : manager.getFlowItems()) {
+        for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
             if (itemBase.isVisible() && itemBase.onKeyStroke(this, c, k) && k != 1) {
                 return;
             }
         }
 
         super.keyTyped(c, k);
+    }
+
+    @Override
+    public void onGuiClosed() {
+        Keyboard.enableRepeatEvents(false);
+
+        super.onGuiClosed();
     }
 
 

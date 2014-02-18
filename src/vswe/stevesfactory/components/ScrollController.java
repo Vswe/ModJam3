@@ -71,7 +71,7 @@ public  abstract class ScrollController<T> {
                 }
             };
 
-            textBox.setText(defaultText);
+            textBox.setTextAndCursor(defaultText);
         }
 
         updateSearch();
@@ -113,7 +113,11 @@ public  abstract class ScrollController<T> {
 
     public void onClick(int mX, int mY, int button) {
         if (CollisionHelper.inBounds(TEXT_BOX_X, TEXT_BOX_Y, TEXT_BOX_SIZE_W, TEXT_BOX_SIZE_H, mX, mY)) {
-            selected = !selected;
+            if (button == 0 || !selected) {
+                selected = !selected;
+            }else{
+                textBox.setTextAndCursor("");
+            }
         }
 
         List<Point> points = getItemCoordinates();
@@ -132,6 +136,7 @@ public  abstract class ScrollController<T> {
             dir = -1;
         }
     }
+
 
 
 
@@ -258,6 +263,10 @@ public  abstract class ScrollController<T> {
 
     public String getText() {
         return textBox.getText();
+    }
+
+    public void setTextAndCursor(String s) {
+        textBox.setTextAndCursor(s);
     }
 
 

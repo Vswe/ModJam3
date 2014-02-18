@@ -37,8 +37,8 @@ public class TextBoxLogic {
                 text = text.substring(0, cursor) + text.substring(cursor + 1);
             }else{
                 text = text.substring(0, cursor - 1) + text.substring(cursor);
+                moveCursor(gui, direction);
             }
-            moveCursor(gui, direction);
             textChanged();
         }
     }
@@ -98,5 +98,10 @@ public class TextBoxLogic {
     public void resetCursor() {
         cursor = text.length();
         updatedCursor = true;
+    }
+
+    public void setTextAndCursor(String s) {
+        setText(s);
+        resetCursor();
     }
 }

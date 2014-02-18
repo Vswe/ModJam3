@@ -200,9 +200,9 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             @Override
             void onClick() {
                 if (scrollController.getText().equals(".var")) {
-                    scrollController.setText(".all");
+                    scrollController.setTextAndCursor(".all");
                 }else{
-                    scrollController.setText(".var");
+                    scrollController.setTextAndCursor(".var");
                 }
             }
         });

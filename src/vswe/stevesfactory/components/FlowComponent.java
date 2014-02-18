@@ -75,6 +75,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     private static final int CURSOR_Z = 5;
     private static final int TEXT_X = 7;
     private static final int TEXT_Y = 10;
+    private static final int TEXT_HEIGHT = 10;
     private static final int EDIT_SRC_X = 32;
     private static final int EDIT_SRC_Y = 189;
     private static final int EDIT_X = 103;
@@ -499,8 +500,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                 isLarge = !isLarge;
             }else if(isLarge && !isEditing && CollisionHelper.inBounds(EDIT_X, EDIT_Y, EDIT_SIZE, EDIT_SIZE, internalX, internalY)) {
                 isEditing = true;
-                textBox.setText(getName());
-                textBox.resetCursor();
+                textBox.setTextAndCursor(getName());
             }else if(isLarge && isEditing && CollisionHelper.inBounds(EDIT_X_SMALL, EDIT_Y_TOP, EDIT_SIZE_SMALL, EDIT_SIZE_SMALL, internalX, internalY)) {
                 isEditing = false;
                 name = textBox.getText();
@@ -512,6 +512,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             }else if(isLarge && isEditing && CollisionHelper.inBounds(EDIT_X_SMALL, EDIT_Y_BOT, EDIT_SIZE_SMALL, EDIT_SIZE_SMALL, internalX, internalY)) {
                 isEditing = false;
                 textBox.setText(null);
+            }else if(isLarge && isEditing && CollisionHelper.inBounds(TEXT_X, TEXT_Y, TEXT_SPACE, TEXT_HEIGHT, internalX, internalY)) {
+                if (button == 1) {
+                    textBox.setTextAndCursor("");
+                }
             }else if (isLarge){
 
                 for (int i = 0; i < menus.size(); i++) {
