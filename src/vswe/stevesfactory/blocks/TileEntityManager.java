@@ -522,6 +522,17 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
 
     @Override
     public void readUpdatedData(DataReader dr, EntityPlayer player) {
+        if (!worldObj.isRemote && dr.readBoolean()) {
+            System.out.println("ACTION");
+            for (FlowComponent item : items) {
+                item.adjustEverythingToGridRaw();
+            }
+            for (FlowComponent item : items) {
+                item.adjustEverythingToGridFine();
+            }
+            return;
+        }
+
         boolean isNew = worldObj.isRemote && dr.readBoolean();
         if (isNew) {
             readAllComponentData(dr);

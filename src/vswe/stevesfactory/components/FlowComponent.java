@@ -760,8 +760,9 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                 for (int j = 0; j < connection.getNodes().size(); j++) {
                     Point node = connection.getNodes().get(j);
                     if (node.equals(connection.getSelectedNode())) {
+                        connection.update(mX, mY);
+                        sendConnectionNode(i, j, false, false, node.getX(), node.getY());
                         connection.setSelectedNode(null);
-                        sendConnectionNode(i, j, false, false, mX, mY);
                         return;
                     }
                 }
@@ -774,16 +775,121 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
         isDragging = false;
     }
 
+    @SideOnly(Side.CLIENT)
     private void followMouse(int mX, int mY) {
         if (isDragging) {
             x += mX - mouseDragX;
             y += mY - mouseDragY;
 
-            mouseDragX = mX;
-            mouseDragY = mY;
 
-
+           if (GuiScreen.isShiftKeyDown()) {
+               adjustToGrid();
+               mouseDragX = x;
+               mouseDragY = y;
+           }else{
+               mouseDragX = mX;
+               mouseDragY = mY;
+           }
         }
+    }
+
+    private void adjustToGrid() {
+        x = (x / 10) * 10;
+        y = (y / 10) * 10;
+    }
+
+
+    public void adjustEverythingToGridRaw() {
+        if (true) return;  //TODO work in progress
+        adjustToGrid();
+        for (Connection connection : connections.values()) {
+            if(connection != null) {
+                connection.adjustAllToGrid();
+            }
+        }
+    }
+    public void adjustEverythingToGridFine() {
+        if (true) return; //TODO work in progress
+        int outputCount = 0;
+        int inputCount = 0;
+        int sideCount = 0;
+        for (int i = 0; i < connectionSet.getConnections().length; i++) {
+            ConnectionOption connectionOption = connectionSet.getConnections()[i];
+
+            int[] location = getConnectionLocation(connectionOption, inputCount, outputCount, sideCount);
+            if (location == null) {
+                continue;
+            }
+
+            if (connectionOption.isInput()) {
+                inputCount++;
+            }else if(connectionOption.getType() == ConnectionOption.ConnectionType.OUTPUT){
+                outputCount++;
+            }else{
+                sideCount++;
+            }
+
+            Connection connection = connections.get(i);
+            if (connection != null && id < connection.getComponentId()) {
+
+
+                int startX = location[0] + location[3] / 2;
+                int startY = location[1] + location[4] / 2;
+                int[] otherLocation = getManager().getFlowItems().get(connection.getComponentId()).getConnectionLocationFromId(connection.getConnectionId());
+                if (otherLocation == null) {
+                    return;
+                }
+                int endX = otherLocation[0] + otherLocation[3] / 2;
+                int endY = otherLocation[1] + otherLocation[4] / 2;
+
+                if (startX != endX && startY != endY && connection.getNodes().size() < 1) {
+                    connection.getNodes().add(new Point(startX, startY));
+                }
+
+                int x = startX;
+                int y = startY;
+
+                List<Point> nodes = connection.getNodes();
+                for (int j = 0; j <= nodes.size(); j++) {
+                    Point point;
+                    boolean isFinal;
+                    if (j == nodes.size()) {
+                        if (j == 0) {
+                            break;
+                        }
+                        point = nodes.get(j - 1);
+                        x = endX;
+                        y = endY;
+                    }else{
+                        point = nodes.get(j) ;
+                    }
+                    /*boolean closeX = Math.abs(point.getX() - x) < 20;
+                    boolean closeY = Math.abs(point.getY() - y) < 20;
+
+                    if (closeX && closeY) {
+                        System.out.println("Double"); */
+                        if (Math.abs(point.getX() - x) < Math.abs(point.getY() - y)) {
+                            point.setX(x);
+                        } else {
+                            point.setY(y);
+                        }
+                        //TODO how do we decide?
+                    /*} else if (closeX) {
+                        point.setX(x);
+                    } else if (closeY) {
+                        point.setY(y);
+                    } else {
+                        System.out.println("Nothing");
+                        //Do nothing
+                    } */
+
+                    x = point.getX();
+                    y = point.getY();
+                }
+            }
+        }
+
+
     }
 
 

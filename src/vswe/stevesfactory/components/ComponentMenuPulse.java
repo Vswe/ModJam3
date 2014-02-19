@@ -326,7 +326,7 @@ public class ComponentMenuPulse extends ComponentMenu {
     }
 
     public boolean shouldEmitPulse()  {
-        return usePulse && getPulseTime() != 0;
+        return usePulse;
     }
 
     public PULSE_OPTIONS getSelectedPulseOverride() {

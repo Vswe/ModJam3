@@ -135,7 +135,7 @@ public class PacketHandler implements IPacketHandler {
     }
 
     @SideOnly(Side.CLIENT)
-    public static DataWriter getWriterForServerPacket() {
+    private static DataWriter getBaseWriterForServerPacket() {
         Container container = Minecraft.getMinecraft().thePlayer.openContainer;
 
         if (container != null) {
@@ -147,6 +147,23 @@ public class PacketHandler implements IPacketHandler {
         }else{
             return null;
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static DataWriter getWriterForServerPacket() {
+        DataWriter dw = getBaseWriterForServerPacket();
+
+        dw.writeBoolean(false); //no action
+
+        return dw;
+    }
+    @SideOnly(Side.CLIENT)
+    public static DataWriter getWriterForServerActionPacket() {
+        DataWriter dw = getBaseWriterForServerPacket();
+
+        dw.writeBoolean(true); //action
+
+        return dw;
     }
 
     private static void createNonComponentPacket(DataWriter dw) {

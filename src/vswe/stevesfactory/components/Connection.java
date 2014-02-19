@@ -1,6 +1,10 @@
 package vswe.stevesfactory.components;
 
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.GuiScreen;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,11 +48,21 @@ public class Connection {
         nodes.add(id, selectedNode = new Point(mX, mY));
     }
 
-
+    @SideOnly(Side.CLIENT)
     public void update(int mX, int mY) {
         if (selectedNode != null) {
             selectedNode.setX(mX);
             selectedNode.setY(mY);
+
+            if (GuiScreen.isShiftKeyDown()) {
+                selectedNode.adjustToGrid();
+            }
+        }
+    }
+
+    public void adjustAllToGrid() {
+        for (Point node : nodes) {
+            node.adjustToGrid();
         }
     }
 
@@ -64,4 +78,5 @@ public class Connection {
     public void setSelectedNode(Point selectedNode) {
         this.selectedNode = selectedNode;
     }
+
 }

@@ -51,4 +51,9 @@ public class Point {
         result = 31 * result + y;
         return result;
     }
+
+    public void adjustToGrid() {
+        x = ((x - 2) / 10) * 10 + 2;
+        y = ((y - 4) / 10) * 10 + 4;
+    }
 }

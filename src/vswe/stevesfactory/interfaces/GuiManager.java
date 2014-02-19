@@ -138,6 +138,9 @@ public class GuiManager extends GuiBase {
         }
         CollisionHelper.disableInBoundsCheck = false;
 
+        if (!Keyboard.isKeyDown(54) && doubleShiftFlag) {
+            doubleShiftFlag = false;
+        }
     }
 
     public void handleMouseInput() {
@@ -259,8 +262,16 @@ public class GuiManager extends GuiBase {
 
     }
 
+    private boolean doubleShiftFlag;
+
     @Override
     protected void keyTyped(char c, int k) {
+        if (k == 54 && !doubleShiftFlag) {
+            DataWriter dw = PacketHandler.getWriterForServerActionPacket();
+            PacketHandler.sendDataToServer(dw);
+            doubleShiftFlag = true;
+        }
+
         for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
             if (itemBase.isVisible() && itemBase.onKeyStroke(this, c, k) && k != 1) {
                 return;
