@@ -297,18 +297,18 @@ public class GuiManager extends GuiBase {
     protected void keyTyped(char c, int k) {
         if (hasSpecialRenderer()) {
             getSpecialRenderer().onKeyTyped(this, c, k);
-            return;
-        }
+        }else{
 
-        if (k == 54 && !doubleShiftFlag) {
-            DataWriter dw = PacketHandler.getWriterForServerActionPacket();
-            PacketHandler.sendDataToServer(dw);
-            doubleShiftFlag = true;
-        }
+            if (k == 54 && !doubleShiftFlag) {
+                DataWriter dw = PacketHandler.getWriterForServerActionPacket();
+                PacketHandler.sendDataToServer(dw);
+                doubleShiftFlag = true;
+            }
 
-        for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
-            if (itemBase.isVisible() && itemBase.onKeyStroke(this, c, k) && k != 1) {
-                return;
+            for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
+                if (itemBase.isVisible() && itemBase.onKeyStroke(this, c, k) && k != 1) {
+                    return;
+                }
             }
         }
 

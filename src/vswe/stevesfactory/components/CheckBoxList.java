@@ -35,7 +35,7 @@ public class CheckBoxList {
 
                 gui.drawTexture(checkBox.getX(), checkBox.getY(), CHECK_BOX_SRC_X + srcCheckBoxX * CHECK_BOX_SIZE, CHECK_BOX_SRC_Y + srcCheckBoxY * CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE);
                 if (checkBox.getName() != null) {
-                    gui.drawString(checkBox.getName(), checkBox.getX() + CHECK_BOX_TEXT_X, checkBox.getY() + CHECK_BOX_TEXT_Y, 0.7F, 0x404040);
+                    gui.drawSplitString(checkBox.getName(), checkBox.getX() + CHECK_BOX_TEXT_X, checkBox.getY() + CHECK_BOX_TEXT_Y, checkBox.getTextWidth(), 0.7F, 0x404040);
                 }
             }
         }

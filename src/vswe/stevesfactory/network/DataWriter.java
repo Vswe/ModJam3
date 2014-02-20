@@ -13,12 +13,16 @@ import vswe.stevesfactory.interfaces.ContainerManager;
 import java.io.*;
 
 public class DataWriter {
-    private ByteArrayOutputStream stream;
+    private OutputStream stream;
     private int byteBuffer;
     private int bitCountBuffer;
 
     DataWriter() {
        stream = new ByteArrayOutputStream();
+    }
+
+    DataWriter(OutputStream stream) {
+        this.stream = stream;
     }
 
     public void writeByte(int data) {
@@ -48,7 +52,10 @@ public class DataWriter {
                 addData <<= bitCountBuffer;
                 byteBuffer |= addData;
 
-                stream.write(byteBuffer);
+                try {
+                    stream.write(byteBuffer);
+                }catch (IOException ignored) {}
+
 
                 byteBuffer = 0;
                 bitCount -= bitsToAdd;
@@ -63,48 +70,42 @@ public class DataWriter {
 
     void sendPlayerPackets(double x, double y, double z, double r, int dimension){
         if (bitCountBuffer > 0) {
-            stream.write(byteBuffer);
+            ((ByteArrayOutputStream)stream).write(byteBuffer);
         }
 
-        PacketDispatcher.sendPacketToAllAround(x, y, z, r, dimension, PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()));
+        PacketDispatcher.sendPacketToAllAround(x, y, z, r, dimension, PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()));
     }
 
     void sendPlayerPacket(Player player){
         if (bitCountBuffer > 0) {
-            stream.write(byteBuffer);
+            ((ByteArrayOutputStream)stream).write(byteBuffer);
         }
 
-        PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()), player);
+        PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()), player);
     }
 
     void sendServerPacket() {
         if (bitCountBuffer > 0) {
-            stream.write(byteBuffer);
+            ((ByteArrayOutputStream)stream).write(byteBuffer);
         }
 
-        PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()));
+        PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()));
     }
     
     void sendPlayerPackets(ContainerBase container) {
         if (bitCountBuffer > 0) {
-            stream.write(byteBuffer);
+            ((ByteArrayOutputStream)stream).write(byteBuffer);
         }
 
         for (ICrafting crafting : container.getCrafters()) {
             if (crafting instanceof Player) {
                 Player player = (Player)crafting;
-                PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()), player);
+                PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()), player);
             }
         }
     }
 
-    void sendGlobalPlayerPacket() {
-        if (bitCountBuffer > 0) {
-            stream.write(byteBuffer);
-        }
 
-        PacketDispatcher.sendPacketToAllPlayers(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, stream.toByteArray()));
-    }
 
     void close() {
         try {

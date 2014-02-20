@@ -19,6 +19,7 @@ public class NBTRenderer implements IInterfaceRenderer {
         root = NBTNode.generateNodes(compound);
     }
 
+    //TODO this uses an old texture file that was "removed" during the merge
     private static final int POS_X = 5;
     private static final int POS_Y = 5;
     private static final int LINE_HEIGHT = 8;

@@ -11,8 +11,10 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import vswe.stevesfactory.blocks.Blocks;
 import vswe.stevesfactory.components.ModItemHelper;
 import vswe.stevesfactory.configs.ConfigHandler;
+import vswe.stevesfactory.network.FileHelper;
 import vswe.stevesfactory.network.PacketHandler;
 import vswe.stevesfactory.proxy.CommonProxy;
+import vswe.stevesfactory.settings.Settings;
 import vswe.stevesfactory.waila.Provider;
 
 @Mod(modid = "StevesFactoryManager", name = "Steve's Factory Manager", version = GeneratedInfo.version)
@@ -36,6 +38,9 @@ public class StevesFactoryManager {
     public void preInit(FMLPreInitializationEvent event) {
         ConfigHandler config = new ConfigHandler(event.getSuggestedConfigurationFile());
 
+        FileHelper.setConfigDir(event.getModConfigurationDirectory());
+        Settings.load();
+
         Blocks.init();
     }
 
@@ -53,5 +58,6 @@ public class StevesFactoryManager {
     public void postInit(FMLPostInitializationEvent event) {
         ModItemHelper.init();
     }
+
 
 }

@@ -7,17 +7,23 @@ import net.minecraft.nbt.NBTTagCompound;
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataReader {
 
-    private ByteArrayInputStream stream;
+    private InputStream stream;
     private int byteBuffer;
     private int bitCountBuffer;
 
-    public DataReader(byte[] data) {
+    DataReader(byte[] data) {
         stream = new ByteArrayInputStream(data);
     }
 
+    DataReader(InputStream stream) {
+        this.stream = stream;
+    }
 
     public int readByte() {
         return readData(8);
@@ -47,7 +53,11 @@ public class DataReader {
                 data |= byteBuffer << readBits;
                 readBits += bitCountBuffer;
 
-                byteBuffer = stream.read();
+                try {
+                    byteBuffer = stream.read();
+                }catch (IOException ignored) {
+                    byteBuffer = 0;
+                }
                 bitCountBuffer = 8;
             }
         }

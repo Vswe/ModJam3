@@ -14,6 +14,8 @@ import vswe.stevesfactory.components.*;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.interfaces.IInterfaceRenderer;
+import vswe.stevesfactory.settings.Settings;
+import vswe.stevesfactory.settings.SettingsScreen;
 import vswe.stevesfactory.network.*;
 
 import java.util.*;
@@ -78,6 +80,19 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
             @Override
             public boolean activateOnRelease() {
                 return true;
+            }
+        });
+
+        buttons.add(new Button(Localization.SETTINGS) {
+            @Override
+            protected void onClick(DataReader dr) {
+
+            }
+
+            @Override
+            public boolean onClick(DataWriter dw) {
+                Settings.openMenu(self);
+                return false;
             }
         });
 

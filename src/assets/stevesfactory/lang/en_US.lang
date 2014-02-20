@@ -343,6 +343,11 @@ gui.sfm.MaximumComponentError=Maximum component amount reached
 gui.sfm.ExitGroup=Close group
 gui.sfm.ExitGroupDrop=Move from group [Drop command here]
 gui.sfm.Commands=Commands
+gui.sfm.Settings=Settings
+gui.sfm.CloseGroupLabel=Groups will automatically be closed when the interface is reopened.
+gui.sfm.OpenMenuLargeHitBox=Clicking anywhere on a small command will open it and enlarge it
+gui.sfm.OpenGroupQuick=Enlarging a group command automatically opens the group
+gui.sfm.ShowCommandType=Always show the command type of the command, even when it's named. (Holding Ctrl to display the types works regardless of this setting)
 
 # ======================================
 #		 ADVANCED RELAY INTERFACE
