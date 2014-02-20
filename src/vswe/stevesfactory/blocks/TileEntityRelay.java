@@ -598,6 +598,14 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
 
     @Override
     public void readUpdatedData(DataReader dr, EntityPlayer player) {
+        if (!worldObj.isRemote)  {
+            boolean action = dr.readBoolean();
+            if (action) {
+
+                return;
+            }
+        }
+
         String username = StringUtils.stripControlCodes(player.username);
         boolean isOp = false;
         if (worldObj.isRemote || username.equals(owner)) {

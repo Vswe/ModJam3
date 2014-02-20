@@ -210,6 +210,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
             if (block != null) {
                 ids[side] = block.blockID;
                 metas[side] = item.getItem().getMetadata(item.getItemDamage());
+                validateSide(side);
             }else{
                 ids[side] = 0;
                 metas[side] = 0;
@@ -290,6 +291,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
                 }else{
                     ids[i] = dr.readData(DataBitHelper.BLOCK_ID);
                     metas[i] = dr.readData(DataBitHelper.BLOCK_META);
+                    validateSide(i);
                 }
             }
             if (getCamouflageType().useSpecialShape()) {
@@ -314,6 +316,12 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
                 }
             }
             worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
+        }
+    }
+
+    private void validateSide(int i) {
+        if (ids[i] < 0 || ids[i] >= Block.blocksList.length) {
+            ids[i] = 0;
         }
     }
 
@@ -398,6 +406,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
 
             ids[i] = element.getShort(NBT_ID);
             metas[i] = element.getByte(NBT_META);
+            validateSide(i);
         }
 
         if (tagCompound.hasKey(NBT_COLLISION)) {

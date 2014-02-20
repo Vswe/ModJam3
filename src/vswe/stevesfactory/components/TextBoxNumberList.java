@@ -42,6 +42,7 @@ public class TextBoxNumberList {
                         selectedTextBox = null;
                     }else{
                         textBox.setNumber(0);
+                        selectedTextBox.onNumberChanged();
                     }
                 }else{
                     selectedTextBox = textBox;

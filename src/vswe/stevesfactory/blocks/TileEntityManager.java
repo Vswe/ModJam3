@@ -13,6 +13,7 @@ import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.components.*;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
+import vswe.stevesfactory.interfaces.IInterfaceRenderer;
 import vswe.stevesfactory.network.*;
 
 import java.util.*;
@@ -38,6 +39,8 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
     private List<FlowComponent> zLevelRenderingList;
     private Variable[] variables;
     private FlowComponent selectedComponent;
+    @SideOnly(Side.CLIENT)
+    public IInterfaceRenderer specialRenderer;
 
     public TileEntityManager() {
         items = new ArrayList<FlowComponent>();

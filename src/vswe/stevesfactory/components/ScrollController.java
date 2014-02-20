@@ -115,7 +115,7 @@ public  abstract class ScrollController<T> {
         if (CollisionHelper.inBounds(TEXT_BOX_X, TEXT_BOX_Y, TEXT_BOX_SIZE_W, TEXT_BOX_SIZE_H, mX, mY)) {
             if (button == 0 || !selected) {
                 selected = !selected;
-            }else{
+            }else if (hasSearchBox){
                 textBox.setTextAndCursor("");
             }
         }

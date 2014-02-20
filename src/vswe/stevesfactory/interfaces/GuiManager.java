@@ -76,6 +76,13 @@ public class GuiManager extends GuiBase {
         y -= guiTop;
 
         bindTexture(COMPONENTS);
+
+        if (hasSpecialRenderer()) {
+            getSpecialRenderer().draw(this, x, y);
+            getSpecialRenderer().drawMouseOver(this, x, y);
+            return;
+        }
+
         for (int i = 0; i < manager.buttons.size(); i++) {
             TileEntityManager.Button button = manager.buttons.get(i);
             if (button.isVisible()) {
@@ -146,8 +153,15 @@ public class GuiManager extends GuiBase {
     public void handleMouseInput() {
         super.handleMouseInput();
 
+
+
         int scroll = Mouse.getEventDWheel();
         if (scroll != 0) {
+            if (hasSpecialRenderer()) {
+                getSpecialRenderer().onScroll(scroll);
+                return;
+            }
+
             for (FlowComponent component : manager.getZLevelRenderingList()) {
                 if (component.isVisible()) {
                     component.doScroll(scroll);
@@ -190,6 +204,11 @@ public class GuiManager extends GuiBase {
         x -= guiLeft;
         y -= guiTop;
 
+        if (hasSpecialRenderer()) {
+            getSpecialRenderer().onClick(this, x, y, button);
+            return;
+        }
+
         for (int i = 0; i < manager.getZLevelRenderingList().size(); i++) {
             FlowComponent itemBase = manager.getZLevelRenderingList().get(i);
             if (itemBase.isVisible() && itemBase.onClick(x, y, button)) {
@@ -227,6 +246,11 @@ public class GuiManager extends GuiBase {
         x -= guiLeft;
         y -= guiTop;
 
+        if (hasSpecialRenderer()) {
+            getSpecialRenderer().onDrag(this, x, y);
+            return;
+        }
+
         for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
             if (itemBase.isVisible()) {
                 itemBase.onDrag(x, y);
@@ -243,6 +267,11 @@ public class GuiManager extends GuiBase {
 
         x -= guiLeft;
         y -= guiTop;
+
+        if (hasSpecialRenderer()) {
+            getSpecialRenderer().onRelease(this, x, y);
+            return;
+        }
 
         onClickButtonCheck(x, y, true);
 
@@ -266,6 +295,11 @@ public class GuiManager extends GuiBase {
 
     @Override
     protected void keyTyped(char c, int k) {
+        if (hasSpecialRenderer()) {
+            getSpecialRenderer().onKeyTyped(this, c, k);
+            return;
+        }
+
         if (k == 54 && !doubleShiftFlag) {
             DataWriter dw = PacketHandler.getWriterForServerActionPacket();
             PacketHandler.sendDataToServer(dw);
@@ -295,5 +329,12 @@ public class GuiManager extends GuiBase {
         return manager;
     }
 
+    private boolean hasSpecialRenderer() {
+        return getSpecialRenderer() != null;
+    }
+
+    private IInterfaceRenderer getSpecialRenderer() {
+        return manager.specialRenderer;
+    }
 
 }
