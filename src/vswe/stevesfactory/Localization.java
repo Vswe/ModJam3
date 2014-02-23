@@ -313,6 +313,8 @@ public enum Localization {
     OPEN_MENU_LARGE_HIT_BOX,
     OPEN_GROUP_QUICK,
     SHOW_COMMAND_TYPE,
+    AUTO_SIDE,
+    AUTO_BLACK_LIST,
 
 
     GIVE_PERMISSION,

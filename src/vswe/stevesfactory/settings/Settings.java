@@ -17,7 +17,8 @@ public final class Settings {
     private static boolean largeOpenHitBox;
     private static boolean quickGroupOpen;
     private static boolean commandTypes;
-
+    private static boolean autoSide;
+    private static boolean autoBlacklist;
 
     public static void openMenu(TileEntityManager manager) {
         manager.specialRenderer = new SettingsScreen(manager);
@@ -86,6 +87,24 @@ public final class Settings {
 
     public static void setCommandTypes(boolean commandTypes) {
         Settings.commandTypes = commandTypes;
+        save();
+    }
+
+    public static boolean isAutoSide() {
+        return autoSide;
+    }
+
+    public static void setAutoSide(boolean autoSide) {
+        Settings.autoSide = autoSide;
+        save();
+    }
+
+    public static boolean isAutoBlacklist() {
+        return autoBlacklist;
+    }
+
+    public static void setAutoBlacklist(boolean autoBlacklist) {
+        Settings.autoBlacklist = autoBlacklist;
         save();
     }
 

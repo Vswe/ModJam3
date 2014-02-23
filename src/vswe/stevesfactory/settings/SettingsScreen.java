@@ -65,6 +65,30 @@ public class SettingsScreen implements IInterfaceRenderer {
                 return Settings.isCommandTypes();
             }
         });
+
+        checkBoxes.addCheckBox(new CheckBoxSetting(Localization.AUTO_SIDE, 10, 160) {
+            @Override
+            public void setValue(boolean val) {
+                Settings.setAutoSide(val);
+            }
+
+            @Override
+            public boolean getValue() {
+                return Settings.isAutoSide();
+            }
+        });
+
+        checkBoxes.addCheckBox(new CheckBoxSetting(Localization.AUTO_BLACK_LIST, 10, 200) {
+            @Override
+            public void setValue(boolean val) {
+                Settings.setAutoBlacklist(val);
+            }
+
+            @Override
+            public boolean getValue() {
+                return Settings.isAutoBlacklist();
+            }
+        });
     }
 
     private abstract class CheckBoxSetting extends CheckBox {
@@ -96,6 +120,9 @@ public class SettingsScreen implements IInterfaceRenderer {
     @Override
     public void onClick(GuiManager gui, int mX, int mY, int button) {
         checkBoxes.onClick(mX, mY);
+        if (button == 1) {
+            manager.specialRenderer = null;
+        }
     }
 
     @Override
