@@ -105,7 +105,13 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
     }
 
     public void drawMouseOver(String str, int x, int y, int width) {
-        List lst = new ArrayList<String>();
+
+
+        drawMouseOver(getLinesFromText(str, width), x, y);
+    }
+
+    public List<String> getLinesFromText(String str, int width) {
+        List<String> lst = new ArrayList<String>();
         String[] words = str.split(" ");
         String line = "";
         for (String word : words) {
@@ -124,7 +130,7 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
         }
         lst.add(line);
 
-        drawMouseOver(lst, x, y);
+        return lst;
     }
 
     public void drawMouseOver(String str, int x, int y) {
@@ -392,4 +398,7 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
     }
 
 
+    public int getFontHeight() {
+        return fontRenderer.FONT_HEIGHT;
+    }
 }

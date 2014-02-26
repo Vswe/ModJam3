@@ -83,8 +83,8 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
             }
         });
 
-        //TODO re-add this when the settings menu is dead
-       /* buttons.add(new Button(Localization.SETTINGS) {
+        //TODO re-add this when the settings menu is done
+       buttons.add(new Button(Localization.SETTINGS) {
             @Override
             protected void onClick(DataReader dr) {
 
@@ -95,7 +95,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
                 Settings.openMenu(self);
                 return false;
             }
-        });*/
+        });
 
         buttons.add(new Button(Localization.EXIT_GROUP) {
             @Override
@@ -484,7 +484,6 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
 
     @Override
     public void readAllData(DataReader dr, EntityPlayer player) {
-        selectedComponent = null;
         updateInventories();
         int flowControlCount = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
         getFlowItems().clear();
@@ -495,6 +494,25 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
         for (FlowComponent item : items) {
             item.linkParentAfterLoad();
         }
+
+        if (Settings.isAutoCloseGroup()) {
+            selectedComponent = null;
+        }else{
+            while(selectedComponent != null && !findNewSelectedComponent(selectedComponent.getId())) {
+                selectedComponent = selectedComponent.getParent();
+            }
+        }
+    }
+
+    private boolean findNewSelectedComponent(int id) {
+        for (FlowComponent item : items) {
+            if (item.getId() == id) {
+                selectedComponent = item;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void readAllComponentData(DataReader dr) {

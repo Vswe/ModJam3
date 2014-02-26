@@ -8,18 +8,20 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.FileHelper;
 
-@SideOnly(Side.CLIENT)
+
 public final class Settings {
 
     private static final String NAME = "StevesFactoryManagerInside";
     private static final int VERSION = 0;
     private static boolean autoCloseGroup;
     private static boolean largeOpenHitBox;
+    private static boolean largeOpenHitBoxMenu;
     private static boolean quickGroupOpen;
     private static boolean commandTypes;
     private static boolean autoSide;
     private static boolean autoBlacklist;
 
+    @SideOnly(Side.CLIENT)
     public static void openMenu(TileEntityManager manager) {
         manager.specialRenderer = new SettingsScreen(manager);
     }
@@ -69,6 +71,15 @@ public final class Settings {
 
     public static void setLargeOpenHitBox(boolean largeOpenHitBox) {
         Settings.largeOpenHitBox = largeOpenHitBox;
+        save();
+    }
+
+    public static boolean isLargeOpenHitBoxMenu() {
+        return largeOpenHitBoxMenu;
+    }
+
+    public static void setLargeOpenHitBoxMenu(boolean largeOpenHitBoxMenu) {
+        Settings.largeOpenHitBoxMenu = largeOpenHitBoxMenu;
         save();
     }
 

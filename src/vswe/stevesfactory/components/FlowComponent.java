@@ -12,6 +12,7 @@ import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.network.*;
+import vswe.stevesfactory.settings.Settings;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -368,6 +369,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             gui.drawString(getShortName(gui, getName()), x + TEXT_X, y + TEXT_Y, 0.7F, 0x207020);
         }
 
+        if (name != null && Settings.isCommandTypes() && !GuiScreen.isCtrlKeyDown()) {
+            gui.drawCenteredString(getType().getName(), x + DRAGGABLE_SIZE, y + 3, 0.7F, getComponentWidth() - DRAGGABLE_SIZE - ARROW_SIZE_W, 0x707070);
+        }
+
         if (isLarge) {
             if (isEditing) {
                 gui.drawCursor(x + TEXT_X + (int)((textBox.getCursorPosition(gui) +  CURSOR_X) * 0.7F), y + TEXT_Y + (int)(CURSOR_Y * 0.7F), CURSOR_Z, 0.7F, 0xFFFFFFFF);
@@ -410,7 +415,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
     @SideOnly(Side.CLIENT)
     public String getName() {
-         return textBox.getText() == null ? name == null ||GuiScreen.isCtrlKeyDown() ? getType().getName() : name : textBox.getText();
+         return textBox.getText() == null ? name == null || GuiScreen.isCtrlKeyDown() ? getType().getName() : name : textBox.getText();
     }
 
     List<String> errors = new ArrayList<String>();
@@ -501,8 +506,6 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                 mouseStartX = mouseDragX = mX;
                 mouseStartY = mouseDragY = mY;
                 isDragging = true;
-            }else if(inArrowBounds(internalX, internalY)) {
-                isLarge = !isLarge;
             }else if(isLarge && !isEditing && CollisionHelper.inBounds(EDIT_X, EDIT_Y, EDIT_SIZE, EDIT_SIZE, internalX, internalY)) {
                 isEditing = true;
                 textBox.setTextAndCursor(getName());
@@ -521,13 +524,19 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                 if (button == 1) {
                     textBox.setTextAndCursor("");
                 }
+            }else if(inArrowBounds(internalX, internalY) || (Settings.isLargeOpenHitBox() &&  internalY < COMPONENT_SIZE_H)) {
+                if (!isLarge && type == ComponentType.GROUP && Settings.isQuickGroupOpen() && !GuiScreen.isShiftKeyDown()) {
+                    manager.setSelectedComponent(this);
+                }else{
+                    isLarge = !isLarge;
+                }
             }else if (isLarge){
 
                 for (int i = 0; i < menus.size(); i++) {
                     ComponentMenu menu = menus.get(i);
 
                     if (menu.isVisible()) {
-                        if (inMenuArrowBounds(i, internalX, internalY)) {
+                        if (inMenuArrowBounds(i, internalX, internalY) || (Settings.isLargeOpenHitBoxMenu() && internalY >= getMenuItemY(i) && internalY <= getMenuItemY(i) + MENU_ITEM_SIZE_H)) {
                             if (openMenuId == i) {
                                 openMenuId = -1;
                             }else{
