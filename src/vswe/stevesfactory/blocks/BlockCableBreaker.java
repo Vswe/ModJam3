@@ -96,7 +96,7 @@ public class BlockCableBreaker extends BlockContainer {
         }
 
         TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, x, y, z);
-        if (breaker != null) {
+        if (breaker != null && !breaker.isBlocked()) {
             breaker.setPlaceDirection(side);
             return true;
         }

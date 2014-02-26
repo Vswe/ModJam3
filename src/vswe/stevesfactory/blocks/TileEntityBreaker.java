@@ -30,6 +30,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
     private List<ItemStack> inventoryCache;
     private boolean broken;
     private int placeDirection;
+    private boolean blocked;
 
 
     private List<ItemStack> getInventory() {
@@ -71,12 +72,31 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
         player.rotationYaw = rotationSide * 90;
 
         if (itemstack.getItem() != null && itemstack.stackSize > 0) {
-            System.out.println("Side: " + side.ordinal());
-            System.out.println("Direction: " + direction.ordinal());
-            System.out.println();
+            blocked = true;
             player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, placeDirection, hitX, hitY, hitZ);
+            blocked = false;
         }
     }
+
+    /*private void placeItem(ItemStack itemstack) {
+        ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
+
+        int x = xCoord;
+        int y = yCoord;
+        int z = zCoord;
+        int side = direction.ordinal();
+        float hitX = 0.5F + direction.offsetX * 0.5F;
+        float hitY = 0.5F + direction.offsetY * 0.5F;
+        float hitZ = 0.5F + direction.offsetZ * 0.5F;
+
+        EntityPlayerMP player = FakePlayerFactory.get(worldObj, FAKE_PLAYER_NAME);
+        int rotationSide = ROTATION_SIDE_MAPPING[side];
+        player.rotationYaw = rotationSide * 90;
+
+        if (itemstack.getItem() != null && itemstack.stackSize > 0) {
+            player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, side, hitX, hitY, hitZ);
+        }
+    }*/
 
     private static  final  double SPEED_MULTIPLIER = 0.05F;
     private static final Random rand = new Random();
@@ -377,4 +397,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
     }
 
 
+    public boolean isBlocked() {
+        return blocked;
+    }
 }
