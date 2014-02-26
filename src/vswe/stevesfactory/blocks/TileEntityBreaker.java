@@ -10,6 +10,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -56,50 +57,56 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
         return inventory;
     }
 
-    private void placeItem(ItemStack itemstack) {
-        ForgeDirection side = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
-        ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[placeDirection];
+    private ItemStack         placeItem(ItemStack itemstack) {
+            if (itemstack != null && itemstack.getItem() != null && itemstack.stackSize > 0) {
+                ForgeDirection side = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
+                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[placeDirection].getOpposite();
 
-        int x = xCoord + side.offsetX - direction.offsetX;
-        int y = yCoord + side.offsetY - direction.offsetY;
-        int z = zCoord + side.offsetZ - direction.offsetZ;
-        float hitX = 0.5F + direction.offsetX * 0.5F;
-        float hitY = 0.5F + direction.offsetY * 0.5F;
-        float hitZ = 0.5F + direction.offsetZ * 0.5F;
 
-        EntityPlayerMP player = FakePlayerFactory.get(worldObj, FAKE_PLAYER_NAME);
-        int rotationSide = ROTATION_SIDE_MAPPING[placeDirection];
-        player.rotationYaw = rotationSide * 90;
 
-        if (itemstack.getItem() != null && itemstack.stackSize > 0) {
-            blocked = true;
-            player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, placeDirection, hitX, hitY, hitZ);
-            blocked = false;
-        }
+                float hitX = 0.5F + direction.offsetX * 0.5F;
+                float hitY = 0.5F + direction.offsetY * 0.5F;
+                float hitZ = 0.5F + direction.offsetZ * 0.5F;
+
+                EntityPlayerMP player = FakePlayerFactory.get(worldObj, FAKE_PLAYER_NAME);
+                int rotationSide = ROTATION_SIDE_MAPPING[direction.ordinal()];
+
+                player.prevRotationPitch = player.rotationYaw = rotationSide * 90;
+                player.prevRotationYaw = player.rotationPitch = direction == ForgeDirection.UP ? 90 : direction == ForgeDirection.DOWN ? -90 : 0;
+                player.prevPosX = player.posX = xCoord + side.offsetX + 0.5 + direction.offsetX * 0.4;
+                player.prevPosY = player.posY = yCoord + side.offsetY + 0.5 + direction.offsetY * 0.4;
+                player.prevPosZ = player.posZ = zCoord + side.offsetZ + 0.5 + direction.offsetZ * 0.4;
+                player.eyeHeight = 0;
+                player.yOffset = 1.82F;
+                player.theItemInWorldManager.setBlockReachDistance(1);
+
+                blocked = true;
+                try {
+                    player.inventory.currentItem = 0;
+                    player.inventory.setInventorySlotContents(0, itemstack);
+                    ItemStack result = itemstack.useItemRightClick(worldObj, player);
+                    if (result == null || !result.isItemEqual(itemstack) || !ItemStack.areItemStackTagsEqual(result, itemstack)) {
+                        itemstack = result;
+                    }else{
+                        int x = xCoord + side.offsetX - direction.offsetX;
+                        int y = yCoord + side.offsetY - direction.offsetY;
+                        int z = zCoord + side.offsetZ - direction.offsetZ;
+
+                        player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, direction.ordinal(), hitX, hitY, hitZ);
+
+                        ItemStack playerItem  = player.inventory.getStackInSlot(0);
+                        if (playerItem == null || !playerItem.isItemEqual(itemstack) || !ItemStack.areItemStackTagsEqual(playerItem, itemstack)) {
+                            itemstack = null;
+                        }
+                    }
+                }catch (Exception ignored) {
+
+                }
+                blocked = false;
+            }
+
+        return itemstack;
     }
-
-    /*private void placeItem(ItemStack itemstack) {
-        ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
-
-        int x = xCoord;
-        int y = yCoord;
-        int z = zCoord;
-        int side = direction.ordinal();
-        float hitX = 0.5F + direction.offsetX * 0.5F;
-        float hitY = 0.5F + direction.offsetY * 0.5F;
-        float hitZ = 0.5F + direction.offsetZ * 0.5F;
-
-        EntityPlayerMP player = FakePlayerFactory.get(worldObj, FAKE_PLAYER_NAME);
-        int rotationSide = ROTATION_SIDE_MAPPING[side];
-        player.rotationYaw = rotationSide * 90;
-
-        if (itemstack.getItem() != null && itemstack.stackSize > 0) {
-            player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, side, hitX, hitY, hitZ);
-        }
-    }*/
-
-    private static  final  double SPEED_MULTIPLIER = 0.05F;
-    private static final Random rand = new Random();
 
     @Override
     public void updateEntity() {
@@ -114,25 +121,28 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
         if (inventory != null) {
             ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
 
-            double x = xCoord + direction.offsetX;
-            double y = yCoord + direction.offsetY;
-            double z = zCoord + direction.offsetZ;
 
             for (ItemStack itemStack : getInventoryForDrop()) {
-                placeItem(itemStack);
+                itemStack = placeItem(itemStack);
                 if (itemStack != null && itemStack.stackSize > 0) {
 
 
-                    double spawnX = x + rand.nextDouble() * 0.8 + 0.1;
-                    double spawnY = y + rand.nextDouble() * 0.8 + 0.1;
-                    double spawnZ = z + rand.nextDouble() * 0.8 + 0.1;
+                    double x = xCoord + 0.5 + direction.offsetX * 0.75;
+                    double y = yCoord + 0.5 + direction.offsetY * 0.75;
+                    double z = zCoord + 0.5 + direction.offsetZ * 0.75;
 
-                    EntityItem entityitem = new EntityItem(worldObj, spawnX, spawnY, spawnZ, itemStack);
 
-                    entityitem.motionX = rand.nextGaussian() * SPEED_MULTIPLIER;
-                    entityitem.motionY = rand.nextGaussian() * SPEED_MULTIPLIER + 0.2F;
-                    entityitem.motionZ = rand.nextGaussian() * SPEED_MULTIPLIER;
+                    if (direction.offsetY == 0) {
+                        y -= 0.1;
+                    }
 
+                    EntityItem entityitem = new EntityItem(worldObj, x, y, z, itemStack);
+
+                    entityitem.motionX = direction.offsetX * 0.1;
+                    entityitem.motionY = direction.offsetY * 0.1;
+                    entityitem.motionZ = direction.offsetZ * 0.1;
+
+                    entityitem.delayBeforeCanPickup = 40;
                     worldObj.spawnEntityInWorld(entityitem);
                 }
             }
@@ -217,7 +227,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
 
     }
 
-    private static final int[] ROTATION_SIDE_MAPPING = {0, 0, 2, 0, 1, 3};
+    private static final int[] ROTATION_SIDE_MAPPING = {0, 0, 0, 2, 3, 1};
 
     @Override
     public void setInventorySlotContents(int id, ItemStack itemstack) {
@@ -334,8 +344,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
 
     @Override
     protected void writeContentToNBT(NBTTagCompound tagCompound) {
-        //TODO
-        //tagCompound.setByte(NBT_DIRECTION, (byte)placeDirection);
+        tagCompound.setByte(NBT_DIRECTION, (byte)placeDirection);
     }
 
     private static final int UPDATE_BUFFER_DISTANCE = 5;
