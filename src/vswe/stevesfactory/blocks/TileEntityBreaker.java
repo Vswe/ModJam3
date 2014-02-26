@@ -1,29 +1,35 @@
 package vswe.stevesfactory.blocks;
 
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.FakePlayerFactory;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ForgeHooks;
+import vswe.stevesfactory.network.*;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
-public class TileEntityBreaker extends TileEntityClusterElement implements IInventory {
+public class TileEntityBreaker extends TileEntityClusterElement implements IInventory, IPacketBlock {
 
     private static final String FAKE_PLAYER_NAME = "[SFM_PLAYER]";
     private List<ItemStack> inventory;
     private List<ItemStack> inventoryCache;
     private boolean broken;
+    private int placeDirection;
 
 
     private List<ItemStack> getInventory() {
@@ -50,22 +56,25 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
     }
 
     private void placeItem(ItemStack itemstack) {
-        ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
+        ForgeDirection side = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
+        ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[placeDirection];
 
-        int x = xCoord;
-        int y = yCoord;
-        int z = zCoord;
-        int side = direction.ordinal();
+        int x = xCoord + side.offsetX - direction.offsetX;
+        int y = yCoord + side.offsetY - direction.offsetY;
+        int z = zCoord + side.offsetZ - direction.offsetZ;
         float hitX = 0.5F + direction.offsetX * 0.5F;
         float hitY = 0.5F + direction.offsetY * 0.5F;
         float hitZ = 0.5F + direction.offsetZ * 0.5F;
 
         EntityPlayerMP player = FakePlayerFactory.get(worldObj, FAKE_PLAYER_NAME);
-        int rotationSide = ROTATION_SIDE_MAPPING[side];
+        int rotationSide = ROTATION_SIDE_MAPPING[placeDirection];
         player.rotationYaw = rotationSide * 90;
 
         if (itemstack.getItem() != null && itemstack.stackSize > 0) {
-            player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, side, hitX, hitY, hitZ);
+            System.out.println("Side: " + side.ordinal());
+            System.out.println("Direction: " + direction.ordinal());
+            System.out.println();
+            player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, placeDirection, hitX, hitY, hitZ);
         }
     }
 
@@ -74,6 +83,14 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
 
     @Override
     public void updateEntity() {
+        if (missingPlaceDirection) {
+            setPlaceDirection(getBlockMetadata());
+            missingPlaceDirection = false;
+        }
+        if (worldObj.isRemote) {
+            keepClientDataUpdated();
+        }
+
         if (inventory != null) {
             ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
 
@@ -84,7 +101,6 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
             for (ItemStack itemStack : getInventoryForDrop()) {
                 placeItem(itemStack);
                 if (itemStack != null && itemStack.stackSize > 0) {
-
 
 
                     double spawnX = x + rand.nextDouble() * 0.8 + 0.1;
@@ -105,6 +121,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
         inventoryCache = null;
         broken = false;
     }
+
 
     private List<ItemStack> getInventoryForDrop() {
         List<ItemStack> ret = new ArrayList<ItemStack>();
@@ -276,6 +293,88 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
 
     @Override
     protected EnumSet<ClusterMethodRegistration> getRegistrations() {
-        return EnumSet.of(ClusterMethodRegistration.ON_BLOCK_PLACED_BY);
+        return EnumSet.of(ClusterMethodRegistration.ON_BLOCK_PLACED_BY, ClusterMethodRegistration.ON_BLOCK_ACTIVATED);
     }
+
+    private static final String NBT_DIRECTION = "Direction";
+
+    private boolean missingPlaceDirection;
+    @Override
+    protected void readContentFromNBT(NBTTagCompound tagCompound) {
+        if (tagCompound.hasKey(NBT_DIRECTION)) {
+            setPlaceDirection(tagCompound.getByte(NBT_DIRECTION));
+        }else{
+            if (worldObj != null) {
+                setPlaceDirection(getBlockMetadata());
+            }else{
+                missingPlaceDirection = true;
+            }
+        }
+    }
+
+    @Override
+    protected void writeContentToNBT(NBTTagCompound tagCompound) {
+        //TODO
+        //tagCompound.setByte(NBT_DIRECTION, (byte)placeDirection);
+    }
+
+    private static final int UPDATE_BUFFER_DISTANCE = 5;
+    private boolean hasUpdatedData;
+
+    @SideOnly(Side.CLIENT)
+    private void keepClientDataUpdated() {
+        if (isPartOfCluster()) {
+            return;
+        }
+
+        double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+
+        if (distance > Math.pow(PacketHandler.BLOCK_UPDATE_RANGE, 2)) {
+            hasUpdatedData = false;
+        }else if(!hasUpdatedData && distance < Math.pow(PacketHandler.BLOCK_UPDATE_RANGE - UPDATE_BUFFER_DISTANCE, 2)) {
+            hasUpdatedData = true;
+            PacketHandler.sendBlockPacket(this, Minecraft.getMinecraft().thePlayer, 0);
+        }
+    }
+
+    @Override
+    public void writeData(DataWriter dw, EntityPlayer player, boolean onServer, int id) {
+        if (onServer) {
+            dw.writeData(placeDirection, DataBitHelper.PLACE_DIRECTION);
+        }else{
+            //nothing to write, empty packet
+        }
+    }
+
+    @Override
+    public void readData(DataReader dr, EntityPlayer player, boolean onServer, int id) {
+        if (onServer) {
+            //respond by sending the data to the client that required it
+            PacketHandler.sendBlockPacket(this, player, 0);
+        }else{
+            placeDirection = dr.readData(DataBitHelper.PLACE_DIRECTION);
+            worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
+        }
+    }
+
+    @Override
+    public int infoBitLength(boolean onServer) {
+        return 0;
+    }
+
+    public int getPlaceDirection() {
+        return placeDirection;
+    }
+
+    public void setPlaceDirection(int placeDirection) {
+        if (this.placeDirection != placeDirection) {
+            this.placeDirection = placeDirection;
+
+            if (!isPartOfCluster() && worldObj != null && !worldObj.isRemote) {
+                PacketHandler.sendBlockPacket(this, null, 0);
+            }
+        }
+    }
+
+
 }

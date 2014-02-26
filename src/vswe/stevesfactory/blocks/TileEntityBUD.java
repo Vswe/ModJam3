@@ -52,14 +52,16 @@ public class TileEntityBUD extends TileEntityClusterElement implements ISystemLi
     }
 
     public void updateData() {
-        data = new int[data.length];
-        for (int i = 0; i < data.length; i++) {
-            ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[i];
-            int x = direction.offsetX + this.xCoord;
-            int y = direction.offsetY + this.yCoord;
-            int z = direction.offsetZ + this.zCoord;
+        if (worldObj != null) {
+            data = new int[data.length];
+            for (int i = 0; i < data.length; i++) {
+                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[i];
+                int x = direction.offsetX + this.xCoord;
+                int y = direction.offsetY + this.yCoord;
+                int z = direction.offsetZ + this.zCoord;
 
-            data[i] = (worldObj.getBlockId(x, y, z) << 4) | (worldObj.getBlockMetadata(x, y, z) & 15);
+                data[i] = (worldObj.getBlockId(x, y, z) << 4) | (worldObj.getBlockMetadata(x, y, z) & 15);
+            }
         }
     }
 

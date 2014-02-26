@@ -83,7 +83,8 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
             }
         });
 
-        buttons.add(new Button(Localization.SETTINGS) {
+        //TODO re-add this when the settings menu is dead
+       /* buttons.add(new Button(Localization.SETTINGS) {
             @Override
             protected void onClick(DataReader dr) {
 
@@ -94,7 +95,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
                 Settings.openMenu(self);
                 return false;
             }
-        });
+        });*/
 
         buttons.add(new Button(Localization.EXIT_GROUP) {
             @Override

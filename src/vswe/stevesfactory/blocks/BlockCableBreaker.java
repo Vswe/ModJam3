@@ -8,6 +8,7 @@ import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
@@ -32,34 +33,50 @@ public class BlockCableBreaker extends BlockContainer {
     }
 
     @SideOnly(Side.CLIENT)
-    private Icon outIcon;
+    private Icon doubleIcon;
+    @SideOnly(Side.CLIENT)
+    private Icon frontIcon;
+    @SideOnly(Side.CLIENT)
+    private Icon sideIcon;
+
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerIcons(IconRegister register) {
         blockIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_idle");
-        outIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_breaker");
+        doubleIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_breaker");
+        frontIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_breaker_front");
+        sideIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_breaker_direction");
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public Icon getIcon(int side, int meta) {
-        //pretend the meta is 3
-        return getIconFromSideAndMeta(side, 3);
+        return side == 3 ? doubleIcon : blockIcon;
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
-        int meta = world.getBlockMetadata(x, y, z);
+        TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, x, y, z);
 
-        return getIconFromSideAndMeta(side, meta);
+        if (breaker != null) {
+            int meta = breaker.getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length;
+            int direction = breaker.getPlaceDirection();
+
+            if (side == meta && side == direction) {
+                return doubleIcon;
+            }else if(side == meta) {
+                return frontIcon;
+            }else if(side == direction) {
+                return sideIcon;
+            }
+        }
+
+        return blockIcon;
     }
 
-    @SideOnly(Side.CLIENT)
-    private Icon getIconFromSideAndMeta(int side, int meta) {
-        return side == meta % ForgeDirection.VALID_DIRECTIONS.length ? outIcon : blockIcon;
-    }
+
 
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
@@ -68,6 +85,22 @@ public class BlockCableBreaker extends BlockContainer {
         TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, x, y, z);
         if (breaker != null) {
             breaker.setMetaData(meta);
+            breaker.setPlaceDirection(meta);
         }
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+        if (player.isSneaking()) {
+            side = ForgeDirection.VALID_DIRECTIONS[side].getOpposite().ordinal();
+        }
+
+        TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, x, y, z);
+        if (breaker != null) {
+            breaker.setPlaceDirection(side);
+            return true;
+        }
+
+        return false;
     }
 }
