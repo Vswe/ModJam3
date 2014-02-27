@@ -31,6 +31,9 @@ public class ComponentMenuResult extends ComponentMenu {
             public void setSelectedOption(int selectedOption) {
                 super.setSelectedOption(selectedOption);
 
+                if (selectedOption >= sets.length) {
+                    System.out.println(getParent().getType().getLongName());
+                }
                 getParent().setConnectionSet(sets[radioButtons.getSelectedOption()]);
 
                 if (getParent().getType() == ComponentType.VARIABLE) {

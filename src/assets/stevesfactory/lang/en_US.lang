@@ -353,6 +353,7 @@ gui.sfm.ShowCommandType=Always show the command type of the command, even when i
 gui.sfm.AutoSide=Automatically select one side for inputs, outputs and conditions. Inputs will use the up side and the others will use the down side.
 gui.sfm.AutoBlackList=Automatically select an empty blacklist for input commands as well. (Output commands start with an empty blacklist regardless of this setting.)
 gui.sfm.Limitless=Remove all limits of this manager. Without this selected there's a limit of 511 commands, 1023 connected inventories and a max reach of 128 blocks. [Creative only]
+gui.sfm.EnlargeInterfaces=Enlarge interfaces to fit the full screen, unless they do that already. (Interfaces are always made smaller to fit the screen regardless of this setting.)
 
 # ======================================
 #		 ADVANCED RELAY INTERFACE

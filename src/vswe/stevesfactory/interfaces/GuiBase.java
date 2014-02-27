@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import vswe.stevesfactory.StevesFactoryManager;
 import vswe.stevesfactory.blocks.TileEntityClusterElement;
+import vswe.stevesfactory.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -337,7 +338,7 @@ public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiCont
         float multX = w / xSize;
         float multY = h / ySize;
         float mult = Math.min(multX, multY);
-        if (mult > 1F) {
+        if (mult > 1F && !Settings.isEnlargeInterfaces()) {
             mult = 1F;
         }
 

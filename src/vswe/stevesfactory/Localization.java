@@ -318,6 +318,7 @@ public enum Localization {
     AUTO_SIDE,
     AUTO_BLACK_LIST,
     LIMITLESS,
+    ENLARGE_INTERFACES,
 
 
     GIVE_PERMISSION,

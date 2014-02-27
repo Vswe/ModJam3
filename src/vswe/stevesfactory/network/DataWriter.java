@@ -176,6 +176,7 @@ public class DataWriter {
     private int invBits;
     public void writeInventoryId(TileEntityManager manager, int id) {
         if (!invWritten) {
+            manager.updateFirst();
             if (Settings.isLimitless(manager) && manager.getConnectedInventories().size() > TileEntityManager.MAX_CONNECTED_INVENTORIES)  {
                 writeBoolean(true);
                 int count = manager.getConnectedInventories().size();

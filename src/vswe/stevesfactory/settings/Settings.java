@@ -21,6 +21,7 @@ public final class Settings {
     private static boolean commandTypes;
     private static boolean autoSide;
     private static boolean autoBlacklist;
+    private static boolean enlargeInterfaces;
 
     @SideOnly(Side.CLIENT)
     public static void openMenu(TileEntityManager manager) {
@@ -41,6 +42,7 @@ public final class Settings {
                 commandTypes = dr.readBoolean();
                 autoSide = dr.readBoolean();
                 autoBlacklist = dr.readBoolean();
+                enlargeInterfaces = dr.readBoolean();
             }catch (Exception ignored){
                 loadDefault();
             }finally {
@@ -59,6 +61,7 @@ public final class Settings {
         commandTypes = false;
         autoSide = false;
         autoBlacklist = false;
+        enlargeInterfaces = false;
     }
 
     private static void save() {
@@ -74,6 +77,7 @@ public final class Settings {
             dw.writeBoolean(commandTypes);
             dw.writeBoolean(autoSide);
             dw.writeBoolean(autoBlacklist);
+            dw.writeBoolean(enlargeInterfaces);
 
             FileHelper.write(dw);
         }
@@ -143,7 +147,7 @@ public final class Settings {
     }
 
     public static boolean isLimitless(TileEntityManager manager) {
-        return ( manager.worldObj.getBlockMetadata(manager.xCoord, manager.yCoord, manager.zCoord) & 1) != 0;
+       return ( manager.worldObj.getBlockMetadata(manager.xCoord, manager.yCoord, manager.zCoord) & 1) != 0;
     }
 
     public static void setLimitless(TileEntityManager manager, boolean limitless) {
@@ -160,6 +164,15 @@ public final class Settings {
             }
             manager.worldObj.setBlockMetadataWithNotify(manager.xCoord, manager.yCoord, manager.zCoord, meta, 3);
         }
+    }
+
+    public static boolean isEnlargeInterfaces() {
+        return enlargeInterfaces;
+    }
+
+    public static void setEnlargeInterfaces(boolean enlargeInterfaces) {
+        Settings.enlargeInterfaces = enlargeInterfaces;
+        save();
     }
 
     private Settings() {}

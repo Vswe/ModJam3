@@ -415,12 +415,17 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
         }
     }
 
-    public void activateTrigger(FlowComponent component, EnumSet<ConnectionOption> validTriggerOutputs) {
+    public void updateFirst() {
         if (firstCommandExecution) {
             updateInventories();
             updateVariables();
+
             firstCommandExecution = false;
         }
+    }
+
+    public void activateTrigger(FlowComponent component, EnumSet<ConnectionOption> validTriggerOutputs) {
+        updateFirst();
 
         for (ConnectionBlock inventory : inventories) {
             if (inventory.getTileEntity().isInvalid()) {

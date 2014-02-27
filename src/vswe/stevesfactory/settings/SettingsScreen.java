@@ -153,6 +153,18 @@ public class SettingsScreen implements IInterfaceRenderer {
             }
         });
 
+        checkBoxes.addCheckBox(new CheckBoxSetting(Localization.ENLARGE_INTERFACES) {
+            @Override
+            public void setValue(boolean val) {
+                Settings.setEnlargeInterfaces(val);
+            }
+
+            @Override
+            public boolean getValue() {
+                return Settings.isEnlargeInterfaces();
+            }
+        });
+
 
         currentX = START_SETTINGS_X;
         currentY = START_Y;
