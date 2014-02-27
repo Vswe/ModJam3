@@ -418,9 +418,9 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     @Override
     public void writeData(DataWriter dw) {
         dw.writeData(getOption(), DataBitHelper.MENU_INVENTORY_MULTI_SELECTION_TYPE);
-        dw.writeData(selectedInventories.size(), DataBitHelper.MENU_INVENTORY_SELECTION);
+        dw.writeInventoryId(getParent().getManager(), selectedInventories.size());
         for (int selectedInventory : selectedInventories) {
-            dw.writeData(selectedInventory, DataBitHelper.MENU_INVENTORY_SELECTION);
+            dw.writeInventoryId(getParent().getManager(),selectedInventory);
 
         }
     }
@@ -429,10 +429,10 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     public void readData(DataReader dr) {
         setOption(dr.readData(DataBitHelper.MENU_INVENTORY_MULTI_SELECTION_TYPE));
         selectedInventories.clear();
-        int count = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION);
+        int count = dr.readInventoryId();
         for(int i = 0; i < count; i++) {
 
-            selectedInventories.add(dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION));
+            selectedInventories.add(dr.readInventoryId());
 
         }
     }
@@ -488,7 +488,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         if (dr.readBoolean()) {
             setOption(dr.readData(DataBitHelper.MENU_INVENTORY_MULTI_SELECTION_TYPE));
         }else{
-            int id = dr.readData(DataBitHelper.MENU_INVENTORY_SELECTION);
+            int id = dr.readInventoryId();
             if (dr.readBoolean()) {
                 selectedInventories.add(id);
             }else{
@@ -510,7 +510,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
     private void writeData(DataWriter dw, int id, boolean select) {
         dw.writeBoolean(false);
-        dw.writeData(id, DataBitHelper.MENU_INVENTORY_SELECTION);
+        dw.writeInventoryId(getParent().getManager(), id);
         dw.writeBoolean(select);
     }
 

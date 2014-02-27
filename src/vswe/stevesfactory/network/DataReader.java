@@ -3,6 +3,8 @@ package vswe.stevesfactory.network;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import vswe.stevesfactory.blocks.TileEntityManager;
+import vswe.stevesfactory.settings.Settings;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
@@ -104,4 +106,37 @@ public class DataReader {
             return null;
         }
     }
+
+    private boolean idRead;
+    private int idBits;
+    public int readComponentId() {
+        if (!idRead) {
+            if (readBoolean()) {
+                idBits = readData(DataBitHelper.BIT_COUNT);
+            }else{
+                idBits = DataBitHelper.FLOW_CONTROL_COUNT.getBitCount();
+            }
+
+            idRead = true;
+        }
+
+        return readData(idBits);
+    }
+
+    private boolean invRead;
+    private int invBits;
+    public int readInventoryId() {
+        if (!invRead) {
+            if (readBoolean()) {
+                invBits = readData(DataBitHelper.BIT_COUNT);
+            }else{
+                invBits = DataBitHelper.MENU_INVENTORY_SELECTION.getBitCount();
+            }
+
+            invRead = true;
+        }
+
+        return readData(invBits);
+    }
+
 }

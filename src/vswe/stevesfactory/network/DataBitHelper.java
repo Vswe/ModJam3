@@ -68,7 +68,8 @@ public enum DataBitHelper {
     CAMOUFLAGE_INSIDE(3),
     CAMOUFLAGE_BOUNDS(6),
     CAMOUFLAGE_BOUND_TYPE(3),
-    PLACE_DIRECTION(3);
+    PLACE_DIRECTION(3),
+    BIT_COUNT(5);
 
 
 

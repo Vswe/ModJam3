@@ -7,8 +7,10 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import vswe.stevesfactory.StevesFactoryManager;
+import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.interfaces.ContainerBase;
 import vswe.stevesfactory.interfaces.ContainerManager;
+import vswe.stevesfactory.settings.Settings;
 
 import java.io.*;
 
@@ -150,4 +152,43 @@ public class DataWriter {
         }
     }
 
+    private boolean idWritten;
+    private int idBits;
+    public void writeComponentId(TileEntityManager manager, int id) {
+        if (!idWritten) {
+            if (Settings.isLimitless(manager) && manager.getFlowItems().size() > TileEntityManager.MAX_COMPONENT_AMOUNT)  {
+                writeBoolean(true);
+                int count = manager.getFlowItems().size();
+                idBits = (int)(Math.log10(count + 1) / Math.log10(2)) + 1;
+                writeData(idBits, DataBitHelper.BIT_COUNT);
+            }else{
+                writeBoolean(false);
+                idBits = DataBitHelper.FLOW_CONTROL_COUNT.getBitCount();
+            }
+
+            idWritten = true;
+        }
+
+        writeData(id, idBits);
+    }
+
+    private boolean invWritten;
+    private int invBits;
+    public void writeInventoryId(TileEntityManager manager, int id) {
+        if (!invWritten) {
+            if (Settings.isLimitless(manager) && manager.getConnectedInventories().size() > TileEntityManager.MAX_CONNECTED_INVENTORIES)  {
+                writeBoolean(true);
+                int count = manager.getConnectedInventories().size();
+                invBits = (int)(Math.log10(count + 1) / Math.log10(2)) + 1;
+                writeData(invBits, DataBitHelper.BIT_COUNT);
+            }else{
+                writeBoolean(false);
+                invBits = DataBitHelper.MENU_INVENTORY_SELECTION.getBitCount();
+            }
+
+            invWritten = true;
+        }
+
+        writeData(id, invBits);
+    }
 }

@@ -60,7 +60,7 @@ public class ComponentMenuGroup extends ComponentMenu {
                 if (component.isBeingMoved()) {
                     if (!component.equals(getParent())) {
                         DataWriter dw = getWriterForServerComponentPacket();
-                        dw.writeData(component.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
+                        dw.writeComponentId(getParent().getManager(), component.getId());
                         dw.writeBoolean(GuiScreen.isShiftKeyDown());
                         PacketHandler.sendDataToServer(dw);
                     }
@@ -104,7 +104,7 @@ public class ComponentMenuGroup extends ComponentMenu {
     @Override
     public void readNetworkComponent(DataReader dr) {
         if (!getParent().getManager().worldObj.isRemote) {
-            int id = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+            int id = dr.readComponentId();
             FlowComponent component = getParent().getManager().getFlowItems().get(id);
             boolean moveCluster = dr.readBoolean();
 

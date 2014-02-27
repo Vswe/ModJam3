@@ -2,6 +2,7 @@ package vswe.stevesfactory.settings;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.CheckBox;
@@ -20,11 +21,12 @@ public class SettingsScreen implements IInterfaceRenderer {
         this.manager = manager;
     }
 
-    private static int CHECK_BOX_WIDTH = 100;
-    private static int START_X = 10;
-    private static int MARGIN_X = 30;
-    private static int START_Y = 20;
-    private static int MAX_Y = 250;
+    private static final int CHECK_BOX_WIDTH = 100;
+    private static final int START_X = 10;
+    private static final int START_SETTINGS_X = 380;
+    private static final int MARGIN_X = 30;
+    private static final int START_Y = 20;
+    private static final int MAX_Y = 250;
     private abstract class CheckBoxSetting extends CheckBox {
         private CheckBoxSetting(Localization name) {
             super(name, getXAndGenerateY(name), currentY);
@@ -150,6 +152,28 @@ public class SettingsScreen implements IInterfaceRenderer {
                 return Settings.isAutoBlacklist();
             }
         });
+
+
+        currentX = START_SETTINGS_X;
+        currentY = START_Y;
+        offsetY = 0;
+
+        checkBoxes.addCheckBox(new CheckBoxSetting(Localization.LIMITLESS) {
+            @Override
+            public void setValue(boolean val) {
+                Settings.setLimitless(manager, val);
+            }
+
+            @Override
+            public boolean getValue() {
+                return Settings.isLimitless(manager);
+            }
+
+            @Override
+            public boolean isVisible() {
+                return Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode;
+            }
+        });
     }
 
     @Override
@@ -158,7 +182,8 @@ public class SettingsScreen implements IInterfaceRenderer {
             addCheckboxes(gui);
         }
 
-        gui.drawString(Localization.SETTINGS.toString(), 8, 6, 0x404040);
+        gui.drawString(Localization.PREFERENCES.toString(), START_X - 2, 6, 0x404040);
+        gui.drawString(Localization.SETTINGS.toString(), START_SETTINGS_X - 2, 6, 0x404040);
         checkBoxes.draw(gui, mX, mY);
     }
 

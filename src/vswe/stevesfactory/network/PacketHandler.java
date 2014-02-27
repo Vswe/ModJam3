@@ -13,6 +13,7 @@ import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.tileentity.TileEntity;
 import vswe.stevesfactory.blocks.ITileEntityInterface;
+import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.*;
 import vswe.stevesfactory.interfaces.ContainerBase;
 import vswe.stevesfactory.interfaces.ContainerManager;
@@ -172,7 +173,7 @@ public class PacketHandler implements IPacketHandler {
 
     private static void createComponentPacket(DataWriter dw, FlowComponent component, ComponentMenu menu) {
         dw.writeBoolean(true); //this is a packet for a specific FlowComponent
-        dw.writeData(component.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
+        dw.writeComponentId(component.getManager(), component.getId());
 
         if (menu != null) {
             dw.writeBoolean(true); //this is packet for a specific menu
@@ -211,7 +212,7 @@ public class PacketHandler implements IPacketHandler {
         dw.writeString(flowComponent.getComponentName(), DataBitHelper.NAME_LENGTH);
         if (flowComponent.getParent() != null) {
             dw.writeBoolean(true);
-            dw.writeData(flowComponent.getParent().getId(), DataBitHelper.FLOW_CONTROL_COUNT);
+            dw.writeComponentId(flowComponent.getManager(), flowComponent.getParent().getId());
         }else{
             dw.writeBoolean(false);
         }
@@ -223,7 +224,7 @@ public class PacketHandler implements IPacketHandler {
             Connection connection = flowComponent.getConnection(i);
             dw.writeBoolean(connection != null);
             if (connection != null) {
-                dw.writeData(connection.getComponentId(), DataBitHelper.FLOW_CONTROL_COUNT);
+                dw.writeComponentId(flowComponent.getManager(), connection.getComponentId());
                 dw.writeData(connection.getConnectionId(), DataBitHelper.CONNECTION_ID);
 
                 dw.writeData(connection.getNodes().size(), DataBitHelper.NODE_ID);
@@ -261,7 +262,7 @@ public class PacketHandler implements IPacketHandler {
         DataWriter dw = PacketHandler.getWriterForSpecificData(container);
         createNonComponentPacket(dw);
         dw.writeBoolean(false);
-        dw.writeData(idToRemove, DataBitHelper.FLOW_CONTROL_COUNT);
+        dw.writeComponentId((TileEntityManager)container.getTileEntity(), idToRemove);
         sendDataToListeningClients(container, dw);
     }
 

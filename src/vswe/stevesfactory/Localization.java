@@ -308,6 +308,7 @@ public enum Localization {
     CREATE_COMMAND,
     MAXIMUM_COMPONENT_ERROR,
     COMMANDS,
+    PREFERENCES,
     SETTINGS,
     CLOSE_GROUP_LABEL,
     OPEN_MENU_LARGE_HIT_BOX,
@@ -316,6 +317,7 @@ public enum Localization {
     SHOW_COMMAND_TYPE,
     AUTO_SIDE,
     AUTO_BLACK_LIST,
+    LIMITLESS,
 
 
     GIVE_PERMISSION,

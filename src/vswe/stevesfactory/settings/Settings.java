@@ -7,6 +7,7 @@ import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.FileHelper;
+import vswe.stevesfactory.network.PacketHandler;
 
 
 public final class Settings {
@@ -30,18 +31,34 @@ public final class Settings {
         DataReader dr = FileHelper.read(NAME);
 
         if (dr != null) {
-            int version = dr.readByte();
+            try {
+                int version = dr.readByte();
 
-            autoCloseGroup = dr.readBoolean();
-             //TODO
-            dr.close();
+                autoCloseGroup = dr.readBoolean();
+                largeOpenHitBox = dr.readBoolean();
+                largeOpenHitBoxMenu = dr.readBoolean();
+                quickGroupOpen = dr.readBoolean();
+                commandTypes = dr.readBoolean();
+                autoSide = dr.readBoolean();
+                autoBlacklist = dr.readBoolean();
+            }catch (Exception ignored){
+                loadDefault();
+            }finally {
+                dr.close();
+            }
         }else{
             loadDefault();
         }
     }
 
     private static void loadDefault() {
-        autoCloseGroup = true;
+        autoCloseGroup = false;
+        largeOpenHitBox = false;
+        largeOpenHitBoxMenu = false;
+        quickGroupOpen = false;
+        commandTypes = false;
+        autoSide = false;
+        autoBlacklist = false;
     }
 
     private static void save() {
@@ -51,7 +68,13 @@ public final class Settings {
             dw.writeByte(VERSION);
 
             dw.writeBoolean(autoCloseGroup);
-            //TODO
+            dw.writeBoolean(largeOpenHitBox);
+            dw.writeBoolean(largeOpenHitBoxMenu);
+            dw.writeBoolean(quickGroupOpen);
+            dw.writeBoolean(commandTypes);
+            dw.writeBoolean(autoSide);
+            dw.writeBoolean(autoBlacklist);
+
             FileHelper.write(dw);
         }
     }
@@ -117,6 +140,26 @@ public final class Settings {
     public static void setAutoBlacklist(boolean autoBlacklist) {
         Settings.autoBlacklist = autoBlacklist;
         save();
+    }
+
+    public static boolean isLimitless(TileEntityManager manager) {
+        return ( manager.worldObj.getBlockMetadata(manager.xCoord, manager.yCoord, manager.zCoord) & 1) != 0;
+    }
+
+    public static void setLimitless(TileEntityManager manager, boolean limitless) {
+        if (manager.worldObj.isRemote) {
+            DataWriter dw = PacketHandler.getWriterForServerActionPacket();
+            dw.writeBoolean(limitless);
+            PacketHandler.sendDataToServer(dw);
+        }else{
+            int meta = manager.worldObj.getBlockMetadata(manager.xCoord, manager.yCoord, manager.zCoord);
+            if (limitless) {
+                meta |= 1;
+            }else{
+                meta &= ~1;
+            }
+            manager.worldObj.setBlockMetadataWithNotify(manager.xCoord, manager.yCoord, manager.zCoord, meta, 3);
+        }
     }
 
     private Settings() {}

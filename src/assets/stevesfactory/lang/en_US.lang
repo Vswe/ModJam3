@@ -343,7 +343,8 @@ gui.sfm.MaximumComponentError=Maximum component amount reached
 gui.sfm.ExitGroup=Close group
 gui.sfm.ExitGroupDrop=Move from group [Drop command here]
 gui.sfm.Commands=Commands
-gui.sfm.Settings=Settings
+gui.sfm.Preferences=User Preferences
+gui.sfm.Settings=Manager Settings
 gui.sfm.CloseGroupLabel=Groups will automatically be closed when the interface is reopened.
 gui.sfm.OpenMenuLargeHitBox=Clicking on the top part of a command (or the full small command) will open or close it.
 gui.sfm.OpenMenuLargeHitBoxMenu=Clicking on a menu's name will open or close it (opposed to having to click the arrow).
@@ -351,7 +352,7 @@ gui.sfm.OpenGroupQuick=Enlarging a group command automatically opens the group (
 gui.sfm.ShowCommandType=Always show the command type of the command, even when it's named. (Holding Ctrl to display the types works regardless of this setting)
 gui.sfm.AutoSide=Automatically select one side for inputs, outputs and conditions. Inputs will use the up side and the others will use the down side.
 gui.sfm.AutoBlackList=Automatically select an empty blacklist for input commands as well. (Output commands start with an empty blacklist regardless of this setting.)
-
+gui.sfm.Limitless=Remove all limits of this manager. Without this selected there's a limit of 511 commands, 1023 connected inventories and a max reach of 128 blocks. [Creative only]
 
 # ======================================
 #		 ADVANCED RELAY INTERFACE

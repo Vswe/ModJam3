@@ -1036,7 +1036,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                     y = dr.readData(DataBitHelper.FLOW_CONTROL_Y);
                 }else{
                     if (dr.readBoolean()) {
-                        setParent(getManager().getFlowItems().get(dr.readData(DataBitHelper.FLOW_CONTROL_COUNT)));
+                        setParent(getManager().getFlowItems().get(dr.readComponentId()));
                     }else{
                         setParent(null);
                     }
@@ -1050,7 +1050,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             if (dr.readBoolean()) {
                 Connection connection;
                 if (dr.readBoolean()) {
-                    int targetComponentId = dr.readData(DataBitHelper.FLOW_CONTROL_COUNT);
+                    int targetComponentId = dr.readComponentId();
                     int targetConnectionId = dr.readData(DataBitHelper.CONNECTION_ID);
 
                     connection = new Connection(targetComponentId, targetConnectionId);
@@ -1117,7 +1117,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
         dw.writeBoolean(false); //parent
         if (parent != null) {
             dw.writeBoolean(true);
-            dw.writeData(parent.getId(), DataBitHelper.FLOW_CONTROL_COUNT);
+            dw.writeComponentId(getManager(), parent.getId());
         }else {
             dw.writeBoolean(false);
         }
@@ -1151,7 +1151,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
         dw.writeBoolean(true); //connection
         dw.writeBoolean(target);
         if (target) {
-            dw.writeData(targetComponent, DataBitHelper.FLOW_CONTROL_COUNT);
+            dw.writeComponentId(getManager(), targetComponent);
             dw.writeData(targetConnection, DataBitHelper.CONNECTION_ID);
         }
     }
