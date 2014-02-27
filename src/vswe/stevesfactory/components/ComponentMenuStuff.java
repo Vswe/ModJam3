@@ -569,6 +569,10 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         return settings;
     }
 
+    public void setBlackList() {
+        setFirstRadioButtonSelected(false);
+    }
+
     protected enum DataTypeHeader {
         CLEAR(0),
         SET_ITEM(1),

@@ -705,6 +705,24 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
                 if (hasParent) {
                     component.setParent(items.get(dr.readData(DataBitHelper.FLOW_CONTROL_COUNT)));
                 }
+
+                boolean autoSide = dr.readBoolean();
+                boolean autoBlackList = dr.readBoolean();
+                boolean isInput = type == ComponentType.INPUT || type == ComponentType.LIQUID_INPUT;
+                if (autoSide) {
+                    for (ComponentMenu componentMenu : component.getMenus()) {
+                        if (componentMenu instanceof ComponentMenuTarget) {
+                            ((ComponentMenuTarget)componentMenu).setActive(isInput ? 1 : 0);
+                        }
+                    }
+                }else if(autoBlackList && isInput) {
+                    for (ComponentMenu componentMenu : component.getMenus()) {
+                        if (componentMenu instanceof ComponentMenuStuff) {
+                            ((ComponentMenuStuff)componentMenu).setBlackList();
+                        }
+                    }
+                }
+
                 getFlowItems().add(component);
             }
         }
@@ -717,6 +735,12 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
             }else{
                 dw.writeBoolean(false);
             }
+
+            //these are written for all different types, that's because the type itself doesn't really know what menus
+            //it will use, this will create a super tiny overhead (each setting is a bit) and could be eliminated with
+            //some semi-ugly code, I decided this approach was fine
+            dw.writeBoolean(Settings.isAutoSide());
+            dw.writeBoolean(Settings.isAutoBlacklist());
 
             return true;
         }

@@ -401,4 +401,8 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
 
         errors.add(Localization.NO_DIRECTION_ERROR.toString());
     }
+
+    public void setActive(int side) {
+        activatedDirections[side] = true;
+    }
 }
