@@ -3,6 +3,7 @@ package vswe.stevesfactory.settings;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.CheckBox;
@@ -10,15 +11,25 @@ import vswe.stevesfactory.components.CheckBoxList;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.interfaces.IInterfaceRenderer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class SettingsScreen implements IInterfaceRenderer {
 
     private TileEntityManager manager;
+    private List<Button> buttons;
 
-    public SettingsScreen(TileEntityManager manager) {
+    public SettingsScreen(final TileEntityManager manager) {
         this.manager = manager;
+
+        buttons = new ArrayList<Button>();
+        buttons.add(new Button(493, 5, Localization.GO_BACK, 231, 193) {
+            @Override
+            protected void onClick() {
+                manager.specialRenderer = null;
+            }
+        });
     }
 
     private static final int CHECK_BOX_WIDTH = 100;
@@ -195,20 +206,30 @@ public class SettingsScreen implements IInterfaceRenderer {
         }
 
         gui.drawString(Localization.PREFERENCES.toString(), START_X - 2, 6, 0x404040);
-        gui.drawString(Localization.SETTINGS.toString(), START_SETTINGS_X - 2, 6, 0x404040);
+        if (Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode) {
+            gui.drawString(Localization.SETTINGS.toString(), START_SETTINGS_X - 2, 6, 0x404040);
+        }
         checkBoxes.draw(gui, mX, mY);
+        for (Button button : buttons) {
+            button.draw(gui, mX, mY);
+        }
     }
 
     @Override
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        for (Button button : buttons) {
+            button.drawMouseOver(gui, mX, mY);
+        }
     }
 
     @Override
-    public void onClick(GuiManager gui, int mX, int mY, int button) {
+    public void onClick(GuiManager gui, int mX, int mY, int b) {
         checkBoxes.onClick(mX, mY);
-        if (button == 1) {
-            manager.specialRenderer = null;
+        for (Button button : buttons) {
+            if (button.inBounds(mX, mY)) {
+                button.onClick();
+                break;
+            }
         }
     }
 
@@ -230,5 +251,45 @@ public class SettingsScreen implements IInterfaceRenderer {
     @Override
     public void onScroll(int scroll) {
         //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    private static final int BUTTON_SRC_X = 242;
+    private static final int BUTTON_SRC_Y = 0;
+    private static final int BUTTON_SIZE = 14;
+    private static final int BUTTON_SIZE_INNER = 12;
+    private abstract class Button {
+        private int x;
+        private int y;
+        private Localization name;
+        private int srcX;
+        private int srcY;
+
+        private Button(int x, int y, Localization name, int srcX, int srcY) {
+            this.x = x;
+            this.y = y;
+            this.name = name;
+            this.srcX = srcX;
+            this.srcY = srcY;
+        }
+
+        private void draw(GuiManager gui, int mX, int mY) {
+            int srcYButton = inBounds(mX, mY) ? 1 : 0;
+
+            gui.drawTexture(x, y, BUTTON_SRC_X, BUTTON_SRC_Y + srcYButton * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
+            gui.drawTexture(x + 2, y + 2, srcX, srcY, BUTTON_SIZE_INNER, BUTTON_SIZE_INNER);
+        }
+
+        private boolean inBounds(int mX, int mY) {
+            return CollisionHelper.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY);
+        }
+
+        private void drawMouseOver(GuiManager gui, int mX, int mY) {
+            if (inBounds(mX, mY)) {
+                gui.drawMouseOver(name.toString(), mX, mY);
+            }
+        }
+
+        protected abstract void onClick();
     }
 }

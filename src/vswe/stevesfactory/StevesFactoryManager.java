@@ -39,7 +39,6 @@ public class StevesFactoryManager {
         ConfigHandler config = new ConfigHandler(event.getSuggestedConfigurationFile());
 
         FileHelper.setConfigDir(event.getModConfigurationDirectory());
-        Settings.load();
 
         Blocks.init();
     }

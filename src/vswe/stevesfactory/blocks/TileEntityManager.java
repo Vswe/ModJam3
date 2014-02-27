@@ -733,7 +733,8 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
                             ((ComponentMenuTarget)componentMenu).setActive(isInput ? 1 : 0);
                         }
                     }
-                }else if(autoBlackList && isInput) {
+                }
+                if(autoBlackList && isInput) {
                     for (ComponentMenu componentMenu : component.getMenus()) {
                         if (componentMenu instanceof ComponentMenuStuff) {
                             ((ComponentMenuStuff)componentMenu).setBlackList();

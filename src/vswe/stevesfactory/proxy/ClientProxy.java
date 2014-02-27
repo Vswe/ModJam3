@@ -14,5 +14,6 @@ public class ClientProxy extends CommonProxy {
         RenderCamouflage camouflage = new RenderCamouflage();
         Blocks.CAMOUFLAGE_RENDER_ID = camouflage.getRenderId();
         RenderingRegistry.registerBlockHandler(camouflage);
+        Settings.load();
     }
 }
