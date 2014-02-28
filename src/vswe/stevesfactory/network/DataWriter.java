@@ -71,33 +71,25 @@ public class DataWriter {
     }
 
     void sendPlayerPackets(double x, double y, double z, double r, int dimension){
-        if (bitCountBuffer > 0) {
-            ((ByteArrayOutputStream)stream).write(byteBuffer);
-        }
+        writeFinalBits();
 
         PacketDispatcher.sendPacketToAllAround(x, y, z, r, dimension, PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()));
     }
 
     void sendPlayerPacket(Player player){
-        if (bitCountBuffer > 0) {
-            ((ByteArrayOutputStream)stream).write(byteBuffer);
-        }
+        writeFinalBits();
 
         PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()), player);
     }
 
     void sendServerPacket() {
-        if (bitCountBuffer > 0) {
-            ((ByteArrayOutputStream)stream).write(byteBuffer);
-        }
+        writeFinalBits();
 
         PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()));
     }
     
     void sendPlayerPackets(ContainerBase container) {
-        if (bitCountBuffer > 0) {
-            ((ByteArrayOutputStream)stream).write(byteBuffer);
-        }
+        writeFinalBits();
 
         for (ICrafting crafting : container.getCrafters()) {
             if (crafting instanceof Player) {
@@ -191,5 +183,11 @@ public class DataWriter {
         }
 
         writeData(id, invBits);
+    }
+
+    void writeFinalBits() {
+        if (bitCountBuffer > 0) {
+            ((ByteArrayOutputStream)stream).write(byteBuffer);
+        }
     }
 }
