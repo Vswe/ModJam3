@@ -187,7 +187,9 @@ public class DataWriter {
 
     void writeFinalBits() {
         if (bitCountBuffer > 0) {
-            ((ByteArrayOutputStream)stream).write(byteBuffer);
+            try {
+                stream.write(byteBuffer);
+            }catch (IOException ignored) {}
         }
     }
 }
