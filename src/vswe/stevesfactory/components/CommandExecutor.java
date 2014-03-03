@@ -207,6 +207,13 @@ public class CommandExecutor {
                         }
                     }
                     break;
+                case SIGN:
+                    List<SlotInventoryHolder> sign = getSign(command.getMenus().get(0));
+                    if (sign != null) {
+                        for (SlotInventoryHolder slotInventoryHolder : sign) {
+                            slotInventoryHolder.getSign().updateSign((ComponentMenuSignText)command.getMenus().get(1));
+                        }
+                    }
             }
 
 
@@ -237,6 +244,10 @@ public class CommandExecutor {
 
     private List<SlotInventoryHolder> getCamouflage(ComponentMenu componentMenu) {
         return getContainers(manager, componentMenu, ConnectionBlockType.CAMOUFLAGE);
+    }
+
+    private List<SlotInventoryHolder> getSign(ComponentMenu componentMenu) {
+        return getContainers(manager, componentMenu, ConnectionBlockType.SIGN);
     }
 
     private List<SlotInventoryHolder> getTiles(ComponentMenu componentMenu) {

@@ -5,7 +5,7 @@ public enum DataBitHelper {
     FLOW_CONTROL_COUNT(9),
     FLOW_CONTROL_X(9),
     FLOW_CONTROL_Y(8),
-    FLOW_CONTROL_TYPE_ID(4),
+    FLOW_CONTROL_TYPE_ID(5),
     MENU_ITEM_ID(16),
     MENU_ITEM_META(15),
     MENU_ITEM_AMOUNT(10),
@@ -69,7 +69,11 @@ public enum DataBitHelper {
     CAMOUFLAGE_BOUNDS(6),
     CAMOUFLAGE_BOUND_TYPE(3),
     PLACE_DIRECTION(3),
-    BIT_COUNT(5);
+    BIT_COUNT(5),
+
+
+    LINE_ID(2),
+    LINE_LENGTH(4);
 
 
 

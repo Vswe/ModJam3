@@ -13,17 +13,19 @@ public class TextBoxLogic {
     private int charLimit;
     private int width;
     private boolean updatedCursor;
+    private float mult;
 
     public TextBoxLogic(int charLimit, int width) {
         this.charLimit = charLimit;
         this.width = width;
+        mult = 1F;
     }
 
     @SideOnly(Side.CLIENT)
     private void addText(GuiManager gui, String str) {
         String newText = text.substring(0, cursor) + str + text.substring(cursor);
 
-        if (newText.length() <= charLimit && gui.getStringWidth(newText) <= width) {
+        if (newText.length() <= charLimit && gui.getStringWidth(newText) * mult <= width) {
             text = newText;
             moveCursor(gui, str.length());
             textChanged();
@@ -59,7 +61,7 @@ public class TextBoxLogic {
 
     public int getCursorPosition(GuiManager gui) {
         if (updatedCursor) {
-            cursorPosition = gui.getStringWidth(text.substring(0, cursor));
+            cursorPosition = (int)(gui.getStringWidth(text.substring(0, cursor)) * mult);
             updatedCursor = false;
         }
 
@@ -85,7 +87,7 @@ public class TextBoxLogic {
         }
     }
 
-    private void updateCursor() {
+    public void updateCursor() {
         if (cursor < 0) {
             cursor = 0;
         }else if (cursor > text.length()) {
@@ -95,6 +97,7 @@ public class TextBoxLogic {
         updatedCursor = true;
     }
 
+
     public void resetCursor() {
         cursor = text.length();
         updatedCursor = true;
@@ -103,5 +106,9 @@ public class TextBoxLogic {
     public void setTextAndCursor(String s) {
         setText(s);
         resetCursor();
+    }
+
+    public void setMult(float mult) {
+        this.mult = mult;
     }
 }

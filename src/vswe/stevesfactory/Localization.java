@@ -36,6 +36,8 @@ public enum Localization {
     NODE_LONG,
     CAMOUFLAGE_SHORT,
     CAMOUFLAGE_LONG,
+    SIGN_SHORT,
+    SIGN_LONG ,
 
     CONNECTION_INPUT,
     CONNECTION_OUTPUT,
@@ -301,6 +303,11 @@ public enum Localization {
     MOD_GROUPING,
     ALL_ITEMS,
     TARGET_MENU,
+    TYPE_SIGN,
+    SIGNS,
+    NO_SIGNS_ERROR,
+    SIGN_TEXT,
+    UPDATE_LINE,
 
     DELETE_COMMAND,
     EXIT_GROUP,

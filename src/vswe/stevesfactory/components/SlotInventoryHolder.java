@@ -53,6 +53,10 @@ public class SlotInventoryHolder {
         return (TileEntityCamouflage)inventory;
     }
 
+    public TileEntitySignUpdater getSign() {
+        return (TileEntitySignUpdater)inventory;
+    }
+
     public Map<Integer, SlotSideTarget> getValidSlots() {
         if (validSlots == null) {
             validSlots = new HashMap<Integer, SlotSideTarget>();

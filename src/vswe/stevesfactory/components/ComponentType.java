@@ -51,7 +51,10 @@ public enum ComponentType {
             ComponentMenuResult.class),
     CAMOUFLAGE(15, Localization.CAMOUFLAGE_SHORT, Localization.CAMOUFLAGE_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuCamouflage.class, ComponentMenuCamouflageShape.class, ComponentMenuCamouflageInside.class, ComponentMenuCamouflageSides.class, ComponentMenuCamouflageItems.class, ComponentMenuResult.class);
+            ComponentMenuCamouflage.class, ComponentMenuCamouflageShape.class, ComponentMenuCamouflageInside.class, ComponentMenuCamouflageSides.class, ComponentMenuCamouflageItems.class, ComponentMenuResult.class),
+    SIGN(16, Localization.SIGN_SHORT, Localization.SIGN_LONG,
+            new ConnectionSet[]{ConnectionSet.STANDARD},
+            ComponentMenuSigns.class, ComponentMenuSignText.class, ComponentMenuResult.class);
 
 
 

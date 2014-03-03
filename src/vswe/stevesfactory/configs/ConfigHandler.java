@@ -22,6 +22,7 @@ public class ConfigHandler extends Configuration {
         Blocks.CABLE_BREAKER_ID = getBlock(Blocks.CABLE_BREAKER_NAME_TAG, Blocks.CABLE_BREAKER_DEFAULT_ID).getInt(Blocks.CABLE_BREAKER_DEFAULT_ID);
         Blocks.CABLE_CLUSTER_ID = getBlock(Blocks.CABLE_CLUSTER_NAME_TAG, Blocks.CABLE_CLUSTER_DEFAULT_ID).getInt(Blocks.CABLE_CLUSTER_DEFAULT_ID);
         Blocks.CABLE_CAMOUFLAGE_ID = getBlock(Blocks.CABLE_CAMOUFLAGE_NAME_TAG, Blocks.CABLE_CAMOUFLAGE_DEFAULT_ID).getInt(Blocks.CABLE_CAMOUFLAGE_DEFAULT_ID);
+        Blocks.CABLE_SIGN_ID = getBlock(Blocks.CABLE_SIGN_NAME_TAG, Blocks.CABLE_SIGN_DEFAULT_ID).getInt(Blocks.CABLE_SIGN_DEFAULT_ID);
 
         save();
     }

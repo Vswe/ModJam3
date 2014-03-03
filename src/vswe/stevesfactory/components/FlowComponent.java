@@ -1624,4 +1624,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             }
         }
     }
+
+    public void onGuiClosed() {
+        for (ComponentMenu menu : menus) {
+            menu.onGuiClosed();
+        }
+    }
 }

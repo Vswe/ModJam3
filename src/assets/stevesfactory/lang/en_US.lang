@@ -18,6 +18,7 @@ tile.sfm.BlockAdvancedCableCluster.name=Advanced Cable Cluster
 tile.sfm.BlockCableCamouflage.name=Cable Camouflage
 tile.sfm.BlockCableInsideCamouflage.name=Double Sided Cable Camouflage
 tile.sfm.BlockCableShapeCamouflage.name=Transforming Cable Camouflage
+tile.sfm.BlockCableSign.name=Sign Updater
 
 # ======================================
 #			COMPONENT TYPES
@@ -54,6 +55,8 @@ gui.sfm.NodeShort=Node
 gui.sfm.NodeLong=Group Node
 gui.sfm.CamouflageShort=Camouflage
 gui.sfm.CamouflageLong=Camouflage Updater
+gui.sfm.SignShort=Sign
+gui.sfm.SignLong=Sign Updater
 
 # ======================================
 #			CONNECTION OPTIONS
@@ -332,6 +335,11 @@ gui.sfm.InsideWarning=The inside camouflage can only be updated in Double Sided 
 gui.sfm.ModGrouping=Mod detection
 gui.sfm.AllItems=Match all
 gui.sfm.TargetMenu=Target
+gui.sfm.TypeSign=Sign updaters
+gui.sfm.Signs=Signs
+gui.sfm.NoSignsError=No sign updaters selected
+gui.sfm.SignText=Sign text
+gui.sfm.UpdateLine=Update?
 
 # ======================================
 #		  OTHER MANAGER INTERFACE

@@ -73,4 +73,6 @@ public abstract class ComponentMenu implements IComponentNetworkReader {
     public void update(float partial) {}
 
     public void doScroll(int scroll) {}
+
+    public void onGuiClosed() {}
 }

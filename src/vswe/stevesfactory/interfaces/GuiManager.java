@@ -319,6 +319,10 @@ public class GuiManager extends GuiBase {
     public void onGuiClosed() {
         Keyboard.enableRepeatEvents(false);
 
+        for (FlowComponent flowComponent : manager.getFlowItems()) {
+            flowComponent.onGuiClosed();
+        }
+
         super.onGuiClosed();
     }
 

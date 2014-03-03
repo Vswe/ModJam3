@@ -81,6 +81,13 @@ public final class Blocks {
     public static final int CABLE_CAMOUFLAGE_DEFAULT_ID = 1321;
     public static int CAMOUFLAGE_RENDER_ID;
 
+    private static final String CABLE_SIGN_TILE_ENTITY_TAG = "TileEntityCableSignName";
+    public static int CABLE_SIGN_ID;
+    public static final String CABLE_SIGN_NAME_TAG = "BlockCableSignName";
+    public static final String CABLE_SIGN_UNLOCALIZED_NAME = "BlockCableSign";
+    public static final int CABLE_SIGN_DEFAULT_ID = 1322;
+
+
     public static BlockManager blockManager;
     public static BlockCable blockCable;
     public static BlockCableRelay blockCableRelay;
@@ -92,6 +99,7 @@ public final class Blocks {
     public static BlockCableBreaker blockCableBreaker;
     public static BlockCableCluster blockCableCluster;
     public static BlockCableCamouflages blockCableCamouflage;
+    public static BlockCableSign blockCableSign;
 
     public static CreativeTabs creativeTab;
 
@@ -160,6 +168,11 @@ public final class Blocks {
         ClusterRegistry.register(new ClusterRegistry.ClusterRegistryMetaSensitive(TileEntityCamouflage.class, blockCableCamouflage, new ItemStack(blockCableCamouflage, 1, 0)));
         ClusterRegistry.register(new ClusterRegistry.ClusterRegistryMetaSensitive(TileEntityCamouflage.class, blockCableCamouflage, new ItemStack(blockCableCamouflage, 1, 1)));
         ClusterRegistry.register(new ClusterRegistry.ClusterRegistryMetaSensitive(TileEntityCamouflage.class, blockCableCamouflage, new ItemStack(blockCableCamouflage, 1, 2)));
+
+        blockCableSign = new BlockCableSign(CABLE_SIGN_ID);
+        GameRegistry.registerBlock(blockCableSign, CABLE_SIGN_NAME_TAG);
+        GameRegistry.registerTileEntity(TileEntitySignUpdater.class, CABLE_SIGN_TILE_ENTITY_TAG);
+        ClusterRegistry.register(TileEntitySignUpdater.class, blockCableSign);
     }
 
     public static void addRecipes() {
@@ -258,6 +271,12 @@ public final class Blocks {
                 Block.pistonStickyBase
         );
 
+
+        GameRegistry.addShapelessRecipe(new ItemStack(blockCableSign, 1),
+                blockCable,
+                new ItemStack(Item.dyePowder, 0),
+                Item.feather
+        );
 
         GameRegistry.addRecipe(new ClusterUpgradeRecipe());
         GameRegistry.addRecipe(new ClusterRecipe());
