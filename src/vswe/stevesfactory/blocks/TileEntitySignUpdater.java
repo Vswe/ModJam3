@@ -15,6 +15,8 @@ public class TileEntitySignUpdater extends TileEntityClusterElement {
     }
 
     public void updateSign(ComponentMenuSignText menu) {
+        if (worldObj == null) return;
+
         ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
         TileEntity te = worldObj.getBlockTileEntity(xCoord + direction.offsetX, yCoord + direction.offsetY, zCoord + direction.offsetZ);
         if (te != null && te instanceof  TileEntitySign) {
