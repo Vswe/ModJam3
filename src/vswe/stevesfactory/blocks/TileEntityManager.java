@@ -727,10 +727,11 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
                 boolean autoSide = dr.readBoolean();
                 boolean autoBlackList = dr.readBoolean();
                 boolean isInput = type == ComponentType.INPUT || type == ComponentType.LIQUID_INPUT;
+                boolean isOutput= type == ComponentType.OUTPUT || type == ComponentType.LIQUID_OUTPUT;
                 if (autoSide) {
                     for (ComponentMenu componentMenu : component.getMenus()) {
                         if (componentMenu instanceof ComponentMenuTarget) {
-                            ((ComponentMenuTarget)componentMenu).setActive(isInput ? 1 : 0);
+                            ((ComponentMenuTarget)componentMenu).setActive(isOutput ? 1 : 0);
                         }
                     }
                 }
