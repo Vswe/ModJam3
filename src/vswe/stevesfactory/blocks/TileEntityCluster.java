@@ -29,16 +29,16 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     private boolean requestedInfo;
     private List<TileEntityClusterElement> elements;
     private List<ClusterRegistry> registryList;
-    private Map<ClusterMethodRegistration, List<ClusterRegistry>> methodRegistration;
+    private Map<ClusterMethodRegistration, List<Pair>> methodRegistration;
     private ITileEntityInterface interfaceObject;  //only the relay is currently having a interface
     private TileEntityCamouflage camouflageObject;
 
     public TileEntityCluster() {
         elements = new ArrayList<TileEntityClusterElement>();
         registryList = new ArrayList<ClusterRegistry>();
-        methodRegistration = new HashMap<ClusterMethodRegistration, List<ClusterRegistry>>();
+        methodRegistration = new HashMap<ClusterMethodRegistration, List<Pair>>();
         for (ClusterMethodRegistration clusterMethodRegistration : ClusterMethodRegistration.values()) {
-            methodRegistration.put(clusterMethodRegistration, new ArrayList<ClusterRegistry>());
+            methodRegistration.put(clusterMethodRegistration, new ArrayList<Pair>());
         }
     }
 
@@ -67,13 +67,23 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
                 camouflageObject = (TileEntityCamouflage)element;
             }
             for (ClusterMethodRegistration clusterMethodRegistration : element.getRegistrations()) {
-                methodRegistration.get(clusterMethodRegistration).add(block);
+                methodRegistration.get(clusterMethodRegistration).add(new Pair(block, element));
             }
             element.xCoord = xCoord;
             element.yCoord = yCoord;
             element.zCoord = zCoord;
             element.worldObj = worldObj;
             element.setPartOfCluster(true);
+        }
+    }
+
+    private class Pair {
+        private ClusterRegistry registry;
+        private TileEntityClusterElement te;
+
+        private Pair(ClusterRegistry registry, TileEntityClusterElement te) {
+            this.registry = registry;
+            this.te = te;
         }
     }
 
@@ -85,9 +95,7 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     @Override
     public void updateEntity() {
         for (TileEntityClusterElement element : elements) {
-            if (element.worldObj == null) {
-                element.worldObj = this.worldObj;
-            }
+            setWorldObject(element);
             element.updateEntity();
         }
 
@@ -97,30 +105,39 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         }
     }
 
+    private void setWorldObject(TileEntityClusterElement te) {
+        if (te.worldObj == null) {
+            te.worldObj = this.worldObj;
+        }
+    }
+
     @SideOnly(Side.CLIENT)
     private void requestData() {
         PacketHandler.sendBlockPacket(this, Minecraft.getMinecraft().thePlayer, 1);
     }
 
-    private List<ClusterRegistry> getRegistrations(ClusterMethodRegistration method) {
+    private List<Pair> getRegistrations(ClusterMethodRegistration method) {
         return methodRegistration.get(method);
     }
 
     public void onBlockPlacedBy(EntityLivingBase entity, ItemStack itemStack) {
-        for (ClusterRegistry blockContainer :  getRegistrations(ClusterMethodRegistration.ON_BLOCK_PLACED_BY)) {
-            blockContainer.getBlock().onBlockPlacedBy(worldObj, xCoord, yCoord, zCoord, entity, blockContainer.getItemStack());
+        for (Pair blockContainer :  getRegistrations(ClusterMethodRegistration.ON_BLOCK_PLACED_BY)) {
+            setWorldObject(blockContainer.te);
+            blockContainer.registry.getBlock().onBlockPlacedBy(worldObj, xCoord, yCoord, zCoord, entity, blockContainer.registry.getItemStack());
         }
     }
 
     public void onNeighborBlockChange(int id) {
-        for (ClusterRegistry blockContainer : getRegistrations(ClusterMethodRegistration.ON_NEIGHBOR_BLOCK_CHANGED)) {
-            blockContainer.getBlock().onNeighborBlockChange(worldObj, xCoord, yCoord, zCoord, id);
+        for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_NEIGHBOR_BLOCK_CHANGED)) {
+            setWorldObject(blockContainer.te);
+            blockContainer.registry.getBlock().onNeighborBlockChange(worldObj, xCoord, yCoord, zCoord, id);
         }
     }
 
     public boolean canConnectRedstone(int side) {
-        for (ClusterRegistry blockContainer : getRegistrations(ClusterMethodRegistration.CAN_CONNECT_REDSTONE)) {
-            if (blockContainer.getBlock().canConnectRedstone(worldObj, xCoord, yCoord, zCoord, side)) {
+        for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.CAN_CONNECT_REDSTONE)) {
+            setWorldObject(blockContainer.te);
+            if (blockContainer.registry.getBlock().canConnectRedstone(worldObj, xCoord, yCoord, zCoord, side)) {
                 return true;
             }
         }
@@ -129,14 +146,16 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     }
 
     public void onBlockAdded() {
-        for (ClusterRegistry blockContainer : getRegistrations(ClusterMethodRegistration.ON_BLOCK_ADDED)) {
-            blockContainer.getBlock().onBlockAdded(worldObj, xCoord, yCoord, zCoord);
+        for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_BLOCK_ADDED)) {
+            setWorldObject(blockContainer.te);
+            blockContainer.registry.getBlock().onBlockAdded(worldObj, xCoord, yCoord, zCoord);
         }
     }
 
     public boolean shouldCheckWeakPower(int side) {
-        for (ClusterRegistry blockContainer : getRegistrations(ClusterMethodRegistration.SHOULD_CHECK_WEAK_POWER)) {
-            if (blockContainer.getBlock().shouldCheckWeakPower(worldObj, xCoord, yCoord, zCoord, side)) {
+        for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.SHOULD_CHECK_WEAK_POWER)) {
+            setWorldObject(blockContainer.te);
+            if (blockContainer.registry.getBlock().shouldCheckWeakPower(worldObj, xCoord, yCoord, zCoord, side)) {
                 return true;
             }
         }
@@ -148,8 +167,9 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     public int isProvidingWeakPower(int side) {
         int max = 0;
 
-        for (ClusterRegistry blockContainer : getRegistrations(ClusterMethodRegistration.IS_PROVIDING_WEAK_POWER)) {
-            max = Math.max(max, blockContainer.getBlock().isProvidingWeakPower(worldObj, xCoord, yCoord, zCoord, side));
+        for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.IS_PROVIDING_WEAK_POWER)) {
+            setWorldObject(blockContainer.te);
+            max = Math.max(max, blockContainer.registry.getBlock().isProvidingWeakPower(worldObj, xCoord, yCoord, zCoord, side));
         }
 
         return max;
@@ -158,16 +178,18 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     public int isProvidingStrongPower(int side) {
         int max = 0;
 
-        for (ClusterRegistry blockContainer : getRegistrations(ClusterMethodRegistration.IS_PROVIDING_STRONG_POWER)) {
-            max = Math.max(max, blockContainer.getBlock().isProvidingStrongPower(worldObj, xCoord, yCoord, zCoord, side));
+        for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.IS_PROVIDING_STRONG_POWER)) {
+            setWorldObject(blockContainer.te);
+            max = Math.max(max, blockContainer.registry.getBlock().isProvidingStrongPower(worldObj, xCoord, yCoord, zCoord, side));
         }
 
         return max;
     }
 
     public boolean onBlockActivated(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-        for (ClusterRegistry blockContainer : getRegistrations(ClusterMethodRegistration.ON_BLOCK_ACTIVATED)) {
-            if (blockContainer.getBlock().onBlockActivated(worldObj, xCoord, yCoord, zCoord, player, side, hitX, hitY, hitZ)) {
+        for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_BLOCK_ACTIVATED)) {
+            setWorldObject(blockContainer.te);
+            if (blockContainer.registry.getBlock().onBlockActivated(worldObj, xCoord, yCoord, zCoord, player, side, hitX, hitY, hitZ)) {
                 return true;
             }
         }
