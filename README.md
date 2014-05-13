@@ -5,7 +5,7 @@ Setup Workspace
 ---
 
 ```sh
-git clone [git-repo-url] MoarSigns
+git clone [git-repo-url]
 ```
 
 Download [CodeChickenCore-1.7.2-1.0.0-dev][1], [NotEnoughItems-1.7.2-1.0.1-dev][1] & [Waila-1.5.2a_1.7.2][2]
