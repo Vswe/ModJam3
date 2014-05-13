@@ -57,7 +57,7 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         for (byte type : types) {
             ClusterRegistry block = ClusterRegistry.getRegistryList().get(type);
             registryList.add(block);
-            TileEntityClusterElement element = (TileEntityClusterElement)block.getBlock().createNewTileEntity(getWorldObj(), getBlockMetadata());
+            TileEntityClusterElement element = (TileEntityClusterElement)block.getBlock().createNewTileEntity(getWorldObj(), 0);
             elements.add(element);
             if (element instanceof ITileEntityInterface) {
                 interfaceObject = (ITileEntityInterface)element;
