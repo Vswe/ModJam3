@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public abstract class GuiBase extends net.minecraft.client.gui.inventory.GuiContainer {
+public abstract class GuiBase extends GuiAntiNEI {
     public GuiBase(Container container) {
         super(container);
     }
