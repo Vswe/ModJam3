@@ -18,9 +18,9 @@ import java.util.Queue;
 public class BlockCable extends Block {
     public BlockCable() {
         super(Material.iron);
-        setCreativeTab(SetupBlock.creativeTab);
+        setCreativeTab(ModBlocks.creativeTab);
         setStepSound(soundTypeMetal);
-        setBlockName(StevesFactoryManager.UNLOCALIZED_START + SetupBlock.CABLE_UNLOCALIZED_NAME);
+        setBlockName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_UNLOCALIZED_NAME);
         setHardness(0.4F);
     }
 
@@ -73,7 +73,7 @@ public class BlockCable extends Block {
                                 //if (element.getDepth() < TileEntityManager.MAX_CABLE_LENGTH){
                                     Block block = world.getBlock(target.getX(), target.getY(), target.getZ());
                                     int meta = world.getBlockMetadata(target.getX(), target.getY(), target.getZ());
-                                    if (block == SetupBlock.blockManager){
+                                    if (block == ModBlocks.blockManager){
                                         TileEntity tileEntity = world.getTileEntity(target.getX(), target.getY(), target.getZ());
                                         if (tileEntity != null && tileEntity instanceof TileEntityManager) {
                                             ((TileEntityManager)tileEntity).updateInventories();
@@ -95,6 +95,6 @@ public class BlockCable extends Block {
     }
 
     public boolean isCable(Block block, int meta) {
-        return block == SetupBlock.blockCable || (block == SetupBlock.blockCableCluster && SetupBlock.blockCableCluster.isAdvanced(meta));
+        return block == ModBlocks.blockCable || (block == ModBlocks.blockCableCluster && ModBlocks.blockCableCluster.isAdvanced(meta));
     }
 }

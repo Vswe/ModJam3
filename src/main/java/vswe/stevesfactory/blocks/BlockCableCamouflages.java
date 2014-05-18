@@ -21,7 +21,7 @@ public class BlockCableCamouflages extends BlockCamouflageBase {
 
     protected BlockCableCamouflages() {
         super(Material.iron);
-        setCreativeTab(SetupBlock.creativeTab);
+        setCreativeTab(ModBlocks.creativeTab);
         setStepSound(soundTypeMetal);
         setHardness(1.2F);
     }

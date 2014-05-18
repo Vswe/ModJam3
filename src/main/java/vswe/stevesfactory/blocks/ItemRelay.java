@@ -17,7 +17,7 @@ public class ItemRelay extends ItemBlock {
 
     @Override
     public String getUnlocalizedName(ItemStack item) {
-        return "tile." + StevesFactoryManager.UNLOCALIZED_START + (SetupBlock.blockCableRelay.isAdvanced(item.getItemDamage()) ? SetupBlock.CABLE_ADVANCED_RELAY_UNLOCALIZED_NAME : SetupBlock.CABLE_RELAY_UNLOCALIZED_NAME);
+        return "tile." + StevesFactoryManager.UNLOCALIZED_START + (ModBlocks.blockCableRelay.isAdvanced(item.getItemDamage()) ? ModBlocks.CABLE_ADVANCED_RELAY_UNLOCALIZED_NAME : ModBlocks.CABLE_RELAY_UNLOCALIZED_NAME);
     }
 
 }

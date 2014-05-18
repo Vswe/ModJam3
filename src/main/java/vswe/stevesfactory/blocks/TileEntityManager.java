@@ -14,8 +14,8 @@ import vswe.stevesfactory.components.*;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.interfaces.IInterfaceRenderer;
-import vswe.stevesfactory.settings.Settings;
 import vswe.stevesfactory.network.*;
+import vswe.stevesfactory.settings.Settings;
 
 import java.util.*;
 
@@ -248,7 +248,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
                                 }
 
 
-                                if ((Settings.isLimitless(this) || element.getDepth() < MAX_CABLE_LENGTH) && SetupBlock.blockCable.isCable(worldObj.getBlock(target.getX(), target.getY(), target.getZ()), worldObj.getBlockMetadata(target.getX(), target.getY(), target.getZ()))){
+                                if ((Settings.isLimitless(this) || element.getDepth() < MAX_CABLE_LENGTH) && ModBlocks.blockCable.isCable(worldObj.getBlock(target.getX(), target.getY(), target.getZ()), worldObj.getBlockMetadata(target.getX(), target.getY(), target.getZ()))){
                                     queue.add(target);
                                 }
                             }
@@ -795,7 +795,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
     }
 
     public void readContentFromNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
-        int version =  nbtTagCompound.getByte(SetupBlock.NBT_PROTOCOL_VERSION);
+        int version =  nbtTagCompound.getByte(ModBlocks.NBT_PROTOCOL_VERSION);
 
 
         timer = nbtTagCompound.getByte(NBT_TIMER);
@@ -839,7 +839,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
     }
 
     public void writeContentToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
-        nbtTagCompound.setByte(SetupBlock.NBT_PROTOCOL_VERSION, SetupBlock.NBT_CURRENT_PROTOCOL_VERSION);
+        nbtTagCompound.setByte(ModBlocks.NBT_PROTOCOL_VERSION, ModBlocks.NBT_CURRENT_PROTOCOL_VERSION);
 
         nbtTagCompound.setByte(NBT_TIMER, (byte)timer);
 

@@ -61,7 +61,7 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
         id--;
         if (id < 0 || !canPickUp(items.get(id))) {
             if (itemstack != null) {
-                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[SetupBlock.blockCableIntake.getSideMeta(getBlockMetadata()) % ForgeDirection.VALID_DIRECTIONS.length];
+                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[ModBlocks.blockCableIntake.getSideMeta(getBlockMetadata()) % ForgeDirection.VALID_DIRECTIONS.length];
 
                 double posX = xCoord + 0.5 + direction.offsetX * 0.75;
                 double posY = yCoord + 0.5 + direction.offsetY * 0.75;
@@ -100,7 +100,7 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
 
     @Override
     public String getInventoryName() {
-        return SetupBlock.blockCableIntake.getLocalizedName();
+        return ModBlocks.blockCableIntake.getLocalizedName();
     }
 
     @Override
@@ -170,7 +170,7 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
     }
 
     private boolean canPickUp(EntityItem item) {
-        return !item.isDead && (item.delayBeforeCanPickup == 0 || SetupBlock.blockCableIntake.isAdvanced(getBlockMetadata()));
+        return !item.isDead && (item.delayBeforeCanPickup == 0 || ModBlocks.blockCableIntake.isAdvanced(getBlockMetadata()));
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public final class SetupBlock {
+public final class ModBlocks {
 
     public static final byte NBT_CURRENT_PROTOCOL_VERSION = 10;
     public static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
@@ -264,5 +264,5 @@ public final class SetupBlock {
         GameRegistry.addRecipe(new ClusterRecipe());
     }
 
-   private SetupBlock() {}
+   private ModBlocks() {}
 }

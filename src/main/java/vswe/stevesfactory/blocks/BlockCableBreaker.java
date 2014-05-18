@@ -21,9 +21,9 @@ import vswe.stevesfactory.StevesFactoryManager;
 public class BlockCableBreaker extends BlockContainer {
     public BlockCableBreaker() {
         super(Material.iron);
-        setCreativeTab(SetupBlock.creativeTab);
+        setCreativeTab(ModBlocks.creativeTab);
         setStepSound(soundTypeMetal);
-        setBlockName(StevesFactoryManager.UNLOCALIZED_START + SetupBlock.CABLE_BREAKER_UNLOCALIZED_NAME);
+        setBlockName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_BREAKER_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
 

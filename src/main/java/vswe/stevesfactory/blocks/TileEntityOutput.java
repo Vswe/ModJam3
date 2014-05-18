@@ -185,8 +185,8 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
 
 
     private void notifyUpdate(int x, int y, int z, boolean spread) {
-        if (worldObj.getBlock(x, y, z) != SetupBlock.blockCable && (x != xCoord || y != yCoord || z != zCoord)) {
-            worldObj.notifyBlockOfNeighborChange(x, y, z, SetupBlock.blockCableOutput);
+        if (worldObj.getBlock(x, y, z) != ModBlocks.blockCable && (x != xCoord || y != yCoord || z != zCoord)) {
+            worldObj.notifyBlockOfNeighborChange(x, y, z, ModBlocks.blockCableOutput);
 
             if (spread) {
                 notifyUpdate(x - 1, y, z, false);
@@ -209,7 +209,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
 
     @Override
     public void readContentFromNBT(NBTTagCompound nbtTagCompound) {
-        int version = nbtTagCompound.getByte(SetupBlock.NBT_PROTOCOL_VERSION);
+        int version = nbtTagCompound.getByte(ModBlocks.NBT_PROTOCOL_VERSION);
 
 
         NBTTagList sidesTag = nbtTagCompound.getTagList(NBT_SIDES, 10);
@@ -235,7 +235,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
 
     @Override
     public void writeContentToNBT(NBTTagCompound nbtTagCompound) {
-        nbtTagCompound.setByte(SetupBlock.NBT_PROTOCOL_VERSION, SetupBlock.NBT_CURRENT_PROTOCOL_VERSION);
+        nbtTagCompound.setByte(ModBlocks.NBT_PROTOCOL_VERSION, ModBlocks.NBT_CURRENT_PROTOCOL_VERSION);
 
         NBTTagList sidesTag = new NBTTagList();
         for (int i = 0; i < strengths.length; i++) {

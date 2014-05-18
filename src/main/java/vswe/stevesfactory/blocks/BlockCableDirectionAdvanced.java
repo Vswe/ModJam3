@@ -28,7 +28,7 @@ import java.util.List;
 public abstract class BlockCableDirectionAdvanced extends BlockContainer {
     public BlockCableDirectionAdvanced() {
         super(Material.iron);
-        setCreativeTab(SetupBlock.creativeTab);
+        setCreativeTab(ModBlocks.creativeTab);
         setStepSound(soundTypeMetal);
         setHardness(1.2F);
     }

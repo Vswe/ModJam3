@@ -110,7 +110,7 @@ public abstract class BlockCamouflageBase extends BlockContainer {
 
     @Override
     public int getRenderType() {
-        return SetupBlock.CAMOUFLAGE_RENDER_ID;
+        return ModBlocks.CAMOUFLAGE_RENDER_ID;
     }
 
     @Override

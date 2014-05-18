@@ -120,7 +120,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     }
 
     public CamouflageType getCamouflageType() {
-        return CamouflageType.values()[SetupBlock.blockCableCamouflage.getId(getBlockMetadata())];
+        return CamouflageType.values()[ModBlocks.blockCableCamouflage.getId(getBlockMetadata())];
     }
 
     public void setBlockBounds(BlockCamouflageBase blockCamouflageBase) {

@@ -24,7 +24,7 @@ public class ClusterRecipe implements IRecipe {
         for (int i = 0; i < inventorycrafting.getSizeInventory(); i++) {
             ItemStack item = inventorycrafting.getStackInSlot(i);
 
-            if (item != null && Block.getBlockFromItem(item.getItem()) == SetupBlock.blockCableCluster) {
+            if (item != null && Block.getBlockFromItem(item.getItem()) == ModBlocks.blockCableCluster) {
                 if (cluster != null) {
                     return false; //multiple clusters
                 }else{
@@ -47,7 +47,7 @@ public class ClusterRecipe implements IRecipe {
             for (int i = 0; i < inventorycrafting.getSizeInventory(); i++) {
                 ItemStack item = inventorycrafting.getStackInSlot(i);
 
-                if (item != null && Block.getBlockFromItem(item.getItem()) != SetupBlock.blockCableCluster) {
+                if (item != null && Block.getBlockFromItem(item.getItem()) != ModBlocks.blockCableCluster) {
                     boolean validItem = false;
                     for (int j = 0; j < ClusterRegistry.getRegistryList().size(); j++) {
                         if (item.isItemEqual(ClusterRegistry.getRegistryList().get(j).getItemStack())) {
@@ -75,7 +75,7 @@ public class ClusterRecipe implements IRecipe {
                 return false; //nothing added
             }
 
-            output = new ItemStack(SetupBlock.blockCableCluster, 1, cluster.getItemDamage());
+            output = new ItemStack(ModBlocks.blockCableCluster, 1, cluster.getItemDamage());
             NBTTagCompound newCompound = new NBTTagCompound();
             output.setTagCompound(newCompound);
             NBTTagCompound subCompound = new NBTTagCompound();

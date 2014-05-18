@@ -247,7 +247,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
 
     @Override
     public String getInventoryName() {
-        return SetupBlock.blockCableBreaker.getLocalizedName();
+        return ModBlocks.blockCableBreaker.getLocalizedName();
     }
 
     @Override

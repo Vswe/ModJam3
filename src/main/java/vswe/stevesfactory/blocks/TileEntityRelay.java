@@ -85,7 +85,7 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
     }
 
     private boolean isAdvanced() {
-        return SetupBlock.blockCableRelay.isAdvanced(getBlockMetadata());
+        return ModBlocks.blockCableRelay.isAdvanced(getBlockMetadata());
     }
 
     @Override
@@ -462,7 +462,7 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
             }
         }
 
-        ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[SetupBlock.blockCableRelay.getSideMeta(getBlockMetadata()) % ForgeDirection.VALID_DIRECTIONS.length];
+        ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[ModBlocks.blockCableRelay.getSideMeta(getBlockMetadata()) % ForgeDirection.VALID_DIRECTIONS.length];
 
         int x = xCoord + direction.offsetX;
         int y = yCoord + direction.offsetY;
@@ -739,7 +739,7 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
 
     @Override
     public void writeContentToNBT(NBTTagCompound nbtTagCompound) {
-        nbtTagCompound.setByte(SetupBlock.NBT_PROTOCOL_VERSION, SetupBlock.NBT_CURRENT_PROTOCOL_VERSION);
+        nbtTagCompound.setByte(ModBlocks.NBT_PROTOCOL_VERSION, ModBlocks.NBT_CURRENT_PROTOCOL_VERSION);
 
         if (isAdvanced()) {
             nbtTagCompound.setString(NBT_OWNER, owner);
@@ -760,7 +760,7 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
 
     @Override
     public void readContentFromNBT(NBTTagCompound nbtTagCompound) {
-        int version = nbtTagCompound.getByte(SetupBlock.NBT_PROTOCOL_VERSION);
+        int version = nbtTagCompound.getByte(ModBlocks.NBT_PROTOCOL_VERSION);
 
         if (nbtTagCompound.hasKey(NBT_OWNER)) {
             owner = nbtTagCompound.getString(NBT_OWNER);

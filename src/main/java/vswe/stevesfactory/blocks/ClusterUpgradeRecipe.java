@@ -16,11 +16,11 @@ public class ClusterUpgradeRecipe extends ShapelessRecipes {
     private static final List RECIPE;
 
     static {
-        RESULT = new ItemStack(SetupBlock.blockCableCluster, 1, 8);
+        RESULT = new ItemStack(ModBlocks.blockCableCluster, 1, 8);
         RECIPE = new ArrayList();
-        RECIPE.add(new ItemStack(SetupBlock.blockCableCluster, 1, 0));
+        RECIPE.add(new ItemStack(ModBlocks.blockCableCluster, 1, 0));
         for (int i = 0; i < 8; i++) {
-            RECIPE.add(new ItemStack(SetupBlock.blockCable));
+            RECIPE.add(new ItemStack(ModBlocks.blockCable));
         }
     }
 
@@ -34,7 +34,7 @@ public class ClusterUpgradeRecipe extends ShapelessRecipes {
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack itemStack = inv.getStackInSlot(i);
 
-            if (itemStack != null && itemStack.getItem() != null && Block.getBlockFromItem(itemStack.getItem()) == SetupBlock.blockCableCluster) {
+            if (itemStack != null && itemStack.getItem() != null && Block.getBlockFromItem(itemStack.getItem()) == ModBlocks.blockCableCluster) {
                 ItemStack copy = itemStack.copy();
                 copy.setItemDamage(8);
                 return copy;

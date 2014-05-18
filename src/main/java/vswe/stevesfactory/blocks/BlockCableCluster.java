@@ -27,7 +27,7 @@ import java.util.List;
 public class BlockCableCluster extends BlockCamouflageBase {
     protected BlockCableCluster() {
         super(Material.iron);
-        setCreativeTab(SetupBlock.creativeTab);
+        setCreativeTab(ModBlocks.creativeTab);
         setStepSound(soundTypeMetal);
         setHardness(2F);
     }
@@ -76,7 +76,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
         super.breakBlock(world, x, y, z, oldBlock, oldMeta);
 
         if (isAdvanced(world.getBlockMetadata(x, y, z))) {
-            SetupBlock.blockCable.updateInventories(world, x, y, z);
+            ModBlocks.blockCable.updateInventories(world, x, y, z);
         }
     }
 
@@ -95,7 +95,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
 
         if (te != null && te instanceof  TileEntityCluster) {
             TileEntityCluster cluster = (TileEntityCluster)te;
-            ItemStack itemStack = new ItemStack(SetupBlock.blockCableCluster, 1, damageDropped(meta));
+            ItemStack itemStack = new ItemStack(ModBlocks.blockCableCluster, 1, damageDropped(meta));
             NBTTagCompound compound = new NBTTagCompound();
             itemStack.setTagCompound(compound);
             NBTTagCompound cable = new NBTTagCompound();
@@ -154,7 +154,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
         }
 
         if (isAdvanced(world.getBlockMetadata(x, y, z))) {
-            SetupBlock.blockCable.updateInventories(world, x, y, z);
+            ModBlocks.blockCable.updateInventories(world, x, y, z);
         }
     }
 
@@ -178,7 +178,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
         }
 
         if (isAdvanced(world.getBlockMetadata(x, y, z))) {
-            SetupBlock.blockCable.updateInventories(world, x, y, z);
+            ModBlocks.blockCable.updateInventories(world, x, y, z);
         }
     }
 

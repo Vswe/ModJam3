@@ -53,6 +53,6 @@ public class ItemCluster extends ItemBlock {
 
     @Override
     public String getUnlocalizedName(ItemStack item) {
-        return "tile." + StevesFactoryManager.UNLOCALIZED_START + (SetupBlock.blockCableCluster.isAdvanced(item.getItemDamage()) ? SetupBlock.CABLE_ADVANCED_CLUSTER_UNLOCALIZED_NAME : SetupBlock.CABLE_CLUSTER_UNLOCALIZED_NAME);
+        return "tile." + StevesFactoryManager.UNLOCALIZED_START + (ModBlocks.blockCableCluster.isAdvanced(item.getItemDamage()) ? ModBlocks.CABLE_ADVANCED_CLUSTER_UNLOCALIZED_NAME : ModBlocks.CABLE_CLUSTER_UNLOCALIZED_NAME);
     }
 }

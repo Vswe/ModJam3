@@ -14,9 +14,9 @@ import vswe.stevesfactory.StevesFactoryManager;
 public class BlockCableBUD extends BlockContainer {
     public BlockCableBUD() {
         super(Material.iron);
-        setCreativeTab(SetupBlock.creativeTab);
+        setCreativeTab(ModBlocks.creativeTab);
         setStepSound(soundTypeMetal);
-        setBlockName(StevesFactoryManager.UNLOCALIZED_START + SetupBlock.CABLE_BUD_UNLOCALIZED_NAME);
+        setBlockName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_BUD_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
 

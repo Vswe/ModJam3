@@ -7,7 +7,7 @@ import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import vswe.stevesfactory.blocks.SetupBlock;
+import vswe.stevesfactory.blocks.ModBlocks;
 import vswe.stevesfactory.components.ModItemHelper;
 import vswe.stevesfactory.network.FileHelper;
 import vswe.stevesfactory.network.PacketPipeline;
@@ -34,7 +34,7 @@ public class StevesFactoryManager {
     public void preInit(FMLPreInitializationEvent event) {
         FileHelper.setConfigDir(event.getModConfigurationDirectory());
 
-        SetupBlock.init();
+        ModBlocks.init();
     }
 
     @Mod.EventHandler
@@ -42,7 +42,7 @@ public class StevesFactoryManager {
         proxy.init();
         pipeline.initalise();
 
-        SetupBlock.addRecipes();
+        ModBlocks.addRecipes();
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
 

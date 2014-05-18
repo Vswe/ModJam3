@@ -72,7 +72,7 @@ public class TileEntityCreative extends TileEntityClusterElement implements IInv
 
     @Override
     public String getInventoryName() {
-        return SetupBlock.CABLE_CREATIVE_NAME_TAG;
+        return ModBlocks.CABLE_CREATIVE_NAME_TAG;
     }
 
     @Override
