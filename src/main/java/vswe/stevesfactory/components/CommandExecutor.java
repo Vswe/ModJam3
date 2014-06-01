@@ -15,7 +15,6 @@ import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.TileEntityCreative;
 import vswe.stevesfactory.blocks.TileEntityManager;
 
-
 import java.util.*;
 
 public class CommandExecutor {

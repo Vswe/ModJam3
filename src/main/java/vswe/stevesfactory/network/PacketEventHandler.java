@@ -1,30 +1,23 @@
 package vswe.stevesfactory.network;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
 import vswe.stevesfactory.interfaces.ContainerBase;
 
-public class SFMPacket extends AbstractPacket {
+public class PacketEventHandler {
 
-    public byte[] data = new byte[0];
-
-    @Override
-    public void encodeInto(ChannelHandlerContext ctx, ByteBuf buf) {
-        buf.writeBytes(data);
-    }
-
-    @Override
-    public void decodeInto(ChannelHandlerContext ctx, ByteBuf buf) {
-        data = new byte[buf.readableBytes()];
-        buf.readBytes(data);
-    }
-
-    @Override
-    public void handleClientSide(EntityPlayer player) {
-        DataReader dr = new DataReader(data);
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public void onClientPacket(FMLNetworkEvent.ClientCustomPacketEvent event) {
+        DataReader dr = new DataReader(event.packet.payload().array());
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 
         boolean useContainer = dr.readBoolean();
 
@@ -55,9 +48,10 @@ public class SFMPacket extends AbstractPacket {
         dr.close();
     }
 
-    @Override
-    public void handleServerSide(EntityPlayer player) {
-        DataReader dr = new DataReader(data);
+    @SubscribeEvent
+    public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
+        DataReader dr = new DataReader(event.packet.payload().array());
+        EntityPlayer player = ((NetHandlerPlayServer)event.handler).playerEntity;
 
         boolean useContainer = dr.readBoolean();
 
@@ -83,4 +77,5 @@ public class SFMPacket extends AbstractPacket {
 
         dr.close();
     }
+
 }

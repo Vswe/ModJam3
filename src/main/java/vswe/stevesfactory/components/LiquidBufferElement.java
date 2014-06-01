@@ -1,7 +1,6 @@
 package vswe.stevesfactory.components;
 
 
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.ArrayList;

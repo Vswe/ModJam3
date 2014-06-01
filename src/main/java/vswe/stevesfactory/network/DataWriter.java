@@ -2,6 +2,9 @@ package vswe.stevesfactory.network;
 
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ICrafting;
@@ -15,12 +18,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static vswe.stevesfactory.StevesFactoryManager.pipeline;
+import static vswe.stevesfactory.StevesFactoryManager.CHANNEL;
+import static vswe.stevesfactory.StevesFactoryManager.packetHandler;
 
 public class DataWriter {
     private OutputStream stream;
     private int byteBuffer;
     private int bitCountBuffer;
+    private FMLProxyPacket packet;
 
     DataWriter() {
        stream = new ByteArrayOutputStream();
@@ -74,46 +79,30 @@ public class DataWriter {
     }
 
     void sendPlayerPackets(double x, double y, double z, double r, int dimension){
-        writeFinalBits();
+        composePacket();
 
-        SFMPacket message = new SFMPacket();
-        message.data = ((ByteArrayOutputStream)stream).toByteArray();
-
-        pipeline.sendToAllAround(message, new TargetPoint(dimension, x, y, z, r));
-        //PacketDispatcher.sendPacketToAllAround(x, y, z, r, dimension, PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()));
+        packetHandler.sendToAllAround(packet, new TargetPoint(dimension, x, y, z, r));
     }
 
     void sendPlayerPacket(EntityPlayerMP player){
-        writeFinalBits();
+        composePacket();
 
-        SFMPacket message = new SFMPacket();
-        message.data = ((ByteArrayOutputStream)stream).toByteArray();
-
-        pipeline.sendTo(message, player);
-        //PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()), player);
+        packetHandler.sendTo(packet, player);
     }
 
     void sendServerPacket() {
-        writeFinalBits();
+        composePacket();
 
-        SFMPacket message = new SFMPacket();
-        message.data = ((ByteArrayOutputStream)stream).toByteArray();
-
-        pipeline.sendToServer(message);
-        //PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()));
+        packetHandler.sendToServer(packet);
     }
     
     void sendPlayerPackets(ContainerBase container) {
-        writeFinalBits();
+        composePacket();
 
         for (ICrafting crafting : container.getCrafters()) {
             if (crafting instanceof EntityPlayer) {
                 EntityPlayerMP player = (EntityPlayerMP) crafting;
-                SFMPacket message = new SFMPacket();
-                message.data = ((ByteArrayOutputStream)stream).toByteArray();
-
-                pipeline.sendTo(message, player);
-                //PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(StevesFactoryManager.CHANNEL, ((ByteArrayOutputStream)stream).toByteArray()), player);
+                packetHandler.sendTo(packet, player);
             }
         }
     }
@@ -210,5 +199,11 @@ public class DataWriter {
                 stream.write(byteBuffer);
             }catch (IOException ignored) {}
         }
+    }
+
+    void composePacket() {
+        writeFinalBits();
+        ByteBuf buf = Unpooled.copiedBuffer(((ByteArrayOutputStream)stream).toByteArray());
+        packet = new FMLProxyPacket(buf, CHANNEL);
     }
 }

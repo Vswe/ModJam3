@@ -1,6 +1,5 @@
 package vswe.stevesfactory.blocks;
 
-import net.minecraft.block.BlockContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;

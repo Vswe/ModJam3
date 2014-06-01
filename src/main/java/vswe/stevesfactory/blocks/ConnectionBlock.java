@@ -8,11 +8,9 @@ import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.components.ComponentMenuContainer;
 import vswe.stevesfactory.components.IContainerSelection;
 import vswe.stevesfactory.components.Variable;
-import vswe.stevesfactory.interfaces.Color;
 import vswe.stevesfactory.interfaces.GuiManager;
 
 import java.util.EnumSet;
-import java.util.List;
 
 public class ConnectionBlock implements IContainerSelection {
 

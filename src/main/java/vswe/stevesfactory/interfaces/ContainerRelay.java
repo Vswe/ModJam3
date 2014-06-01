@@ -2,12 +2,9 @@ package vswe.stevesfactory.interfaces;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
-import net.minecraft.tileentity.TileEntity;
-import vswe.stevesfactory.blocks.*;
-import vswe.stevesfactory.components.FlowComponent;
-import vswe.stevesfactory.network.DataWriter;
+import vswe.stevesfactory.blocks.TileEntityRelay;
+import vswe.stevesfactory.blocks.UserPermission;
 import vswe.stevesfactory.network.PacketHandler;
 
 import java.util.ArrayList;

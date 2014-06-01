@@ -6,7 +6,6 @@ import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.IRedstoneNode;
 import vswe.stevesfactory.blocks.ITriggerNode;
 
-
 import java.util.EnumSet;
 import java.util.List;
 

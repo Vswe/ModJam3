@@ -1,7 +1,5 @@
 package vswe.stevesfactory;
 
-import vswe.stevesfactory.interfaces.GuiManager;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Vswe

@@ -2,7 +2,6 @@ package vswe.stevesfactory.nbt;
 
 
 import net.minecraft.nbt.*;
-import vswe.stevesfactory.interfaces.GuiManager;
 
 import java.util.ArrayList;
 import java.util.List;

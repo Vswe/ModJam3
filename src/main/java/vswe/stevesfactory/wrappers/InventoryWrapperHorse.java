@@ -2,10 +2,8 @@ package vswe.stevesfactory.wrappers;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 /**

@@ -12,8 +12,6 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
-import java.util.List;
-
 public class ComponentMenuTargetTank extends ComponentMenuTarget {
     public ComponentMenuTargetTank(FlowComponent parent) {
         super(parent);

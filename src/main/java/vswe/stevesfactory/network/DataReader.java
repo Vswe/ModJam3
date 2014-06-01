@@ -3,15 +3,10 @@ package vswe.stevesfactory.network;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import vswe.stevesfactory.blocks.TileEntityManager;
-import vswe.stevesfactory.settings.Settings;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DataReader {
 

@@ -1,15 +1,11 @@
 package vswe.stevesfactory.components;
 
 
-
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.world.World;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class CraftingDummy extends InventoryCrafting
