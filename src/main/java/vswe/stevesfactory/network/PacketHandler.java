@@ -26,18 +26,15 @@ public class PacketHandler {
             EntityPlayerMP player = (EntityPlayerMP)crafting;
 
             dw.sendPlayerPacket(player);
-            dw.close();
         }
     }
 
     public static void sendDataToServer(DataWriter dw) {
         dw.sendServerPacket();
-        dw.close();
     }
 
     public static void sendDataToListeningClients(ContainerBase container, DataWriter dw) {
         dw.sendPlayerPackets(container);
-        dw.close();
     }
 
 

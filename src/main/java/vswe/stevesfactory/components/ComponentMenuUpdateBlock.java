@@ -23,6 +23,7 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
         checkBoxes = new CheckBoxList();
 
+        //TODO decide how to do this in 1.7
         checkBoxes.addCheckBox(new CheckBox(Localization.USE_ID, ID_START_X, ID_START_Y + CHECKBOX_OFFSET) {
             @Override
             public void setValue(boolean val) {

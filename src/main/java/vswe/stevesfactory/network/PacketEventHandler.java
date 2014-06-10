@@ -1,10 +1,10 @@
 package vswe.stevesfactory.network;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -17,7 +17,7 @@ public class PacketEventHandler {
     @SubscribeEvent
     public void onClientPacket(FMLNetworkEvent.ClientCustomPacketEvent event) {
         DataReader dr = new DataReader(event.packet.payload().array());
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
 
         boolean useContainer = dr.readBoolean();
 

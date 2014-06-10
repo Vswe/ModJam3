@@ -22,17 +22,19 @@ import static vswe.stevesfactory.StevesFactoryManager.CHANNEL;
 import static vswe.stevesfactory.StevesFactoryManager.packetHandler;
 
 public class DataWriter {
-    private OutputStream stream;
     private int byteBuffer;
     private int bitCountBuffer;
-    private FMLProxyPacket packet;
+    private ByteBuf buf;
 
     DataWriter() {
-       stream = new ByteArrayOutputStream();
+       buf = Unpooled.buffer();
     }
 
     DataWriter(OutputStream stream) {
-        this.stream = stream;
+        this.buf = Unpooled.copiedBuffer(((ByteArrayOutputStream)stream).toByteArray());
+        try {
+            stream.close();
+        } catch (IOException ignored) {}
     }
 
     public void writeByte(int data) {
@@ -62,10 +64,7 @@ public class DataWriter {
                 addData <<= bitCountBuffer;
                 byteBuffer |= addData;
 
-                try {
-                    stream.write(byteBuffer);
-                }catch (IOException ignored) {}
-
+                buf.writeByte(byteBuffer);
 
                 byteBuffer = 0;
                 bitCount -= bitsToAdd;
@@ -79,44 +78,33 @@ public class DataWriter {
     }
 
     void sendPlayerPackets(double x, double y, double z, double r, int dimension){
-        composePacket();
+        writeFinalBits();
 
-        packetHandler.sendToAllAround(packet, new TargetPoint(dimension, x, y, z, r));
+        packetHandler.sendToAllAround(new FMLProxyPacket(buf, CHANNEL), new TargetPoint(dimension, x, y, z, r));
     }
 
     void sendPlayerPacket(EntityPlayerMP player){
-        composePacket();
+        writeFinalBits();
 
-        packetHandler.sendTo(packet, player);
+        packetHandler.sendTo(new FMLProxyPacket(buf, CHANNEL), player);
     }
 
     void sendServerPacket() {
-        composePacket();
+        writeFinalBits();
 
-        packetHandler.sendToServer(packet);
+        packetHandler.sendToServer(new FMLProxyPacket(buf, CHANNEL));
     }
     
     void sendPlayerPackets(ContainerBase container) {
-        composePacket();
+        writeFinalBits();
 
         for (ICrafting crafting : container.getCrafters()) {
             if (crafting instanceof EntityPlayer) {
                 EntityPlayerMP player = (EntityPlayerMP) crafting;
-                packetHandler.sendTo(packet, player);
+                packetHandler.sendTo(new FMLProxyPacket(buf, CHANNEL), player);
             }
         }
     }
-
-
-
-    void close() {
-        try {
-            stream.close();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     public void writeString(String str, DataBitHelper bits) {
         if (str != null) {
@@ -195,15 +183,8 @@ public class DataWriter {
 
     void writeFinalBits() {
         if (bitCountBuffer > 0) {
-            try {
-                stream.write(byteBuffer);
-            }catch (IOException ignored) {}
+            buf.writeByte(byteBuffer);
         }
     }
 
-    void composePacket() {
-        writeFinalBits();
-        ByteBuf buf = Unpooled.copiedBuffer(((ByteArrayOutputStream)stream).toByteArray());
-        packet = new FMLProxyPacket(buf, CHANNEL);
-    }
 }

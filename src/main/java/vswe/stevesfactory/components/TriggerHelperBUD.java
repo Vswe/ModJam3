@@ -23,6 +23,7 @@ public class TriggerHelperBUD extends TriggerHelper {
 
         ComponentMenuUpdateBlock updateMenu =  (ComponentMenuUpdateBlock)component.getMenus().get(TRIGGER_BUD_BLOCK_ID);
 
+        //TODO decide how to do this in 1.7
         if (updateMenu.useId()) {
             boolean idMatch = id == updateMenu.getBlockId();
 

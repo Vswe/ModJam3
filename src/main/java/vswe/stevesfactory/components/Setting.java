@@ -40,7 +40,7 @@ public abstract class Setting {
 
     public void setDefaultAmount() {
         setAmount(getDefaultAmount());
-    };
+    }
 
     public abstract int getAmount();
     public abstract void setAmount(int val);

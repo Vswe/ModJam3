@@ -51,7 +51,6 @@ public final class FileHelper {
 
     public static void write(DataWriter dw) {
         dw.writeFinalBits();
-        dw.close();
     }
 
     private FileHelper() {}
