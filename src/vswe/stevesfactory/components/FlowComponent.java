@@ -288,7 +288,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
             Connection current = manager.getCurrentlyConnecting();
             if (current != null && current.getComponentId() == id && current.getConnectionId() == i) {
-                gui.drawLine(location[0] + connectionWidth / 2, location[1] + connectionHeight / 2, mX, mY);
+                gui.drawLine(location[0] + connectionWidth / 2, location[1] + connectionHeight / 2, overrideX != -1 ? overrideX : mX, overrideY != -1 ? overrideY : mY);
             }
 
             Connection connectedConnection = connections.get(i);
@@ -420,7 +420,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
     List<String> errors = new ArrayList<String>();
 
-    private int[] getConnectionLocationFromId(int id) {
+    public int[] getConnectionLocationFromId(int id) {
         int outputCount = 0;
         int inputCount = 0;
         int sideCount = 0;
@@ -1582,7 +1582,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     }
 
     public boolean isVisible() {
-        FlowComponent selectedComponent = getManager().getSelectedComponent();
+        return isVisible(getManager().getSelectedComponent());
+    }
+
+    public boolean isVisible(FlowComponent selectedComponent) {
         return (selectedComponent == null && parent == null) || (parent != null && parent.equals(selectedComponent));
     }
 
@@ -1629,5 +1632,62 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
         for (ComponentMenu menu : menus) {
             menu.onGuiClosed();
         }
+    }
+
+    public void setOpen(boolean b) {
+        isLarge = b;
+        openMenuId = -1;
+    }
+
+    public void setNameEdited(boolean b) {
+        isEditing = b;
+        if (b) {
+            textBox.setTextAndCursor("");
+        }else{
+            textBox.setText(null);
+        }
+    }
+
+    public void refreshEditing(String name) {
+        textBox.setTextAndCursor(name);
+    }
+
+    public boolean isNameBeingEdited() {
+        return isEditing;
+    }
+
+    private int overrideX = -1;
+    private int overrideY = -1;
+
+    public int getOverrideY() {
+        return overrideY;
+    }
+
+    public void setOverrideY(int overrideY) {
+        this.overrideY = overrideY;
+    }
+
+    public int getOverrideX() {
+        return overrideX;
+    }
+
+    public void setOverrideX(int overrideX) {
+        this.overrideX = overrideX;
+    }
+
+    public Map<Integer,Connection> getConnections() {
+        return connections;
+    }
+
+    public int getOpenMenuId() {
+        return openMenuId;
+    }
+
+    public void setOpenMenuId(int openMenuId) {
+        this.openMenuId = openMenuId;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

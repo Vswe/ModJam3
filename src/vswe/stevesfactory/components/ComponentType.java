@@ -5,7 +5,7 @@ import vswe.stevesfactory.Localization;
 
 public enum ComponentType {
     TRIGGER(0, Localization.TRIGGER_SHORT, Localization.TRIGGER_LONG,
-            new ConnectionSet[] {ConnectionSet.CONTINUOUSLY, ConnectionSet.REDSTONE, ConnectionSet.BUD},
+            new ConnectionSet[] {ConnectionSet.CONTINUOUSLY, ConnectionSet.REDSTONE, ConnectionSet.BUD, ConnectionSet.CHAT},
             ComponentMenuReceivers.class, ComponentMenuBUDs.class, ComponentMenuInterval.class, ComponentMenuRedstoneSidesTrigger.class, ComponentMenuRedstoneStrength.class, ComponentMenuUpdateBlock.class, ComponentMenuResult.class),
     INPUT(1, Localization.INPUT_SHORT, Localization.INPUT_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},

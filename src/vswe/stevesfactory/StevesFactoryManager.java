@@ -9,6 +9,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import vswe.stevesfactory.blocks.Blocks;
+import vswe.stevesfactory.components.ChatListener;
 import vswe.stevesfactory.components.ModItemHelper;
 import vswe.stevesfactory.configs.ConfigHandler;
 import vswe.stevesfactory.network.FileHelper;
@@ -24,7 +25,6 @@ public class StevesFactoryManager {
 
     public static final String RESOURCE_LOCATION = "stevesfactory";
     public static final String CHANNEL = "FactoryManager";
-    public static final boolean GREEN_SCREEN_MODE = false;
     public static final String UNLOCALIZED_START = "sfm.";
 
     @SidedProxy(clientSide = "vswe.stevesfactory.proxy.ClientProxy", serverSide = "vswe.stevesfactory.proxy.CommonProxy")
@@ -47,7 +47,7 @@ public class StevesFactoryManager {
     public void init(FMLInitializationEvent event) {
         proxy.init();
         Blocks.addRecipes();
-
+        new ChatListener();
         NetworkRegistry.instance().registerGuiHandler(this, new GuiHandler());
 
         FMLInterModComms.sendMessage("Waila", "register", "vswe.stevesfactory.waila.Provider.callbackRegister");

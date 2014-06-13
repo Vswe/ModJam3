@@ -11,12 +11,15 @@ import org.lwjgl.opengl.GL11;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.StevesFactoryManager;
+import vswe.stevesfactory.animation.AnimationController;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.FlowComponent;
 import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 @SideOnly(Side.CLIENT)
@@ -48,7 +51,13 @@ public class GuiManager extends GuiBase {
 
     @Override
     public void drawWorldBackground(int val) {
-        if (StevesFactoryManager.GREEN_SCREEN_MODE) {
+        if (usePinkScreen) {
+            drawRect(0, 0, width, height, 0xFFEC008C);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        }else if (useBlueScreen) {
+            drawRect(0, 0, width, height, 0xFF000A91);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        }else if (useGreenScreen) {
             drawRect(0, 0, width, height, 0xFF00FF00);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         }else{
@@ -63,7 +72,7 @@ public class GuiManager extends GuiBase {
 
 
 
-        if (!StevesFactoryManager.GREEN_SCREEN_MODE) {
+        if (!useGreenScreen && !useBlueScreen && !usePinkScreen) {
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             bindTexture(BACKGROUND_1);
             drawTexture(0, 0, 0, 0, 256, 256);
@@ -83,20 +92,28 @@ public class GuiManager extends GuiBase {
             return;
         }
 
-        for (int i = 0; i < manager.buttons.size(); i++) {
-            TileEntityManager.Button button = manager.buttons.get(i);
-            if (button.isVisible()) {
-                int srcButtonY = CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y) ? 1 : 0;
+        if (useButtons) {
+            for (int i = 0; i < manager.buttons.size(); i++) {
+                TileEntityManager.Button button = manager.buttons.get(i);
+                if (button.isVisible()) {
+                    int srcButtonY = CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y) ? 1 : 0;
 
-                drawTexture(button.getX(), button.getY(), TileEntityManager.BUTTON_SRC_X, TileEntityManager.BUTTON_SRC_Y + srcButtonY * TileEntityManager.BUTTON_SIZE_H, TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H);
-                drawTexture(button.getX() + 1, button.getY() + 1, TileEntityManager.BUTTON_INNER_SRC_X, TileEntityManager.BUTTON_INNER_SRC_Y + i * TileEntityManager.BUTTON_INNER_SIZE_H, TileEntityManager.BUTTON_INNER_SIZE_W, TileEntityManager.BUTTON_INNER_SIZE_H);
+                    drawTexture(button.getX(), button.getY(), TileEntityManager.BUTTON_SRC_X, TileEntityManager.BUTTON_SRC_Y + srcButtonY * TileEntityManager.BUTTON_SIZE_H, TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H);
+                    drawTexture(button.getX() + 1, button.getY() + 1, TileEntityManager.BUTTON_INNER_SRC_X, TileEntityManager.BUTTON_INNER_SRC_Y + i * TileEntityManager.BUTTON_INNER_SIZE_H, TileEntityManager.BUTTON_INNER_SIZE_W, TileEntityManager.BUTTON_INNER_SIZE_H);
+                }
             }
         }
 
+
+
         //update components completely independent on their visibility
         long ticks = Minecraft.getSystemTime();
+        float elapsedSeconds = (ticks - this.lastTicks) / 1000F;
+        if (controller != null) {
+            controller.update(elapsedSeconds);
+        }
         for (FlowComponent component : manager.getFlowItems()) {
-            component.update((ticks - this.lastTicks) / 1000F);
+            component.update(elapsedSeconds);
         }
         this.lastTicks = ticks;
 
@@ -125,12 +142,17 @@ public class GuiManager extends GuiBase {
         }
         CollisionHelper.disableInBoundsCheck = false;
 
-        if (!StevesFactoryManager.GREEN_SCREEN_MODE) {
+        if (useInfo) {
             drawString(getInfo(), 5, ySize - 13, 1F, 0x606060);
+        }
 
-            for (TileEntityManager.Button button : manager.buttons) {
-                if (button.isVisible() && CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y)) {
-                    drawMouseOver(button.getMouseOver(), x, y);
+        if (useMouseOver) {
+
+            if (useButtons) {
+                for (TileEntityManager.Button button : manager.buttons) {
+                    if (button.isVisible() && CollisionHelper.inBounds(button.getX(), button.getY(), TileEntityManager.BUTTON_SIZE_W, TileEntityManager.BUTTON_SIZE_H, x, y)) {
+                        drawMouseOver(button.getMouseOver(), x, y);
+                    }
                 }
             }
 
@@ -219,7 +241,9 @@ public class GuiManager extends GuiBase {
         }
 
 
-        onClickButtonCheck(x, y, false);
+        if (useButtons) {
+            onClickButtonCheck(x, y, false);
+        }
     }
 
     private void onClickButtonCheck(int x, int y, boolean release) {
@@ -273,7 +297,9 @@ public class GuiManager extends GuiBase {
             return;
         }
 
-        onClickButtonCheck(x, y, true);
+        if (useButtons) {
+            onClickButtonCheck(x, y, true);
+        }
 
         if (!manager.justSentServerComponentRemovalPacket) {
             for (FlowComponent itemBase : manager.getZLevelRenderingList()) {
@@ -291,13 +317,126 @@ public class GuiManager extends GuiBase {
 
     }
 
+    private AnimationController controller;
     private boolean doubleShiftFlag;
+    private boolean useGreenScreen;
+    private boolean useBlueScreen;
+    private boolean usePinkScreen;
+    private boolean useButtons = true;
+    private boolean useInfo = true;
+    private boolean useMouseOver = true;
+
+    private List<SecretCode> codes = new ArrayList<SecretCode>();{
+        codes.add(new SecretCode("animate") {
+            @Override
+            protected void trigger() {
+                controller = new AnimationController(manager, 2);
+            }
+        });
+        codes.add(new SecretCode("animslow") {
+            @Override
+            protected void trigger() {
+                controller = new AnimationController(manager, 1);
+            }
+        });
+        codes.add(new SecretCode("animfast") {
+            @Override
+            protected void trigger() {
+                controller = new AnimationController(manager, 5);
+            }
+        });
+        codes.add(new SecretCode("animrapid") {
+            @Override
+            protected void trigger() {
+                controller = new AnimationController(manager, 20);
+            }
+        });
+        codes.add(new SecretCode("animinstant") {
+            @Override
+            protected void trigger() {
+                controller = new AnimationController(manager, 100);
+            }
+        });
+        codes.add(new SecretCode("green") {
+            @Override
+            protected void trigger() {
+                useGreenScreen = !useGreenScreen;
+                useBlueScreen = false;
+                usePinkScreen = false;
+            }
+        });
+        codes.add(new SecretCode("blue") {
+            @Override
+            protected void trigger() {
+                useBlueScreen = !useBlueScreen;
+                useGreenScreen = false;
+                usePinkScreen = false;
+            }
+        });
+        codes.add(new SecretCode("pink") {
+            @Override
+            protected void trigger() {
+                usePinkScreen = !usePinkScreen;
+                useGreenScreen = false;
+                useBlueScreen = false;
+            }
+        });
+        codes.add(new SecretCode("buttons") {
+            @Override
+            protected void trigger() {
+                useButtons = !useButtons;
+            }
+        });
+        codes.add(new SecretCode("info") {
+            @Override
+            protected void trigger() {
+                useInfo = !useInfo;
+            }
+        });
+        codes.add(new SecretCode("mouse") {
+            @Override
+            protected void trigger() {
+                useMouseOver = !useMouseOver;
+            }
+        });
+    }
+
+    private abstract class SecretCode {
+        private final String code;
+        private int triggerNumber;
+
+        private SecretCode(String code) {
+            this.code = code;
+        }
+
+        public boolean keyTyped(char c) {
+            if (Character.isAlphabetic(c)) {
+                if (code.charAt(triggerNumber) == c) {
+                    if (triggerNumber + 1 > code.length() - 1) {
+                        triggerNumber = 0;
+                        trigger();
+                    }else{
+                        triggerNumber++;
+                    }
+                    return true;
+                }else if (triggerNumber != 0){
+                    triggerNumber = 0;
+                    keyTyped(c);
+                }
+            }
+
+            return false;
+        }
+
+        protected abstract void trigger();
+    }
 
     @Override
     protected void keyTyped(char c, int k) {
         if (hasSpecialRenderer()) {
             getSpecialRenderer().onKeyTyped(this, c, k);
         }else{
+
 
             if (k == 54 && !doubleShiftFlag) {
                 DataWriter dw = PacketHandler.getWriterForServerActionPacket();
@@ -309,6 +448,17 @@ public class GuiManager extends GuiBase {
                 if (itemBase.isVisible() && itemBase.onKeyStroke(this, c, k) && k != 1) {
                     return;
                 }
+            }
+
+            boolean recognized = false;
+            for (SecretCode code : codes) {
+                if (code.keyTyped(c)) {
+                    recognized = true;
+                }
+            }
+
+            if (recognized) {
+                return;
             }
         }
 
