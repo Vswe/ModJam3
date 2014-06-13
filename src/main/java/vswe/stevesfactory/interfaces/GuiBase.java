@@ -283,13 +283,15 @@ public abstract class GuiBase extends GuiAntiNEI {
 
         //GL11.glEnable(GL11.GL_BLEND);
         //GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_DST_COLOR);
-        GL11.glEnable(GL11.GL_LINE_SMOOTH);
-        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
-        GL11.glLineWidth(5);
+        //GL11.glShadeModel(GL11.GL_SMOOTH);
+        //GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        //GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
+        //GL11.glLineWidth(5);
+        GL11.glLineWidth(1 + 5 * this.width / 500F);
 
         GL11.glBegin(GL11.GL_LINES);
-        GL11.glVertex2i(guiLeft + x1, guiTop + y1);
-        GL11.glVertex2i(guiLeft + x2, guiTop + y2);
+        GL11.glVertex3f(guiLeft + x1, guiTop + y1, 0);
+        GL11.glVertex3f(guiLeft + x2, guiTop + y2, 0);
         GL11.glEnd();
 
         GL11.glDisable(GL11.GL_BLEND);
@@ -297,6 +299,10 @@ public abstract class GuiBase extends GuiAntiNEI {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glPopMatrix();
     }
+
+
+
+
 
     @Override
     public final void drawDefaultBackground() {

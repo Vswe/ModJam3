@@ -8,6 +8,7 @@ import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.CheckBox;
 import vswe.stevesfactory.components.CheckBoxList;
+import vswe.stevesfactory.components.ComponentType;
 import vswe.stevesfactory.interfaces.GuiManager;
 import vswe.stevesfactory.interfaces.IInterfaceRenderer;
 
@@ -24,7 +25,7 @@ public class SettingsScreen implements IInterfaceRenderer {
         this.manager = manager;
 
         buttons = new ArrayList<Button>();
-        buttons.add(new Button(493, 5, Localization.GO_BACK, 231, 193) {
+        buttons.add(new Button(493, 5, Localization.GO_BACK, 231, 12 * ComponentType.values().length + 1) {
             @Override
             protected void onClick() {
                 manager.specialRenderer = null;

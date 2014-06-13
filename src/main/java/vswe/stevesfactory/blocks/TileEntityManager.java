@@ -240,7 +240,9 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
                                 TileEntity te = worldObj.getTileEntity(target.getX(), target.getY(), target.getZ());
 
                                 if (te instanceof TileEntityCluster) {
+
                                     for (TileEntityClusterElement tileEntityClusterElement : ((TileEntityCluster) te).getElements()) {
+                                        ((TileEntityCluster)te).setWorldObject(tileEntityClusterElement);
                                         addInventory(tileEntityClusterElement, target);
                                     }
                                 }else{
@@ -446,6 +448,14 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
         for (FlowComponent item : items) {
             if (item.getType() == ComponentType.TRIGGER && item.getConnectionSet() == ConnectionSet.REDSTONE) {
                 redstoneTrigger.onRedstoneTrigger(item, inputTrigger);
+            }
+        }
+    }
+
+    public void triggerChat() {
+        for (FlowComponent item : items) {
+            if (item.getType() == ComponentType.TRIGGER && item.getConnectionSet() == ConnectionSet.CHAT) {
+                activateTrigger(item, EnumSet.allOf(ConnectionOption.class));
             }
         }
     }
@@ -666,6 +676,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
     public void setSelectedComponent(FlowComponent selectedComponent) {
         this.selectedComponent = selectedComponent;
     }
+
 
 
     public abstract class Button {

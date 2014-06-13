@@ -103,7 +103,7 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         }
     }
 
-    private void setWorldObject(TileEntityClusterElement te) {
+    public void setWorldObject(TileEntityClusterElement te) {
         if (!te.hasWorldObj()) {
             te.setWorldObj(this.worldObj);
         }

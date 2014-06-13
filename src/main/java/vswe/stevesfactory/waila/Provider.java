@@ -3,10 +3,7 @@ package vswe.stevesfactory.waila;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import mcp.mobius.waila.api.IWailaConfigHandler;
-import mcp.mobius.waila.api.IWailaDataAccessor;
-import mcp.mobius.waila.api.IWailaDataProvider;
-import mcp.mobius.waila.api.IWailaRegistrar;
+import mcp.mobius.waila.api.*;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -95,6 +92,7 @@ public class Provider implements IWailaDataProvider {
         Provider instance = new Provider();
         registrar.registerBodyProvider(instance, BlockCableCluster.class);
         registrar.registerBodyProvider(instance, BlockCableOutput.class);
+
 
         registrar.registerStackProvider(instance, BlockCableCluster.class);
         registrar.registerStackProvider(instance, BlockCableCamouflages.class);
