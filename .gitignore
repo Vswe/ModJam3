@@ -1,8 +1,20 @@
-eclipse/
+# Gradle
+.gradle/
 build/
+eclipse/
+libs/
+
+# IDEA
+out/
 *.iml
 *.iws
 *.ipr
-.gradle/
-libs/
-out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# OS Generated Garbage
+.DS_Store
