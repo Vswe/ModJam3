@@ -49,8 +49,9 @@ public final class FileHelper {
         }
     }
 
-    public static void write(DataWriter dw) {
+    public static void close(DataWriter dw) {
         dw.writeFinalBits();
+        dw.close();
     }
 
     private FileHelper() {}

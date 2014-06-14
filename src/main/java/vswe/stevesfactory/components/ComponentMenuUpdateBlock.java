@@ -3,6 +3,8 @@ package vswe.stevesfactory.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import vswe.stevesfactory.Localization;
@@ -13,7 +15,7 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
-public class ComponentMenuUpdateBlock extends ComponentMenu {
+public class ComponentMenuUpdateBlock extends ComponentMenuItem {
     public ComponentMenuUpdateBlock(FlowComponent parent) {
         super(parent);
 
@@ -23,7 +25,12 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
         checkBoxes = new CheckBoxList();
 
-        //TODO decide how to do this in 1.7
+        scrollControllerSelected.setItemsPerRow(1);
+        scrollControllerSelected.setVisibleRows(1);
+        scrollControllerSelected.setItemUpperLimit(-2);
+        scrollControllerSelected.setX(ID_START_X + ID_TEXT_BOX + 10);
+
+
         checkBoxes.addCheckBox(new CheckBox(Localization.USE_ID, ID_START_X, ID_START_Y + CHECKBOX_OFFSET) {
             @Override
             public void setValue(boolean val) {
@@ -41,7 +48,7 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
             }
         });
 
-        textBoxes.addTextBox(textBoxId = new TextBoxNumber(ID_START_X + ID_TEXT_BOX, ID_START_Y, 4, true) {
+        /*textBoxes.addTextBox(textBoxId = new TextBoxNumber(ID_START_X + ID_TEXT_BOX, ID_START_Y, 4, true) {
             @Override
             public int getMaxNumber() {
                 return 4095;
@@ -56,7 +63,7 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
             public boolean isVisible() {
                 return useId;
             }
-        });
+        });*/
 
         checkBoxes.addCheckBox(new CheckBox(Localization.INVERT, ID_START_X + META_INVERTED_OFFSET, ID_START_Y + CHECKBOX_OFFSET) {
             @Override
@@ -172,6 +179,11 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
     }
 
+    @Override
+    protected int getSettingCount() {
+        return 1;
+    }
+
     public class MetaSetting {
         public boolean[] bits = new boolean[META_BITS];
         public TextBoxNumber lowerTextBox;
@@ -200,7 +212,6 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
     private TextBoxNumberList textBoxes;
     private CheckBoxList checkBoxes;
-    private TextBoxNumber textBoxId;
 
 
     private static final int ID_START_X = 1;
@@ -225,14 +236,15 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
     }
 
     public int getBlockId() {
-        return textBoxId.getNumber();
+        ItemSetting itemSetting = (ItemSetting)getSettings().get(0);
+        return itemSetting.getItem() == null ? 0 : Item.getIdFromItem(itemSetting.getItem().getItem());
     }
 
     public boolean isIdInverted() {
         return idInverted;
     }
 
-    public MetaSetting[] getSettings() {
+    public MetaSetting[] getMetaSettings() {
         return settings;
     }
 
@@ -249,27 +261,47 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
-        textBoxes.draw(gui, mX, mY);
-        checkBoxes.draw(gui, mX, mY);
-        gui.drawString(Localization.META.toString(), META_TEXT_X, META_TEXT_Y, 0.7F, 0x404040);
+        if (!isEditing() && !isSearching()) {
+            textBoxes.draw(gui, mX, mY);
+            checkBoxes.draw(gui, mX, mY);
+            gui.drawString(Localization.META.toString(), META_TEXT_X, META_TEXT_Y, 0.7F, 0x404040);
+            if (useId) {
+                super.draw(gui, mX, mY);
+            }
+        }else{
+            super.draw(gui, mX, mY);
+        }
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        if (isEditing() || isSearching() || useId) {
+            super.drawMouseOver(gui, mX, mY);
+        }
     }
 
     @Override
     public void onClick(int mX, int mY, int button) {
-        textBoxes.onClick(mX, mY, button);
-        checkBoxes.onClick(mX, mY);
+        if (!isEditing() && !isSearching()) {
+            textBoxes.onClick(mX, mY, button);
+            checkBoxes.onClick(mX, mY);
+            if (useId) {
+                super.onClick(mX, mY, button);
+            }
+        }else{
+            super.onClick(mX, mY, button);
+        }
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public boolean onKeyStroke(GuiManager gui, char c, int k) {
-        return textBoxes.onKeyStroke(gui, c, k);
+        if (!isEditing() && !isSearching()) {
+            return textBoxes.onKeyStroke(gui, c, k);
+        }else{
+            return super.onKeyStroke(gui, c, k);
+        }
     }
 
     @Override
@@ -284,8 +316,9 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
     @Override
     public void writeData(DataWriter dw) {
+        super.writeData(dw);
+
         dw.writeBoolean(useId);
-        dw.writeData(textBoxId.getNumber(), DataBitHelper.BLOCK_ID);
         dw.writeBoolean(idInverted);
 
         for (MetaSetting setting : settings) {
@@ -300,8 +333,9 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
     @Override
     public void readData(DataReader dr) {
+        super.readData(dr);
+
         useId = dr.readBoolean();
-        textBoxId.setNumber(dr.readData(DataBitHelper.BLOCK_ID));
         idInverted = dr.readBoolean();
 
 
@@ -317,9 +351,10 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
     @Override
     public void copyFrom(ComponentMenu menu) {
+        super.copyFrom(menu);
+
         ComponentMenuUpdateBlock menuUpdate = (ComponentMenuUpdateBlock)menu;
         useId = menuUpdate.useId;
-        textBoxId.setNumber(menuUpdate.textBoxId.getNumber());
         idInverted = menuUpdate.idInverted;
 
         for (int i = 0; i < settings.length; i++) {
@@ -334,16 +369,13 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
     @Override
     public void refreshData(ContainerManager container, ComponentMenu newData) {
+        super.refreshData(container, newData);
+
         ComponentMenuUpdateBlock newDataUpdate = (ComponentMenuUpdateBlock)newData;
 
         if (useId != newDataUpdate.useId) {
             useId = newDataUpdate.useId;
             sendClientData(container, 0, 0);
-        }
-
-        if (textBoxId.getNumber() != newDataUpdate.textBoxId.getNumber()) {
-            textBoxId.setNumber(newDataUpdate.textBoxId.getNumber());
-            sendClientData(container, 0, 1);
         }
 
         if (idInverted != newDataUpdate.idInverted) {
@@ -392,8 +424,14 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
     @Override
     public void readFromNBT(NBTTagCompound nbtTagCompound, int version, boolean pickup) {
+        if (version >= 11) {
+            super.readFromNBT(nbtTagCompound, version, pickup);
+        }else{
+            ItemSetting setting = (ItemSetting)getSettings().get(0);
+            setting.setItem(new ItemStack(Item.getItemById(nbtTagCompound.getShort(NBT_ID))));
+        }
         useId = nbtTagCompound.getBoolean(NBT_USE_ID);
-        textBoxId.setNumber(nbtTagCompound.getShort(NBT_ID));
+
         idInverted = nbtTagCompound.getBoolean(NBT_INVERTED);
 
         NBTTagList list = nbtTagCompound.getTagList(NBT_SETTINGS, 10);
@@ -413,10 +451,9 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
 
     @Override
     public void writeToNBT(NBTTagCompound nbtTagCompound, boolean pickup) {
-
+        super.writeToNBT(nbtTagCompound, pickup);
 
         nbtTagCompound.setBoolean(NBT_USE_ID, useId);
-        nbtTagCompound.setShort(NBT_ID, (short)textBoxId.getNumber());
         nbtTagCompound.setBoolean(NBT_INVERTED, idInverted);
 
         NBTTagList list = new NBTTagList();
@@ -451,15 +488,55 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
         PacketHandler.sendDataToServer(dw);
     }
 
+    @Override
+    protected void writeRadioButtonRefreshState(DataWriter dw, boolean value) {
+        dw.writeBoolean(false);
+        super.writeRadioButtonRefreshState(dw, value);
+    }
+
+    @Override
+    protected void readNonSettingData(DataReader dr) {
+        if (dr.readBoolean()) {
+            int id = dr.readData(DataBitHelper.BUD_SYNC_TYPE);
+            if (id == 0) {
+                int subId = dr.readData(DataBitHelper.BUD_SYNC_SUB_TYPE_SHORT);
+                if (subId == 0) {
+                    useId = dr.readBoolean();
+                }else if(subId == 2) {
+                    idInverted = dr.readBoolean();
+                }
+            }else{
+                id--;
+                MetaSetting setting = settings[id];
+                int subId = dr.readData(DataBitHelper.BUD_SYNC_SUB_TYPE_LONG);
+                if (subId < 4) {
+                    setting.bits[subId] = dr.readBoolean();
+                    if (!setting.bits[subId]) {
+                        setting.lowerTextBox.setNumber(setting.lowerTextBox.getNumber());
+                        setting.higherTextBox.setNumber(setting.higherTextBox.getNumber());
+                    }
+                }else if(subId == 4) {
+                    setting.lowerTextBox.setNumber(dr.readData(DataBitHelper.BLOCK_META));
+                }else if(subId == 5) {
+                    setting.higherTextBox.setNumber(dr.readData(DataBitHelper.BLOCK_META));
+                }else if(subId == 6) {
+                    setting.inverted = dr.readBoolean();
+                }
+            }
+        }else{
+            super.readNonSettingData(dr);
+        }
+    }
+
     private void writeData(DataWriter dw, int id, int subId) {
+        dw.writeBoolean(false); //no setting specific
+        dw.writeBoolean(true); //other data
         dw.writeData(id, DataBitHelper.BUD_SYNC_TYPE);
         dw.writeData(subId, id == 0 ? DataBitHelper.BUD_SYNC_SUB_TYPE_SHORT : DataBitHelper.BUD_SYNC_SUB_TYPE_LONG);
 
         if (id == 0) {
             if (subId == 0) {
                 dw.writeBoolean(useId);
-            }else if(subId == 1) {
-                dw.writeData(textBoxId.getNumber(), DataBitHelper.BLOCK_ID);
             }else if(subId == 2) {
                 dw.writeBoolean(idInverted);
             }
@@ -478,40 +555,15 @@ public class ComponentMenuUpdateBlock extends ComponentMenu {
         }
     }
 
-    @Override
-    public void readNetworkComponent(DataReader dr) {
-        int id = dr.readData(DataBitHelper.BUD_SYNC_TYPE);
-        if (id == 0) {
-            int subId = dr.readData(DataBitHelper.BUD_SYNC_SUB_TYPE_SHORT);
-            if (subId == 0) {
-                useId = dr.readBoolean();
-            }else if(subId == 1) {
-                textBoxId.setNumber(dr.readData(DataBitHelper.BLOCK_ID));
-            }else if(subId == 2) {
-                idInverted = dr.readBoolean();
-            }
-        }else{
-            id--;
-            MetaSetting setting = settings[id];
-            int subId = dr.readData(DataBitHelper.BUD_SYNC_SUB_TYPE_LONG);
-            if (subId < 4) {
-                setting.bits[subId] = dr.readBoolean();
-                if (!setting.bits[subId]) {
-                    setting.lowerTextBox.setNumber(setting.lowerTextBox.getNumber());
-                    setting.higherTextBox.setNumber(setting.higherTextBox.getNumber());
-                }
-            }else if(subId == 4) {
-                setting.lowerTextBox.setNumber(dr.readData(DataBitHelper.BLOCK_META));
-            }else if(subId == 5) {
-                setting.higherTextBox.setNumber(dr.readData(DataBitHelper.BLOCK_META));
-            }else if(subId == 6) {
-                setting.inverted = dr.readBoolean();
-            }
-        }
-    }
 
     @Override
     public boolean isVisible() {
         return getParent().getConnectionSet() == ConnectionSet.BUD;
+    }
+
+
+    @Override
+    protected void initRadioButtons() {
+        //no radio buttons
     }
 }

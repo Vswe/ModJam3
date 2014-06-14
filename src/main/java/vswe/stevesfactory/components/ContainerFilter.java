@@ -112,7 +112,7 @@ public class ContainerFilter {
         for (int i = 0; i < selection.length; i++) {
             radioButtonsSelection.add(new RadioButton(RADIO_BUTTON_X, RADIO_BUTTON_Y + RADIO_BUTTON_SPACING * i, selection[i]));
         }
-        //TODO add this
+
         //checkBoxes.addCheckBox(new CheckBoxPage(Localization.RELOAD_ON_CHANGE, ComponentMenuContainer.Page.SELECTION, CHECK_BOX_X, CHECK_BOX_SELECTION_Y));
 
         scrollControllerVariable = new ScrollController<Variable>(false) {

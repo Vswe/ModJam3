@@ -23,7 +23,6 @@ public class TriggerHelperBUD extends TriggerHelper {
 
         ComponentMenuUpdateBlock updateMenu =  (ComponentMenuUpdateBlock)component.getMenus().get(TRIGGER_BUD_BLOCK_ID);
 
-        //TODO decide how to do this in 1.7
         if (updateMenu.useId()) {
             boolean idMatch = id == updateMenu.getBlockId();
 
@@ -32,7 +31,7 @@ public class TriggerHelperBUD extends TriggerHelper {
             }
         }
 
-        for (ComponentMenuUpdateBlock.MetaSetting setting : updateMenu.getSettings()) {
+        for (ComponentMenuUpdateBlock.MetaSetting setting : updateMenu.getMetaSettings()) {
             if (setting.inUse()) {
                 int count = 0;
                 int settingMeta = 0;

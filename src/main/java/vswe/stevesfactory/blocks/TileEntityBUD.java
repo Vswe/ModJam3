@@ -59,7 +59,6 @@ public class TileEntityBUD extends TileEntityClusterElement implements ISystemLi
                 int y = direction.offsetY + this.yCoord;
                 int z = direction.offsetZ + this.zCoord;
 
-                //TODO decide how to do this in 1.7
                 data[i] = (Block.getIdFromBlock(worldObj.getBlock(x, y, z)) << 4) | (worldObj.getBlockMetadata(x, y, z) & 15);
             }
         }

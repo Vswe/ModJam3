@@ -79,7 +79,7 @@ public final class Settings {
             dw.writeBoolean(autoBlacklist);
             dw.writeBoolean(enlargeInterfaces);
 
-            FileHelper.write(dw);
+            FileHelper.close(dw);
         }
     }
 

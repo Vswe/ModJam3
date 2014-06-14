@@ -31,10 +31,12 @@ public class PacketHandler {
 
     public static void sendDataToServer(DataWriter dw) {
         dw.sendServerPacket();
+        dw.close();
     }
 
     public static void sendDataToListeningClients(ContainerBase container, DataWriter dw) {
         dw.sendPlayerPackets(container);
+        dw.close();
     }
 
 
@@ -47,6 +49,7 @@ public class PacketHandler {
         te.writeAllData(dw);
 
         sendDataToPlayer(crafting, dw);
+        dw.close();
     }
 
 
@@ -206,6 +209,8 @@ public class PacketHandler {
 
         writeAllComponentData(dw, component);
         PacketHandler.sendDataToListeningClients(container, dw);
+
+        dw.close();
     }
 
     public static void sendRemovalPacket(ContainerManager container, int idToRemove) {
@@ -214,6 +219,8 @@ public class PacketHandler {
         dw.writeBoolean(false);
         dw.writeComponentId((TileEntityManager)container.getTileEntity(), idToRemove);
         sendDataToListeningClients(container, dw);
+
+        dw.close();
     }
 
     public static void sendBlockPacket(IPacketBlock block, EntityPlayer player, int id) {
@@ -239,6 +246,8 @@ public class PacketHandler {
             }else{
                 dw.sendPlayerPackets(te.xCoord + 0.5, te.yCoord, te.zCoord, BLOCK_UPDATE_RANGE, te.getWorldObj().provider.dimensionId);
             }
+
+            dw.close();
         }
     }
 }

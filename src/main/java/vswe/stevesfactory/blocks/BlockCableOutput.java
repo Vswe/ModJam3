@@ -56,11 +56,6 @@ public class BlockCableOutput extends BlockContainer {
         }
         return inactiveIcon;    }
 
-    @Override
-    public boolean shouldCheckWeakPower(IBlockAccess world, int x, int y, int z, int side) {
-        return true;
-    }
-
 
     @Override
     public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side) {
@@ -87,6 +82,11 @@ public class BlockCableOutput extends BlockContainer {
 
     @Override
     public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side) {
+        return true;
+    }
+
+    @Override
+    public boolean canProvidePower(){
         return true;
     }
 }

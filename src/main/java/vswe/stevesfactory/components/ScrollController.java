@@ -23,7 +23,6 @@ public  abstract class ScrollController<T> {
 
     private static final int ITEM_SIZE = 16;
     private static final int ITEM_SIZE_WITH_MARGIN = 20;
-    private static final int ITEM_X = 5;
 
     private static final int ARROW_SIZE_W = 10;
     private static final int ARROW_SIZE_H = 6;
@@ -50,6 +49,7 @@ public  abstract class ScrollController<T> {
 
     private int itemsPerRow = 5;
     private int visibleRows = 2;
+    private int startX = 5;
     private int scrollingUpperLimit = TEXT_BOX_Y + TEXT_BOX_SIZE_H;
     public ScrollController(boolean hasSearchBox) {
         this(hasSearchBox ? "" : null);
@@ -82,6 +82,14 @@ public  abstract class ScrollController<T> {
     protected abstract List<String> getMouseOver(T t);
 
 
+    public void setX(int val) {
+        startX = val;
+    }
+
+    public int getScrollingStartX() {
+        return startX;
+    }
+
     public int getScrollingStartY() {
         return scrollingUpperLimit + 3;
     }
@@ -101,7 +109,7 @@ public  abstract class ScrollController<T> {
                 if (id >= 0 && id < result.size())  {
                     int y = getScrollingStartY() + row * ITEM_SIZE_WITH_MARGIN - offset;
                     if (y > scrollingUpperLimit && y + ITEM_SIZE < FlowComponent.getMenuOpenSize()) {
-                        points.add(new Point(id, ITEM_X + ITEM_SIZE_WITH_MARGIN * col, y));
+                        points.add(new Point(id, getScrollingStartX() + ITEM_SIZE_WITH_MARGIN * col, y));
                     }
                 }
             }

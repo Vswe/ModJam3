@@ -87,12 +87,14 @@ public class LiquidSetting extends Setting {
     private static final String NBT_FLUID_AMOUNT = "Amount";
     @Override
     public void load(NBTTagCompound settingTag) {
+        //TODO load properly
         fluid = FluidRegistry.getFluid(settingTag.getShort(NBT_FLUID_ID));
         amount = settingTag.getInteger(NBT_FLUID_AMOUNT);
     }
 
     @Override
     public void save(NBTTagCompound settingTag) {
+        //TODO save properly
         settingTag.setShort(NBT_FLUID_ID, (short)fluid.getID());
         settingTag.setInteger(NBT_FLUID_AMOUNT, amount);
     }

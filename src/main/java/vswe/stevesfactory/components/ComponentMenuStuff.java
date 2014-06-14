@@ -47,7 +47,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             public void updateSelectedOption(int selectedOption) {
                 DataWriter dw = getWriterForServerComponentPacket();
                 dw.writeBoolean(false); //no specific item
-                dw.writeBoolean(selectedOption == 0);
+                writeRadioButtonRefreshState(dw, selectedOption == 0);
                 PacketHandler.sendDataToServer(dw);
             }
         };
@@ -441,7 +441,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
             DataWriter dw = getWriterForClientComponentPacket(container);
             dw.writeBoolean(false); //no specific setting
-            dw.writeBoolean(isFirstRadioButtonSelected());
+            writeRadioButtonRefreshState(dw, isFirstRadioButtonSelected());
             PacketHandler.sendDataToListeningClients(container, dw);
         }
 
@@ -513,11 +513,17 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
             onSettingContentChange();
         }else{
-            setFirstRadioButtonSelected(dr.readBoolean());
+            readNonSettingData(dr);
         }
     }
 
+    protected void writeRadioButtonRefreshState(DataWriter dw, boolean value) {
+        dw.writeBoolean(value);
+    }
 
+    protected void readNonSettingData(DataReader dr) {
+        setFirstRadioButtonSelected(dr.readBoolean());
+    }
 
     protected void writeClientData(ContainerManager container, DataTypeHeader header, Setting setting) {
         DataWriter dw = getWriterForClientComponentPacket(container);
