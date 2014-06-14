@@ -17,13 +17,41 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "A85"
-group= "vswe.stevesfactory" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+// Define properties file
+ext.configFile = file "build.properties"
+
+configFile.withReader {
+	// Load config.  It shall from now be referenced as simply config or project.config
+	def prop = new Properties()
+	prop.load(it)
+	project.ext.config = new ConfigSlurper().parse prop
+}
+
+repositories {
+	maven {
+		name "CB's Repo"
+		url "http://chickenbones.net/maven"
+	}
+	maven {
+		name "ProfMobius's Repo"
+		url "http://mobiusstrip.eu/maven"
+	}
+}
+
+dependencies {
+	compile "mcp.mobius.waila:Waila:${config.waila_version}"
+}
+
+version = "${config.mc_version}-${config.mod_version}"
+group= "vswe" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "StevesFactoryManager"
 
 minecraft {
-    version = "1.7.2-10.12.1.1063"
+    version = "${config.mc_version}-${config.forge_version}"
     assetDir = "eclipse/assets"
+	
+	replaceIn "GeneratedInfo.java"
+	replace "@MOD_VERSION@", config.mod_version
 }
 
 processResources
@@ -37,7 +65,7 @@ processResources
         include 'mcmod.info'
                 
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version':config.mod_version, 'mcversion':project.minecraft.version
     }
         
     // copy everything else, thats not the mcmod.info
