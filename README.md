@@ -10,9 +10,9 @@ Setup Workspace
 git clone [git-repo-url]
 ```
 
-If you don't have [Gradle][3] installed on your computer you can use `gradlew` or `gradlew.bat` instead
+If you don't have [Gradle][1] installed on your computer you can use `gradlew` or `gradlew.bat` instead
 
-For help setting up a ForgeGradle workspace, go to this [forum page][1].
+For help setting up a ForgeGradle workspace, go to this [forum page][2].
 
 Note that Waila will be automatically downloaded on setup and will be in the classpath.
 
@@ -26,4 +26,5 @@ gradle setupDecompWorkspace idea
 gradle setupDecompWorkspace eclipse
 ```
 
-[1]:http://www.minecraftforge.net/forum/index.php/topic,14048.0.html
+[1]:http://www.gradle.org/
+[2]:http://www.minecraftforge.net/forum/index.php/topic,14048.0.html
