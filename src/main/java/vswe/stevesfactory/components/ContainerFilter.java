@@ -126,7 +126,7 @@ public class ContainerFilter {
             }
 
             @Override
-            protected void onClick(Variable variable, int button) {
+            protected void onClick(Variable variable, int mX, int mY, int button) {
                 if (filterVariableSelection.contains(variable.getId())) {
                     filterVariableSelection.remove((Integer)variable.getId());
                 }else{
@@ -140,8 +140,8 @@ public class ContainerFilter {
             }
 
             @Override
-            protected List<String> getMouseOver(Variable variable) {
-                return currentMenu.getMouseOverForContainer(variable, filterVariableSelection);
+            protected void drawMouseOver(GuiManager gui, Variable variable, int mX, int mY) {
+                gui.drawMouseOver(currentMenu.getMouseOverForContainer(variable, filterVariableSelection), mX, mY);
             }
         };
 

@@ -27,6 +27,7 @@ import vswe.stevesfactory.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
@@ -37,7 +38,7 @@ public abstract class GuiBase extends GuiAntiNEI {
 
     private static final ResourceLocation TERRAIN = new ResourceLocation("textures/atlas/blocks.png");
 
-    protected abstract ResourceLocation getComponentResource();
+    public abstract ResourceLocation getComponentResource();
 
     public void drawTexture(int x, int y, int srcX, int srcY, int w, int h) {
         float scale = getScale();
@@ -135,6 +136,116 @@ public abstract class GuiBase extends GuiAntiNEI {
         return lst;
     }
 
+    private int getStringMaxWidth(List<String> lines) {
+        int width = 0;
+
+        if (lines != null) {
+            for (String line : lines) {
+                int w = fontRendererObj.getStringWidth(line);
+
+                if (w > width) {
+                    width = w;
+                }
+            }
+        }
+
+        return width;
+    }
+
+    private int renderLines(List<String> lines, int mX, int mY, boolean first) {
+        return renderLines(lines, mX, mY, first, false);
+    }
+    private int renderLines(List<String> lines, int mX, int mY, boolean first, boolean fake) {
+        if (lines != null) {
+            for (String line : lines) {
+                if (!fake) {
+                    fontRendererObj.drawStringWithShadow(line, mX, mY, -1);
+                }
+
+                if (first){
+                    mY += 2;
+                    first = false;
+                }
+
+                mY += 10;
+            }
+        }
+
+        return mY;
+    }
+
+    public void drawMouseOver(IAdvancedTooltip tooltip, int mX, int mY) {
+        drawMouseOver(tooltip, mX, mY, mX, mY);
+    }
+    public void drawMouseOver(IAdvancedTooltip tooltip, int x, int y, int mX, int mY) {
+        if (tooltip != null) {
+            GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+            RenderHelper.disableStandardItemLighting();
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+
+
+            List<String> prefix = tooltip.getPrefix(this);
+            List<String> suffix = tooltip.getSuffix(this);
+            int prefixLength = prefix != null ? prefix.size() : 0;
+            int suffixLength = suffix != null ? suffix.size() : 0;
+            int extraHeight = tooltip.getExtraHeight(this);
+
+            int width = Math.max(tooltip.getMinWidth(this), Math.max(getStringMaxWidth(prefix), getStringMaxWidth(suffix)));
+            int height = extraHeight + (prefixLength + suffixLength) * 10 - 2;
+
+
+            x += guiLeft + 12;
+            y += guiTop - 12;
+            if (x + width > this.width){
+                x -= 28 + width;
+            }
+            if (y + height + 6 > this.height){
+                y = this.height - height - 6;
+            }
+
+
+            this.zLevel = 300.0F;
+            itemRender.zLevel = 300.0F;
+            int j1 = -267386864;
+            this.drawGradientRect(x - 3, y - 4, x + width + 3, y - 3, j1, j1);
+            this.drawGradientRect(x - 3, y + height + 3, x + width + 3, y + height + 4, j1, j1);
+            this.drawGradientRect(x - 3, y - 3, x + width + 3, y + height + 3, j1, j1);
+            this.drawGradientRect(x - 4, y - 3, x - 3, y + height + 3, j1, j1);
+            this.drawGradientRect(x + width + 3, y - 3, x + width + 4, y + height + 3, j1, j1);
+            int k1 = 1347420415;
+            int l1 = (k1 & 16711422) >> 1 | k1 & -16777216;
+            this.drawGradientRect(x - 3, y - 3 + 1, x - 3 + 1, y + height + 3 - 1, k1, l1);
+            this.drawGradientRect(x + width + 2, y - 3 + 1, x + width + 3, y + height + 3 - 1, k1, l1);
+            this.drawGradientRect(x - 3, y - 3, x + width + 3, y - 3 + 1, k1, k1);
+            this.drawGradientRect(x - 3, y + height + 2, x + width + 3, y + height + 3, l1, l1);
+
+            y = renderLines(prefix, x, y, true);
+            tooltip.drawContent(this, x - guiLeft, y - guiTop, mX, mY);
+            y += extraHeight;
+            renderLines(suffix, x, y, false);
+
+            this.zLevel = 0.0F;
+            itemRender.zLevel = 0.0F;
+            GL11.glEnable(GL11.GL_LIGHTING);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            RenderHelper.enableStandardItemLighting();
+            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        }
+    }
+    public int getAdvancedToolTipContentStartX(IAdvancedTooltip tooltip) {
+        return 12;
+    }
+    public int getAdvancedToolTipContentStartY(IAdvancedTooltip tooltip) {
+        if (tooltip != null) {
+            return renderLines(tooltip.getPrefix(this), 0, 0, true, true) - 12;
+        }
+
+        return 0;
+    }
+
+
+
     public void drawMouseOver(String str, int x, int y) {
         drawMouseOver(Arrays.asList(str.split("\n")), x, y);
     }
@@ -158,57 +269,76 @@ public abstract class GuiBase extends GuiAntiNEI {
         ItemStack item = getItemStackFromBlock(te);
 
         if (item != null) {
-            try {
-                List str = item.getTooltip(Minecraft.getMinecraft().thePlayer, false);
-                if (str != null && str.size() > 0) {
-                    return (String)str.get(0);
-                }
-            }catch (Throwable ignored) {}
+            return getItemName(item);
         }
 
         return "Unknown";
     }
 
+    public String getItemName(ItemStack item) {
+        try {
+            List str = item.getTooltip(Minecraft.getMinecraft().thePlayer, false);
+            if (str != null && str.size() > 0) {
+                return (String)str.get(0);
+            }
+        }catch (Throwable ignored) {}
+
+        return "Unknown";
+    }
+
     private ItemStack getItemStackFromBlock(TileEntity te) {
-        if (te instanceof TileEntityClusterElement) {
-            return ((TileEntityClusterElement)te).getItemStackFromBlock();
+        if (te != null) {
+            if (te instanceof TileEntityClusterElement) {
+                return ((TileEntityClusterElement)te).getItemStackFromBlock();
+            }
+
+            World world = te.getWorldObj();
+            Block block = te.getBlockType();
+            if (world != null && block != null) {
+                int x = te.xCoord;
+                int y = te.yCoord;
+                int z = te.zCoord;
+
+                return getItemStackFromBlock(world, x, y, z, block, world.getBlockMetadata(x, y, z));
+            }
         }
 
-        World world = te.getWorldObj();
-        Block block = te.getBlockType();
-        if (world != null && block != null) {
-            int x = te.xCoord;
-            int y = te.yCoord;
-            int z = te.zCoord;
+        return null;
+    }
 
-
-
-
-            try {
-                //try to get it by picking the block
-                ItemStack item = block.getPickBlock(new MovingObjectPosition(x, y, z, 1, Vec3.createVectorHelper(x, y, z)), world, x, y, z);
-                if (item != null) {
-                    return item;
-                }
-            }catch (Throwable ignored) {}
-
-
-            try{
-                //try to get it from dropped items
-                List<ItemStack> items = block.getDrops(world, x, y, z, te.getBlockMetadata(), 0);
-                if (items != null && items.size() > 0 && items.get(0) != null) {
-                    return items.get(0);
-                }
-            }catch (Throwable ignored) {}
-
-
-
-            //get it from its id and meta
-            return  new ItemStack(block, 1, te.getBlockMetadata());
-        }else{
-            return null;
+    public ItemStack getItemStackFromBlock(World world, int x, int y, int z) {
+        if (world != null) {
+            Block block = world.getBlock(x, y, z);
+            if (block != null) {
+                return getItemStackFromBlock(world, x, y, z, block, world.getBlockMetadata(x, y, z));
+            }
         }
 
+        return null;
+    }
+
+    private ItemStack getItemStackFromBlock(World world, int x, int y, int z, Block block, int meta) {
+        try {
+            //try to get it by picking the block
+            ItemStack item = block.getPickBlock(new MovingObjectPosition(x, y, z, 1, Vec3.createVectorHelper(x, y, z)), world, x, y, z);
+            if (item != null) {
+                return item;
+            }
+        }catch (Throwable ignored) {}
+
+
+        try{
+            //try to get it from dropped items
+            List<ItemStack> items = block.getDrops(world, x, y, z, meta, 0);
+            if (items != null && items.size() > 0 && items.get(0) != null) {
+                return items.get(0);
+            }
+        }catch (Throwable ignored) {}
+
+
+
+        //get it from its id and meta
+        return  new ItemStack(block, 1, meta);
     }
 
     public void drawItemAmount(ItemStack itemstack, int x, int y) {
@@ -408,5 +538,13 @@ public abstract class GuiBase extends GuiAntiNEI {
 
     public int getFontHeight() {
         return fontRendererObj.FONT_HEIGHT;
+    }
+
+    public int getLeft() {
+        return guiLeft;
+    }
+
+    public int getTop() {
+        return guiTop;
     }
 }

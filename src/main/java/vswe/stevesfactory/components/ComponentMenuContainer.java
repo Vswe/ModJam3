@@ -3,8 +3,16 @@ package vswe.stevesfactory.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import org.lwjgl.opengl.GL11;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlock;
@@ -12,7 +20,9 @@ import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.interfaces.Color;
 import vswe.stevesfactory.interfaces.ContainerManager;
+import vswe.stevesfactory.interfaces.GuiBase;
 import vswe.stevesfactory.interfaces.GuiManager;
+import vswe.stevesfactory.interfaces.IAdvancedTooltip;
 import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
@@ -134,8 +144,18 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
 
             @Override
-            protected void onClick(IContainerSelection iContainerSelection, int button) {
-                setSelectedInventoryAndSync(iContainerSelection.getId(), !selectedInventories.contains(iContainerSelection.getId()));
+            protected void onClick(IContainerSelection iContainerSelection, int mX, int mY, int button) {
+                if (GuiScreen.isShiftKeyDown() && mX != -1 && mY != -1) {
+                    if (cachedTooltip != null && cachedId == iContainerSelection.getId()) {
+                        if (!locked) {
+                            lockedX = mX;
+                            lockedY = mY;
+                        }
+                        locked = !locked;
+                    }
+                }else{
+                    setSelectedInventoryAndSync(iContainerSelection.getId(), !selectedInventories.contains(iContainerSelection.getId()));
+                }
             }
 
             @Override
@@ -143,9 +163,188 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 drawContainer(gui, iContainerSelection, selectedInventories, x, y, hover);
             }
 
+            private boolean locked;
+            private int lockedX;
+            private int lockedY;
+            private ToolTip cachedTooltip;
+            private int cachedId;
+            private IContainerSelection cachedContainer;
+            private boolean keepCache;
+            class ToolTip implements IAdvancedTooltip {
+                private ItemStack[] items;
+                private List<String>[] itemTexts;
+                List<String> prefix;
+                List<String> suffix;
+                List<String> lockedSuffix;
+                public ToolTip(GuiManager gui, ConnectionBlock block) {
+                    items = new ItemStack[ForgeDirection.VALID_DIRECTIONS.length];
+                    itemTexts = new List[ForgeDirection.VALID_DIRECTIONS.length];
+
+                    World world = block.getTileEntity().getWorldObj();
+                    int x = block.getTileEntity().xCoord;
+                    int y = block.getTileEntity().yCoord;
+                    int z = block.getTileEntity().zCoord;
+
+                    for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+                        int targetX = x + direction.offsetX;
+                        int targetY = y + direction.offsetY;
+                        int targetZ = z + direction.offsetZ;
+
+                        ItemStack item = gui.getItemStackFromBlock(world, targetX, targetY, targetZ);
+                        items[direction.ordinal()] = item;
+
+                        List<String> text = new ArrayList<String>();
+                        if (item != null && item.getItem() != null) {
+                            text.add(gui.getItemName(item));
+                        }
+                        String side = Localization.getForgeDirectionLocalization(direction.ordinal()).toString();
+                        text.add(Color.YELLOW + side);
+
+                        TileEntity te = world.getTileEntity(targetX, targetY, targetZ);
+                        if (te instanceof TileEntitySign) {
+                            TileEntitySign sign = (TileEntitySign)te;
+                            for (String txt : sign.signText) {
+                                if (!txt.isEmpty()) {
+                                    text.add(Color.GRAY + txt);
+                                }
+                            }
+                        }
+
+                        itemTexts[direction.ordinal()] = text;
+                    }
+
+                    prefix = getMouseOverForContainer(block, selectedInventories);
+                    prefix.add("");
+                    prefix.add(Color.LIGHT_BLUE + Localization.TOOLTIP_ADJACENT.toString());
+
+                    suffix = new ArrayList<String>();
+                    suffix.add(Color.GRAY + Localization.TOOLTIP_LOCK.toString());
+
+                    lockedSuffix = gui.getLinesFromText(Localization.TOOLTIP_UNLOCK.toString(), getMinWidth(gui));
+                    for (int i = 0; i < lockedSuffix.size(); i++) {
+                        lockedSuffix.set(i, Color.GRAY + lockedSuffix.get(i));
+                    }
+
+                }
+
+                @Override
+                public int getMinWidth(GuiBase gui) {
+                    return 110;
+                }
+
+                @Override
+                public int getExtraHeight(GuiBase gui) {
+                    return 70;
+                }
+
+                private static final int SRC_X = 30;
+                private static final int SRC_Y = 20;
+
+                private void drawBlock(GuiBase gui, int x, int y, int mX, int mY, ForgeDirection direction) {
+                    GL11.glColor4f(1, 1, 1, 1);
+                    GuiBase.bindTexture(gui.getComponentResource());
+                    gui.drawTexture(x, y, SRC_X, SRC_Y + (CollisionHelper.inBounds(x, y, 16, 16, mX, mY) ? 16 : 0), 16, 16);
+
+                    ItemStack item = items[direction.ordinal()];
+                    if (item != null && item.getItem() != null) {
+                        gui.drawItemStack(item, x, y);
+                        gui.drawItemAmount(item, x, y);
+                    }
+                }
+
+                private boolean drawBlockMouseOver(GuiBase gui, int x, int y, int mX, int mY, ForgeDirection direction) {
+                    if (CollisionHelper.inBounds(x, y, 16, 16, mX, mY)) {
+                        List<String> itemText = itemTexts[direction.ordinal()];
+                        if (itemText != null) {
+                            gui.drawMouseOver(itemText, mX, mY);
+                        }
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }
+
+
+                @Override
+                public void drawContent(GuiBase gui, int x, int y, int mX, int mY) {
+                    drawBlock(gui, x + 25, y + 5, mX, mY, ForgeDirection.NORTH);
+                    drawBlock(gui, x + 5, y + 25, mX, mY, ForgeDirection.WEST);
+                    drawBlock(gui, x + 25, y + 45, mX, mY, ForgeDirection.SOUTH);
+                    drawBlock(gui, x + 45, y + 25, mX, mY, ForgeDirection.EAST);
+
+                    drawBlock(gui, x + 80, y + 15, mX, mY, ForgeDirection.UP);
+                    drawBlock(gui, x + 80, y + 35, mX, mY, ForgeDirection.DOWN);
+                }
+
+                private void drawMouseOverMouseOver(GuiBase gui, int x, int y, int mX, int mY) {
+                    boolean ignored =
+                    drawBlockMouseOver(gui, x + 25, y + 5, mX, mY, ForgeDirection.NORTH) ||
+                    drawBlockMouseOver(gui, x + 5, y + 25, mX, mY, ForgeDirection.WEST) ||
+                    drawBlockMouseOver(gui, x + 25, y + 45, mX, mY, ForgeDirection.SOUTH) ||
+                    drawBlockMouseOver(gui, x + 45, y + 25, mX, mY, ForgeDirection.EAST) ||
+
+                    drawBlockMouseOver(gui, x + 80, y + 15, mX, mY, ForgeDirection.UP) ||
+                    drawBlockMouseOver(gui, x + 80, y + 35, mX, mY, ForgeDirection.DOWN);
+                }
+
+                @Override
+                public List<String> getPrefix(GuiBase gui) {
+                    return prefix;
+                }
+
+                @Override
+                public List<String> getSuffix(GuiBase gui) {
+                    return locked ? lockedSuffix : suffix;
+                }
+            }
+
+
             @Override
-            protected List<String> getMouseOver(IContainerSelection iContainerSelection) {
-                return getMouseOverForContainer(iContainerSelection, selectedInventories);
+            public void drawMouseOver(GuiManager gui, int mX, int mY) {
+                if (locked && GuiBase.isShiftKeyDown()) {
+                    drawMouseOver(gui, cachedContainer, lockedX, lockedY, mX, mY);
+                    cachedTooltip.drawMouseOverMouseOver(gui, lockedX + gui.getAdvancedToolTipContentStartX(cachedTooltip), lockedY + gui.getAdvancedToolTipContentStartY(cachedTooltip), mX, mY);
+                }else{
+                    locked = false;
+                    keepCache = false;
+                    super.drawMouseOver(gui, mX, mY);
+                    if (!keepCache) {
+                        cachedTooltip = null;
+                        cachedContainer = null;
+                    }
+                }
+            }
+
+            @Override
+            protected void drawMouseOver(GuiManager gui, IContainerSelection iContainerSelection, int mX, int mY) {
+                drawMouseOver(gui, iContainerSelection, mX, mY, mX, mY);
+            }
+
+            private void drawMouseOver(GuiManager gui, IContainerSelection iContainerSelection, int x, int y, int mX, int mY) {
+                boolean isBlock = !iContainerSelection.isVariable();
+
+                if (GuiScreen.isShiftKeyDown() && isBlock) {
+                    if (cachedTooltip == null || cachedId != iContainerSelection.getId()) {
+                        cachedContainer = iContainerSelection;
+                        cachedTooltip = new ToolTip(gui, (ConnectionBlock)iContainerSelection);
+                        cachedId = iContainerSelection.getId();
+                    }
+                    keepCache = true;
+
+                    gui.drawMouseOver(cachedTooltip, x, y, mX, mY);
+                }else{
+                    List<String> lines = getMouseOverForContainer(iContainerSelection, selectedInventories);
+                    if (isBlock) {
+                        if (lines == null) {
+                            lines = new ArrayList<String>();
+                        }
+
+                        lines.add("");
+                        lines.add(Color.GRAY + Localization.TOOLTIP_EXTRA_INFO.toString());
+                    }
+
+                    gui.drawMouseOver(lines, mX, mY);
+                }
             }
         };
 
@@ -170,7 +369,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             void onClick() {
                 for (IContainerSelection iContainerSelection : scrollController.getResult()) {
                     if (!selectedInventories.contains(iContainerSelection.getId())) {
-                        scrollController.onClick(iContainerSelection, 0);
+                        scrollController.onClick(iContainerSelection, -1, -1, 0);
                     }
                 }
             }
@@ -181,7 +380,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             void onClick() {
                 for (IContainerSelection iContainerSelection : scrollController.getResult()) {
                     if (selectedInventories.contains(iContainerSelection.getId())) {
-                        scrollController.onClick(iContainerSelection, 0);
+                        scrollController.onClick(iContainerSelection, -1, -1, 0);
                     }
                 }
             }
@@ -191,7 +390,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             @Override
             void onClick() {
                 for (IContainerSelection iContainerSelection : scrollController.getResult()) {
-                    scrollController.onClick(iContainerSelection, 0);
+                    scrollController.onClick(iContainerSelection, -1, -1, 0);
                 }
             }
         });

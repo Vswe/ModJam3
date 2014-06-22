@@ -77,9 +77,9 @@ public  abstract class ScrollController<T> {
     }
 
     protected abstract List<T> updateSearch(String search, boolean all);
-    protected abstract void onClick(T t, int button);
+    protected abstract void onClick(T t, int mX, int mY, int button);
     protected abstract void draw(GuiManager gui, T t, int x, int y, boolean hover);
-    protected abstract List<String> getMouseOver(T t);
+    protected abstract void drawMouseOver(GuiManager gui, T t, int mX, int mY);
 
 
     public void setX(int val) {
@@ -130,7 +130,7 @@ public  abstract class ScrollController<T> {
         List<Point> points = getItemCoordinates();
         for (Point point : points) {
             if (CollisionHelper.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                onClick(result.get(point.id), button);
+                onClick(result.get(point.id), mX, mY, button);
                 break;
             }
         }
@@ -236,7 +236,7 @@ public  abstract class ScrollController<T> {
         List<Point> points = getItemCoordinates();
         for (Point point : points) {
             if (CollisionHelper.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                gui.drawMouseOver(getMouseOver(result.get(point.id)), mX, mY);
+                drawMouseOver(gui, result.get(point.id), mX, mY);
             }
         }
     }

@@ -40,7 +40,7 @@ public class GuiManager extends GuiBase {
     private static final ResourceLocation COMPONENTS = registerTexture("FlowComponents");
 
     @Override
-    protected ResourceLocation getComponentResource() {
+    public ResourceLocation getComponentResource() {
         return COMPONENTS;
     }
 

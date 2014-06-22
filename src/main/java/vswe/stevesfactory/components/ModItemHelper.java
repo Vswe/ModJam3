@@ -6,6 +6,7 @@ import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.Item;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,8 @@ public final class ModItemHelper {
 
 
             Item item = (Item) itemRegistry.getObject(keys[i]);
-            String modId = GameRegistry.findUniqueIdentifierFor(item).modId;
+            GameRegistry.UniqueIdentifier uniqueIdentity = GameRegistry.findUniqueIdentifierFor(item);
+            String modId = uniqueIdentity == null ? null : uniqueIdentity.modId;
 
             items.put(i, modId);
         }

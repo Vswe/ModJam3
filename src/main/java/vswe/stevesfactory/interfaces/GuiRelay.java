@@ -292,7 +292,7 @@ public class GuiRelay extends GuiBase {
     private static final int PAGE_BUTTON_Y = 147;
 
     @Override
-    protected ResourceLocation getComponentResource() {
+    public ResourceLocation getComponentResource() {
         return TEXTURE;
     }
 

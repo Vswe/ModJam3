@@ -86,7 +86,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             }
 
             @Override
-            protected void onClick(Object o, int button) {
+            protected void onClick(Object o, int mX, int mY, int button) {
                 selectedSetting.setContent(o);
                 writeServerData(DataTypeHeader.SET_ITEM);
                 selectedSetting = null;
@@ -99,12 +99,10 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             }
 
             @Override
-            protected List<String> getMouseOver(Object o) {
-                if (o == null) {
-                    return null;
+            protected void drawMouseOver(GuiManager gui, Object o, int mX, int mY) {
+                if (o != null) {
+                    gui.drawMouseOver(getResultObjectMouseOver(o), mX, mY);
                 }
-
-                return getResultObjectMouseOver(o);
             }
         };
 
@@ -115,7 +113,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             }
 
             @Override
-            protected void onClick(Setting setting, int button) {
+            protected void onClick(Setting setting, int mX, int mY, int button) {
                 selectedSetting = setting;
                 editSetting = button == 1 && doAllowEdit();
 
@@ -143,12 +141,11 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             }
 
             @Override
-            protected List<String> getMouseOver(Setting setting) {
-                if (!setting.isValid()) {
-                    return null;
+            protected void drawMouseOver(GuiManager gui, Setting setting, int mX, int mY) {
+                if (setting.isValid()) {
+                    gui.drawMouseOver(getSettingObjectMouseOver(setting), mX, mY);
                 }
 
-                return getSettingObjectMouseOver(setting);
             }
         };
     }
@@ -302,7 +299,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     public void drawMouseOver(GuiManager gui, int mX, int mY) {
         if (isEditing()) {
             if (CollisionHelper.inBounds(EDIT_ITEM_X, EDIT_ITEM_Y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                gui.drawMouseOver(scrollControllerSelected.getMouseOver(selectedSetting), mX, mY);
+                scrollControllerSelected.drawMouseOver(gui, selectedSetting, mX, mY);
             }else if(inDeleteBounds(mX, mY)) {
                 gui.drawMouseOver(Localization.DELETE_ITEM_SELECTION.toString(), mX, mY);
             }
