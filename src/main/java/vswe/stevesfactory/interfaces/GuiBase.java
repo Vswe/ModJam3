@@ -361,7 +361,7 @@ public abstract class GuiBase extends GuiAntiNEI {
 
 
         try {
-            ItemRenderHelper.renderItemIntoGUI(itemRender, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
+            itemRender.renderItemIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
         }catch (Exception ex) {
             if (itemstack.getItemDamage() != 0) {
                 ItemStack newStack = itemstack.copy();

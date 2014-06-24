@@ -253,11 +253,9 @@ public class ComponentMenuItem extends ComponentMenuStuff {
                 }
             }
         }else{
-            RegistryNamespaced items = Item.itemRegistry;
-            int itemLength = items.getKeys().size();
-
-            for (int i = 0; i < itemLength; ++i) {
-                Item item = Item.getItemById(i);
+            Iterator itemTypeIterator = Item.itemRegistry.iterator();
+            while (itemTypeIterator.hasNext()){
+                Item item = (Item)itemTypeIterator.next();
 
                 if (item != null && item.getCreativeTab() != null) {
                     item.getSubItems(item, null, ret);
