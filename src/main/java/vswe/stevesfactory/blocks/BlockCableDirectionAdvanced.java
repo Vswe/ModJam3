@@ -18,13 +18,7 @@ import vswe.stevesfactory.StevesFactoryManager;
 
 import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Vswe
- * Date: 07/02/14
- * Time: 14:22
- * To change this template use File | Settings | File Templates.
- */
+
 public abstract class BlockCableDirectionAdvanced extends BlockContainer {
     public BlockCableDirectionAdvanced() {
         super(Material.iron);

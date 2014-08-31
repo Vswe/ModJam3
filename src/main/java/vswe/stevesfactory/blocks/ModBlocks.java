@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 
 public final class ModBlocks {
 
-    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 11;
+    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 12;
     public static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
 
     private static final String MANAGER_TILE_ENTITY_TAG = "TileEntityMachineManagerName";

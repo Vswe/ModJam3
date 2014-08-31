@@ -1438,6 +1438,11 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                     menuId += 2;
                 }
 
+                //added crafting priority to the crafter
+                if (component.type == ComponentType.AUTO_CRAFTING && i == 1 && version < 11) {
+                    menuId++;
+                }
+
                 component.menus.get(menuId).readFromNBT(menuTag, version, pickup);
                 menuId++;
             }

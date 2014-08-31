@@ -51,6 +51,8 @@ public  abstract class ScrollController<T> {
     private int visibleRows = 2;
     private int startX = 5;
     private int scrollingUpperLimit = TEXT_BOX_Y + TEXT_BOX_SIZE_H;
+    private boolean disabledScroll;
+
     public ScrollController(boolean hasSearchBox) {
         this(hasSearchBox ? "" : null);
     }
@@ -76,9 +78,13 @@ public  abstract class ScrollController<T> {
         updateSearch();
     }
 
+
     protected abstract List<T> updateSearch(String search, boolean all);
+    @SideOnly(Side.CLIENT)
     protected abstract void onClick(T t, int mX, int mY, int button);
+    @SideOnly(Side.CLIENT)
     protected abstract void draw(GuiManager gui, T t, int x, int y, boolean hover);
+    @SideOnly(Side.CLIENT)
     protected abstract void drawMouseOver(GuiManager gui, T t, int mX, int mY);
 
 
@@ -107,9 +113,10 @@ public  abstract class ScrollController<T> {
             for (int col = 0; col < itemsPerRow; col++) {
                 int id = row * itemsPerRow + col;
                 if (id >= 0 && id < result.size())  {
+                    int x = getScrollingStartX() + ITEM_SIZE_WITH_MARGIN * col;
                     int y = getScrollingStartY() + row * ITEM_SIZE_WITH_MARGIN - offset;
                     if (y > scrollingUpperLimit && y + ITEM_SIZE < FlowComponent.getMenuOpenSize()) {
-                        points.add(new Point(id, getScrollingStartX() + ITEM_SIZE_WITH_MARGIN * col, y));
+                        points.add(new Point(id, x, y));
                     }
                 }
             }
@@ -180,15 +187,13 @@ public  abstract class ScrollController<T> {
         }
 
         if (result.size() > 0) {
+            drawArrow(gui, true, mX, mY);
+            drawArrow(gui, false, mX, mY);
+
             List<Point> points = getItemCoordinates();
             for (Point point : points) {
                 draw(gui, result.get(point.id), point.x, point.y, CollisionHelper.inBounds(point.x, point.y, ITEM_SIZE, ITEM_SIZE, mX, mY));
             }
-
-
-            drawArrow(gui, true, mX, mY);
-            drawArrow(gui, false, mX, mY);
-
         }
     }
 
@@ -289,7 +294,13 @@ public  abstract class ScrollController<T> {
     }
 
     public void doScroll(int scroll) {
-        moveOffset(scroll / -20);
+        if (!disabledScroll) {
+            moveOffset(scroll / -20);
+        }
+    }
+
+    public void setDisabledScroll(boolean disabledScroll) {
+        this.disabledScroll = disabledScroll;
     }
 
 

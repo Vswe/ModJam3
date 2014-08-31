@@ -62,4 +62,8 @@ public abstract class Setting {
     public boolean isAmountSpecific() {
         return true;
     }
+
+    public void delete() {
+        clear();
+    }
 }

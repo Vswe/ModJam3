@@ -160,7 +160,7 @@ public class ItemSetting extends Setting {
         this.item = item;
     }
 
-    public boolean isEqualForCommandExecutor(ItemStack other) {
+    public boolean  isEqualForCommandExecutor(ItemStack other) {
         if (!isValid() || other == null) {
             return false;
         }else {
@@ -185,5 +185,9 @@ public class ItemSetting extends Setting {
                     return false;
             }
         }
+    }
+
+    public boolean canChangeMetaData() {
+        return true;
     }
 }

@@ -171,10 +171,18 @@ public class CraftingBufferElement implements IItemBufferElement, IItemBufferSub
 
     @Override
     public ItemStack getItemStack() {
+        if (useAdvancedDetection()) {
+            findItems(false);
+        }
+
         return result;
     }
 
     private List<IInventory> inventories = new ArrayList<IInventory>();
+
+    private boolean useAdvancedDetection() {
+        return craftingMenu.getResultItem().getFuzzyMode() != FuzzyMode.PRECISE;
+    }
 
     private boolean findItems(boolean remove) {
         Map<Integer, ItemStack> foundItems = new HashMap<Integer, ItemStack>();
@@ -191,7 +199,8 @@ public class CraftingBufferElement implements IItemBufferElement, IItemBufferSub
                             foundItems.put(i, DUMMY_ITEM);
                         } else if (subCount > 0 && setting.isEqualForCommandExecutor(itemstack)) {
                             foundItems.put(i, itemstack.copy());
-                            if (craftingMenu.getDummy().isItemValidForRecipe(recipe, result, foundItems)) {
+
+                            if (craftingMenu.getDummy().isItemValidForRecipe(recipe, craftingMenu.getResultItem(), foundItems, useAdvancedDetection())) {
                                 subCount--;
                                 count--;
                                 if (remove) {
@@ -215,7 +224,15 @@ public class CraftingBufferElement implements IItemBufferElement, IItemBufferSub
             }
         }
 
-        return foundItems.size() == 9;
+
+
+        if (foundItems.size() == 9) {
+            result = craftingMenu.getDummy().getResult(foundItems);
+            result = result != null ? result.copy() : null;
+            return true;
+        }else{
+            return false;
+        }
     }
 
 

@@ -313,6 +313,8 @@ public enum Localization {
     TOOLTIP_LOCK,
     TOOLTIP_UNLOCK,
     TOOLTIP_ADJACENT,
+    PRIORITY_MOVE_FIRST,
+    PRIORITY_CRAFT_FIRST,
 
     DELETE_COMMAND,
     EXIT_GROUP,
@@ -331,6 +333,7 @@ public enum Localization {
     AUTO_BLACK_LIST,
     LIMITLESS,
     ENLARGE_INTERFACES,
+    AUTO_MOVE_FIRST,
 
 
     GIVE_PERMISSION,

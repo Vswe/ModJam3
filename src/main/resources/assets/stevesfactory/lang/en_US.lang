@@ -344,6 +344,8 @@ gui.sfm.TooltipExtraInfo=Hold shift for more info
 gui.sfm.TooltipLock=Click to lock tooltip
 gui.sfm.TooltipUnlock=Release shift or click to unlock tooltip
 gui.sfm.TooltipAdjacent=Adjacent blocks
+gui.sfm.PriorityMoveFirst=Move before crafting
+gui.sfm.PriorityCraftFirst=Craft before moving
 
 # ======================================
 #		  OTHER MANAGER INTERFACE
@@ -366,6 +368,7 @@ gui.sfm.AutoSide=Automatically select one side for inputs, outputs and condition
 gui.sfm.AutoBlackList=Automatically select an empty blacklist for input commands as well. (Output commands start with an empty blacklist regardless of this setting.)
 gui.sfm.Limitless=Remove all limits of this manager. Without this selected there's a limit of 511 commands, 1023 connected inventories and a max reach of 128 blocks. [Creative only]
 gui.sfm.EnlargeInterfaces=Enlarge interfaces to fit the full screen, unless they do that already. (Interfaces are always made smaller to fit the screen regardless of this setting.)
+gui.sfm.AutoMoveFirst=Set the default option for new crafting commands to prioritize movement.
 
 # ======================================
 #		 ADVANCED RELAY INTERFACE

@@ -29,11 +29,14 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
 
 
         settings = new ArrayList<Setting>();
+        externalSettings = new ArrayList<Setting>();
         for (int i = 0; i < getSettingCount(); i++) {
             try {
                 Constructor<? extends Setting> constructor = settingClass.getConstructor(int.class);
                 Object obj = constructor.newInstance(i);
-                settings.add((Setting)obj);
+                Setting setting = (Setting)obj;
+                settings.add(setting);
+                externalSettings.add(setting);
             }catch (Exception ex) {
                 System.err.println("Failed to create setting");
             }
@@ -150,7 +153,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         };
     }
 
-    private static boolean hasUpdated;
+
     @Override
     public void update(float partial) {
         if (isSearching()) {
@@ -222,6 +225,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     protected ScrollController scrollControllerSearch;
     protected ScrollController<Setting> scrollControllerSelected;
     protected List<Setting> settings;
+    private List<Setting> externalSettings;
     protected Setting selectedSetting;
     private boolean editSetting;
     protected TextBoxNumberList numberTextBoxes;
@@ -325,7 +329,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
             numberTextBoxes.onClick(mX, mY, button);
 
             if (inDeleteBounds(mX, mY)) {
-                selectedSetting.clear();
+                selectedSetting.delete();
                 writeServerData(DataTypeHeader.CLEAR);
                 selectedSetting = null;
                 getScrollingList().updateScrolling();
@@ -528,10 +532,14 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         PacketHandler.sendDataToListeningClients(container, dw);
     }
 
-    protected void writeServerData(DataTypeHeader header) {
+    protected void writeServerData(DataTypeHeader header, Setting setting) {
         DataWriter dw = getWriterForServerComponentPacket();
-        writeData(dw, header, selectedSetting);
+        writeData(dw, header, setting);
         PacketHandler.sendDataToServer(dw);
+    }
+
+    protected void writeServerData(DataTypeHeader header) {
+        writeServerData(header, selectedSetting);
     }
 
     protected abstract DataBitHelper getAmountBitLength();
@@ -569,7 +577,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
     protected abstract void writeSpecificHeaderData(DataWriter dw, DataTypeHeader header, Setting setting);
 
     public List<Setting> getSettings() {
-        return settings;
+        return externalSettings;
     }
 
     public void setBlackList() {

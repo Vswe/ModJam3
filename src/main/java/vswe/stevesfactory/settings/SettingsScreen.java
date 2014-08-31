@@ -177,6 +177,18 @@ public class SettingsScreen implements IInterfaceRenderer {
             }
         });
 
+        checkBoxes.addCheckBox(new CheckBoxSetting(Localization.AUTO_MOVE_FIRST) {
+            @Override
+            public void setValue(boolean val) {
+                Settings.setPriorityMoveFirst(val);
+            }
+
+            @Override
+            public boolean getValue() {
+                return Settings.isPriorityMoveFirst();
+            }
+        });
+
 
         currentX = START_SETTINGS_X;
         currentY = START_Y;
@@ -236,22 +248,22 @@ public class SettingsScreen implements IInterfaceRenderer {
 
     @Override
     public void onDrag(GuiManager gui, int mX, int mY) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override
     public void onRelease(GuiManager gui, int mX, int mY) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override
     public void onKeyTyped(GuiManager gui, char c, int k) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override
     public void onScroll(int scroll) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
 

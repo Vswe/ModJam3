@@ -737,6 +737,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
 
                 boolean autoSide = dr.readBoolean();
                 boolean autoBlackList = dr.readBoolean();
+                boolean moveFirst = dr.readBoolean();
                 boolean isInput = type == ComponentType.INPUT || type == ComponentType.LIQUID_INPUT;
                 boolean isOutput= type == ComponentType.OUTPUT || type == ComponentType.LIQUID_OUTPUT;
                 if (autoSide) {
@@ -750,6 +751,13 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
                     for (ComponentMenu componentMenu : component.getMenus()) {
                         if (componentMenu instanceof ComponentMenuStuff) {
                             ((ComponentMenuStuff)componentMenu).setBlackList();
+                        }
+                    }
+                }
+                if (type == ComponentType.AUTO_CRAFTING) {
+                    for (ComponentMenu componentMenu : component.getMenus()) {
+                        if (componentMenu instanceof ComponentMenuCraftingPriority) {
+                            ((ComponentMenuCraftingPriority)componentMenu).setPrioritizeCrafting(!moveFirst);
                         }
                     }
                 }
@@ -772,6 +780,7 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
             //some semi-ugly code, I decided this approach was fine
             dw.writeBoolean(Settings.isAutoSide());
             dw.writeBoolean(Settings.isAutoBlacklist());
+            dw.writeBoolean(Settings.isPriorityMoveFirst());
 
             return true;
         }

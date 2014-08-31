@@ -21,7 +21,8 @@ public class CommandExecutor {
 
     private TileEntityManager manager;
     List<ItemBufferElement> itemBuffer;
-    List<CraftingBufferElement> craftingBuffer;
+    List<CraftingBufferElement> craftingBufferHigh;
+    List<CraftingBufferElement> craftingBufferLow;
     List<LiquidBufferElement> liquidBuffer;
     private List<Integer> usedCommands;
 
@@ -31,15 +32,17 @@ public class CommandExecutor {
     public CommandExecutor(TileEntityManager manager) {
         this.manager = manager;
         itemBuffer = new ArrayList<ItemBufferElement>();
-        craftingBuffer = new ArrayList<CraftingBufferElement>();
+        craftingBufferHigh = new ArrayList<CraftingBufferElement>();
+        craftingBufferLow = new ArrayList<CraftingBufferElement>();
         liquidBuffer = new ArrayList<LiquidBufferElement>();
         usedCommands = new ArrayList<Integer>();
     }
 
-    private CommandExecutor(TileEntityManager manager, List<ItemBufferElement> itemBufferSplit, List<CraftingBufferElement> craftingBufferSplit, List<LiquidBufferElement> liquidBufferSplit, List<Integer> usedCommandCopy) {
+    private CommandExecutor(TileEntityManager manager, List<ItemBufferElement> itemBufferSplit, List<CraftingBufferElement> craftingBufferHighSplit, List<CraftingBufferElement> craftingBufferLowSplit, List<LiquidBufferElement> liquidBufferSplit, List<Integer> usedCommandCopy) {
         this.manager = manager;
         this.itemBuffer = itemBufferSplit;
-        this.craftingBuffer = craftingBufferSplit;
+        this.craftingBufferHigh = craftingBufferHighSplit;
+        this.craftingBufferLow = craftingBufferLowSplit;
         this.usedCommands = usedCommandCopy;
         this.liquidBuffer = liquidBufferSplit;
     }
@@ -164,7 +167,12 @@ public class CommandExecutor {
                     executeChildCommands(command, EnumSet.of(ConnectionOption.STANDARD_OUTPUT));
                     return;
                 case  AUTO_CRAFTING:
-                    craftingBuffer.add(new CraftingBufferElement(this, (ComponentMenuCrafting)command.getMenus().get(0), (ComponentMenuContainerScrap)command.getMenus().get(1)));
+                    CraftingBufferElement element = new CraftingBufferElement(this, (ComponentMenuCrafting)command.getMenus().get(0), (ComponentMenuContainerScrap)command.getMenus().get(2));
+                    if (((ComponentMenuCraftingPriority)command.getMenus().get(1)).shouldPrioritizeCrafting()) {
+                        craftingBufferHigh.add(element);
+                    }else{
+                        craftingBufferLow.add(element);
+                    }
                     break;
                 case GROUP:
                     if (connectionId < command.getChildrenInputNodes().size()) {
@@ -603,10 +611,13 @@ public class CommandExecutor {
                 outputCounters.clear();
             }
 
+            for (CraftingBufferElement craftingBufferElement : craftingBufferHigh) {
+                insertItemsFromInputBufferElement(menuItem, inventories, outputCounters, inventoryHolder, craftingBufferElement);
+            }
             for (ItemBufferElement itemBufferElement : itemBuffer) {
                 insertItemsFromInputBufferElement(menuItem, inventories, outputCounters, inventoryHolder, itemBufferElement);
             }
-            for (CraftingBufferElement craftingBufferElement : craftingBuffer) {
+            for (CraftingBufferElement craftingBufferElement : craftingBufferLow) {
                 insertItemsFromInputBufferElement(menuItem, inventories, outputCounters, inventoryHolder, craftingBufferElement);
             }
         }
@@ -922,7 +933,7 @@ public class CommandExecutor {
                         usedCommandCopy.add(usedCommand);
                     }
 
-                    CommandExecutor newExecutor = new CommandExecutor(manager, itemBufferSplit, new ArrayList<CraftingBufferElement>(craftingBuffer), liquidBufferSplit, usedCommandCopy);
+                    CommandExecutor newExecutor = new CommandExecutor(manager, itemBufferSplit, new ArrayList<CraftingBufferElement>(craftingBufferHigh), new ArrayList<CraftingBufferElement>(craftingBufferLow), liquidBufferSplit, usedCommandCopy);
                     newExecutor.executeCommand(manager.getFlowItems().get(connection.getComponentId()), connection.getConnectionId());
                     usedId++;
                 }

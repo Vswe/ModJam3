@@ -3,7 +3,11 @@ package vswe.stevesfactory.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,6 +17,7 @@ import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlock;
@@ -70,10 +75,12 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     protected RadioButtonList radioButtonsMulti;
     protected ScrollController<IContainerSelection> scrollController;
     private ConnectionBlockType validType;
+    @SideOnly(Side.CLIENT)
     private GuiManager cachedInterface;
     private List<Button> buttons;
     private static final ContainerFilter filter = new ContainerFilter(); //this one is static so all of the menus will share the selection
     private List<Variable> filterVariables;
+    private boolean clientUpdate; //ugly quick way to fix client/server issue
 
 
 
@@ -101,7 +108,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
         scrollController = new ScrollController<IContainerSelection>(getDefaultSearch()) {
             @Override
             protected List<IContainerSelection> updateSearch(String search, boolean all) {
-                if (search.equals("") || cachedInterface == null) {
+                if (search.equals("") || !clientUpdate || cachedInterface == null) {
                     return new ArrayList<IContainerSelection>();
                 }
 
@@ -143,6 +150,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 return ret;
             }
 
+            @SideOnly(Side.CLIENT)
             @Override
             protected void onClick(IContainerSelection iContainerSelection, int mX, int mY, int button) {
                 if (GuiScreen.isShiftKeyDown() && mX != -1 && mY != -1) {
@@ -158,6 +166,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 }
             }
 
+            @SideOnly(Side.CLIENT)
             @Override
             protected void draw(GuiManager gui, IContainerSelection iContainerSelection, int x, int y, boolean hover) {
                 drawContainer(gui, iContainerSelection, selectedInventories, x, y, hover);
@@ -166,16 +175,20 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             private boolean locked;
             private int lockedX;
             private int lockedY;
+            @SideOnly(Side.CLIENT)
             private ToolTip cachedTooltip;
             private int cachedId;
             private IContainerSelection cachedContainer;
             private boolean keepCache;
+            @SideOnly(Side.CLIENT)
             class ToolTip implements IAdvancedTooltip {
                 private ItemStack[] items;
                 private List<String>[] itemTexts;
                 List<String> prefix;
                 List<String> suffix;
                 List<String> lockedSuffix;
+
+                @SideOnly(Side.CLIENT)
                 public ToolTip(GuiManager gui, ConnectionBlock block) {
                     items = new ItemStack[ForgeDirection.VALID_DIRECTIONS.length];
                     itemTexts = new List[ForgeDirection.VALID_DIRECTIONS.length];
@@ -227,11 +240,13 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
                 }
 
+                @SideOnly(Side.CLIENT)
                 @Override
                 public int getMinWidth(GuiBase gui) {
                     return 110;
                 }
 
+                @SideOnly(Side.CLIENT)
                 @Override
                 public int getExtraHeight(GuiBase gui) {
                     return 70;
@@ -240,6 +255,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 private static final int SRC_X = 30;
                 private static final int SRC_Y = 20;
 
+                @SideOnly(Side.CLIENT)
                 private void drawBlock(GuiBase gui, int x, int y, int mX, int mY, ForgeDirection direction) {
                     GL11.glColor4f(1, 1, 1, 1);
                     GuiBase.bindTexture(gui.getComponentResource());
@@ -252,6 +268,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                     }
                 }
 
+                @SideOnly(Side.CLIENT)
                 private boolean drawBlockMouseOver(GuiBase gui, int x, int y, int mX, int mY, ForgeDirection direction) {
                     if (CollisionHelper.inBounds(x, y, 16, 16, mX, mY)) {
                         List<String> itemText = itemTexts[direction.ordinal()];
@@ -265,6 +282,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 }
 
 
+                @SideOnly(Side.CLIENT)
                 @Override
                 public void drawContent(GuiBase gui, int x, int y, int mX, int mY) {
                     drawBlock(gui, x + 25, y + 5, mX, mY, ForgeDirection.NORTH);
@@ -276,6 +294,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                     drawBlock(gui, x + 80, y + 35, mX, mY, ForgeDirection.DOWN);
                 }
 
+                @SideOnly(Side.CLIENT)
                 private void drawMouseOverMouseOver(GuiBase gui, int x, int y, int mX, int mY) {
                     boolean ignored =
                     drawBlockMouseOver(gui, x + 25, y + 5, mX, mY, ForgeDirection.NORTH) ||
@@ -287,11 +306,13 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                     drawBlockMouseOver(gui, x + 80, y + 35, mX, mY, ForgeDirection.DOWN);
                 }
 
+                @SideOnly(Side.CLIENT)
                 @Override
                 public List<String> getPrefix(GuiBase gui) {
                     return prefix;
                 }
 
+                @SideOnly(Side.CLIENT)
                 @Override
                 public List<String> getSuffix(GuiBase gui) {
                     return locked ? lockedSuffix : suffix;
@@ -299,6 +320,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             }
 
 
+            @SideOnly(Side.CLIENT)
             @Override
             public void drawMouseOver(GuiManager gui, int mX, int mY) {
                 if (locked && GuiBase.isShiftKeyDown()) {
@@ -315,11 +337,13 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 }
             }
 
+            @SideOnly(Side.CLIENT)
             @Override
             protected void drawMouseOver(GuiManager gui, IContainerSelection iContainerSelection, int mX, int mY) {
                 drawMouseOver(gui, iContainerSelection, mX, mY, mX, mY);
             }
 
+            @SideOnly(Side.CLIENT)
             private void drawMouseOver(GuiManager gui, IContainerSelection iContainerSelection, int x, int y, int mX, int mY) {
                 boolean isBlock = !iContainerSelection.isVariable();
 
@@ -463,6 +487,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
+        clientUpdate = true;
         cachedInterface = gui;
         filter.currentMenu = this;
         if (currentPage == Page.MAIN) {

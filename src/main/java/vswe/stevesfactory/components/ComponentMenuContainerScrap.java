@@ -45,8 +45,8 @@ public class ComponentMenuContainerScrap extends ComponentMenuContainer {
         //no radio buttons
     }
 
-    @Override
+    /*@Override
     protected String getDefaultSearch() {
         return "";
-    }
+    }*/
 }

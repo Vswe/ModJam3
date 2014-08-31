@@ -2,6 +2,7 @@ package vswe.stevesfactory.network;
 
 
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.io.ByteArrayInputStream;
@@ -93,7 +94,7 @@ public class DataReader {
             }
 
             try {
-                return CompressedStreamTools.decompress(bytes);
+                return CompressedStreamTools.func_152457_a(bytes, new NBTSizeTracker(2097152L));
             }catch (IOException ex) {
                 return null;
             }

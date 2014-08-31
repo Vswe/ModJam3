@@ -86,7 +86,7 @@ public class NBTNode {
         if (tag == null) {
             return "Element";
         }else{
-            String name = NBTBase.func_150283_g(tag.getId());
+            String name = ""; // NBTBase.func_150283_g(tag.getId()); TODO
             if (name.equals("UNKNOWN")) {
                 return "Node";
             }else{

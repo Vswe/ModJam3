@@ -22,11 +22,12 @@ import vswe.stevesfactory.network.*;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 
 public class TileEntityBreaker extends TileEntityClusterElement implements IInventory, IPacketBlock {
 
     private static final String FAKE_PLAYER_NAME = "[SFM_PLAYER]";
-    private static final String FAKE_PLAYER_ID = "[SFM_PLAYER_ID]";
+    private static final UUID FAKE_PLAYER_ID = null;
     private List<ItemStack> inventory;
     private List<ItemStack> inventoryCache;
     private boolean broken;
@@ -57,55 +58,61 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
         return inventory;
     }
 
-    private ItemStack         placeItem(ItemStack itemstack) {
-            if (itemstack != null && itemstack.getItem() != null && itemstack.stackSize > 0) {
-                ForgeDirection side = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
-                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[placeDirection].getOpposite();
+    private List<ItemStack> placeItem(ItemStack itemstack) {
+        List<ItemStack> items = new ArrayList<ItemStack>();
+
+        if (itemstack != null && itemstack.getItem() != null && itemstack.stackSize > 0) {
+            ForgeDirection side = ForgeDirection.VALID_DIRECTIONS[getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length];
+            ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[placeDirection].getOpposite();
 
 
 
-                float hitX = 0.5F + direction.offsetX * 0.5F;
-                float hitY = 0.5F + direction.offsetY * 0.5F;
-                float hitZ = 0.5F + direction.offsetZ * 0.5F;
+            float hitX = 0.5F + direction.offsetX * 0.5F;
+            float hitY = 0.5F + direction.offsetY * 0.5F;
+            float hitZ = 0.5F + direction.offsetZ * 0.5F;
 
-                EntityPlayerMP player = FakePlayerFactory.get((WorldServer) worldObj, new GameProfile(FAKE_PLAYER_ID, FAKE_PLAYER_NAME));
-                int rotationSide = ROTATION_SIDE_MAPPING[direction.ordinal()];
+            EntityPlayerMP player = FakePlayerFactory.get((WorldServer) worldObj, new GameProfile(FAKE_PLAYER_ID, FAKE_PLAYER_NAME));
+            int rotationSide = ROTATION_SIDE_MAPPING[direction.ordinal()];
 
-                player.prevRotationPitch = player.rotationYaw = rotationSide * 90;
-                player.prevRotationYaw = player.rotationPitch = direction == ForgeDirection.UP ? 90 : direction == ForgeDirection.DOWN ? -90 : 0;
-                player.prevPosX = player.posX = xCoord + side.offsetX + 0.5 + direction.offsetX * 0.4;
-                player.prevPosY = player.posY = yCoord + side.offsetY + 0.5 + direction.offsetY * 0.4;
-                player.prevPosZ = player.posZ = zCoord + side.offsetZ + 0.5 + direction.offsetZ * 0.4;
-                player.eyeHeight = 0;
-                player.yOffset = 1.82F;
-                player.theItemInWorldManager.setBlockReachDistance(1);
+            player.prevRotationPitch = player.rotationYaw = rotationSide * 90;
+            player.prevRotationYaw = player.rotationPitch = direction == ForgeDirection.UP ? 90 : direction == ForgeDirection.DOWN ? -90 : 0;
+            player.prevPosX = player.posX = xCoord + side.offsetX + 0.5 + direction.offsetX * 0.4;
+            player.prevPosY = player.posY = yCoord + side.offsetY + 0.5 + direction.offsetY * 0.4;
+            player.prevPosZ = player.posZ = zCoord + side.offsetZ + 0.5 + direction.offsetZ * 0.4;
+            player.eyeHeight = 0;
+            player.yOffset = 1.82F;
+            player.theItemInWorldManager.setBlockReachDistance(1);
 
-                blocked = true;
-                try {
-                    player.inventory.currentItem = 0;
-                    player.inventory.setInventorySlotContents(0, itemstack);
-                    ItemStack result = itemstack.useItemRightClick(worldObj, player);
-                    if (result == null || !result.isItemEqual(itemstack) || !ItemStack.areItemStackTagsEqual(result, itemstack)) {
-                        itemstack = result;
-                    }else{
-                        int x = xCoord + side.offsetX - direction.offsetX;
-                        int y = yCoord + side.offsetY - direction.offsetY;
-                        int z = zCoord + side.offsetZ - direction.offsetZ;
+            blocked = true;
+            try {
+                player.inventory.clearInventory(null, -1);
+                player.inventory.currentItem = 0;
+                player.inventory.setInventorySlotContents(0, itemstack);
+                ItemStack result = itemstack.useItemRightClick(worldObj, player);
+                if (ItemStack.areItemStacksEqual(result, itemstack)) {
+                    int x = xCoord + side.offsetX - direction.offsetX;
+                    int y = yCoord + side.offsetY - direction.offsetY;
+                    int z = zCoord + side.offsetZ - direction.offsetZ;
 
-                        player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, direction.ordinal(), hitX, hitY, hitZ);
+                    player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, x, y, z, direction.ordinal(), hitX, hitY, hitZ);
 
-                        ItemStack playerItem  = player.inventory.getStackInSlot(0);
-                        if (playerItem == null || !playerItem.isItemEqual(itemstack) || !ItemStack.areItemStackTagsEqual(playerItem, itemstack)) {
-                            itemstack = null;
-                        }
+                }else{
+                    player.inventory.setInventorySlotContents(0, result);
+                }
+            }catch (Exception ignored) {
+
+            }finally {
+                for (ItemStack itemStack : player.inventory.mainInventory) {
+                    if (itemStack != null && itemStack.stackSize > 0) {
+                        items.add(itemStack);
                     }
-                }catch (Exception ignored) {
-
                 }
                 blocked = false;
             }
 
-        return itemstack;
+        }
+
+        return items;
     }
 
     @Override
@@ -123,27 +130,27 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
 
 
             for (ItemStack itemStack : getInventoryForDrop()) {
-                itemStack = placeItem(itemStack);
-                if (itemStack != null && itemStack.stackSize > 0) {
+                List<ItemStack> items = placeItem(itemStack);
+                if (items != null && !items.isEmpty()) {
+                    for (ItemStack item : items) {
+                        double x = xCoord + 0.5 + direction.offsetX * 0.75;
+                        double y = yCoord + 0.5 + direction.offsetY * 0.75;
+                        double z = zCoord + 0.5 + direction.offsetZ * 0.75;
 
 
-                    double x = xCoord + 0.5 + direction.offsetX * 0.75;
-                    double y = yCoord + 0.5 + direction.offsetY * 0.75;
-                    double z = zCoord + 0.5 + direction.offsetZ * 0.75;
+                        if (direction.offsetY == 0) {
+                            y -= 0.1;
+                        }
 
+                        EntityItem entityitem = new EntityItem(worldObj, x, y, z, item);
 
-                    if (direction.offsetY == 0) {
-                        y -= 0.1;
+                        entityitem.motionX = direction.offsetX * 0.1;
+                        entityitem.motionY = direction.offsetY * 0.1;
+                        entityitem.motionZ = direction.offsetZ * 0.1;
+
+                        entityitem.delayBeforeCanPickup = 40;
+                        worldObj.spawnEntityInWorld(entityitem);
                     }
-
-                    EntityItem entityitem = new EntityItem(worldObj, x, y, z, itemStack);
-
-                    entityitem.motionX = direction.offsetX * 0.1;
-                    entityitem.motionY = direction.offsetY * 0.1;
-                    entityitem.motionZ = direction.offsetZ * 0.1;
-
-                    entityitem.delayBeforeCanPickup = 40;
-                    worldObj.spawnEntityInWorld(entityitem);
                 }
             }
         }

@@ -42,7 +42,7 @@ public enum ComponentType {
             ComponentMenuVariableLoop.class, ComponentMenuContainerTypes.class, ComponentMenuListOrder.class, ComponentMenuResult.class),
     AUTO_CRAFTING(12, Localization.AUTO_CRAFTER_SHORT, Localization.AUTO_CRAFTER_LONG,
             new ConnectionSet[]{ConnectionSet.STANDARD},
-            ComponentMenuCrafting.class, ComponentMenuContainerScrap.class, ComponentMenuResult.class),
+            ComponentMenuCrafting.class, ComponentMenuCraftingPriority.class, ComponentMenuContainerScrap.class, ComponentMenuResult.class),
     GROUP(13, Localization.GROUP_SHORT, Localization.GROUP_LONG,
             new ConnectionSet[]{ConnectionSet.DYNAMIC},
             ComponentMenuGroup.class, ComponentMenuResult.class),

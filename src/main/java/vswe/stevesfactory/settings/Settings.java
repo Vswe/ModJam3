@@ -13,7 +13,7 @@ import vswe.stevesfactory.network.PacketHandler;
 public final class Settings {
 
     private static final String NAME = "StevesFactoryManagerInside";
-    private static final int VERSION = 0;
+    private static final int VERSION = 1;
     private static boolean autoCloseGroup;
     private static boolean largeOpenHitBox;
     private static boolean largeOpenHitBoxMenu;
@@ -22,6 +22,7 @@ public final class Settings {
     private static boolean autoSide;
     private static boolean autoBlacklist;
     private static boolean enlargeInterfaces;
+    private static boolean priorityMoveFirst;
 
     @SideOnly(Side.CLIENT)
     public static void openMenu(TileEntityManager manager) {
@@ -43,6 +44,9 @@ public final class Settings {
                 autoSide = dr.readBoolean();
                 autoBlacklist = dr.readBoolean();
                 enlargeInterfaces = dr.readBoolean();
+                if (version >= 1) {
+                    priorityMoveFirst = dr.readBoolean();
+                }
             }catch (Exception ignored){
                 loadDefault();
             }finally {
@@ -78,6 +82,7 @@ public final class Settings {
             dw.writeBoolean(autoSide);
             dw.writeBoolean(autoBlacklist);
             dw.writeBoolean(enlargeInterfaces);
+            dw.writeBoolean(priorityMoveFirst);
 
             FileHelper.close(dw);
         }
@@ -173,6 +178,14 @@ public final class Settings {
     public static void setEnlargeInterfaces(boolean enlargeInterfaces) {
         Settings.enlargeInterfaces = enlargeInterfaces;
         save();
+    }
+
+    public static boolean isPriorityMoveFirst() {
+        return priorityMoveFirst;
+    }
+
+    public static void setPriorityMoveFirst(boolean priorityMoveFirst) {
+        Settings.priorityMoveFirst = priorityMoveFirst;
     }
 
     private Settings() {}

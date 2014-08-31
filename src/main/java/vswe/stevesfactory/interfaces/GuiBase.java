@@ -374,7 +374,8 @@ public abstract class GuiBase extends GuiAntiNEI {
             bindTexture(getComponentResource());
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             GL11.glDisable(GL11.GL_LIGHTING);
-
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
             GL11.glPopMatrix();
         }
 
@@ -469,7 +470,7 @@ public abstract class GuiBase extends GuiAntiNEI {
 
     protected float getScale() {
 
-        net.minecraft.client.gui.ScaledResolution scaledresolution = new net.minecraft.client.gui.ScaledResolution(this.mc.gameSettings, this.mc.displayWidth, this.mc.displayHeight);
+        net.minecraft.client.gui.ScaledResolution scaledresolution = new net.minecraft.client.gui.ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
         float w = scaledresolution.getScaledWidth() * 0.9F;
         float h = scaledresolution.getScaledHeight() * 0.9F;
         float multX = w / xSize;

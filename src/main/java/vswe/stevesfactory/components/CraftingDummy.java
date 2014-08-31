@@ -65,19 +65,26 @@ public class CraftingDummy extends InventoryCrafting
         return;
     }
 
+    public ItemStack getResult(Map<Integer, ItemStack> overrideMap) {
+        this.overrideMap = overrideMap;
+        try {
+            return getResult();
+        }finally {
+            this.overrideMap = null;
+        }
+    }
+
     public ItemStack getResult() {
         IRecipe recipe = getRecipe();
         return recipe == null ? null : recipe.getCraftingResult(this);
     }
 
     public IRecipe getRecipe() {
-        for (int i = 0; i < CraftingManager.getInstance().getRecipeList().size(); ++i)
-        {
-            IRecipe irecipe = (IRecipe) CraftingManager.getInstance().getRecipeList().get(i);
+        for (int i = 0; i < CraftingManager.getInstance().getRecipeList().size(); ++i) {
+            IRecipe recipe = (IRecipe) CraftingManager.getInstance().getRecipeList().get(i);
 
-            if (irecipe.matches(this, crafting.getParent().getManager().getWorldObj()))
-            {
-                return irecipe;
+            if (recipe.matches(this, crafting.getParent().getManager().getWorldObj())) {
+                return recipe;
             }
         }
 
@@ -85,13 +92,13 @@ public class CraftingDummy extends InventoryCrafting
     }
 
     private Map<Integer, ItemStack> overrideMap;
-    public boolean isItemValidForRecipe(IRecipe recipe, ItemStack result, Map<Integer, ItemStack> overrideMap) {
+    public boolean isItemValidForRecipe(IRecipe recipe, ItemSetting result, Map<Integer, ItemStack> overrideMap, boolean advanced) {
         this.overrideMap = overrideMap;
-        if (!recipe.matches(this, crafting.getParent().getManager().getWorldObj())) {
+        if ((advanced && getRecipe() == null) || (!advanced && !recipe.matches(this, crafting.getParent().getManager().getWorldObj()))) {
             return false;
         }
         ItemStack itemStack = recipe.getCraftingResult(this);
         this.overrideMap = null;
-        return ItemStack.areItemStacksEqual(result, itemStack);
+        return result.isEqualForCommandExecutor(itemStack);
     }
 }

@@ -6,13 +6,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Vswe
- * Date: 15/01/14
- * Time: 16:48
- * To change this template use File | Settings | File Templates.
- */
+
 public class InventoryWrapperHorse extends InventoryWrapper {
     private EntityHorse horse;
     public InventoryWrapperHorse(EntityHorse horse) {
