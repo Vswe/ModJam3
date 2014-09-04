@@ -29,6 +29,7 @@ import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
+import vswe.stevesfactory.util.Utils;
 import vswe.stevesfactory.wrappers.InventoryWrapper;
 import vswe.stevesfactory.wrappers.InventoryWrapperHorse;
 import vswe.stevesfactory.wrappers.InventoryWrapperPlayer;
@@ -60,7 +61,7 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
 
     public void setOwner(EntityLivingBase entity) {
         if (entity != null && entity instanceof EntityPlayer) {
-            owner = StringUtils.stripControlCodes(((EntityPlayer)entity).getDisplayName());
+            owner = Utils.stripControlCodes(((EntityPlayer) entity).getDisplayName());
         }
     }
 
@@ -540,7 +541,7 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
     private boolean isPlayerActive(EntityPlayer player) {
         if (player != null) {
             for (UserPermission permission : permissions) {
-                if (permission.getName().equals(StringUtils.stripControlCodes(player.getDisplayName()))) {
+                if (permission.getName().equals(Utils.stripControlCodes(player.getDisplayName()))) {
                     return permission.isActive();
                 }
             }
@@ -605,7 +606,7 @@ public class TileEntityRelay extends TileEntityClusterElement implements IInvent
             }
         }
 
-        String username = StringUtils.stripControlCodes(player.getDisplayName());
+        String username = Utils.stripControlCodes(player.getDisplayName());
         boolean isOp = false;
         if (worldObj.isRemote || username.equals(owner)) {
             isOp = true;
