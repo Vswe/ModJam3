@@ -14,6 +14,7 @@ import vswe.stevesfactory.blocks.UserPermission;
 import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
+import vswe.stevesfactory.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -499,7 +500,7 @@ public class GuiRelay extends GuiBase {
     private boolean hasCachedPermission;
 
     private String getUserName()  {
-        return StringUtils.stripControlCodes(Minecraft.getMinecraft().thePlayer.getDisplayName());
+        return Utils.stripControlCodes(Minecraft.getMinecraft().thePlayer.getDisplayName());
     }
 
     private UserPermission getUserPermission() {
