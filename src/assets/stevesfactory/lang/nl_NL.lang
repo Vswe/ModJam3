@@ -1,0 +1,296 @@
+# ======================================
+#				BLOCKS
+# ======================================
+
+tile.sfm.BlockMachineManager.name=Machine Inventaris Manager
+tile.sfm.BlockCable.name=Inventaris Kabel
+tile.sfm.BlockCableRelay.name=Inventaris Relais
+tile.sfm.BlockAdvancedCableRelay.name=Geadvanceerde Inventaris Relais
+tile.sfm.BlockCableOutput.name=Redstone Emitter
+tile.sfm.BlockCableInput.name=Redstone Ontvanger
+tile.sfm.BlockCableCreative.name=Creative Leverancier
+tile.sfm.BlockCableIntake.name=Voorwerp Klep
+tile.sfm.BlockCableBUD.name=Blok Detector
+tile.sfm.BlockCableBreaker.name=Block Gate
+
+# ======================================
+#			COMPONENT TYPES
+# ======================================
+gui.sfm.TriggerShort=Trigger
+gui.sfm.TriggerLong=Trigger
+gui.sfm.InputShort=Invoer
+gui.sfm.InputLong=Invoer
+gui.sfm.OutputShort=Uitvoer
+gui.sfm.OutputLong=Uitvoer
+gui.sfm.ConditionShort=Voorwaarde
+gui.sfm.ConditionLong=Voorwaarde
+gui.sfm.FlowControlShort=Stroom
+gui.sfm.FlowControlLong=Stroom Control
+gui.sfm.LiquidInputShort=Invoer (L)
+gui.sfm.LiquidInputLong=Vloeistofinvoer
+gui.sfm.LiquidOutputShort=Afvoer (L)
+gui.sfm.LiquidOutputLong=Vloeistofafvoer
+gui.sfm.LiquidConditionShort=Voorwaarde (L)
+gui.sfm.LiquidConditionLong=Vloeistofvoowaarde
+gui.sfm.RedstoneEmitterShort=Emitter
+gui.sfm.RedstoneEmitterLong=Redstone Emitter
+gui.sfm.RedstoneConditionShort=Voorwaarde (R)
+gui.sfm.RedstoneConditionLong=Redstone Voorwaarde
+gui.sfm.ContainerVariableShort=Variabel
+gui.sfm.ContainerVariableLong=Container Variabel
+gui.sfm.ForEachLoopShort=Voor Elk
+gui.sfm.ForEachLoopLong=Voor Elk Lus
+gui.sfm.AutoCrafterShort=Crafter
+gui.sfm.AutoCrafterLong=Auto Crafter
+
+# ======================================
+#			CONNECTION OPTIONS
+# ======================================
+
+gui.sfm.ConnectionInput=Invoer
+gui.sfm.ConnectionOutput=Uitvoer
+gui.sfm.ConnectionInterval=Interval
+gui.sfm.ConnectionOnHighRedstonePulse=Op hoge puls
+gui.sfm.ConnectionOnLowRedstonePulse=Op lage puls
+gui.sfm.ConnectionWhileHighRedstone=Zolang een hoog signaal
+gui.sfm.ConnectionWhileLowRedstone=Zolang een laag signaal
+gui.sfm.ConnectionTrue=Waar
+gui.sfm.ConnectionFalse=Onwaar
+gui.sfm.ConnectionForEach=Voor elk
+gui.sfm.ConnectionOnBlockUpdate=Op blok update
+gui.sfm.ConnectionOnHighBlockPulse=Op hoge puls
+gui.sfm.ConnectionWhileHighBlock=Zolang een hoog signaal
+gui.sfm.ConnectionOnLowBlockPulse=Op lage puls
+gui.sfm.ConnectionWhileLowBlock=Zolang een laag signaal
+
+
+# ======================================
+#			CONNECTION SETS
+# ======================================
+
+gui.sfm.ConnectionSetStandard=Standaard
+gui.sfm.ConnectionSetInterval=Op interval
+gui.sfm.ConnectionSetRedstone=Redstone gecontroleerd
+gui.sfm.ConnectionSetCondition=Voorwaarde
+gui.sfm.ConnectionSetCollector2=Verzamelaar - 2 inputs
+gui.sfm.ConnectionSetCollector5=Verzamelaar - 5 inputs
+gui.sfm.ConnectionSetSplit2=Split - 2 outputs
+gui.sfm.ConnectionSetSplit5=Split - 5 outputs
+gui.sfm.ConnectionSetDeclaration=Declaratie
+gui.sfm.ConnectionSetForEach=For each
+gui.sfm.ConnectionSetBud=Blok update detector
+
+# ======================================
+#			COMPONENT MENUS
+# ======================================
+
+gui.sfm.DetectorMenu=Update Detector
+gui.sfm.RequireAllTargets=Vereist alle doelen
+gui.sfm.RequireOneTarget=Vereist een doel
+gui.sfm.RunSharedOnce=Voer een gedeelde opdacht één keer uit
+gui.sfm.RunOnePerTarget=Voer een opdacht één keer uit per doel
+gui.sfm.Selected=[Geselecteerd]
+gui.sfm.OverflowMenu=Overmatige Inventarissen
+gui.sfm.NoDetectorError=Geen detector geselecteerd
+gui.sfm.NoOverflowError=Geen overmatige inventaris geselecteerd
+gui.sfm.OverflowInfo=Deze inventarissen zullen gebruikt worden als sommige van de gecreëerde voorwerpen niet passen. Ze worden ook gebruikt voor container voorwerpen, zoals emmers.
+gui.sfm.ContainerTypeMenu=Container Types
+gui.sfm.CraftingMenu=Crafting
+gui.sfm.EmitterMenu=Emitters
+gui.sfm.NoEmitterError=Geen emitter geselecteerd
+gui.sfm.RequiresAll=Vereist allen
+gui.sfm.IfAny=Eventuele
+gui.sfm.WhiteList=Witte lijst
+gui.sfm.BlackList=Zwarte lijst
+gui.sfm.EmptyTank=Lege tank
+gui.sfm.FilledTank=Gevulde tank
+gui.sfm.StrongPower=Sterke stroom
+gui.sfm.WeakPower=Zwakke stroom
+gui.sfm.Sequential=sequentiële
+gui.sfm.Split=Split
+gui.sfm.IntervalMenu=Interval
+gui.sfm.IntervalInfo=Tijd tussen deze opdacht is getriggerd 
+gui.sfm.Second=seconde(n)
+gui.sfm.InventoryMenu=Inventarissen
+gui.sfm.NoInventoryError=Geen inventaris geselecteerd
+gui.sfm.ItemMenu=Voorwerpen
+gui.sfm.DamageValue=Schade waarde
+gui.sfm.NoConditionError=Geen voorwaarde geselecteerd
+gui.sfm.Buckets=Emmers
+gui.sfm.MilliBuckets=Milli Emmers
+gui.sfm.LiquidsMenu=Vloerstoffen
+gui.sfm.UseAll=Gebruik allen
+gui.sfm.Reversed=Omgekeerde
+gui.sfm.LoopOrderMenu=Lus Volgorde
+gui.sfm.ValueOrderMenu=Waarde Volgorde
+gui.sfm.RedstoneNodeMenu=Redstone Knooppunten
+gui.sfm.NoNodeError=Geen knooppunten geselecteerd
+gui.sfm.DoEmitPulse=Puls uitzenden
+gui.sfm.Seconds=Seconden
+gui.sfm.Ticks=Tikken
+gui.sfm.PulseMenu=Puls
+gui.sfm.ReceiversMenu=Redstone Ontvangers
+gui.sfm.NoReceiverError=Geen ontvangers geselecteerd
+gui.sfm.RedstoneOutputMenu=Uitvoer
+gui.sfm.RedstoneStrength=Redstone sterkte
+gui.sfm.DigitalToggle=Digitaal signaal toggle
+gui.sfm.NoRedstoneSidesError=Geen redstone zijden geselecteerd
+gui.sfm.RedstoneSidesMenu=Zijden
+gui.sfm.RedstoneSidesInfo=Kies aan welke blok zijde redstone gedetecteerd zou moeten worden
+gui.sfm.UpdateSidesInfo=Kies aan welke blok zijde updates gedetecteerd zou moeten worden
+gui.sfm.RedstoneSidesMenuTrigger=Redstone zijden
+gui.sfm.UpdateSidesMenu=Update Zijden
+gui.sfm.NoSidesError=Geen zijden geselecteerd
+gui.sfm.InvertSelection=Keer selectie om
+gui.sfm.RedstoneStrengthMenu=Analoge Redstone
+gui.sfm.RedstoneStrengthInfo=Kies het benodigde sterkte bereik voor het redstone signaal
+gui.sfm.Through=door
+gui.sfm.InvalidRedstoneRangeError=Ongeldige sterkte bereik
+gui.sfm.RedundantRedstoneRangeError=Overtollig sterkte bereik
+gui.sfm.RedstoneStrengthMenuCondition=Sterkte
+gui.sfm.ConnectionsMenu=Verbindingen
+gui.sfm.FairSplit=Gebruik eerlijke split
+gui.sfm.EmptyPins=Omvat lege pinnen
+gui.sfm.SplitMenu=Split
+gui.sfm.SpecifyAmount=Geef hoeveelheid op
+gui.sfm.Delete=Verwijder
+gui.sfm.DeleteItemSelection=Verwijder deze voorwerp selectie
+gui.sfm.GoBack=Ga terug
+gui.sfm.Cancel=Annuleren
+gui.sfm.EmptyWhiteListError=De witte lijst is leeg
+gui.sfm.TankMenu=Tanks
+gui.sfm.NoTankError=Geen tank geselecteerd
+gui.sfm.Activate=Activeer
+gui.sfm.Deactivate=Deactiveer
+gui.sfm.ActivateLong=Klik om deze zijde te gebruiken
+gui.sfm.DeactivateLong=klik om te voorkomen dat deze zijde wordt gebruikt
+gui.sfm.NoDirectionError=Geen richting is actief
+gui.sfm.AllSlots=Gebruik alle slots
+gui.sfm.IdRange=Gebruik id bereik
+gui.sfm.AllSlotsLong=Klik om alle slots te gebruiken voor deze zijde
+gui.sfm.IdRangeLong=Klik om een slot id bereik te gebruiken voor deze specifieke zijde
+gui.sfm.InvalidRange=Bereik is ongeldig
+gui.sfm.AdvancedMode=Geadvanceerde modus
+gui.sfm.SimpleMode=Simpele modus
+gui.sfm.AdvancedModeLong=Klik om geadvanceerde modus te gebruiken voor deze zijde
+gui.sfm.SimpleModeLong=Klik om simpele modus te gebruiken voor deze zijde
+gui.sfm.UseId=Gebruik id
+gui.sfm.Invert=Omkeren
+gui.sfm.UpdateBlockMenu=Update Blok
+gui.sfm.Meta=Meta
+gui.sfm.GlobalValueSet=Globale waarde set
+gui.sfm.VariableMenu=Variabel
+gui.sfm.NotDeclaredError=Deze variabele is niet gedeclareerd
+gui.sfm.AlreadyDeclaredError=Deze variabele is al gedeclareerd
+gui.sfm.VariableContainersMenu=Containers
+gui.sfm.VariableList=Lijst
+gui.sfm.VariableElement=Element
+gui.sfm.LoopVariableMenu=Variabelen
+gui.sfm.ListNotDeclared=Lijst variabele is niet gedeclareerd
+gui.sfm.ElementNotDeclared=Element variabele is niet gedeclareerd
+gui.sfm.VariableWhite=Witte variabele
+gui.sfm.VariableOrange=Oranje variabele
+gui.sfm.VariableMagenta=Magenta variabele
+gui.sfm.VariableLightBlue=Licht blauwe variabele
+gui.sfm.VariableYellow=Gele variabele
+gui.sfm.VariableLime=Lime variabele
+gui.sfm.VariablePink=Roze variabele
+gui.sfm.VariableGray=Grijze variabele
+gui.sfm.VariableLightGray=Licht grijze variabele
+gui.sfm.VariableCyan=Cyan variabele
+gui.sfm.VariablePurple=Paarse variabele
+gui.sfm.VariableBlue=Blauwe variabele
+gui.sfm.VariableBrown=Bruine variabele
+gui.sfm.VariableGreen=Groene variabele
+gui.sfm.VariableRed=Rode variabele
+gui.sfm.VariableBlack=Zwarte variabele
+gui.sfm.NoLiquidSelected=[Geen vloeistof geselecteerd
+gui.sfm.ChangeLiquid=Links klik om vloeistof te wisselen
+gui.sfm.EditSetting=Rechts klik om instellingen te bewerken
+gui.sfm.NoItemSelected=[Geen voorwerp geselecteerd]
+gui.sfm.ChangeItem=Links klik om voorwerp te veranderen
+gui.sfm.FullDescription=Houd shift ingedrukt om de volledige voorwerp omschrijving te zien
+gui.sfm.DetectionPrecise=Precieze detectie
+gui.sfm.DetectionNbtFuzzy=NBT onafhankelijke detectie
+gui.sfm.DetectionFuzzy=Nevilige detectie
+gui.sfm.DetectionOreDictionary=Ore woordenboek ondersteuning
+gui.sfm.ItemsFound=Gevonden
+gui.sfm.RedstoneEmitterSidesMenu=Zijden
+gui.sfm.RedstoneEmitterSidesInfo=Selecteer aan welke blok zijde het redstone signaal uitgezonden moet worden
+gui.sfm.TypeInventory=Inventaris
+gui.sfm.TypeTank=Tank
+gui.sfm.TypeEmitter=Uitzender
+gui.sfm.TypeReceiver=Ontvanger
+gui.sfm.TypeNode=Knooppunt
+gui.sfm.TypeBud=BUD
+gui.sfm.OrderStandard=Standaard
+gui.sfm.OrderCable=Kabel volgorde
+gui.sfm.OrderRandom=Willekeurig
+gui.sfm.ExtendOld=Breid oude uit
+gui.sfm.KeepAll=Houd allen
+gui.sfm.KeepOld=Houd oude
+gui.sfm.KeepNew=Houd nieuwe
+gui.sfm.Fixed=Vast
+gui.sfm.Toggle=Toggle
+gui.sfm.Max=Max
+gui.sfm.Min=Min
+gui.sfm.Increase=Verhoog
+gui.sfm.Decrease=Verlaag
+gui.sfm.Forward=Vooruit
+gui.sfm.Backward=Achteruit
+gui.sfm.Global=Globaal
+gui.sfm.Local=Lokaal
+gui.sfm.Add=Voeg toe
+gui.sfm.Remove=Verwijder
+gui.sfm.Set=Zet
+gui.sfm.Down=Omlaag
+gui.sfm.Up=Omhoog
+gui.sfm.North=Noord
+gui.sfm.South=Zuid
+gui.sfm.West=West
+gui.sfm.East=Oost
+
+# ======================================
+#		  OTHER MANAGER INTERFACE
+# ======================================
+
+gui.sfm.DeleteCommand=Verwijder [Plaats opdacht hier]
+gui.sfm.CreateCommand=Creëer
+gui.sfm.MaximumComponentError=Maximale component hoeveelheid bereikt
+
+
+# ======================================
+#		 ADVANCED RELAY INTERFACE
+# ======================================
+gui.sfm.GivePermission=Geef permissie
+gui.sfm.RevokePermission=Trek permissie in
+gui.sfm.ActivateUser=Activeer
+gui.sfm.DeactivateUser=Deactiveer
+gui.sfm.DeleteUser=Verwijder gebruiker
+gui.sfm.MakeEditor=Maak bewerker
+gui.sfm.RemoveEditor=Verwijder bewerker
+gui.sfm.ShowListToAll=Laat lijst aan allen zien
+gui.sfm.ShowToEditors=Laat zijn aan bewerkers
+gui.sfm.EnableCreativeMode=Zet creatieve modus aan
+gui.sfm.DisableCreativeMode=Zet creatieve modus uit
+gui.sfm.Page=Pagina
+gui.sfm.Of=van
+gui.sfm.NoAccess=GEEN TOEGANG
+gui.sfm.EditorDescriptionShort=Je mag defineren wie toegang heeft tot deze blok, maar mensen moeten jou eerst permissie geven.
+gui.sfm.UserDescriptionShort=Je bent niet bevoegd om deze blok te gebruiken. Je hebt wel toegang tot het lezen van de instellingen.
+gui.sfm.EditorDescriptionLong=Als een bewerker kan je bapalen met welke spelers deze blok moet omgaan. Je kan alleen kiezen tussen de spelers die permissie hebben gegeven.
+gui.sfm.UserDescriptionLong=Deze blok zal in staat zijn om toegang te krijgen tot de inventarissen van spelers, naast andere inventarissen. Om deze blok toegang te geven tot jouw inventaris moet je het permissie geven om dat te doen. Een bewerker kan dan bepalen of het blok om zou moeten gaan met jou inventaris of niet. 
+gui.sfm.PermissionOwner=Eigenaar
+gui.sfm.PermissionEditor=Bewerker
+gui.sfm.PermissionUser=Alleen lezen
+gui.sfm.PermissionRestricted=Beperkte toegang
+gui.sfm.PermissionCreative=Creatieve toegang
+gui.sfm.PermissionInventory=Inventaris toegang
+gui.sfm.PermissionDenied=Geen toegang
+
+
+# ======================================
+#				OTHER
+# ======================================
+
+itemGroup.sfm=Steve's Fabriek Manager
