@@ -1,0 +1,303 @@
+# German Translation of Steve's Factory Manager
+# Created 2/4/2014, 7:19AM
+# Main translator: Galaxy_2Alex
+# Helpers: [None at the moment]
+# I'm open to suggestions, please send me a Tweet at @Galaxy2Alex with a paste link to your suggestions (Pastepin, Pastie or similar)
+# As I'm already the translator of SC2, I've got priority with this translation. Also, I kind of promised it to Vswe (https://twitter.com/Galaxy2Alex/status/418021561874915329)
+
+# ======================================
+#				BLOCKS
+# ======================================
+
+tile.sfm.BlockMachineManager.name=Maschineninventarmanager
+tile.sfm.BlockCable.name=Inventarkabel
+tile.sfm.BlockCableRelay.name=Inventarrelais
+tile.sfm.BlockAdvancedCableRelay.name=Fortgeschrittenes Inventarrelais
+tile.sfm.BlockCableOutput.name=Redstone-Sender
+tile.sfm.BlockCableInput.name=Redstone-Empfänger
+tile.sfm.BlockCableCreative.name=Kreativversorger
+tile.sfm.BlockCableIntake.name=Itemventil
+tile.sfm.BlockCableBUD.name=Blockdetector
+tile.sfm.BlockCableBreaker.name=Blockgatter
+
+# ======================================
+#			COMPONENT TYPES
+# ======================================
+gui.sfm.TriggerShort=Auslöser
+gui.sfm.TriggerLong=Auslöser
+gui.sfm.InputShort=Input
+gui.sfm.InputLong=Input
+gui.sfm.OutputShort=Output
+gui.sfm.OutputLong=Output
+gui.sfm.ConditionShort=Zustand
+gui.sfm.ConditionLong=Zustand
+gui.sfm.FlowControlShort=Flussk.
+gui.sfm.FlowControlLong=Flusskontrolle
+gui.sfm.LiquidInputShort=Input (F)
+gui.sfm.LiquidInputLong=Flüssigkeitsinput
+gui.sfm.LiquidOutputShort=Output (F)
+gui.sfm.LiquidOutputLong=Flüssigkeitsoutput
+gui.sfm.LiquidConditionShort=Zustand (F)
+gui.sfm.LiquidConditionLong=Flüssigkeitszustand
+gui.sfm.RedstoneEmitterShort=Sender
+gui.sfm.RedstoneEmitterLong=Redstone-Sender
+gui.sfm.RedstoneConditionShort=Zustand (R)
+gui.sfm.RedstoneConditionLong=Redstone-Zustand
+gui.sfm.ContainerVariableShort=Variabel
+gui.sfm.ContainerVariableLong=Behältervariable
+gui.sfm.ForEachLoopShort=Jeweils
+gui.sfm.ForEachLoopLong=für jede Schleife
+gui.sfm.AutoCrafterShort=Hersteller
+gui.sfm.AutoCrafterLong=Auto-Hersteller
+
+# ======================================
+#			CONNECTION OPTIONS
+# ======================================
+
+gui.sfm.ConnectionInput=Input
+gui.sfm.ConnectionOutput=Output
+gui.sfm.ConnectionInterval=Intervall
+gui.sfm.ConnectionOnHighRedstonePulse=Bei hohem Puls
+gui.sfm.ConnectionOnLowRedstonePulse=Bei niedrigen Puls
+gui.sfm.ConnectionWhileHighRedstone=Während hohem Signal
+gui.sfm.ConnectionWhileLowRedstone=Während niedrigem Signal
+gui.sfm.ConnectionTrue=Wahr
+gui.sfm.ConnectionFalse=Falsch
+gui.sfm.ConnectionForEach=Jeweils
+gui.sfm.ConnectionOnBlockUpdate=Bei Blockupdate
+gui.sfm.ConnectionOnHighBlockPulse=Bei hohem Puls
+gui.sfm.ConnectionWhileHighBlock=Während hohem Signal
+gui.sfm.ConnectionOnLowBlockPulse=Bei niedrigen Puls
+gui.sfm.ConnectionWhileLowBlock=Während niedrigem Signal
+
+
+# ======================================
+#			CONNECTION SETS
+# ======================================
+
+gui.sfm.ConnectionSetStandard=Standard
+gui.sfm.ConnectionSetInterval=Auf Intervall
+gui.sfm.ConnectionSetRedstone=Redstone-kontrolliert
+gui.sfm.ConnectionSetCondition=Zustand
+gui.sfm.ConnectionSetCollector2=Kollektor - 2 Inputs
+gui.sfm.ConnectionSetCollector5=Kollektor - 5 Inputs
+gui.sfm.ConnectionSetSplit2=Aufteilung - 2 Outputs
+gui.sfm.ConnectionSetSplit5=Aufteilung - 5 Outputs
+gui.sfm.ConnectionSetDeclaration=Deklaration
+gui.sfm.ConnectionSetForEach=Jeweils
+gui.sfm.ConnectionSetBud=Block-Update-Detektor
+
+# ======================================
+#			COMPONENT MENUS
+# ======================================
+
+gui.sfm.DetectorMenu=Updatedetektors
+gui.sfm.RequireAllTargets=Benötigt alle Ziele
+gui.sfm.RequireOneTarget=Benötigt ein Ziel
+gui.sfm.RunSharedOnce=Gemeinsamer Befehl einmal ausführen
+gui.sfm.RunOnePerTarget=Befehl einmal pro Ziel ausfhren
+gui.sfm.Selected=[Ausgewählt]
+gui.sfm.OverflowMenu=Überflussinventare
+gui.sfm.NoDetectorError=Kein Detektor ausgewählt
+gui.sfm.NoOverflowError=Kein Überflussinventar gewählt
+gui.sfm.OverflowInfo=Diese Inventare werden genutzt wenn die hergestellten Items nicht passen, außerdem wird es für Behältnisitems wie z.B. Eimer benutzt.
+gui.sfm.ContainerTypeMenu=Behältnistyp
+gui.sfm.CraftingMenu=Herstellung
+gui.sfm.EmitterMenu=Sender
+gui.sfm.NoEmitterError=Kein Sender ausgewählt
+gui.sfm.RequiresAll=Benötigt alle
+gui.sfm.IfAny=Eine:
+gui.sfm.WhiteList=Whitelist
+gui.sfm.BlackList=Blacklist
+gui.sfm.EmptyTank=Leerer Tank
+gui.sfm.FilledTank=Gefüllter Tank
+gui.sfm.StrongPower=Starke Kraft
+gui.sfm.WeakPower=Labile Kraft
+gui.sfm.Sequential=Der Reihe nach
+gui.sfm.Split=Teilen
+gui.sfm.IntervalMenu=Intervall
+gui.sfm.IntervalInfo=Zeit zwischen der Aktivierung des Befehls
+gui.sfm.Second=Sekunde(n)
+gui.sfm.InventoryMenu=Inventare
+gui.sfm.NoInventoryError=Kein Inventar ausgewählt
+gui.sfm.ItemMenu=Items
+gui.sfm.DamageValue=Schadenswert
+gui.sfm.NoConditionError=Kein Zustand ausgewählt
+gui.sfm.Buckets=Eimer
+gui.sfm.MilliBuckets=Millieimer
+gui.sfm.LiquidsMenu=Flüssigkeit
+gui.sfm.UseAll=Alles Benutzen
+gui.sfm.Reversed=Umgekehrt
+gui.sfm.LoopOrderMenu=Schleifenordnung
+gui.sfm.ValueOrderMenu=Werteordnung
+gui.sfm.RedstoneNodeMenu=Redstone-Knoten
+gui.sfm.NoNodeError=Kein Knoten ausgewählt
+gui.sfm.DoEmitPulse=Signal aussenden
+gui.sfm.Seconds=Sekunden
+gui.sfm.Ticks=Ticks
+gui.sfm.PulseMenu=Puls
+gui.sfm.ReceiversMenu=Redstone-Empfänger
+gui.sfm.NoReceiverError=Kein Empfänger ausgewählt
+gui.sfm.RedstoneOutputMenu=Output
+gui.sfm.RedstoneStrength=Redstonestärke
+gui.sfm.DigitalToggle=Schlatet digitales Signal
+gui.sfm.NoRedstoneSidesError=Keine Redstoneseite ausgewählt
+gui.sfm.RedstoneSidesMenu=Seiten
+gui.sfm.RedstoneSidesInfo=Wähle an welcher Blockseite Redstone erkannt werden soll
+gui.sfm.UpdateSidesInfo=Wähle an welcher Blockseite Updates erkannt werden sollen
+gui.sfm.RedstoneSidesMenuTrigger=Redstoneseiten
+gui.sfm.UpdateSidesMenu=Updateseiten
+gui.sfm.NoSidesError=Keine Seiten ausgewählt
+gui.sfm.InvertSelection=Kehrt Auswahl um
+gui.sfm.RedstoneStrengthMenu=Analoges Redstone
+gui.sfm.RedstoneStrengthInfo=Wähle den Stärkeradius aus der für das Redstonesignal benötigt wird
+gui.sfm.Through=bis
+gui.sfm.InvalidRedstoneRangeError=Ungültiger Stärkeradius
+gui.sfm.RedundantRedstoneRangeError=Redundanter Stärkeradius
+gui.sfm.RedstoneStrengthMenuCondition=Stärke
+gui.sfm.ConnectionsMenu=Verbindungen
+gui.sfm.FairSplit=Verwende gerechte Aufteilung
+gui.sfm.EmptyPins=Inkludiert leere Nadeln
+gui.sfm.SplitMenu=Teilung
+gui.sfm.SpecifyAmount=Bestimmte Menge?
+gui.sfm.Delete=Löschen
+gui.sfm.DeleteItemSelection=Löscht diese Itemauswahl
+gui.sfm.GoBack=Zurück
+gui.sfm.Cancel=Abbrechen
+gui.sfm.EmptyWhiteListError=Die Whitelist ist leer
+gui.sfm.TankMenu=Tanks
+gui.sfm.NoTankError=Kein Tank ausgewählt
+gui.sfm.Activate=Aktiviert
+gui.sfm.Deactivate=Deaktiviert
+gui.sfm.ActivateLong=Klicken zum Benutzen dieser Seite
+gui.sfm.DeactivateLong=Klicken um benutzen dieser Seite zu verhindern
+gui.sfm.NoDirectionError=Keine Richtung ist aktiv
+gui.sfm.AllSlots=Benutzt alle Slots
+gui.sfm.IdRange=Benutzt ID-Umfang
+gui.sfm.AllSlotsLong=Klicken, um dafür alle Slots für diese Seite zu benutzen.
+gui.sfm.IdRangeLong=Klicken, um einen Slot ID-Umfang für diese Seite zu benutzen.
+gui.sfm.InvalidRange=Umfang ist ungültig
+gui.sfm.AdvancedMode=Fortgeschrittener Modus
+gui.sfm.SimpleMode=Einfacher Modus
+gui.sfm.AdvancedModeLong=Klicken, um fortgeschrittenen Modus für diese Seite zu benutzen
+gui.sfm.SimpleModeLong=Klicken, um einfachen Modus für diese Seite zu benutzen
+gui.sfm.UseId=Benutzt ID
+gui.sfm.Invert=Kehrt um
+gui.sfm.UpdateBlockMenu=Updatet Block
+gui.sfm.Meta=Meta
+gui.sfm.GlobalValueSet=Globaler Wert festgelegt
+gui.sfm.VariableMenu=Variabel
+gui.sfm.NotDeclaredError=Diese Variable wurde nicht deklariert.
+gui.sfm.AlreadyDeclaredError=Diese Variable ist bereits deklariert.
+gui.sfm.VariableContainersMenu=Behälter
+gui.sfm.VariableList=Liste
+gui.sfm.VariableElement=Element
+gui.sfm.LoopVariableMenu=Variablen
+gui.sfm.ListNotDeclared=Listenvariable wurde nicht deklariert.
+gui.sfm.ElementNotDeclared=Elementvariable wurde nicht deklariert.
+gui.sfm.VariableWhite=>Weiße Variable
+gui.sfm.VariableOrange=Orange Variable
+gui.sfm.VariableMagenta=Magentafarbene Variable
+gui.sfm.VariableLightBlue=Hellblaue Variable
+gui.sfm.VariableYellow=Gelbe Variable
+gui.sfm.VariableLime=Hellgrüne Variable
+gui.sfm.VariablePink=Pinke Variable
+gui.sfm.VariableGray=Graue Variable
+gui.sfm.VariableLightGray=Hellgraue Variable
+gui.sfm.VariableCyan=Cyanfarbene Variable
+gui.sfm.VariablePurple=Violette Variable
+gui.sfm.VariableBlue=Blaue Variable
+gui.sfm.VariableBrown=Braune Variable
+gui.sfm.VariableGreen=Grüne Variable
+gui.sfm.VariableRed=Rote Variable
+gui.sfm.VariableBlack=Schwarze Variable
+gui.sfm.NoLiquidSelected=[Keine Flüssigkeit ausgewählt]
+gui.sfm.ChangeLiquid=Linksklick um Flüssigkeit zu ändern
+gui.sfm.EditSetting=Rechtsklick um Einstellungen zu ändern
+gui.sfm.NoItemSelected=[Kein Item ausgewählt]
+gui.sfm.ChangeItem=Linksklick um Item zu ändern
+gui.sfm.FullDescription=Halte Shift, um die volle Beschreibung des Items zu sehen
+gui.sfm.DetectionPrecise=Genaue Erkennung
+gui.sfm.DetectionNbtFuzzy=NBT-unabhängige Erkennung
+gui.sfm.DetectionFuzzy=Ungenaue Erkennung
+gui.sfm.DetectionOreDictionary="Ore-Dictionary"-Unterstützung
+gui.sfm.ItemsFound=Gefunden
+gui.sfm.RedstoneEmitterSidesMenu=Seiten
+gui.sfm.RedstoneEmitterSidesInfo=Wählt aus welchen Blockseiten das Redstonesignal ausgesendet werden soll
+gui.sfm.TypeInventory=Inventar
+gui.sfm.TypeTank=Tank
+gui.sfm.TypeEmitter=Sender
+gui.sfm.TypeReceiver=Empfänger
+gui.sfm.TypeNode=Knoten
+gui.sfm.TypeBud=BUD
+gui.sfm.OrderStandard=Standard
+gui.sfm.OrderCable=Kabelfarbe
+gui.sfm.OrderRandom=Zufällig
+gui.sfm.ExtendOld=Erweitert alte
+gui.sfm.KeepAll=Hält alle
+gui.sfm.KeepOld=Hält alte
+gui.sfm.KeepNew=Hält neue
+gui.sfm.Fixed=Fixiert
+gui.sfm.Toggle=Umstellen
+gui.sfm.Max=Max
+gui.sfm.Min=Min
+gui.sfm.Increase=Mehr
+gui.sfm.Decrease=Weniger
+gui.sfm.Forward=Vorwärts
+gui.sfm.Backward=Rückwärts
+gui.sfm.Global=Global
+gui.sfm.Local=Lokal
+gui.sfm.Add=+
+gui.sfm.Remove=-
+gui.sfm.Set=setzen
+gui.sfm.Down=Oben
+gui.sfm.Up=Unten
+gui.sfm.North=Nord
+gui.sfm.South=Süd
+gui.sfm.West=West
+gui.sfm.East=Ost
+
+# ======================================
+#		  OTHER MANAGER INTERFACE
+# ======================================
+
+gui.sfm.DeleteCommand=Löschen [Befehl hier droppen]
+gui.sfm.CreateCommand=Erstellt
+gui.sfm.MaximumComponentError=Maximale Komponentenanzahl erreicht
+
+
+# ======================================
+#		 ADVANCED RELAY INTERFACE
+# ======================================
+gui.sfm.GivePermission=Gibt Erlaubnis
+gui.sfm.RevokePermission=Entzieht Erlaubnis
+gui.sfm.ActivateUser=Aktiviert
+gui.sfm.DeactivateUser=Deaktiviert
+gui.sfm.DeleteUser=Löscht Benutzer
+gui.sfm.MakeEditor=Erstelle Editor
+gui.sfm.RemoveEditor=Entferne Editor
+gui.sfm.ShowListToAll=Zeigt Liste allen
+gui.sfm.ShowToEditors=Editoren zeigen 
+gui.sfm.EnableCreativeMode=Kreativmodus Ein
+gui.sfm.DisableCreativeMode=Kreativmodus Aus
+gui.sfm.Page=Seite
+gui.sfm.Of=von
+gui.sfm.NoAccess=KEIN ZUTRITT
+gui.sfm.EditorDescriptionShort=Du kannst den Zugriff zu diesem Block sperren, um nur bestimmten Personen Zugang zu gewähren.
+gui.sfm.UserDescriptionShort=Du hast nicht die Erlaubnis diesen Block zu kontrollieren, hast aber die Möglichkeit, die Einstellungen zu lesen.
+gui.sfm.EditorDescriptionLong=Als Editor kannst du entscheiden mit welchen Spielern der Block interagieren soll. Du kannst jedoch nur den erlaubten Spielern wählen.
+gui.sfm.UserDescriptionLong=Ein Block mit der Möglichkeit, jede Art von Inventar zu benutzen. Damit der Block das Inventar benutzen kann, musst du ihm Befehle geben, damit dies erlaubt ist. Ein Editor kann über die Zugänglichkeit deines Inventares entscheiden.
+gui.sfm.PermissionOwner=Eigentümer
+gui.sfm.PermissionEditor=Editor
+gui.sfm.PermissionUser=Read-only
+gui.sfm.PermissionRestricted=Beschränkter Zugang
+gui.sfm.PermissionCreative=Kreativzugang
+gui.sfm.PermissionInventory=Inventarzugang
+gui.sfm.PermissionDenied=Kein Zugang
+
+
+# ======================================
+#				OTHER
+# ======================================
+
+itemGroup.sfm=Steve's Factory Manager
