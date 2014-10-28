@@ -9,6 +9,8 @@ import vswe.stevesfactory.interfaces.GuiManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public  abstract class ScrollController<T> {
 
@@ -52,6 +54,7 @@ public  abstract class ScrollController<T> {
     private int startX = 5;
     private int scrollingUpperLimit = TEXT_BOX_Y + TEXT_BOX_SIZE_H;
     private boolean disabledScroll;
+    private ExecutorService async;
 
     public ScrollController(boolean hasSearchBox) {
         this(hasSearchBox ? "" : null);
@@ -59,6 +62,7 @@ public  abstract class ScrollController<T> {
 
     public ScrollController(String defaultText) {
         this.hasSearchBox = defaultText != null;
+        this.async = Executors.newSingleThreadExecutor();
         if (hasSearchBox) {
             textBox = new TextBoxLogic(Integer.MAX_VALUE, TEXT_BOX_SIZE_W - TEXT_BOX_TEXT_X * 2) {
                 @Override
@@ -268,12 +272,17 @@ public  abstract class ScrollController<T> {
     }
 
     public void updateSearch() {
-        if (hasSearchBox) {
-            result = updateSearch(textBox.getText().toLowerCase(), textBox.getText().toLowerCase().equals(".all"));
-        }else{
-            result = updateSearch("", false);
-        }
-        updateScrolling();
+        async.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (hasSearchBox) {
+                    result = updateSearch(textBox.getText().toLowerCase(), textBox.getText().toLowerCase().equals(".all"));
+                } else {
+                    result = updateSearch("", false);
+                }
+                updateScrolling();
+            }
+        });
     }
 
     public List<T> getResult() {
