@@ -26,6 +26,21 @@ minecraft {
     assetDir = "eclipse/assets"
 }
 
+repositories {
+    maven { // WAILA
+        name 'Prof. Mobius'
+        url 'http://mobiusstrip.eu/maven'
+    }
+    maven { // NEI and friends
+        name 'Chickenbones'
+        url 'http://chickenbones.net/maven/'
+    }
+}
+
+dependencies {
+    compile 'mcp.mobius.waila:Waila:1.5.5_1.7.10'
+}
+
 processResources
 {
     // this will ensure that this task is redone when the versions change.
