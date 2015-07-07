@@ -80,7 +80,7 @@ public class SlotInventoryHolder {
 
         SlotInventoryHolder that = (SlotInventoryHolder) o;
 
-        return inventory.xCoord == that.inventory.xCoord && inventory.yCoord == that.inventory.yCoord && inventory.zCoord == that.inventory.yCoord;
+        return inventory.getPos().getX() == that.inventory.getPos().getX() && inventory.getPos().getY() == that.inventory.getPos().getY() && inventory.getPos().getZ() == that.inventory.getPos().getY();
     }
 
     @Override

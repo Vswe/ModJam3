@@ -110,17 +110,17 @@ public class CraftingBufferElement implements IItemBufferElement, IItemBufferSub
 
 
 
-        double spawnX = manager.xCoord + rand.nextDouble() * 0.8 + 0.1;
-        double spawnY = manager.yCoord + rand.nextDouble() * 0.3 + 1.1;
-        double spawnZ = manager.zCoord + rand.nextDouble() * 0.8 + 0.1;
+        double spawnX = manager.getPos().getX() + rand.nextDouble() * 0.8 + 0.1;
+        double spawnY = manager.getPos().getY() + rand.nextDouble() * 0.3 + 1.1;
+        double spawnZ = manager.getPos().getZ() + rand.nextDouble() * 0.8 + 0.1;
 
-        EntityItem entityitem = new EntityItem(manager.getWorldObj(), spawnX, spawnY, spawnZ, itemStack);
+        EntityItem entityitem = new EntityItem(manager.getWorld(), spawnX, spawnY, spawnZ, itemStack);
 
         entityitem.motionX = rand.nextGaussian() * SPEED_MULTIPLIER;
         entityitem.motionY = rand.nextGaussian() * SPEED_MULTIPLIER + 0.2F;
         entityitem.motionZ = rand.nextGaussian() * SPEED_MULTIPLIER;
 
-        manager.getWorldObj().spawnEntityInWorld(entityitem);
+        manager.getWorld().spawnEntityInWorld(entityitem);
     }
 
     @Override

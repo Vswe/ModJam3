@@ -22,7 +22,7 @@ public class ContainerRelay extends ContainerBase {
 
     @Override
     public boolean canInteractWith(EntityPlayer entityplayer) {
-        return entityplayer.getDistanceSq(relay.xCoord, relay.yCoord, relay.zCoord) <= 64;
+        return entityplayer.getDistanceSq(relay.getPos().getX(), relay.getPos().getY(), relay.getPos().getZ()) <= 64;
     }
 
     @Override
@@ -35,8 +35,8 @@ public class ContainerRelay extends ContainerBase {
     }
 
     @Override
-    public void addCraftingToCrafters(ICrafting player) {
-        super.addCraftingToCrafters(player);
+    public void onCraftGuiOpened(ICrafting player) {
+        super.onCraftGuiOpened(player);
         PacketHandler.sendAllData(this, player, relay);
         oldPermissions = new ArrayList<UserPermission>();
         for (UserPermission permission : relay.getPermissions()) {

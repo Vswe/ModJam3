@@ -1,10 +1,10 @@
 package vswe.stevesfactory.wrappers;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 
 public class InventoryWrapperHorse extends InventoryWrapper {
@@ -26,7 +26,7 @@ public class InventoryWrapperHorse extends InventoryWrapper {
 
         //armor
         }else if(i == 1 && horse.getHorseType() == 0) {
-            return horse.func_110259_cr() && EntityHorse.func_146085_a(itemstack.getItem());
+            return horse.canWearArmor() && EntityHorse.isArmorItem(itemstack.getItem());
 
         //chest
         }else {

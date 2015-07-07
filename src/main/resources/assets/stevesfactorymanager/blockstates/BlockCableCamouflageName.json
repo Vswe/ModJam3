@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "camo_type=cable_camo": { "model": "stevesfactorymanager:builtin/cable_camouflage" },
+        "camo_type=cable_camo_inside": { "model": "stevesfactorymanager:builtin/cable_camouflage" },
+        "camo_type=cable_camo_shape": { "model": "stevesfactorymanager:builtin/cable_camouflage" }
+    }
+}

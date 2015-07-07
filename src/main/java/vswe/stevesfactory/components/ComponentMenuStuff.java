@@ -1,10 +1,10 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
@@ -568,7 +568,7 @@ public abstract class ComponentMenuStuff extends ComponentMenu {
         }
 
         //if the client send data to the server, do the update right away on that client
-        if (getParent().getManager().getWorldObj().isRemote) {
+        if (getParent().getManager().getWorld().isRemote) {
             onSettingContentChange();
         }
     }

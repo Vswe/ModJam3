@@ -1,6 +1,7 @@
 package vswe.stevesfactory;
 
 
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StatCollector;
 
 public enum Localization {
@@ -14,12 +15,12 @@ public enum Localization {
     CONDITION_LONG,
     FLOW_CONTROL_SHORT,
     FLOW_CONTROL_LONG,
-    LIQUID_INPUT_SHORT,
-    LIQUID_INPUT_LONG,
-    LIQUID_OUTPUT_SHORT,
-    LIQUID_OUTPUT_LONG,
-    LIQUID_CONDITION_SHORT,
-    LIQUID_CONDITION_LONG,
+    FLUID_INPUT_SHORT,
+    FLUID_INPUT_LONG,
+    FLUID_OUTPUT_SHORT,
+    FLUID_OUTPUT_LONG,
+    FLUID_CONDITION_SHORT,
+    FLUID_CONDITION_LONG,
     REDSTONE_EMITTER_SHORT,
     REDSTONE_EMITTER_LONG,
     REDSTONE_CONDITION_SHORT,
@@ -105,7 +106,7 @@ public enum Localization {
     NO_CONDITION_ERROR,
     BUCKETS,
     MILLI_BUCKETS,
-    LIQUIDS_MENU,
+    FLUIDS_MENU,
     USE_ALL,
     REVERSED,
     LOOP_ORDER_MENU,
@@ -191,8 +192,8 @@ public enum Localization {
     VARIABLE_GREEN,
     VARIABLE_RED,
     VARIABLE_BLACK,
-    NO_LIQUID_SELECTED,
-    CHANGE_LIQUID,
+    NO_FLUID_SELECTED,
+    CHANGE_FLUID,
     EDIT_SETTING,
     NO_ITEM_SELECTED,
     CHANGE_ITEM,
@@ -378,17 +379,17 @@ public enum Localization {
         return StatCollector.translateToLocal("gui." + StevesFactoryManager.UNLOCALIZED_START + name);
     }
 
-    public static Localization getForgeDirectionLocalization(int id) {
-        switch (id) {
-            case 0:
+    public static Localization getDirectionLocalization(EnumFacing facing) {
+        switch (facing) {
+            case DOWN:
                 return DOWN;
-            case 1:
+            case UP:
                 return UP;
-            case 2:
+            case NORTH:
                 return NORTH;
-            case 3:
+            case SOUTH:
                 return SOUTH;
-            case 4:
+            case WEST:
                 return WEST;
             default:
                 return EAST;

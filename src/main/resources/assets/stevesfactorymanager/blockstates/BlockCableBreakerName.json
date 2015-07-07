@@ -1,0 +1,45 @@
+{
+    "variants": {
+        "direction=down,front=down": { "model": "stevesfactorymanager:cable_breaker_both", "x": 90},
+        "direction=up,front=down": { "model": "stevesfactorymanager:cable_breaker_op", "x": 90},
+        "direction=north,front=down": { "model": "stevesfactorymanager:cable_breaker_side", "x": 90, "y": 270},
+        "direction=south,front=down": { "model": "stevesfactorymanager:cable_breaker_side", "x": 90, "y": 90},
+        "direction=west,front=down": { "model": "stevesfactorymanager:cable_breaker_side", "x": 90, "y": 180},
+        "direction=east,front=down": { "model": "stevesfactorymanager:cable_breaker_side", "x": 90},
+
+        "direction=down,front=up": { "model": "stevesfactorymanager:cable_breaker_op", "x": 270},
+        "direction=up,front=up": { "model": "stevesfactorymanager:cable_breaker_both", "x": 270},
+        "direction=north,front=up": { "model": "stevesfactorymanager:cable_breaker_side", "x": 270, "y": 270},
+        "direction=south,front=up": { "model": "stevesfactorymanager:cable_breaker_side", "x": 270, "y": 90},
+        "direction=west,front=up": { "model": "stevesfactorymanager:cable_breaker_side", "x": 270, "y": 180},
+        "direction=east,front=up": { "model": "stevesfactorymanager:cable_breaker_side", "x": 270},
+
+        "direction=down,front=north": { "model": "stevesfactorymanager:cable_breaker_up", "x": 180, "y": 180},
+        "direction=up,front=north": { "model": "stevesfactorymanager:cable_breaker_up"},
+        "direction=north,front=north": { "model": "stevesfactorymanager:cable_breaker_both"},
+        "direction=south,front=north": { "model": "stevesfactorymanager:cable_breaker_op"},
+        "direction=west,front=north": { "model": "stevesfactorymanager:cable_breaker_side", "x": 180, "y": 180},
+        "direction=east,front=north": { "model": "stevesfactorymanager:cable_breaker_side"},
+
+        "direction=down,front=south": { "model": "stevesfactorymanager:cable_breaker_up", "x": 180},
+        "direction=up,front=south": { "model": "stevesfactorymanager:cable_breaker_up", "y": 180},
+        "direction=north,front=south": { "model": "stevesfactorymanager:cable_breaker_op", "y": 180},
+        "direction=south,front=south": { "model": "stevesfactorymanager:cable_breaker_both", "y": 180},
+        "direction=west,front=south": { "model": "stevesfactorymanager:cable_breaker_side", "y": 180},
+        "direction=east,front=south": { "model": "stevesfactorymanager:cable_breaker_side", "x": 180},
+
+        "direction=down,front=west": { "model": "stevesfactorymanager:cable_breaker_up", "x": 180, "y": 90},
+        "direction=up,front=west": { "model": "stevesfactorymanager:cable_breaker_up", "y": 270},
+        "direction=north,front=west": { "model": "stevesfactorymanager:cable_breaker_side", "y": 270},
+        "direction=south,front=west": { "model": "stevesfactorymanager:cable_breaker_side", "y": 90, "x": 180},
+        "direction=west,front=west": { "model": "stevesfactorymanager:cable_breaker_both", "y": 270},
+        "direction=east,front=west": { "model": "stevesfactorymanager:cable_breaker_op", "y": 270},
+
+        "direction=down,front=east": { "model": "stevesfactorymanager:cable_breaker_up", "x": 180, "y": 270},
+        "direction=up,front=east": { "model": "stevesfactorymanager:cable_breaker_up", "y": 90},
+        "direction=north,front=east": { "model": "stevesfactorymanager:cable_breaker_side", "y": 270, "x": 180},
+        "direction=south,front=east": { "model": "stevesfactorymanager:cable_breaker_side", "y": 90},
+        "direction=west,front=east": { "model": "stevesfactorymanager:cable_breaker_op", "y": 90},
+        "direction=east,front=east": { "model": "stevesfactorymanager:cable_breaker_both", "y": 90}
+    }
+}

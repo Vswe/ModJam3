@@ -1,33 +1,25 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.ConnectionBlock;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.TileEntityManager;
-import vswe.stevesfactory.interfaces.Color;
-import vswe.stevesfactory.interfaces.ContainerManager;
-import vswe.stevesfactory.interfaces.GuiBase;
-import vswe.stevesfactory.interfaces.GuiManager;
-import vswe.stevesfactory.interfaces.IAdvancedTooltip;
+import vswe.stevesfactory.interfaces.*;
 import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
@@ -190,18 +182,18 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
 
                 @SideOnly(Side.CLIENT)
                 public ToolTip(GuiManager gui, ConnectionBlock block) {
-                    items = new ItemStack[ForgeDirection.VALID_DIRECTIONS.length];
-                    itemTexts = new List[ForgeDirection.VALID_DIRECTIONS.length];
+                    items = new ItemStack[EnumFacing.values().length];
+                    itemTexts = new List[EnumFacing.values().length];
 
-                    World world = block.getTileEntity().getWorldObj();
-                    int x = block.getTileEntity().xCoord;
-                    int y = block.getTileEntity().yCoord;
-                    int z = block.getTileEntity().zCoord;
+                    World world = block.getTileEntity().getWorld();
+                    int x = block.getTileEntity().getPos().getX();
+                    int y = block.getTileEntity().getPos().getY();
+                    int z = block.getTileEntity().getPos().getZ();
 
-                    for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
-                        int targetX = x + direction.offsetX;
-                        int targetY = y + direction.offsetY;
-                        int targetZ = z + direction.offsetZ;
+                    for (EnumFacing direction : EnumFacing.values()) {
+                        int targetX = x + direction.getFrontOffsetX();
+                        int targetY = y + direction.getFrontOffsetY();
+                        int targetZ = z + direction.getFrontOffsetZ();
 
                         ItemStack item = gui.getItemStackFromBlock(world, targetX, targetY, targetZ);
                         items[direction.ordinal()] = item;
@@ -210,15 +202,15 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                         if (item != null && item.getItem() != null) {
                             text.add(gui.getItemName(item));
                         }
-                        String side = Localization.getForgeDirectionLocalization(direction.ordinal()).toString();
+                        String side = Localization.getDirectionLocalization(direction).toString();
                         text.add(Color.YELLOW + side);
 
-                        TileEntity te = world.getTileEntity(targetX, targetY, targetZ);
+                        TileEntity te = world.getTileEntity(new BlockPos(targetX, targetY, targetZ));
                         if (te instanceof TileEntitySign) {
                             TileEntitySign sign = (TileEntitySign)te;
-                            for (String txt : sign.signText) {
-                                if (!txt.isEmpty()) {
-                                    text.add(Color.GRAY + txt);
+                            for (IChatComponent txt : sign.signText) {
+                                if (!txt.getFormattedText().isEmpty()) {
+                                    text.add(Color.GRAY + txt.getFormattedText());
                                 }
                             }
                         }
@@ -256,8 +248,8 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 private static final int SRC_Y = 20;
 
                 @SideOnly(Side.CLIENT)
-                private void drawBlock(GuiBase gui, int x, int y, int mX, int mY, ForgeDirection direction) {
-                    GL11.glColor4f(1, 1, 1, 1);
+                private void drawBlock(GuiBase gui, int x, int y, int mX, int mY, EnumFacing direction) {
+                    GlStateManager.color(1, 1, 1, 1);
                     GuiBase.bindTexture(gui.getComponentResource());
                     gui.drawTexture(x, y, SRC_X, SRC_Y + (CollisionHelper.inBounds(x, y, 16, 16, mX, mY) ? 16 : 0), 16, 16);
 
@@ -269,7 +261,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 }
 
                 @SideOnly(Side.CLIENT)
-                private boolean drawBlockMouseOver(GuiBase gui, int x, int y, int mX, int mY, ForgeDirection direction) {
+                private boolean drawBlockMouseOver(GuiBase gui, int x, int y, int mX, int mY, EnumFacing direction) {
                     if (CollisionHelper.inBounds(x, y, 16, 16, mX, mY)) {
                         List<String> itemText = itemTexts[direction.ordinal()];
                         if (itemText != null) {
@@ -285,25 +277,25 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                 @SideOnly(Side.CLIENT)
                 @Override
                 public void drawContent(GuiBase gui, int x, int y, int mX, int mY) {
-                    drawBlock(gui, x + 25, y + 5, mX, mY, ForgeDirection.NORTH);
-                    drawBlock(gui, x + 5, y + 25, mX, mY, ForgeDirection.WEST);
-                    drawBlock(gui, x + 25, y + 45, mX, mY, ForgeDirection.SOUTH);
-                    drawBlock(gui, x + 45, y + 25, mX, mY, ForgeDirection.EAST);
+                    drawBlock(gui, x + 25, y + 5, mX, mY, EnumFacing.NORTH);
+                    drawBlock(gui, x + 5, y + 25, mX, mY, EnumFacing.WEST);
+                    drawBlock(gui, x + 25, y + 45, mX, mY, EnumFacing.SOUTH);
+                    drawBlock(gui, x + 45, y + 25, mX, mY, EnumFacing.EAST);
 
-                    drawBlock(gui, x + 80, y + 15, mX, mY, ForgeDirection.UP);
-                    drawBlock(gui, x + 80, y + 35, mX, mY, ForgeDirection.DOWN);
+                    drawBlock(gui, x + 80, y + 15, mX, mY, EnumFacing.UP);
+                    drawBlock(gui, x + 80, y + 35, mX, mY, EnumFacing.DOWN);
                 }
 
                 @SideOnly(Side.CLIENT)
                 private void drawMouseOverMouseOver(GuiBase gui, int x, int y, int mX, int mY) {
                     boolean ignored =
-                    drawBlockMouseOver(gui, x + 25, y + 5, mX, mY, ForgeDirection.NORTH) ||
-                    drawBlockMouseOver(gui, x + 5, y + 25, mX, mY, ForgeDirection.WEST) ||
-                    drawBlockMouseOver(gui, x + 25, y + 45, mX, mY, ForgeDirection.SOUTH) ||
-                    drawBlockMouseOver(gui, x + 45, y + 25, mX, mY, ForgeDirection.EAST) ||
+                    drawBlockMouseOver(gui, x + 25, y + 5, mX, mY, EnumFacing.NORTH) ||
+                    drawBlockMouseOver(gui, x + 5, y + 25, mX, mY, EnumFacing.WEST) ||
+                    drawBlockMouseOver(gui, x + 25, y + 45, mX, mY, EnumFacing.SOUTH) ||
+                    drawBlockMouseOver(gui, x + 45, y + 25, mX, mY, EnumFacing.EAST) ||
 
-                    drawBlockMouseOver(gui, x + 80, y + 15, mX, mY, ForgeDirection.UP) ||
-                    drawBlockMouseOver(gui, x + 80, y + 35, mX, mY, ForgeDirection.DOWN);
+                    drawBlockMouseOver(gui, x + 80, y + 15, mX, mY, EnumFacing.UP) ||
+                    drawBlockMouseOver(gui, x + 80, y + 35, mX, mY, EnumFacing.DOWN);
                 }
 
                 @SideOnly(Side.CLIENT)
@@ -573,9 +565,9 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
             if (CollisionHelper.inBounds(5, 60, MENU_WIDTH - 20, 5, mX, mY)) {
                 String str = Localization.ABSOLUTE_RANGES.toString() + ":";
 
-                str += "\n" + Localization.X.toString() + " (" + (filter.lowerRange[0].getNumber() + getParent().getManager().xCoord) + ", " + (filter.higherRange[0].getNumber() + getParent().getManager().xCoord) + ")";
-                str += "\n" + Localization.Y.toString() + " (" + (filter.lowerRange[1].getNumber() + getParent().getManager().yCoord) + ", " + (filter.higherRange[1].getNumber() + getParent().getManager().yCoord) + ")";
-                str += "\n" + Localization.Z.toString() + " (" + (filter.lowerRange[2].getNumber() + getParent().getManager().zCoord) + ", " + (filter.higherRange[2].getNumber() + getParent().getManager().zCoord) + ")";
+                str += "\n" + Localization.X.toString() + " (" + (filter.lowerRange[0].getNumber() + getParent().getManager().getPos().getX()) + ", " + (filter.higherRange[0].getNumber() + getParent().getManager().getPos().getX()) + ")";
+                str += "\n" + Localization.Y.toString() + " (" + (filter.lowerRange[1].getNumber() + getParent().getManager().getPos().getY()) + ", " + (filter.higherRange[1].getNumber() + getParent().getManager().getPos().getY()) + ")";
+                str += "\n" + Localization.Z.toString() + " (" + (filter.lowerRange[2].getNumber() + getParent().getManager().getPos().getZ()) + ", " + (filter.higherRange[2].getNumber() + getParent().getManager().getPos().getZ()) + ")";
 
                 gui.drawMouseOver(str, mX, mY);
             }

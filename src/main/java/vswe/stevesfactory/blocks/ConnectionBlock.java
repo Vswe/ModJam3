@@ -1,9 +1,9 @@
 package vswe.stevesfactory.blocks;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.components.ComponentMenuContainer;
 import vswe.stevesfactory.components.IContainerSelection;
@@ -71,7 +71,7 @@ public class ConnectionBlock implements IContainerSelection {
 
         str += getVariableTag(gui);
 
-        str += "\n" + Localization.X + ": " + tileEntity.xCoord + " " + Localization.Y + ": " + tileEntity.yCoord + " " + Localization.Z + ": " + tileEntity.zCoord;
+        str += "\n" + Localization.X + ": " + tileEntity.getPos().getX() + " " + Localization.Y + ": " + tileEntity.getPos().getY() + " " + Localization.Z + ": " + tileEntity.getPos().getZ();
         int distance = getDistance(gui.getManager());
         str += "\n" + distance + " " + (distance > 1 ? Localization.BLOCKS_AWAY : Localization.BLOCK_AWAY);
         str += "\n" + cableDistance + " " + (cableDistance > 1 ? Localization.CABLES_AWAY : Localization.CABLE_AWAY);
@@ -81,7 +81,7 @@ public class ConnectionBlock implements IContainerSelection {
 
 
     public int getDistance(TileEntityManager manager) {
-        return (int)Math.round(Math.sqrt(manager.getDistanceFrom(tileEntity.xCoord + 0.5, tileEntity.yCoord + 0.5, tileEntity.zCoord + 0.5)));
+        return (int)Math.round(Math.sqrt(manager.getDistanceSq(tileEntity.getPos().getX() + 0.5, tileEntity.getPos().getY() + 0.5, tileEntity.getPos().getZ() + 0.5)));
     }
 
     public int getCableDistance() {

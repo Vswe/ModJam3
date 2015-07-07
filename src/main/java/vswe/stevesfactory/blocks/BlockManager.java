@@ -1,21 +1,23 @@
 package vswe.stevesfactory.blocks;
 
 
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import vswe.stevesfactory.GeneratedInfo;
 import vswe.stevesfactory.StevesFactoryManager;
 
@@ -23,10 +25,27 @@ public class BlockManager extends BlockContainer {
     public BlockManager() {
         super(Material.iron);
 
-        setBlockName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.MANAGER_UNLOCALIZED_NAME);
+        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.MANAGER_UNLOCALIZED_NAME);
         setStepSound(soundTypeMetal);
         setCreativeTab(ModBlocks.creativeTab);
         setHardness(2F);
+    }
+
+    public static final IProperty LIMITLESS = PropertyBool.create("limitless");
+
+    @Override
+    protected BlockState createBlockState() {
+        return new BlockState(this, LIMITLESS);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(LIMITLESS, meta == 1);
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return (Boolean) state.getValue(LIMITLESS) ? 1 : 0;
     }
 
 
@@ -36,66 +55,42 @@ public class BlockManager extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float xSide, float ySide, float zSide) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float xSide, float ySide, float zSide) {
         if (!world.isRemote) {
-            FMLNetworkHandler.openGui(player, StevesFactoryManager.instance, 0, world, x, y, z);
+            FMLNetworkHandler.openGui(player, StevesFactoryManager.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
         }
 
         return true;
     }
 
-    @SideOnly(Side.CLIENT)
-    private IIcon sideIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon topIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon botIcon;
-
-    @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister register) {
-        sideIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":manager_side");
-        topIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":manager_top");
-        botIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":manager_bot");
-    }
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+        super.onBlockAdded(world, pos, state);
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public IIcon getIcon(int side, int meta) {
-        if (side == 0) {
-            return botIcon;
-        }else if(side == 1) {
-            return topIcon;
-        }else{
-            return sideIcon;
-        }
+        updateInventories(world, pos);
     }
 
     @Override
-    public void onBlockAdded(World world, int x, int y, int z) {
-        super.onBlockAdded(world, x, y, z);
+    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
+        super.onNeighborBlockChange(world, pos, state, block);
 
-        updateInventories(world, x, y, z);  
+        updateInventories(world, pos);
     }
 
     @Override
-    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-        super.onNeighborBlockChange(world, x, y, z, block);
-
-        updateInventories(world, x, y, z);
+    public int getRenderType() {
+        return 3;
     }
-
-
 
     @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        super.breakBlock(world, x, y, z, block, meta);
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        super.breakBlock(world, pos, state);
 
-        updateInventories(world, x, y, z);
+        updateInventories(world, pos);
     }
 
-    private void updateInventories(World world, int x, int y, int z) {
-        TileEntity tileEntity = world.getTileEntity(x, y, z);
+    private void updateInventories(World world, BlockPos pos) {
+        TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity != null && tileEntity instanceof TileEntityManager) {
             ((TileEntityManager)tileEntity).updateInventories();
         }
@@ -103,18 +98,18 @@ public class BlockManager extends BlockContainer {
 
 
    @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player) {
        if (GeneratedInfo.inDev) {
             System.out.println("Picked" + world.isRemote);
-            TileEntity te = world.getTileEntity(x, y, z);
+            TileEntity te = world.getTileEntity(pos);
             if (te != null && te instanceof TileEntityManager) {
                 TileEntityManager manager = (TileEntityManager)te;
 
-                if (manager.xCoord != x || manager.yCoord != y || manager.zCoord != z) {
+                if (manager.getPos().getX() != pos.getX() || manager.getPos().getY() != pos.getY() || manager.getPos().getZ() != pos.getZ()) {
                     return null;
                 }
 
-                ItemStack itemStack = super.getPickBlock(target, world, x, y, z);
+                ItemStack itemStack = super.getPickBlock(target, world, pos, player);
                 if (itemStack != null) {
                     NBTTagCompound tagCompound = itemStack.getTagCompound();
                     if (tagCompound == null) {
@@ -134,16 +129,16 @@ public class BlockManager extends BlockContainer {
             System.out.println("failed to write");
             return  null;
        }else{
-           return super.getPickBlock(target, world, x, y, z);
+           return super.getPickBlock(target, world, pos, player);
        }
     }
 
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemStack) {
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack itemStack) {
         if (GeneratedInfo.inDev) {
             System.out.println("Placed" + world.isRemote);
-            TileEntity te = world.getTileEntity(x, y, z);
+            TileEntity te = world.getTileEntity(pos);
             if (te != null && te instanceof TileEntityManager) {
                 TileEntityManager manager = (TileEntityManager)te;
                 if (itemStack.hasTagCompound() && itemStack.getTagCompound().hasKey("Manager")) {
@@ -154,7 +149,7 @@ public class BlockManager extends BlockContainer {
                 }
             }
         }else{
-            super.onBlockPlacedBy(world, x, y, z, entity, itemStack);
+            super.onBlockPlacedBy(world, pos, state, entity, itemStack);
         }
     }
 

@@ -1,11 +1,11 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.Item;
-
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
+import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ public final class ModItemHelper {
         for (int i = 0; i < keys.length; i++) {
 
 
-            Item item = (Item) itemRegistry.getObject(keys[i]);
+            Item item = (Item) itemRegistry.getObject((ResourceLocation) keys[i]);
             GameRegistry.UniqueIdentifier uniqueIdentity = GameRegistry.findUniqueIdentifierFor(item);
             String modId = uniqueIdentity == null ? null : uniqueIdentity.modId;
 

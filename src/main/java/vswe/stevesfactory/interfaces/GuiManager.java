@@ -1,16 +1,15 @@
 package vswe.stevesfactory.interfaces;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
-import vswe.stevesfactory.StevesFactoryManager;
 import vswe.stevesfactory.animation.AnimationController;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.FlowComponent;
@@ -18,6 +17,7 @@ import vswe.stevesfactory.network.DataBitHelper;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,13 +53,13 @@ public class GuiManager extends GuiBase {
     public void drawWorldBackground(int val) {
         if (usePinkScreen) {
             drawRect(0, 0, width, height, 0xFFEC008C);
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }else if (useBlueScreen) {
             drawRect(0, 0, width, height, 0xFF000A91);
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }else if (useGreenScreen) {
             drawRect(0, 0, width, height, 0xFF00FF00);
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }else{
             super.drawWorldBackground(val);
         }
@@ -73,7 +73,7 @@ public class GuiManager extends GuiBase {
 
 
         if (!useGreenScreen && !useBlueScreen && !usePinkScreen) {
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             bindTexture(BACKGROUND_1);
             drawTexture(0, 0, 0, 0, 256, 256);
 
@@ -172,10 +172,9 @@ public class GuiManager extends GuiBase {
         }
     }
 
-    public void handleMouseInput() {
+    @Override
+    public void handleMouseInput() throws IOException {
         super.handleMouseInput();
-
-
 
         int scroll = Mouse.getEventDWheel();
         if (scroll != 0) {
@@ -217,7 +216,7 @@ public class GuiManager extends GuiBase {
     }
 
     @Override
-    protected void mouseClicked(int x, int y, int button) {
+    protected void mouseClicked(int x, int y, int button) throws IOException {
         x = scaleX(x);
         y = scaleY(y);
 
@@ -283,11 +282,11 @@ public class GuiManager extends GuiBase {
     }
 
     @Override
-    protected void mouseMovedOrUp(int x, int y, int button) {
+    protected void mouseReleased(int x, int y, int button) {
         x = scaleX(x);
         y = scaleY(y);
 
-        super.mouseMovedOrUp(x, y, button);
+        super.mouseReleased(x, y, button);
 
         x -= guiLeft;
         y -= guiTop;
@@ -432,7 +431,7 @@ public class GuiManager extends GuiBase {
     }
 
     @Override
-    protected void keyTyped(char c, int k) {
+    protected void keyTyped(char c, int k) throws IOException{
         if (hasSpecialRenderer()) {
             getSpecialRenderer().onKeyTyped(this, c, k);
         }else{

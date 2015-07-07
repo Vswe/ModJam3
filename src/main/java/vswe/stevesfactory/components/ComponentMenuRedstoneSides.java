@@ -1,10 +1,10 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
@@ -24,7 +24,7 @@ public abstract class ComponentMenuRedstoneSides extends ComponentMenu {
 
         checkBoxList = new CheckBoxList();
 
-        for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
+        for (int i = 0; i < EnumFacing.values().length; i++) {
             checkBoxList.addCheckBox(new CheckBoxSide(i));
         }
 
@@ -59,7 +59,7 @@ public abstract class ComponentMenuRedstoneSides extends ComponentMenu {
     private class CheckBoxSide extends CheckBox {
         private int id;
         public CheckBoxSide(int id) {
-            super(Localization.getForgeDirectionLocalization(id), CHECKBOX_X + CHECKBOX_SPACING_X * (id % 2), CHECKBOX_Y + CHECKBOX_SPACING_Y * (id / 2));
+            super(Localization.getDirectionLocalization(EnumFacing.getFront(id)), CHECKBOX_X + CHECKBOX_SPACING_X * (id % 2), CHECKBOX_Y + CHECKBOX_SPACING_Y * (id / 2));
 
             this.id = id;
         }

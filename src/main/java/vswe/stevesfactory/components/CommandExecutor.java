@@ -5,7 +5,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
@@ -23,7 +23,7 @@ public class CommandExecutor {
     List<ItemBufferElement> itemBuffer;
     List<CraftingBufferElement> craftingBufferHigh;
     List<CraftingBufferElement> craftingBufferLow;
-    List<LiquidBufferElement> liquidBuffer;
+    List<FluidBufferElement> fluidBuffer;
     private List<Integer> usedCommands;
 
     public static final int MAX_FLUID_TRANSFER = 10000000;
@@ -34,17 +34,17 @@ public class CommandExecutor {
         itemBuffer = new ArrayList<ItemBufferElement>();
         craftingBufferHigh = new ArrayList<CraftingBufferElement>();
         craftingBufferLow = new ArrayList<CraftingBufferElement>();
-        liquidBuffer = new ArrayList<LiquidBufferElement>();
+        fluidBuffer = new ArrayList<FluidBufferElement>();
         usedCommands = new ArrayList<Integer>();
     }
 
-    private CommandExecutor(TileEntityManager manager, List<ItemBufferElement> itemBufferSplit, List<CraftingBufferElement> craftingBufferHighSplit, List<CraftingBufferElement> craftingBufferLowSplit, List<LiquidBufferElement> liquidBufferSplit, List<Integer> usedCommandCopy) {
+    private CommandExecutor(TileEntityManager manager, List<ItemBufferElement> itemBufferSplit, List<CraftingBufferElement> craftingBufferHighSplit, List<CraftingBufferElement> craftingBufferLowSplit, List<FluidBufferElement> fluidBufferSplit, List<Integer> usedCommandCopy) {
         this.manager = manager;
         this.itemBuffer = itemBufferSplit;
         this.craftingBufferHigh = craftingBufferHighSplit;
         this.craftingBufferLow = craftingBufferLowSplit;
         this.usedCommands = usedCommandCopy;
-        this.liquidBuffer = liquidBufferSplit;
+        this.fluidBuffer = fluidBufferSplit;
     }
 
     public void executeTriggerCommand(FlowComponent command, EnumSet<ConnectionOption> validTriggerOutputs) {
@@ -105,21 +105,21 @@ public class CommandExecutor {
                         }
                     }
                     return;
-                case LIQUID_INPUT:
+                case FLUID_INPUT:
                     List<SlotInventoryHolder> inputTank = getTanks(command.getMenus().get(0));
                     if (inputTank != null) {
                         getValidTanks(command.getMenus().get(1), inputTank);
-                        getLiquids(command.getMenus().get(2), inputTank);
+                        getFluids(command.getMenus().get(2), inputTank);
                     }
                     break;
-                case LIQUID_OUTPUT:
+                case FLUID_OUTPUT:
                     List<SlotInventoryHolder> outputTank = getTanks(command.getMenus().get(0));
                     if (outputTank != null) {
                         getValidTanks(command.getMenus().get(1), outputTank);
-                        insertLiquids(command.getMenus().get(2), outputTank);
+                        insertFluids(command.getMenus().get(2), outputTank);
                     }
                     break;
-                case LIQUID_CONDITION:
+                case FLUID_CONDITION:
                     List<SlotInventoryHolder> conditionTank = getTanks(command.getMenus().get(0));
                     if (conditionTank != null) {
                         getValidTanks(command.getMenus().get(1), conditionTank);
@@ -205,7 +205,7 @@ public class CommandExecutor {
                             ItemStack itemStack = items.isFirstRadioButtonSelected() ? null : ((ItemSetting)items.getSettings().get(0)).getItem();
                             for (SlotInventoryHolder slotInventoryHolder : camouflage) {
                                 slotInventoryHolder.getCamouflage().setBounds(shape);
-                                for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
+                                for (int i = 0; i < EnumFacing.values().length; i++) {
                                     if (sides.isSideRequired(i)) {
                                         slotInventoryHolder.getCamouflage().setItem(itemStack, i, inside.getCurrentType());
                                     }
@@ -314,7 +314,7 @@ public class CommandExecutor {
 
     private static boolean containsTe(List<SlotInventoryHolder> lst, TileEntity te) {
         for (SlotInventoryHolder slotInventoryHolder : lst) {
-            if (slotInventoryHolder.getTile().xCoord == te.xCoord && slotInventoryHolder.getTile().yCoord == te.yCoord && slotInventoryHolder.getTile().zCoord == te.zCoord && slotInventoryHolder.getTile().getClass().equals(te.getClass())) {
+            if (slotInventoryHolder.getTile().getPos().getX() == te.getPos().getX() && slotInventoryHolder.getTile().getPos().getY() == te.getPos().getY() && slotInventoryHolder.getTile().getPos().getZ() == te.getPos().getZ() && slotInventoryHolder.getTile().getClass().equals(te.getClass())) {
                 return true;
             }
         }
@@ -332,7 +332,7 @@ public class CommandExecutor {
                 if (menuTarget.isActive(side)) {
                     int[] inventoryValidSlots;
                     if (inventory instanceof ISidedInventory) {
-                        inventoryValidSlots =  ((ISidedInventory) inventory).getAccessibleSlotsFromSide(side);
+                        inventoryValidSlots =  ((ISidedInventory) inventory).getSlotsForFace(EnumFacing.getFront(side));
                     }else{
                         inventoryValidSlots = new int[inventory.getSizeInventory()];
                         for (int j = 0; j < inventoryValidSlots.length; j++) {
@@ -416,10 +416,10 @@ public class CommandExecutor {
         }else if (inventory instanceof ISidedInventory) {
             boolean hasValidSide = false;
             for (int side : slot.getSides()) {
-                if (isInput && ((ISidedInventory)inventory).canExtractItem(slot.getSlot(), item, side)) {
+                if (isInput && ((ISidedInventory)inventory).canExtractItem(slot.getSlot(), item, EnumFacing.getFront(side))) {
                     hasValidSide = true;
                     break;
-                }else if (!isInput && ((ISidedInventory)inventory).canInsertItem(slot.getSlot(), item, side)) {
+                }else if (!isInput && ((ISidedInventory)inventory).canInsertItem(slot.getSlot(), item, EnumFacing.getFront(side))) {
                     hasValidSide = true;
                     break;
                 }
@@ -488,19 +488,19 @@ public class CommandExecutor {
         }
     }
 
-    private void getLiquids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
+    private void getFluids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
         for (SlotInventoryHolder tank : tanks) {
             ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
             if (tank.getTank() instanceof TileEntityCreative) {
                 if (menuItem.useWhiteList()) {
                     for (SlotSideTarget slot : tank.getValidSlots().values()) {
                         for (Setting setting : menuItem.getSettings()) {
-                            Fluid fluid = ((LiquidSetting)setting).getFluid();
+                            Fluid fluid = ((FluidSetting)setting).getFluid();
                             if (fluid != null) {
-                                FluidStack liquid = new FluidStack(fluid, setting.isLimitedByAmount() ? setting.getAmount() : setting.getDefaultAmount());
+                                FluidStack fluidStack = new FluidStack(fluid, setting.isLimitedByAmount() ? setting.getAmount() : setting.getDefaultAmount());
 
-                                if (liquid != null) {
-                                    addLiquidToBuffer(menuItem, tank, setting, liquid, 0);
+                                if (fluidStack != null) {
+                                    addFluidToBuffer(menuItem, tank, setting, fluidStack, 0);
                                 }
                             }
                         }
@@ -510,7 +510,7 @@ public class CommandExecutor {
                 for (SlotSideTarget slot : tank.getValidSlots().values()) {
                     List<FluidTankInfo> tankInfos = new ArrayList<FluidTankInfo>();
                     for (int side : slot.getSides()) {
-                        FluidTankInfo[] currentTankInfos = tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side]);
+                        FluidTankInfo[] currentTankInfos = tank.getTank().getTankInfo(EnumFacing.getFront(side));
                         if (currentTankInfos == null) {
                             continue;
                         }
@@ -538,11 +538,11 @@ public class CommandExecutor {
 
                             fluidStack = fluidStack.copy();
 
-                            Setting setting = isLiquidValid(componentMenu, fluidStack);
-                            addLiquidToBuffer(menuItem, tank, setting, fluidStack, side);
+                            Setting setting = isFluidValid(componentMenu, fluidStack);
+                            addFluidToBuffer(menuItem, tank, setting, fluidStack, side);
                         }
 
-                        for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
+                        for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(EnumFacing.getFront(side))) {
                             if (fluidTankInfo != null) {
                                 tankInfos.add(fluidTankInfo);
                             }
@@ -554,22 +554,22 @@ public class CommandExecutor {
     }
 
 
-    private void addLiquidToBuffer(ComponentMenuStuff menuItem, SlotInventoryHolder tank, Setting setting, FluidStack fluidStack, int side) {
+    private void addFluidToBuffer(ComponentMenuStuff menuItem, SlotInventoryHolder tank, Setting setting, FluidStack fluidStack, int side) {
         if ((menuItem.useWhiteList() == (setting != null)) || (setting != null && setting.isLimitedByAmount())) {
             FlowComponent owner = menuItem.getParent();
-            StackTankHolder target = new StackTankHolder(fluidStack, tank.getTank(), ForgeDirection.VALID_DIRECTIONS[side]);
+            StackTankHolder target = new StackTankHolder(fluidStack, tank.getTank(), EnumFacing.getFront(side));
 
             boolean added = false;
-            for (LiquidBufferElement liquidBufferElement : liquidBuffer) {
-                if (liquidBufferElement.addTarget(owner, setting, tank, target)) {
+            for (FluidBufferElement fluidBufferElement : fluidBuffer) {
+                if (fluidBufferElement.addTarget(owner, setting, tank, target)) {
                     added = true;
                     break;
                 }
             }
 
             if (!added) {
-                LiquidBufferElement itemBufferElement = new LiquidBufferElement(owner, setting, tank, menuItem.useWhiteList(), target);
-                liquidBuffer.add(itemBufferElement);
+                FluidBufferElement itemBufferElement = new FluidBufferElement(owner, setting, tank, menuItem.useWhiteList(), target);
+                fluidBuffer.add(itemBufferElement);
             }
 
         }
@@ -587,13 +587,13 @@ public class CommandExecutor {
         return null;
     }
 
-    private Setting isLiquidValid(ComponentMenu componentMenu, FluidStack fluidStack)  {
+    private Setting isFluidValid(ComponentMenu componentMenu, FluidStack fluidStack)  {
         ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
 
         if (fluidStack != null)  {
-            int fluidId = fluidStack.fluidID;
+            String fluidName = fluidStack.getFluid().getName();
             for (Setting setting : menuItem.getSettings()) {
-                if (setting.isValid() && ((LiquidSetting)setting).getLiquidId() == fluidId) {
+                if (setting.isValid() && ((FluidSetting)setting).getFluidName().equals(fluidName)) {
                     return setting;
                 }
             }
@@ -703,43 +703,43 @@ public class CommandExecutor {
     }
 
 
-    private void insertLiquids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
+    private void insertFluids(ComponentMenu componentMenu, List<SlotInventoryHolder> tanks) {
         ComponentMenuStuff menuItem = (ComponentMenuStuff)componentMenu;
 
-        List<OutputLiquidCounter> outputCounters = new ArrayList<OutputLiquidCounter>();
+        List<OutputFluidCounter> outputCounters = new ArrayList<OutputFluidCounter>();
         for (SlotInventoryHolder tankHolder : tanks) {
             if (!tankHolder.isShared()) {
                 outputCounters.clear();
             }
 
             IFluidHandler tank = tankHolder.getTank();
-            Iterator<LiquidBufferElement> bufferIterator = liquidBuffer.iterator();
+            Iterator<FluidBufferElement> bufferIterator = fluidBuffer.iterator();
             while(bufferIterator.hasNext()) {
-                LiquidBufferElement liquidBufferElement = bufferIterator.next();
+                FluidBufferElement fluidBufferElement = bufferIterator.next();
 
 
-                Iterator<StackTankHolder> liquidIterator = liquidBufferElement.getHolders().iterator();
-                while (liquidIterator.hasNext()) {
-                    StackTankHolder holder = liquidIterator.next();
+                Iterator<StackTankHolder> fluidIterator = fluidBufferElement.getHolders().iterator();
+                while (fluidIterator.hasNext()) {
+                    StackTankHolder holder = fluidIterator.next();
                     FluidStack fluidStack = holder.getFluidStack();
 
-                    Setting setting = isLiquidValid(componentMenu, fluidStack);
+                    Setting setting = isFluidValid(componentMenu, fluidStack);
 
                     if ((menuItem.useWhiteList() == (setting == null)) &&  (setting == null || !setting.isLimitedByAmount())) {
                         continue;
                     }
 
-                    OutputLiquidCounter outputLiquidCounter = null;
-                    for (OutputLiquidCounter e : outputCounters) {
+                    OutputFluidCounter outputFluidCounter = null;
+                    for (OutputFluidCounter e : outputCounters) {
                         if (e.areSettingsSame(setting)) {
-                            outputLiquidCounter = e;
+                            outputFluidCounter = e;
                             break;
                         }
                     }
 
-                    if (outputLiquidCounter == null) {
-                        outputLiquidCounter = new OutputLiquidCounter(liquidBuffer, tanks, tankHolder, setting, menuItem.useWhiteList());
-                        outputCounters.add(outputLiquidCounter);
+                    if (outputFluidCounter == null) {
+                        outputFluidCounter = new OutputFluidCounter(fluidBuffer, tanks, tankHolder, setting, menuItem.useWhiteList());
+                        outputCounters.add(outputFluidCounter);
                     }
 
                     for (SlotSideTarget slot : tankHolder.getValidSlots().values()) {
@@ -747,9 +747,9 @@ public class CommandExecutor {
                         for (int side : slot.getSides()) {
                             FluidStack temp = fluidStack.copy();
                             temp.amount = holder.getSizeLeft();
-                            int amount = tank.fill(ForgeDirection.VALID_DIRECTIONS[side], temp, false);
-                            amount = liquidBufferElement.retrieveItemCount(amount);
-                            amount = outputLiquidCounter.retrieveItemCount(amount);
+                            int amount = tank.fill(EnumFacing.getFront(side), temp, false);
+                            amount = fluidBufferElement.retrieveItemCount(amount);
+                            amount = outputFluidCounter.retrieveItemCount(amount);
 
                             if (amount > 0) {
                                 FluidStack resource = fluidStack.copy();
@@ -757,12 +757,12 @@ public class CommandExecutor {
 
                                 resource = holder.getTank().drain(holder.getSide(), resource, true);
                                 if (resource != null && resource.amount > 0) {
-                                    tank.fill(ForgeDirection.VALID_DIRECTIONS[side], resource, true);
-                                    liquidBufferElement.decreaseStackSize(resource.amount);
-                                    outputLiquidCounter.modifyStackSize(resource.amount);
+                                    tank.fill(EnumFacing.getFront(side), resource, true);
+                                    fluidBufferElement.decreaseStackSize(resource.amount);
+                                    outputFluidCounter.modifyStackSize(resource.amount);
                                     holder.reduceAmount(resource.amount);
                                     if (holder.getSizeLeft() == 0) {
-                                        liquidIterator.remove();
+                                        fluidIterator.remove();
                                         break;
                                     }
                                 }
@@ -779,18 +779,18 @@ public class CommandExecutor {
 
     }
 
-    private boolean searchForStuff(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories, boolean useLiquids) {
+    private boolean searchForStuff(ComponentMenu componentMenu, List<SlotInventoryHolder> inventories, boolean useFluids) {
         if (inventories.get(0).isShared()) {
             Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<Integer, ConditionSettingChecker>();
             for (int i = 0; i < inventories.size(); i++) {
-                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap, useLiquids);
+                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap, useFluids);
             }
             return checkConditionResult(componentMenu, conditionSettingCheckerMap);
         }else{
             boolean useAnd = inventories.get(0).getSharedOption() == 1;
             for (int i = 0; i < inventories.size(); i++) {
                 Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap = new HashMap<Integer, ConditionSettingChecker>();
-                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap, useLiquids);
+                calculateConditionData(componentMenu, inventories.get(i), conditionSettingCheckerMap, useFluids);
 
                 if (checkConditionResult(componentMenu, conditionSettingCheckerMap)) {
                     if (!useAnd) {
@@ -804,9 +804,9 @@ public class CommandExecutor {
         }
     }
 
-    private void calculateConditionData(ComponentMenu componentMenu, SlotInventoryHolder inventoryHolder, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap, boolean useLiquid) {
-        if (useLiquid) {
-            calculateConditionDataLiquid(componentMenu, inventoryHolder, conditionSettingCheckerMap);
+    private void calculateConditionData(ComponentMenu componentMenu, SlotInventoryHolder inventoryHolder, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap, boolean useFluids) {
+        if (useFluids) {
+            calculateConditionDataFluid(componentMenu, inventoryHolder, conditionSettingCheckerMap);
         }else{
             calculateConditionDataItem(componentMenu, inventoryHolder, conditionSettingCheckerMap);
         }
@@ -831,11 +831,11 @@ public class CommandExecutor {
         }
     }
 
-    private void calculateConditionDataLiquid(ComponentMenu componentMenu, SlotInventoryHolder tank, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
+    private void calculateConditionDataFluid(ComponentMenu componentMenu, SlotInventoryHolder tank, Map<Integer, ConditionSettingChecker> conditionSettingCheckerMap) {
         for (SlotSideTarget slot : tank.getValidSlots().values()) {
             List<FluidTankInfo> tankInfos = new ArrayList<FluidTankInfo>();
             for (int side : slot.getSides()) {
-                FluidTankInfo[] currentTankInfos = tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side]);
+                FluidTankInfo[] currentTankInfos = tank.getTank().getTankInfo(EnumFacing.getFront(side));
                 if (currentTankInfos == null) {
                     continue;
                 }
@@ -855,7 +855,7 @@ public class CommandExecutor {
                     }
 
                     FluidStack fluidStack = fluidTankInfo.fluid;
-                    Setting setting = isLiquidValid(componentMenu, fluidStack);
+                    Setting setting = isFluidValid(componentMenu, fluidStack);
                     if (setting != null) {
                         ConditionSettingChecker conditionSettingChecker = conditionSettingCheckerMap.get(setting.getId());
                         if (conditionSettingChecker == null) {
@@ -864,7 +864,7 @@ public class CommandExecutor {
                         conditionSettingChecker.addCount(fluidStack.amount);
                     }
                 }
-                for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(ForgeDirection.VALID_DIRECTIONS[side])) {
+                for (FluidTankInfo fluidTankInfo : tank.getTank().getTankInfo(EnumFacing.getFront(side))) {
                     if (fluidTankInfo != null) {
                         tankInfos.add(fluidTankInfo);
                     }
@@ -918,14 +918,14 @@ public class CommandExecutor {
                 Connection connection = componentMenu.getParent().getConnection(i);
                 if (!connectionOption.isInput() && connection != null) {
                     List<ItemBufferElement> itemBufferSplit = new ArrayList<ItemBufferElement>();
-                    List<LiquidBufferElement> liquidBufferSplit = new ArrayList<LiquidBufferElement>();
+                    List<FluidBufferElement> fluidBufferSplit = new ArrayList<FluidBufferElement>();
 
                     for (ItemBufferElement element : itemBuffer) {
                         itemBufferSplit.add(element.getSplitElement(amount, usedId, split.useFair()));
                     }
 
-                    for (LiquidBufferElement element : liquidBuffer) {
-                        liquidBufferSplit.add(element.getSplitElement(amount, usedId, split.useFair()));
+                    for (FluidBufferElement element : fluidBuffer) {
+                        fluidBufferSplit.add(element.getSplitElement(amount, usedId, split.useFair()));
                     }
 
                     List<Integer> usedCommandCopy = new ArrayList<Integer>();
@@ -933,7 +933,7 @@ public class CommandExecutor {
                         usedCommandCopy.add(usedCommand);
                     }
 
-                    CommandExecutor newExecutor = new CommandExecutor(manager, itemBufferSplit, new ArrayList<CraftingBufferElement>(craftingBufferHigh), new ArrayList<CraftingBufferElement>(craftingBufferLow), liquidBufferSplit, usedCommandCopy);
+                    CommandExecutor newExecutor = new CommandExecutor(manager, itemBufferSplit, new ArrayList<CraftingBufferElement>(craftingBufferHigh), new ArrayList<CraftingBufferElement>(craftingBufferLow), fluidBufferSplit, usedCommandCopy);
                     newExecutor.executeCommand(manager.getFlowItems().get(connection.getComponentId()), connection.getConnectionId());
                     usedId++;
                 }

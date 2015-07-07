@@ -1,24 +1,30 @@
 package vswe.stevesfactory.blocks;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.common.property.Properties;
 import vswe.stevesfactory.StevesFactoryManager;
 
 //This is indeed not a subclass to the cable, you can't relay signals through this block
-public class BlockCableOutput extends BlockContainer {
+public class  BlockCableOutput extends BlockContainer {
     public BlockCableOutput() {
         super(Material.iron);
         setCreativeTab(ModBlocks.creativeTab);
         setStepSound(soundTypeMetal);
-        setBlockName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_OUTPUT_UNLOCALIZED_NAME);
+        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_OUTPUT_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
 
@@ -27,39 +33,49 @@ public class BlockCableOutput extends BlockContainer {
         return new TileEntityOutput();
     }
 
-    @SideOnly(Side.CLIENT)
-    private IIcon inactiveIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon weakIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon strongIcon;
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void registerBlockIcons(IIconRegister register) {
-        strongIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_output_strong");
-        weakIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_output_weak");
-        inactiveIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_idle");
-    }
-
+    public static final IUnlistedProperty<Integer> STRONG_SIDES = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("strong_sides", 0, 63)); // 000000 -> 111111
+    public static final IUnlistedProperty<Integer> WEAK_SIDES = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("strong_sides", 0, 63)); // 000000 -> 111111
 
     @Override
-    public IIcon getIcon(int side, int meta) {
-        return weakIcon;
+    protected BlockState createBlockState() {
+
+        IProperty [] listedProperties = new IProperty[0];
+        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[]{STRONG_SIDES, WEAK_SIDES};
+        return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
 
     @Override
-    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
-        TileEntityOutput te = getTileEntity(world, x, y, z);
-        if (te != null && te.getStrengthFromSide(side) > 0) {
-            return te.hasStrongSignalAtSide(side) ? strongIcon : weakIcon;
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+
+        TileEntityOutput tileEntity = (TileEntityOutput) world.getTileEntity(pos);
+        if (state instanceof IExtendedBlockState && tileEntity != null) {
+
+            int strongVals = 0;
+            int weakVals = 0;
+            for (EnumFacing facing: EnumFacing.values()) {
+                if (tileEntity.getStrengthFromSide(facing) > 0) {
+                    if (tileEntity.hasStrongSignalAtSide(facing)) {
+                        strongVals |= 1 << facing.getIndex();
+                    } else {
+                        weakVals |= 1 << facing.getIndex();
+                    }
+                }
+            }
+
+            return ((IExtendedBlockState)state).withProperty(STRONG_SIDES, strongVals).withProperty(WEAK_SIDES, weakVals);
         }
-        return inactiveIcon;    }
 
+        return state;
+    }
 
     @Override
-    public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side) {
-        TileEntityOutput te = getTileEntity(world, x, y, z);
+    public int getRenderType() {
+        return 3;
+    }
+
+    @Override
+    public int getWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
+        TileEntityOutput te = getTileEntity(world, pos);
         if (te != null) {
             return te.getStrengthFromOppositeSide(side);
         }
@@ -67,8 +83,8 @@ public class BlockCableOutput extends BlockContainer {
     }
 
     @Override
-    public int isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side) {
-        TileEntityOutput te = getTileEntity(world, x, y, z);
+    public int getStrongPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
+        TileEntityOutput te = getTileEntity(world, pos);
         if (te != null && te.hasStrongSignalAtOppositeSide(side)) {
             return te.getStrengthFromOppositeSide(side);
         }
@@ -76,12 +92,12 @@ public class BlockCableOutput extends BlockContainer {
         return 0;
     }
 
-    private TileEntityOutput getTileEntity(IBlockAccess world, int x, int y, int z) {
-        return TileEntityCluster.getTileEntity(TileEntityOutput.class, world, x, y, z);
+    private TileEntityOutput getTileEntity(IBlockAccess world, BlockPos pos) {
+        return TileEntityCluster.getTileEntity(TileEntityOutput.class, world, pos);
     }
 
     @Override
-    public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side) {
+    public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
         return true;
     }
 

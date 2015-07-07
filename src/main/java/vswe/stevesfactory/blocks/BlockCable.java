@@ -1,12 +1,11 @@
 package vswe.stevesfactory.blocks;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import vswe.stevesfactory.StevesFactoryManager;
 
@@ -20,42 +19,36 @@ public class BlockCable extends Block {
         super(Material.iron);
         setCreativeTab(ModBlocks.creativeTab);
         setStepSound(soundTypeMetal);
-        setBlockName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_UNLOCALIZED_NAME);
+        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_UNLOCALIZED_NAME);
         setHardness(0.4F);
     }
 
-    @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister register) {
-        blockIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable");
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+        super.onBlockAdded(world, pos, state);
+
+        updateInventories(world, pos, state);
     }
 
     @Override
-    public void onBlockAdded(World world, int x, int y, int z) {
-        super.onBlockAdded(world, x, y, z);
+    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
+        super.onNeighborBlockChange(world, pos, state, block);
 
-        updateInventories(world, x, y, z);
+        updateInventories(world, pos, state);
     }
 
     @Override
-    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-        super.onNeighborBlockChange(world, x, y, z, block);
+    public void breakBlock(World world, BlockPos pos,IBlockState state) {
+        super.breakBlock(world, pos, state);
 
-        updateInventories(world, x, y, z);
+        updateInventories(world, pos, state);
     }
 
-    @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        super.breakBlock(world, x, y, z, block, meta);
-
-        updateInventories(world, x, y, z);
-    }
-
-    public void updateInventories(World world, int blockX, int blockY, int blockZ) {
+    public void updateInventories(World world, BlockPos pos, IBlockState state) {
         List<WorldCoordinate> visited = new ArrayList<WorldCoordinate>();
 
         Queue<WorldCoordinate> queue = new PriorityQueue<WorldCoordinate>();
-        WorldCoordinate start = new WorldCoordinate(blockX, blockY, blockZ, 0);
+        WorldCoordinate start = new WorldCoordinate(pos.getX(), pos.getY(), pos.getZ(), 0);
         queue.add(start);
         visited.add(start);
 
@@ -71,14 +64,14 @@ public class BlockCable extends Block {
                             if (!visited.contains(target)) {
                                 visited.add(target);
                                 //if (element.getDepth() < TileEntityManager.MAX_CABLE_LENGTH){
-                                    Block block = world.getBlock(target.getX(), target.getY(), target.getZ());
-                                    int meta = world.getBlockMetadata(target.getX(), target.getY(), target.getZ());
-                                    if (block == ModBlocks.blockManager){
-                                        TileEntity tileEntity = world.getTileEntity(target.getX(), target.getY(), target.getZ());
+                                    IBlockState block = world.getBlockState(new BlockPos(x, y, z));
+                                    int meta = block.getBlock().getMetaFromState(block);
+                                    if (block.getBlock() == ModBlocks.blockManager){
+                                        TileEntity tileEntity = world.getTileEntity(new BlockPos(target.getX(), target.getY(), target.getZ()));
                                         if (tileEntity != null && tileEntity instanceof TileEntityManager) {
                                             ((TileEntityManager)tileEntity).updateInventories();
                                         }
-                                    }else if (isCable(block, meta) /*&& target.getDepth() < TileEntityManager.MAX_CABLE_LENGTH*/) {
+                                    }else if (isCable(block.getBlock(), meta) /*&& target.getDepth() < TileEntityManager.MAX_CABLE_LENGTH*/) {
                                         queue.add(target);
                                     }
                                 //}
@@ -87,8 +80,8 @@ public class BlockCable extends Block {
                     }
                 }
             }
-
         }
+
 
 
 
