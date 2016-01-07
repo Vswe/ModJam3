@@ -66,6 +66,7 @@ public class TextBoxNumberList {
             }else if(c == '-' && selectedTextBox.allowNegative()) {
                 selectedTextBox.setNumber(selectedTextBox.getNumber() * -1);
                 selectedTextBox.onNumberChanged();
+                return true;
             }else if(k == 14){
                 selectedTextBox.setNumber(selectedTextBox.getNumber() / 10);
                 selectedTextBox.onNumberChanged();
