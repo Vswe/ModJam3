@@ -8,9 +8,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -208,7 +208,7 @@ public abstract class ComponentMenuContainer extends ComponentMenu {
                         TileEntity te = world.getTileEntity(new BlockPos(targetX, targetY, targetZ));
                         if (te instanceof TileEntitySign) {
                             TileEntitySign sign = (TileEntitySign)te;
-                            for (IChatComponent txt : sign.signText) {
+                            for (ITextComponent txt : sign.signText) {
                                 if (!txt.getFormattedText().isEmpty()) {
                                     text.add(Color.GRAY + txt.getFormattedText());
                                 }

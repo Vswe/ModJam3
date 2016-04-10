@@ -3,19 +3,22 @@ package vswe.stevesfactory.blocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import vswe.stevesfactory.GeneratedInfo;
@@ -26,7 +29,7 @@ public class BlockManager extends BlockContainer {
         super(Material.iron);
 
         setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.MANAGER_UNLOCALIZED_NAME);
-        setStepSound(soundTypeMetal);
+        setStepSound(SoundType.METAL);
         setCreativeTab(ModBlocks.creativeTab);
         setHardness(2F);
     }
@@ -34,8 +37,8 @@ public class BlockManager extends BlockContainer {
     public static final IProperty LIMITLESS = PropertyBool.create("limitless");
 
     @Override
-    protected BlockState createBlockState() {
-        return new BlockState(this, LIMITLESS);
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, LIMITLESS);
     }
 
     @Override
@@ -54,8 +57,9 @@ public class BlockManager extends BlockContainer {
         return new TileEntityManager();
     }
 
+
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float xSide, float ySide, float zSide) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
             FMLNetworkHandler.openGui(player, StevesFactoryManager.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
         }
@@ -78,8 +82,8 @@ public class BlockManager extends BlockContainer {
     }
 
     @Override
-    public int getRenderType() {
-        return 3;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
     }
 
     @Override
@@ -97,8 +101,8 @@ public class BlockManager extends BlockContainer {
     }
 
 
-   @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player) {
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
        if (GeneratedInfo.inDev) {
             System.out.println("Picked" + world.isRemote);
             TileEntity te = world.getTileEntity(pos);
@@ -109,7 +113,7 @@ public class BlockManager extends BlockContainer {
                     return null;
                 }
 
-                ItemStack itemStack = super.getPickBlock(target, world, pos, player);
+                ItemStack itemStack = super.getPickBlock(state, target, world, pos, player);
                 if (itemStack != null) {
                     NBTTagCompound tagCompound = itemStack.getTagCompound();
                     if (tagCompound == null) {
@@ -129,7 +133,7 @@ public class BlockManager extends BlockContainer {
             System.out.println("failed to write");
             return  null;
        }else{
-           return super.getPickBlock(target, world, pos, player);
+           return super.getPickBlock(state, target, world, pos, player);
        }
     }
 

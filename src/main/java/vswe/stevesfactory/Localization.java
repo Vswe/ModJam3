@@ -2,7 +2,7 @@ package vswe.stevesfactory;
 
 
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.translation.I18n;
 
 public enum Localization {
     TRIGGER_SHORT,
@@ -376,7 +376,7 @@ public enum Localization {
     }
 
     public String toString() {
-        return StatCollector.translateToLocal("gui." + StevesFactoryManager.UNLOCALIZED_START + name);
+        return I18n.translateToLocal("gui." + StevesFactoryManager.UNLOCALIZED_START + name);
     }
 
     public static Localization getDirectionLocalization(EnumFacing facing) {

@@ -2,11 +2,12 @@ package vswe.stevesfactory.blocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPistonBase;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,9 +16,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -27,12 +29,12 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class BlockCableCluster extends BlockCamouflageBase {
+
     protected BlockCableCluster() {
         super(Material.iron);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(soundTypeMetal);
+        setStepSound(SoundType.METAL);
         setHardness(2F);
     }
 
@@ -40,7 +42,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
     public static final IProperty ADVANCED = PropertyBool.create("advanced");
 
     @Override
-    protected BlockState createBlockState() {
+    protected BlockStateContainer createBlockState() {
 
         IProperty [] listedProperties = new IProperty[]{ADVANCED, FACING};
         IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[]{BlockCableCamouflages.BLOCK_POS};
@@ -85,13 +87,13 @@ public class BlockCableCluster extends BlockCamouflageBase {
     }
 
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player) {
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
         ItemStack itemStack = getItemStack(world, pos, world.getBlockState(pos));
         if (itemStack != null) {
             return itemStack;
         }
 
-        return super.getPickBlock(target, world, pos, player) ;
+        return super.getPickBlock(state, target, world, pos, player) ;
     }
 
     private ItemStack getItemStack(IBlockAccess world, BlockPos pos, IBlockState state) {
@@ -135,7 +137,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack itemStack) {
-        int meta = addAdvancedMeta(BlockPistonBase.getFacingFromEntity(world, pos, entity).getIndex(), itemStack.getItemDamage());
+        int meta = addAdvancedMeta(BlockPistonBase.getFacingFromEntity(pos, entity).getIndex(), itemStack.getItemDamage());
         world.setBlockState(pos, state.getBlock().getStateFromMeta(meta), 2);
 
         TileEntityCluster cluster = getTe(world, pos);
@@ -143,7 +145,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
         if (cluster != null) {
             cluster.loadElements(itemStack);
 
-            cluster.onBlockPlacedBy(state, entity, itemStack);
+            cluster.onBlockPlacedBy(world, pos, state, entity, itemStack);
         }
     }
 
@@ -152,7 +154,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
         TileEntityCluster cluster = getTe(world, pos);
 
         if (cluster != null) {
-            cluster.onNeighborBlockChange(block, state);
+            cluster.onNeighborBlockChange(world, pos, state, block);
         }
 
         if (isAdvanced(state.getBlock().getMetaFromState(state))) {
@@ -161,11 +163,11 @@ public class BlockCableCluster extends BlockCamouflageBase {
     }
 
     @Override
-    public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
+    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
         TileEntityCluster cluster = getTe(world, pos);
 
         if (cluster != null) {
-            return cluster.canConnectRedstone(side);
+            return cluster.canConnectRedstone(state, world, pos, side);
         }
 
         return false;
@@ -176,7 +178,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
         TileEntityCluster cluster = getTe(world, pos);
 
         if (cluster != null) {
-            cluster.onBlockAdded(state);
+            cluster.onBlockAdded(world, pos, state);
         }
 
         if (isAdvanced(state.getBlock().getMetaFromState(state))) {
@@ -185,44 +187,44 @@ public class BlockCableCluster extends BlockCamouflageBase {
     }
 
     @Override
-    public boolean shouldCheckWeakPower(IBlockAccess world, BlockPos pos, EnumFacing side) {
+    public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
         TileEntityCluster cluster = getTe(world, pos);
 
         if (cluster != null) {
-            return cluster.shouldCheckWeakPower(side);
+            return cluster.shouldCheckWeakPower(state, world, pos, side);
         }
 
         return false;
     }
 
     @Override
-    public int getWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
+    public int getWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
         TileEntityCluster cluster = getTe(world, pos);
 
         if (cluster != null) {
-            return cluster.isProvidingWeakPower(state, side);
+            return cluster.isProvidingWeakPower(state, world, pos, side);
         }
 
         return 0;
     }
 
     @Override
-    public int getStrongPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
-        TileEntityCluster cluster = getTe(world, pos);
+    public int getStrongPower(IBlockState state, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        TileEntityCluster cluster = getTe(blockAccess, pos);
 
         if (cluster != null) {
-            return cluster.isProvidingStrongPower(state, side);
+            return cluster.isProvidingStrongPower(state, blockAccess, pos, side);
         }
 
         return 0;
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         TileEntityCluster cluster = getTe(world, pos);
 
         if (cluster != null) {
-            return cluster.onBlockActivated(player, state, side, hitX, hitY, hitZ);
+            return cluster.onBlockActivated(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
         }
 
         return false;

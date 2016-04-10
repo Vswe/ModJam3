@@ -13,10 +13,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.network.*;
@@ -120,24 +122,24 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         return methodRegistration.get(method);
     }
 
-    public void onBlockPlacedBy(IBlockState state, EntityLivingBase entity, ItemStack itemStack) {
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack itemStack) {
         for (Pair blockContainer :  getRegistrations(ClusterMethodRegistration.ON_BLOCK_PLACED_BY)) {
             setWorldObject(blockContainer.te);
-            blockContainer.registry.getBlock().onBlockPlacedBy(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, entity, blockContainer.registry.getItemStack());
+            blockContainer.registry.getBlock().onBlockPlacedBy(world, pos, state, entity, blockContainer.registry.getItemStack());
         }
     }
 
-    public void onNeighborBlockChange(Block block, IBlockState state) {
+    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_NEIGHBOR_BLOCK_CHANGED)) {
             setWorldObject(blockContainer.te);
-            blockContainer.registry.getBlock().onNeighborBlockChange(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, block);
+            blockContainer.registry.getBlock().onNeighborBlockChange(world, pos, state, block);
         }
     }
 
-    public boolean canConnectRedstone(EnumFacing side) {
+    public boolean canConnectRedstone(IBlockState state, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.CAN_CONNECT_REDSTONE)) {
             setWorldObject(blockContainer.te);
-            if (blockContainer.registry.getBlock().canConnectRedstone(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), side)) {
+            if (blockContainer.registry.getBlock().canConnectRedstone(state, blockAccess, pos, side)) {
                 return true;
             }
         }
@@ -145,17 +147,17 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         return false;
     }
 
-    public void onBlockAdded(IBlockState state) {
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_BLOCK_ADDED)) {
             setWorldObject(blockContainer.te);
-            blockContainer.registry.getBlock().onBlockAdded(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state);
+            blockContainer.registry.getBlock().onBlockAdded(world, pos, state);
         }
     }
 
-    public boolean shouldCheckWeakPower(EnumFacing side) {
+    public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.SHOULD_CHECK_WEAK_POWER)) {
             setWorldObject(blockContainer.te);
-            if (blockContainer.registry.getBlock().shouldCheckWeakPower(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), side)) {
+            if (blockContainer.registry.getBlock().shouldCheckWeakPower(state, blockAccess, pos, side)) {
                 return true;
             }
         }
@@ -164,32 +166,32 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     }
 
 
-    public int isProvidingWeakPower(IBlockState state, EnumFacing side) {
+    public int isProvidingWeakPower(IBlockState state, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         int max = 0;
 
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.IS_PROVIDING_WEAK_POWER)) {
             setWorldObject(blockContainer.te);
-            max = Math.max(max, blockContainer.registry.getBlock().getStrongPower(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, side));
+            max = Math.max(max, blockContainer.registry.getBlock().getStrongPower(state, blockAccess, pos, side));
         }
 
         return max;
     }
 
-    public int isProvidingStrongPower(IBlockState state, EnumFacing side) {
+    public int isProvidingStrongPower(IBlockState state, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         int max = 0;
 
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.IS_PROVIDING_STRONG_POWER)) {
             setWorldObject(blockContainer.te);
-            max = Math.max(max, blockContainer.registry.getBlock().getWeakPower(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, side));
+            max = Math.max(max, blockContainer.registry.getBlock().getWeakPower(state, blockAccess, pos, side));
         }
 
         return max;
     }
 
-    public boolean onBlockActivated(EntityPlayer player, IBlockState state, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_BLOCK_ACTIVATED)) {
             setWorldObject(blockContainer.te);
-            if (blockContainer.registry.getBlock().onBlockActivated(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, player, side, hitX, hitY, hitZ)) {
+            if (blockContainer.registry.getBlock().onBlockActivated(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ)) {
                 return true;
             }
         }

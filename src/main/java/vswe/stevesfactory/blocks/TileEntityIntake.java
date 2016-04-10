@@ -4,10 +4,10 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -111,8 +111,8 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
     }
 
     @Override
-    public IChatComponent getDisplayName() {
-        return new ChatComponentText(ModBlocks.blockCableIntake.getLocalizedName());
+    public ITextComponent getDisplayName() {
+        return new TextComponentString(ModBlocks.blockCableIntake.getLocalizedName());
     }
 
     private static final int DISTANCE = 3;

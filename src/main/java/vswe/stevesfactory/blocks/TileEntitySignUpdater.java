@@ -2,10 +2,10 @@ package vswe.stevesfactory.blocks;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
 import vswe.stevesfactory.components.ComponentMenuSignText;
 
 import java.util.EnumSet;
@@ -27,8 +27,8 @@ public class TileEntitySignUpdater extends TileEntityClusterElement {
                 boolean updated = false;
                 for (int i = 0; i < 4; i++) {
                     if (menu.shouldUpdate(i)) {
-                        IChatComponent oldText = sign.signText[i];
-                        ChatComponentText newText = new ChatComponentText(menu.getText(i));
+                        ITextComponent oldText = sign.signText[i];
+                        TextComponentString newText = new TextComponentString(menu.getText(i));
                         if (!newText.equals(oldText)) {
                             sign.signText[i] = newText;
                             updated = true;
@@ -37,7 +37,7 @@ public class TileEntitySignUpdater extends TileEntityClusterElement {
                 }
                 if (updated) {
                     sign.markDirty();
-                    worldObj.markBlockForUpdate(new BlockPos(sign.getPos().getX(), sign.getPos().getY(), sign.getPos().getZ()));
+                    worldObj.notifyBlockUpdate(sign.getPos(), getWorld().getBlockState(sign.getPos()), getWorld().getBlockState(sign.getPos()), 3);
                 }
 
             //}

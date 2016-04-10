@@ -13,10 +13,13 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.fml.relauncher.Side;
@@ -48,7 +51,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
             int z = getPos().getZ() + direction.getFrontOffsetZ();
             BlockPos pos = new BlockPos(x, y, z);
             IBlockState state = worldObj.getBlockState(pos);
-            if (canBreakBlock(state.getBlock(), pos)) {
+            if (canBreakBlock(state, state.getBlock(), pos)) {
                 inventory = state.getBlock().getDrops(worldObj, pos, state, 0);
             }
             if (inventory == null) {
@@ -83,23 +86,23 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
             player.prevPosY = player.posY = getPos().getY() + side.getFrontOffsetY() + 0.5 + direction.getFrontOffsetY() * 0.4;
             player.prevPosZ = player.posZ = getPos().getZ() + side.getFrontOffsetZ() + 0.5 + direction.getFrontOffsetZ() * 0.4;
             player.eyeHeight = 0;
-            player.theItemInWorldManager.setBlockReachDistance(1);
+            player.interactionManager.setBlockReachDistance(1);
 
             blocked = true;
             try {
                 player.inventory.clear();
                 player.inventory.currentItem = 0;
                 player.inventory.setInventorySlotContents(0, itemstack);
-                ItemStack result = itemstack.useItemRightClick(worldObj, player);
-                if (ItemStack.areItemStacksEqual(result, itemstack)) {
+                ActionResult<ItemStack> result = itemstack.useItemRightClick(worldObj, player, EnumHand.MAIN_HAND);
+                if (result.getType().equals(EnumActionResult.PASS) && ItemStack.areItemStacksEqual(result.getResult(), itemstack)) {
                     int x = getPos().getX() + side.getFrontOffsetX() - direction.getFrontOffsetX();
                     int y = getPos().getY() + side.getFrontOffsetY() - direction.getFrontOffsetY();
                     int z = getPos().getZ() + side.getFrontOffsetZ() - direction.getFrontOffsetZ();
 
-                    player.theItemInWorldManager.activateBlockOrUseItem(player, worldObj, itemstack, new BlockPos(x, y, z), direction, hitX, hitY, hitZ);
+                    player.interactionManager.processRightClickBlock(player, worldObj, itemstack, EnumHand.MAIN_HAND, new BlockPos(x, y, z), direction, hitX, hitY, hitZ);
 
                 }else{
-                    player.inventory.setInventorySlotContents(0, result);
+                    player.inventory.setInventorySlotContents(0, result.getResult());
                 }
             }catch (Exception ignored) {
 
@@ -264,8 +267,8 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
     }
 
     @Override
-    public IChatComponent getDisplayName() {
-        return new ChatComponentText(ModBlocks.blockCableBreaker.getLocalizedName());
+    public ITextComponent getDisplayName() {
+        return new TextComponentString(ModBlocks.blockCableBreaker.getLocalizedName());
     }
 
     @Override
@@ -341,7 +344,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
                Block block = state.getBlock();
 
 
-               if (canBreakBlock(block, pos)) {
+               if (canBreakBlock(state, block, pos)) {
                    broken = true;
                    int meta = state.getBlock().getMetaFromState(state);
                    block.breakBlock(worldObj, pos, state);
@@ -353,8 +356,8 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
         }
     }
 
-    private boolean canBreakBlock(Block block, BlockPos pos) {
-        return block != null && Block.getIdFromBlock(block) != Block.getIdFromBlock(Blocks.bedrock) && block.getBlockHardness(worldObj, pos) >= 0;
+    private boolean canBreakBlock(IBlockState state, Block block, BlockPos pos) {
+        return block != null && Block.getIdFromBlock(block) != Block.getIdFromBlock(Blocks.bedrock) && block.getBlockHardness(state, worldObj, pos) >= 0;
     }
 
     @Override
@@ -420,7 +423,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
         }else{
             int val = dr.readData(DataBitHelper.PLACE_DIRECTION);
             setPlaceDirection(EnumFacing.getFront(val));
-            worldObj.markBlockForUpdate(getPos());
+            worldObj.notifyBlockUpdate(getPos(), getWorld().getBlockState(getPos()), getWorld().getBlockState(getPos()), 3);
             markDirty();
         }
     }

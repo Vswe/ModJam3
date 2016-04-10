@@ -2,10 +2,11 @@ package vswe.stevesfactory.blocks;
 
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import vswe.stevesfactory.StevesFactoryManager;
 
@@ -18,7 +19,7 @@ public class BlockCable extends Block {
     public BlockCable() {
         super(Material.iron);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(soundTypeMetal);
+        setStepSound(SoundType.METAL);
         setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_UNLOCALIZED_NAME);
         setHardness(0.4F);
     }

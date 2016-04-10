@@ -1,6 +1,7 @@
 package vswe.stevesfactory.blocks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityDiggingFX;
@@ -9,9 +10,10 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.components.ComponentMenuCamouflageInside;
@@ -40,36 +42,38 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     }
 
     private static final Random rand = new Random();
+    public int rotate = 0;
 
     @SideOnly(Side.CLIENT)
-    public boolean addBlockEffect(Block camoBlock, EnumFacing sideHit, EffectRenderer effectRenderer) {
+    public boolean addBlockEffect(BlockCamouflageBase camoBlock, IBlockState state, World world, EnumFacing sideHit, EffectRenderer effectRenderer) {
         try {
             if (ids[sideHit.ordinal()] != 0) {
                 Block block = Block.getBlockById(ids[sideHit.ordinal()]);
                 if (block != null) {
                     float f = 0.1F;
-                    double x = (double)getPos().getX() + rand.nextDouble() * (camoBlock.getBlockBoundsMaxX() - camoBlock.getBlockBoundsMinX() - (double)(f * 2.0F)) + (double)f + camoBlock.getBlockBoundsMinX();
-                    double y = (double)getPos().getY() + rand.nextDouble() * (camoBlock.getBlockBoundsMaxY() - camoBlock.getBlockBoundsMinY() - (double)(f * 2.0F)) + (double)f + camoBlock.getBlockBoundsMinY();
-                    double z = (double)getPos().getZ() + rand.nextDouble() * (camoBlock.getBlockBoundsMaxZ() - camoBlock.getBlockBoundsMinZ() - (double)(f * 2.0F)) + (double)f + camoBlock.getBlockBoundsMinZ();
+                    AxisAlignedBB axisalignedbb = state.getBoundingBox(world, getPos());
+                    double x = (double)getPos().getX() + rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - (double)(f * 2.0F)) + (double)f + axisalignedbb.minX;
+                    double y = (double)getPos().getY() + rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - (double)(f * 2.0F)) + (double)f + axisalignedbb.minY;
+                    double z = (double)getPos().getZ() + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - (double)(f * 2.0F)) + (double)f + axisalignedbb.minZ;
 
                     switch (sideHit) {
                         case DOWN:
-                            y = (double)getPos().getY() + camoBlock.getBlockBoundsMinY() - (double)f;
+                            y = (double)getPos().getY() + axisalignedbb.minY - (double)f;
                             break;
                         case UP:
-                            y = (double)getPos().getY() + camoBlock.getBlockBoundsMaxY() + (double)f;
+                            y = (double)getPos().getY() + axisalignedbb.maxY + (double)f;
                             break;
                         case NORTH:
-                            z = (double)getPos().getZ() + camoBlock.getBlockBoundsMinZ() - (double)f;
+                            z = (double)getPos().getZ() + axisalignedbb.minZ - (double)f;
                             break;
                         case SOUTH:
-                            z = (double)getPos().getZ() + camoBlock.getBlockBoundsMaxZ() + (double)f;
+                            z = (double)getPos().getZ() + axisalignedbb.maxZ + (double)f;
                             break;
                         case WEST:
-                            x = (double)getPos().getX() + camoBlock.getBlockBoundsMinX() - (double)f;
+                            x = (double)getPos().getX() + axisalignedbb.minX - (double)f;
                             break;
                         case EAST:
-                            x = (double)getPos().getX() + camoBlock.getBlockBoundsMaxX() + (double)f;
+                            x = (double)getPos().getX() + axisalignedbb.maxX + (double)f;
                             break;
                     }
 
@@ -138,8 +142,8 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
         return CamouflageType.values()[ModBlocks.blockCableCamouflage.getId(getBlockMetadata())];
     }
 
-    public void setBlockBounds(BlockCamouflageBase blockCamouflageBase) {
-        blockCamouflageBase.setBlockBounds(bounds[0] / 32F, bounds[2] / 32F, bounds[4] / 32F, bounds[1] / 32F, bounds[3] / 32F, bounds[5] / 32F);
+    public AxisAlignedBB getBlockBounds() {
+        return new AxisAlignedBB(bounds[0] / 32D, bounds[2] / 32D, bounds[4] / 32D, bounds[1] / 32D, bounds[3] / 32D, bounds[5] / 32D);
     }
 
     public boolean isUseCollision() {
@@ -330,7 +334,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
                     }
                 }
             }
-            worldObj.markBlockForUpdate(new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()));
+            worldObj.notifyBlockUpdate(getPos(), getWorld().getBlockState(getPos()), getWorld().getBlockState(getPos()), 3);
         }
     }
 
@@ -362,7 +366,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     }
 
     @SideOnly(Side.CLIENT)
-    private void keepClientDataUpdated() {
+    protected void keepClientDataUpdated() {
         double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5);
 
         if (distance > Math.pow(PacketHandler.BLOCK_UPDATE_RANGE, 2)) {

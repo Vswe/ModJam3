@@ -6,7 +6,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import vswe.stevesfactory.Localization;
@@ -27,16 +29,16 @@ public class ItemCluster extends ItemBlock {
     public static final String NBT_TYPES = "Types";
 
     @Override
-    public boolean onItemUse(ItemStack item, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-        NBTTagCompound compound = item.getTagCompound();
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        NBTTagCompound compound = stack.getTagCompound();
         if (compound != null && compound.hasKey(NBT_CABLE)) {
             NBTTagCompound cable = compound.getCompoundTag(NBT_CABLE);
             if (cable.hasKey(NBT_TYPES)) {
-                return super.onItemUse(item, player, world, pos, side, hitX, hitY, hitZ);
+                return super.onItemUse(stack, player, world, pos, hand, side, hitX, hitY, hitZ);
             }
         }
 
-        return false;
+        return EnumActionResult.PASS;
     }
 
     @Override

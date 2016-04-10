@@ -1,6 +1,6 @@
 package vswe.stevesfactory.blocks;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class UnlistedBlockPosProperty implements IUnlistedProperty<BlockPos> {

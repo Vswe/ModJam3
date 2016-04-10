@@ -1,15 +1,16 @@
 package vswe.stevesfactory.blocks;
 
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -25,7 +26,7 @@ public class BlockCableCamouflages extends BlockCamouflageBase {
     protected BlockCableCamouflages() {
         super(Material.iron);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(soundTypeMetal);
+        setStepSound(SoundType.METAL);
         setHardness(1.2F);
     }
 
@@ -38,7 +39,7 @@ public class BlockCableCamouflages extends BlockCamouflageBase {
     public static final IProperty CAMO_TYPE = PropertyCamouflageType.create("camo_type");
 
     @Override
-    protected BlockState createBlockState() {
+    protected BlockStateContainer createBlockState() {
 
         IProperty [] listedProperties = new IProperty[]{CAMO_TYPE};
         IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[]{BLOCK_POS};

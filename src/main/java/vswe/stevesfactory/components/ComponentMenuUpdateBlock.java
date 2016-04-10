@@ -15,6 +15,8 @@ import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 
+import java.util.List;
+
 public class ComponentMenuUpdateBlock extends ComponentMenuItem {
     public ComponentMenuUpdateBlock(FlowComponent parent) {
         super(parent);
@@ -216,7 +218,7 @@ public class ComponentMenuUpdateBlock extends ComponentMenuItem {
 
     private static final int ID_START_X = 1;
     private static final int ID_START_Y = 1;
-    private static final int ID_TEXT_BOX = 42;
+    private static final int ID_TEXT_BOX = 48;
 
     private static final int META_START_X = 1;
     private static final int META_START_Y = 21;
@@ -565,5 +567,12 @@ public class ComponentMenuUpdateBlock extends ComponentMenuItem {
     @Override
     protected void initRadioButtons() {
         //no radio buttons
+    }
+
+    @Override
+    public void addErrors(List<String> errors) {
+        if (useId) {
+            super.addErrors(errors);
+        }
     }
 }

@@ -5,7 +5,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
@@ -28,7 +28,7 @@ public class PacketEventHandler {
 
     @SideOnly(Side.CLIENT)
     private void processClientPacket(FMLNetworkEvent.ClientCustomPacketEvent event) {
-        DataReader dr = new DataReader(event.packet.payload().array());
+        DataReader dr = new DataReader(event.getPacket().payload().array());
         EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
 
         boolean useContainer = dr.readBoolean();
@@ -62,7 +62,7 @@ public class PacketEventHandler {
 
     @SubscribeEvent
     public void onServerPacket(final FMLNetworkEvent.ServerCustomPacketEvent event) {
-        EntityPlayerMP player = ((NetHandlerPlayServer)event.handler).playerEntity;
+        EntityPlayerMP player = ((NetHandlerPlayServer)event.getHandler()).playerEntity;
         player.getServerForPlayer().addScheduledTask(new Runnable() {
             @Override
             public void run() {
@@ -72,8 +72,8 @@ public class PacketEventHandler {
     }
 
     private void processServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
-        DataReader dr = new DataReader(event.packet.payload().array());
-        EntityPlayer player = ((NetHandlerPlayServer)event.handler).playerEntity;
+        DataReader dr = new DataReader(event.getPacket().payload().array());
+        EntityPlayer player = ((NetHandlerPlayServer)event.getHandler()).playerEntity;
 
         boolean useContainer = dr.readBoolean();
 

@@ -8,14 +8,18 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -67,7 +71,7 @@ public abstract class GuiBase extends GuiAntiNEI {
         float f = 0.00390625F;
         float f1 = 0.00390625F;
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+        VertexBuffer worldRenderer = tessellator.getBuffer();
         worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
         worldRenderer.pos(x + 0, y + h, (double) this.zLevel).tex((srcX + 0) * f, (srcY + h) * f1).endVertex();
         worldRenderer.pos(x + w, y + h, (double) this.zLevel).tex((srcX + w) * f, (srcY + h) * f1).endVertex();
@@ -321,7 +325,7 @@ public abstract class GuiBase extends GuiAntiNEI {
 
         try {
             //try to get it by picking the block
-            ItemStack item = block.getPickBlock(new MovingObjectPosition(MovingObjectPosition.MovingObjectType.BLOCK, new Vec3(pos.getX(), pos.getY(), pos.getZ()), EnumFacing.UP, pos), world, pos, FMLClientHandler.instance().getClientPlayerEntity());
+            ItemStack item = block.getPickBlock(state, new RayTraceResult(RayTraceResult.Type.BLOCK, new Vec3d(pos.getX(), pos.getY(), pos.getZ()), EnumFacing.UP, pos), world, pos, FMLClientHandler.instance().getClientPlayerEntity());
             if (item != null) {
                 return item;
             }

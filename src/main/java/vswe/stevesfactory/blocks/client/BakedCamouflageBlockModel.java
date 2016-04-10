@@ -9,28 +9,25 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.client.resources.model.ModelRotation;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.util.vector.Vector3f;
-import vswe.stevesfactory.blocks.BlockCableCamouflages;
-import vswe.stevesfactory.blocks.BlockCableCluster;
-import vswe.stevesfactory.blocks.TileEntityCamouflage;
-import vswe.stevesfactory.blocks.TileEntityCluster;
+import vswe.stevesfactory.blocks.*;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 import static vswe.stevesfactory.blocks.TileEntityCamouflage.CamouflageType;
 
-public class BakedCamouflageBlockModel implements IFlexibleBakedModel, ISmartBlockModel {
+public class BakedCamouflageBlockModel implements IBakedModel {
 
     private VertexFormat format;
     private TextureAtlasSprite normalSprite;
@@ -64,16 +61,48 @@ public class BakedCamouflageBlockModel implements IFlexibleBakedModel, ISmartBlo
         bakery = new FaceBakery();
     }
 
-    @Override
-    public List<BakedQuad> getFaceQuads(EnumFacing side) {
-        //This should never be called!  The handleBlockState returns an AssembledBakedModel
-        throw new UnsupportedOperationException();
-    }
 
     @Override
-    public List<BakedQuad> getGeneralQuads() {
-        //This should never be called!  The handleBlockState returns an AssembledBakedModel
-        throw new UnsupportedOperationException();
+    public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+        if (state instanceof IExtendedBlockState) {
+            IExtendedBlockState blockState = (IExtendedBlockState) state;
+            Object obj = blockState.getValue(BlockCableCamouflages.BLOCK_POS);
+
+            if (obj != null) {
+
+                BlockPos pos = (BlockPos) obj;
+                BlockRendererDispatcher dispatcher = FMLClientHandler.instance().getClient().getBlockRendererDispatcher();
+                BlockModelShapes modelShapes = dispatcher.getBlockModelShapes();
+
+                TileEntity tileEntity = FMLClientHandler.instance().getWorldClient().getTileEntity(pos);
+                TileEntityCamouflage camouflage = null;
+                TileEntityCluster cluster = null;
+
+                if (tileEntity instanceof TileEntityCluster) {
+                    cluster = (TileEntityCluster) tileEntity;
+                    camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, FMLClientHandler.instance().getWorldClient(), pos);
+
+                    BlockCableCluster blockCluster = (BlockCableCluster) cluster.getBlockType();
+
+                    if (camouflage == null) {
+                        IModel clusterModel = null;
+                        try {
+                            clusterModel = ModelLoaderRegistry.getModel(blockCluster.isAdvanced(cluster.getBlockMetadata()) ? CamouflageBlockModel.MODEL_CLUSTER_ADV : CamouflageBlockModel.MODEL_CLUSTER);
+                        } catch (Exception ignored) {
+                        }
+
+                        if (clusterModel != null) {
+                            return clusterModel.bake(modelState, format, bakedTextureGetter).getQuads(state, side, rand);
+                        }
+                    }
+                } else if (tileEntity instanceof TileEntityCamouflage) {
+                    camouflage = (TileEntityCamouflage) tileEntity;
+                }
+                return new AssembledBakedModel(camouflage, pos, blockState, modelShapes, cluster, format).getQuads(state, side, rand);
+            }
+        }
+
+        return new AssembledBakedModel().getQuads(state, side, rand);
     }
 
     @Override
@@ -102,60 +131,20 @@ public class BakedCamouflageBlockModel implements IFlexibleBakedModel, ISmartBlo
     }
 
     @Override
-    public VertexFormat getFormat() {
-        return format;
-    }
-
-    @Override
-    public IBakedModel handleBlockState(IBlockState state) {
-        if (state instanceof IExtendedBlockState) {
-            IExtendedBlockState blockState = (IExtendedBlockState) state;
-            Object obj = blockState.getValue(BlockCableCamouflages.BLOCK_POS);
-
-            if (obj != null) {
-
-                BlockPos pos = (BlockPos) obj;
-                BlockRendererDispatcher dispatcher = FMLClientHandler.instance().getClient().getBlockRendererDispatcher();
-                BlockModelShapes modelShapes = dispatcher.getBlockModelShapes();
-
-                TileEntity tileEntity = FMLClientHandler.instance().getWorldClient().getTileEntity(pos);
-                TileEntityCamouflage camouflage = null;
-                TileEntityCluster cluster = null;
-
-                if (tileEntity instanceof TileEntityCluster) {
-                    cluster = (TileEntityCluster) tileEntity;
-                    camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, FMLClientHandler.instance().getWorldClient(), pos);
-
-                    BlockCableCluster blockCluster = (BlockCableCluster) cluster.getBlockType();
-
-                    if (camouflage == null) {
-                        IModel clusterModel = null;
-                        try {
-                            clusterModel = ModelLoaderRegistry.getModel(blockCluster.isAdvanced(cluster.getBlockMetadata()) ? CamouflageBlockModel.MODEL_CLUSTER_ADV : CamouflageBlockModel.MODEL_CLUSTER);
-                        } catch (IOException ignored) {}
-
-                        if (clusterModel != null) {
-                            return clusterModel.bake(modelState, format, bakedTextureGetter);
-                        }
-                    }
-                } else if (tileEntity instanceof TileEntityCamouflage) {
-                    camouflage = (TileEntityCamouflage) tileEntity;
-                }
-                return new AssembledBakedModel(camouflage, pos, blockState, modelShapes, cluster);
-            }
-        }
-
-        return new AssembledBakedModel();
+    public ItemOverrideList getOverrides() {
+        return ItemOverrideList.NONE;
     }
 
     //Apparently it needs to be separate because it could be overridden my another thread as rendering is multithreaded
     //https://github.com/TheGreyGhost/MinecraftByExample/blob/master/src/main/java/minecraftbyexample/mbe05_block_smartblockmodel2/CompositeModel.java
-    public class AssembledBakedModel implements IBakedModel
-    {
+    public class AssembledBakedModel implements IBakedModel {
 
         private List<BakedQuad> quads = new LinkedList<BakedQuad>();
+        private VertexFormat format;
 
-        public AssembledBakedModel(TileEntityCamouflage camouflage, BlockPos pos, IExtendedBlockState blockState, BlockModelShapes modelShapes, TileEntityCluster cluster) {
+        public AssembledBakedModel(TileEntityCamouflage camouflage, BlockPos pos, IExtendedBlockState blockState, BlockModelShapes modelShapes, TileEntityCluster cluster, VertexFormat format) {
+            this.format = format;
+
             if (camouflage != null && quads.isEmpty()) {
 
                 for (EnumFacing facing: EnumFacing.values()) {
@@ -178,7 +167,7 @@ public class BakedCamouflageBlockModel implements IFlexibleBakedModel, ISmartBlo
             if (block instanceof BlockAir || block instanceof BlockCableCamouflages || block instanceof BlockCableCluster) {
                 if (cluster == null) {
                     CamouflageType camoType = (CamouflageType) blockState.getValue(BlockCableCamouflages.CAMO_TYPE);
-                    quads.add(getTransformedQuad(pos, blockState.getBlock(), facing, camoType.getIcon(), camoType == CamouflageType.NORMAL && !inside ? normalSprite : camoType == CamouflageType.INSIDE ? insideSprite: transformSprite, inside));
+                    quads.add(getTransformedQuad(blockState, pos, blockState.getBlock(), facing, camoType.getIcon(), camoType == CamouflageType.NORMAL && !inside ? normalSprite : camoType == CamouflageType.INSIDE ? insideSprite: transformSprite, inside, 0));
                 } else {
                     BlockCableCluster blockCluster = (BlockCableCluster) cluster.getBlockType();
                     int clusterMeta = cluster.getBlockMetadata();
@@ -189,26 +178,20 @@ public class BakedCamouflageBlockModel implements IFlexibleBakedModel, ISmartBlo
                     String resource = (isAdvanced ? (isFacingFront ? CamouflageBlockModel.CL_ADV_FRONT: CamouflageBlockModel.CL_ADV_SIDE): isFacingFront ? CamouflageBlockModel.CL_FRONT: CamouflageBlockModel.CL_SIDE).toString();
                     TextureAtlasSprite texture = isAdvanced ? (isFacingFront ? clusterFrontAdv: clusterSideAdv): isFacingFront ? clusterFront: clusterSide;
 
-                    quads.add(getTransformedQuad(pos, blockState.getBlock(), facing, resource, texture, inside));
+                    quads.add(getTransformedQuad(blockState, pos, blockState.getBlock(), facing, resource, texture, inside, 0));
                 }
             } else {
 
                 IBlockState camoState = block.getStateFromMeta(camouflage.getMeta(facing.getIndex() + (inside ? EnumFacing.values().length: 0)));
                 IBakedModel model = modelShapes.getModelForState(camoState);
 
-                List<BakedQuad> bakedQuads = model.getFaceQuads(facing);
+                List<BakedQuad> bakedQuads = model.getQuads(camoState, facing, 0);
                 List<BakedQuad> reBakedQuads = new LinkedList<BakedQuad>();
-                TextureAtlasSprite sprite = modelShapes.getTexture(camoState);
 
-
-                if (bakedQuads.isEmpty()) {
-                    bakedQuads = model.getGeneralQuads();
-                }
-
-                for (BakedQuad quad :bakedQuads) {
+                for (BakedQuad quad: bakedQuads) {
                     if (quad.getFace() == facing) {
                         if (camouflage.getCamouflageType().useDoubleRendering()) {
-                            quad = reBakeQuadForBlock(quad, pos, blockState.getBlock(), facing, sprite, inside);
+                            quad = reBakeQuadForBlock(quad, blockState, pos, blockState.getBlock(), facing, quad.getSprite(), inside, camouflage.rotate);
                         }
                         reBakedQuads.add(quad);
                     }
@@ -218,16 +201,15 @@ public class BakedCamouflageBlockModel implements IFlexibleBakedModel, ISmartBlo
             }
         }
 
-        private BakedQuad getTransformedQuad(BlockPos pos, Block block, EnumFacing facing, String resource, TextureAtlasSprite sprite, boolean inside) {
+        private BakedQuad getTransformedQuad(IExtendedBlockState blockState, BlockPos pos, Block block, EnumFacing facing, String resource, TextureAtlasSprite sprite, boolean inside, int rotation) {
 
-            block.setBlockBoundsBasedOnState(FMLClientHandler.instance().getWorldClient(), pos);
-
-            float maxX = (((float)block.getBlockBoundsMaxX()) * 16f);
-            float maxY = (((float)block.getBlockBoundsMaxY()) * 16f);
-            float maxZ = (((float)block.getBlockBoundsMaxZ()) * 16f);
-            float minX = (((float)block.getBlockBoundsMinX()) * 16f);
-            float minY = (((float)block.getBlockBoundsMinY()) * 16f);
-            float minZ = (((float)block.getBlockBoundsMinZ()) * 16f);
+            AxisAlignedBB alignedBB = block.getBoundingBox(blockState, FMLClientHandler.instance().getWorldClient(), pos);
+            float maxX = (((float)alignedBB.maxX) * 16f);
+            float maxY = (((float)alignedBB.maxY) * 16f);
+            float maxZ = (((float)alignedBB.maxZ) * 16f);
+            float minX = (((float)alignedBB.minX) * 16f);
+            float minY = (((float)alignedBB.minY) * 16f);
+            float minZ = (((float)alignedBB.minZ) * 16f);
 
             BlockFaceUV faceUV = null;
             float f = 0.002F;
@@ -294,11 +276,12 @@ public class BakedCamouflageBlockModel implements IFlexibleBakedModel, ISmartBlo
                     break;
             }
 
-            return bakery.makeBakedQuad(new Vector3f(minX, minY, minZ), new Vector3f(maxX, maxY, maxZ), new BlockPartFace(facing, -1, resource == null ? "": resource, faceUV), sprite, inside ? facing.getOpposite(): facing, inside ? ModelRotation.X180_Y0: ModelRotation.X0_Y0, null, false, true);
+            ModelRotation modelRotation = inside ? ModelRotation.getModelRotation(180, rotation * 90): ModelRotation.getModelRotation(0, rotation * 90);
+            return bakery.makeBakedQuad(new Vector3f(minX, minY, minZ), new Vector3f(maxX, maxY, maxZ), new BlockPartFace(facing, -1, resource == null ? "": resource, faceUV), sprite, inside ? facing.getOpposite(): facing, modelRotation, null, false, true);
         }
 
-        private BakedQuad reBakeQuadForBlock(BakedQuad original, BlockPos pos, Block block, EnumFacing facing, TextureAtlasSprite sprite, boolean inside) {
-            BakedQuad transformedQuad = getTransformedQuad(pos, block, facing, null, sprite, inside);
+        private BakedQuad reBakeQuadForBlock(BakedQuad original, IExtendedBlockState blockState, BlockPos pos, Block block, EnumFacing facing, TextureAtlasSprite sprite, boolean inside, int rotation) {
+            BakedQuad transformedQuad = getTransformedQuad(blockState, pos, block, facing, null, sprite, inside, rotation);
             int[] transformedFaceData = transformedQuad.getVertexData();
 
             int tintIndex = original.getTintIndex();
@@ -319,81 +302,26 @@ public class BakedCamouflageBlockModel implements IFlexibleBakedModel, ISmartBlo
                 faceData[storeIndex + 2] = transformedFaceData[storeIndex + 2];
                 faceData[storeIndex + 4] = transformedFaceData[storeIndex + 4];
                 faceData[storeIndex + 5] = transformedFaceData[storeIndex + 5];
-            /*
-            faceData[storeIndex + 4] = getDeltaU(faceData[storeIndex + 4], d, facing, storeIndex / 7);
-            faceData[storeIndex + 5] = getDeltaV(faceData[storeIndex + 5], d, facing, storeIndex / 7);*/
             }
 
-            return new BakedQuad(faceData, tintIndex, face);
+            return new BakedQuad(faceData, tintIndex, face, sprite, true, format);
         }
-
-        //Attempt to get the correct side the block, left for future reference
-    /*private int getSign(float i) {
-        return i < 0 ? -1: 1;
-    }
-
-    private int getDeltaU(int origU, float[] delta, EnumFacing facing, int corner) {
-        int d = 0;
-        float d1 = delta[0];
-        float d2 = delta[2];
-        switch (facing) {
-
-            case DOWN:
-            case UP:
-                d = Math.abs(d1) > 0 ? getSign(d1) * 261817 + 261816 * ((int)d1 - 1): 0;
-                break;
-            case NORTH:
-            case SOUTH:
-                d = Math.abs(d1) > 0 ? getSign(d1) * 261817 + 261816 * ((int)d1 - 1): 0;
-                break;
-            case WEST:
-            case EAST:
-                d = Math.abs(d2) > 0 ? getSign(d2) * 261817 + 261816 * ((int)d2 - 1): 0;
-                break;
-        }
-
-        return origU - d;
-    }
-
-    private int getDeltaV(int origV, float[] delta, EnumFacing facing, int corner) {
-        int d = 0;
-        float d1 = delta[1];
-        float d2 = delta[2];
-        int sign = getSign(d1);
-        int sign2 = getSign(d2);
-        switch (facing) {
-            case DOWN:
-            case UP:
-                d = Math.abs(d2) > 1 ? ((sign2 == -1 && corner != 0 && corner != 1) ? sign2: 0) * 261817 + 261816 * ((int)d2 - 1): 0;
-                break;
-            case NORTH:
-            case SOUTH:
-            case WEST:
-            case EAST:
-                d = Math.abs(d1) >= 0 ? ((sign != -1 && (corner == 0 || corner == 3)) ? 261816 * 2: (sign == -1 && (corner == 1 || corner == 2)) ? 261816 / ((int)Math.abs(d1)): 0): 0;
-                break;
-        }
-        if (facing == EnumFacing.EAST) System.out.println("D:" + d + "; " + d1 + "; s:" + sign + "; c:" + corner + "; m:" + ((int)d1 - sign));
-
-        return origV - d;
-    }*/
 
         @Override
-        public List getFaceQuads(EnumFacing side) {
+        public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
             List<BakedQuad> allFaceQuads = new LinkedList<BakedQuad>();
 
-            for (BakedQuad quad: quads) {
-                if (FaceBakery.getFacingFromVertexData(quad.getVertexData()) == side) {
-                    allFaceQuads.add(quad);
+            if (side != null) {
+                for (BakedQuad quad: quads) {
+                    if (FaceBakery.getFacingFromVertexData(quad.getVertexData()) == side) {
+                        allFaceQuads.add(quad);
+                    }
                 }
+            } else {
+                return new LinkedList<BakedQuad>(quads);
             }
 
             return allFaceQuads;
-        }
-
-        @Override
-        public List getGeneralQuads() {
-            return new LinkedList<BakedQuad>(quads);
         }
 
         @Override
@@ -419,6 +347,11 @@ public class BakedCamouflageBlockModel implements IFlexibleBakedModel, ISmartBlo
         @Override
         public ItemCameraTransforms getItemCameraTransforms() {
             return ItemCameraTransforms.DEFAULT;
+        }
+
+        @Override
+        public ItemOverrideList getOverrides() {
+            return null;
         }
     }
 }

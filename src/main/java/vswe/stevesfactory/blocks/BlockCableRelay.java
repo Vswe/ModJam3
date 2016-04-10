@@ -5,7 +5,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
@@ -34,9 +35,8 @@ public class BlockCableRelay extends BlockCableDirectionAdvanced {
         return TileEntityRelay.class;
     }
 
-
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float xSide, float ySide, float zSide) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float xSide, float ySide, float zSide) {
         TileEntityRelay relay = TileEntityCluster.getTileEntity(TileEntityRelay.class, world, pos);
         if (relay != null && isAdvanced(relay.getBlockMetadata())) {
             if (!world.isRemote) {

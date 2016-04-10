@@ -2,17 +2,19 @@ package vswe.stevesfactory.blocks;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockPistonBase;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
@@ -23,7 +25,7 @@ public abstract class BlockCableDirectionAdvanced extends BlockContainer {
     public BlockCableDirectionAdvanced() {
         super(Material.iron);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(soundTypeMetal);
+        setStepSound(SoundType.METAL);
         setHardness(1.2F);
     }
 
@@ -31,8 +33,8 @@ public abstract class BlockCableDirectionAdvanced extends BlockContainer {
     public static final IProperty ADVANCED = PropertyBool.create("advanced");
 
     @Override
-    protected BlockState createBlockState() {
-        return new BlockState(this, ADVANCED, FACING);
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, ADVANCED, FACING);
     }
 
     @Override
@@ -46,13 +48,13 @@ public abstract class BlockCableDirectionAdvanced extends BlockContainer {
     }
 
     @Override
-    public int getRenderType() {
-        return 3;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
     }
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack item) {
-        int meta = addAdvancedMeta(BlockPistonBase.getFacingFromEntity(world, pos, entity).getIndex(), item.getItemDamage());
+        int meta = addAdvancedMeta(BlockPistonBase.getFacingFromEntity(pos, entity).getIndex(), item.getItemDamage());
 
         TileEntityClusterElement element = TileEntityCluster.getTileEntity(getTeClass(), world, pos);
         if (element != null) {

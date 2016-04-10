@@ -5,12 +5,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.client.resources.model.ModelRotation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IFlexibleBakedModel;
-import net.minecraftforge.client.model.ISmartBlockModel;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import org.lwjgl.util.vector.Vector3f;
 import vswe.stevesfactory.blocks.BlockCableOutput;
@@ -26,7 +22,7 @@ enum SideQuad {
 
 
 //Needed to render all the sides individually, if they where made with JSON it would be a huge amount of files, the new format is not good for dynamic and advanced blocks
-public class BakedEmitterBlockModel implements IFlexibleBakedModel, ISmartBlockModel {
+public class BakedEmitterBlockModel implements IBakedModel {
 
     private VertexFormat format;
     private TextureAtlasSprite strongSprite;
@@ -37,10 +33,7 @@ public class BakedEmitterBlockModel implements IFlexibleBakedModel, ISmartBlockM
     private BakedQuad[] weakQuads = new BakedQuad[EnumFacing.values().length];
     private BakedQuad[] idleQuads = new BakedQuad[EnumFacing.values().length];
 
-    public BakedEmitterBlockModel(VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-
-        this.format = format;
-
+    public BakedEmitterBlockModel(Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
         FaceBakery faceBakery = new FaceBakery();
         BlockFaceUV bfUV = new BlockFaceUV(new float[]{0, 0, 16, 16}, 0);
         strongSprite = bakedTextureGetter.apply(EmitterBlockModel.STRONG);
@@ -58,15 +51,13 @@ public class BakedEmitterBlockModel implements IFlexibleBakedModel, ISmartBlockM
     }
 
     @Override
-    public List<BakedQuad> getFaceQuads(EnumFacing side) {
-        //This should never be called!  The handleBlockState returns an AssembledBakedModel
-        throw new UnsupportedOperationException();
-    }
+    public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+        if (state instanceof IExtendedBlockState) {
+            IExtendedBlockState blockState = (IExtendedBlockState) state;
+            return new AssembledBakedModel(blockState).getQuads(state, side, rand);
+        }
 
-    @Override
-    public List<BakedQuad> getGeneralQuads() {
-        //This should never be called!  The handleBlockState returns an AssembledBakedModel
-        throw new UnsupportedOperationException();
+        return new AssembledBakedModel().getQuads(state, side, rand);
     }
 
     @Override
@@ -95,19 +86,8 @@ public class BakedEmitterBlockModel implements IFlexibleBakedModel, ISmartBlockM
     }
 
     @Override
-    public VertexFormat getFormat() {
-        return format;
-    }
-
-    @Override
-    public IBakedModel handleBlockState(IBlockState state) {
-
-        if (state instanceof IExtendedBlockState) {
-            IExtendedBlockState blockState = (IExtendedBlockState) state;
-            return new AssembledBakedModel(blockState);
-        }
-
-        return new AssembledBakedModel();
+    public ItemOverrideList getOverrides() {
+        return ItemOverrideList.NONE;
     }
 
     //Apparently it needs to be separate because it could be overridden my another thread as rendering is multithreaded
@@ -158,7 +138,7 @@ public class BakedEmitterBlockModel implements IFlexibleBakedModel, ISmartBlockM
                     return idleQuads[facing.getIndex()];
             }
         }
-
+/*
         @Override
         public List getFaceQuads(EnumFacing side) {
             List<BakedQuad> allFaceQuads = new LinkedList<BakedQuad>();
@@ -177,6 +157,21 @@ public class BakedEmitterBlockModel implements IFlexibleBakedModel, ISmartBlockM
             }
 
             return allQuads;
+        }
+*/
+        @Override
+        public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+            List<BakedQuad> allFaceQuads = new LinkedList<BakedQuad>();
+
+            if (side != null) {
+                allFaceQuads.add(getQuadFromSide(sideQuads[side.getIndex()], side));
+            } else {
+                for (EnumFacing facing: EnumFacing.values()) {
+                    allFaceQuads.add(getQuadFromSide(sideQuads[facing.getIndex()], facing));
+                }
+            }
+
+            return allFaceQuads;
         }
 
         @Override
@@ -202,6 +197,11 @@ public class BakedEmitterBlockModel implements IFlexibleBakedModel, ISmartBlockM
         @Override
         public ItemCameraTransforms getItemCameraTransforms() {
             return ItemCameraTransforms.DEFAULT;
+        }
+
+        @Override
+        public ItemOverrideList getOverrides() {
+            return ItemOverrideList.NONE;
         }
 
     }

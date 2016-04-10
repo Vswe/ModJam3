@@ -6,7 +6,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.blocks.ITileEntityInterface;
@@ -246,7 +246,7 @@ public class PacketHandler {
             }else if(player != null) {
                 dw.sendPlayerPacket((EntityPlayerMP)player);
             }else{
-                dw.sendPlayerPackets(pos.getX() + 0.5, pos.getY(), pos.getZ(), BLOCK_UPDATE_RANGE, te.getWorld().provider.getDimensionId());
+                dw.sendPlayerPackets(pos.getX() + 0.5, pos.getY(), pos.getZ(), BLOCK_UPDATE_RANGE, te.getWorld().provider.getDimension());
             }
 
             dw.close();
