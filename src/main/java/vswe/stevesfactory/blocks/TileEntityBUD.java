@@ -1,9 +1,11 @@
 package vswe.stevesfactory.blocks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -12,8 +14,8 @@ import java.util.List;
 
 public class TileEntityBUD extends TileEntityClusterElement implements ISystemListener, ITriggerNode{
     private List<TileEntityManager> managerList = new ArrayList<TileEntityManager>();
-    private int[] oldData = new int[ForgeDirection.VALID_DIRECTIONS.length];
-    private int[] data = new int[ForgeDirection.VALID_DIRECTIONS.length];
+    private int[] oldData = new int[EnumFacing.values().length];
+    private int[] data = new int[EnumFacing.values().length];
 
     @Override
     public void added(TileEntityManager owner) {
@@ -54,12 +56,14 @@ public class TileEntityBUD extends TileEntityClusterElement implements ISystemLi
         if (worldObj != null) {
             data = new int[data.length];
             for (int i = 0; i < data.length; i++) {
-                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[i];
-                int x = direction.offsetX + this.xCoord;
-                int y = direction.offsetY + this.yCoord;
-                int z = direction.offsetZ + this.zCoord;
+                EnumFacing direction = EnumFacing.getFront(i);
+                int x = direction.getFrontOffsetX() + this.getPos().getX();
+                int y = direction.getFrontOffsetY() + this.getPos().getY();
+                int z = direction.getFrontOffsetZ() + this.getPos().getZ();
 
-                data[i] = (Block.getIdFromBlock(worldObj.getBlock(x, y, z)) << 4) | (worldObj.getBlockMetadata(x, y, z) & 15);
+                IBlockState state = worldObj.getBlockState(new BlockPos(x, y, z));
+
+                data[i] = (Block.getIdFromBlock(state.getBlock()) << 4) | (state.getBlock().getMetaFromState(state) & 15);
             }
         }
     }

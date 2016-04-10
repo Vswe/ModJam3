@@ -4,8 +4,10 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.text.ITextComponent;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -61,24 +63,24 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
         id--;
         if (id < 0 || !canPickUp(items.get(id))) {
             if (itemstack != null) {
-                ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[ModBlocks.blockCableIntake.getSideMeta(getBlockMetadata()) % ForgeDirection.VALID_DIRECTIONS.length];
+                EnumFacing direction = EnumFacing.getFront(ModBlocks.blockCableIntake.getSideMeta(getBlockMetadata()) % EnumFacing.values().length);
 
-                double posX = xCoord + 0.5 + direction.offsetX * 0.75;
-                double posY = yCoord + 0.5 + direction.offsetY * 0.75;
-                double posZ = zCoord + 0.5 + direction.offsetZ * 0.75;
+                double posX = getPos().getX() + 0.5 + direction.getFrontOffsetX() * 0.75;
+                double posY = getPos().getY() + 0.5 + direction.getFrontOffsetY() * 0.75;
+                double posZ = getPos().getZ() + 0.5 + direction.getFrontOffsetZ() * 0.75;
 
-                if (direction.offsetY == 0) {
+                if (direction.getFrontOffsetY() == 0) {
                     posY -= 0.1;
                 }
 
                 EntityItem item = new EntityItem(worldObj, posX, posY, posZ, itemstack);
 
-                item.motionX = direction.offsetX * 0.2;
-                item.motionY = direction.offsetY * 0.2;
-                item.motionZ = direction.offsetZ * 0.2;
+                item.motionX = direction.getFrontOffsetX() * 0.2;
+                item.motionY = direction.getFrontOffsetY() * 0.2;
+                item.motionZ = direction.getFrontOffsetZ() * 0.2;
 
 
-                item.delayBeforeCanPickup = 40;
+                item.setPickupDelay(40);
                 worldObj.spawnEntityInWorld(item);
 
 
@@ -99,13 +101,18 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
     }
 
     @Override
-    public String getInventoryName() {
+    public String getName() {
         return ModBlocks.blockCableIntake.getLocalizedName();
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean hasCustomName() {
         return true;
+    }
+
+    @Override
+    public ITextComponent getDisplayName() {
+        return new TextComponentString(ModBlocks.blockCableIntake.getLocalizedName());
     }
 
     private static final int DISTANCE = 3;
@@ -114,15 +121,15 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
         if (items == null) {
             items = new ArrayList<EntityItem>();
 
-            int lowX = xCoord - DISTANCE;
-            int lowY = yCoord - DISTANCE;
-            int lowZ = zCoord - DISTANCE;
+            int lowX = getPos().getX() - DISTANCE;
+            int lowY = getPos().getY() - DISTANCE;
+            int lowZ = getPos().getZ() - DISTANCE;
 
-            int highX = xCoord + 1 + DISTANCE;
-            int highY = yCoord + 1 + DISTANCE;
-            int highZ = zCoord + 1 + DISTANCE;
+            int highX = getPos().getX() + 1 + DISTANCE;
+            int highY = getPos().getY() + 1 + DISTANCE;
+            int highZ = getPos().getZ() + 1 + DISTANCE;
 
-            items = worldObj.getEntitiesWithinAABB(EntityItem.class, AxisAlignedBB.getBoundingBox(lowX, lowY, lowZ, highX, highY, highZ));
+            items = worldObj.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(lowX, lowY, lowZ, highX, highY, highZ));
 
             //remove items we can't use right away, this check is done when we interact with items too, to make sure it hasn't changed
             for (Iterator<EntityItem> iterator = items.iterator(); iterator.hasNext(); ) {
@@ -135,7 +142,7 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int i) {
+    public ItemStack removeStackFromSlot(int i) {
         return null;
     }
 
@@ -150,12 +157,12 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
     }
 
     @Override
-    public void openInventory() {
+    public void openInventory(EntityPlayer player) {
 
     }
 
     @Override
-    public void closeInventory() {
+    public void closeInventory(EntityPlayer player) {
 
     }
 
@@ -165,12 +172,32 @@ public class TileEntityIntake extends TileEntityClusterElement implements IInven
     }
 
     @Override
-    public void updateEntity() {
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void clear() {
+        items.clear();
+    }
+
+    @Override
+    public void update() {
         items = null;
     }
 
     private boolean canPickUp(EntityItem item) {
-        return !item.isDead && (item.delayBeforeCanPickup == 0 || ModBlocks.blockCableIntake.isAdvanced(getBlockMetadata()));
+        return !item.isDead && (!item.cannotPickup() || ModBlocks.blockCableIntake.isAdvanced(getBlockMetadata()));
     }
 
     @Override

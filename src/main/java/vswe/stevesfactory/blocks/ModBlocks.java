@@ -1,16 +1,16 @@
 package vswe.stevesfactory.blocks;
 
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public final class ModBlocks {
 
-    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 12;
+    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 13;
     public static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
 
     private static final String MANAGER_TILE_ENTITY_TAG = "TileEntityMachineManagerName";
@@ -58,7 +58,6 @@ public final class ModBlocks {
 
     private static final String CABLE_CAMOUFLAGE_TILE_ENTITY_TAG = "TileEntityCableCamouflageName";
     public static final String CABLE_CAMOUFLAGE_NAME_TAG = "BlockCableCamouflageName";
-    public static int CAMOUFLAGE_RENDER_ID;
 
     private static final String CABLE_SIGN_TILE_ENTITY_TAG = "TileEntityCableSignName";
     public static final String CABLE_SIGN_NAME_TAG = "BlockCableSignName";

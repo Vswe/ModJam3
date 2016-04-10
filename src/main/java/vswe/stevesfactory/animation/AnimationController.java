@@ -1,7 +1,6 @@
 package vswe.stevesfactory.animation;
 
 
-import com.sun.swing.internal.plaf.metal.resources.metal_it;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.*;
 

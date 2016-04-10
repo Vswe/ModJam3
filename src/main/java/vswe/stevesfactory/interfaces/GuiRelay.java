@@ -1,12 +1,11 @@
 package vswe.stevesfactory.interfaces;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StringUtils;
-import org.lwjgl.opengl.GL11;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.TileEntityRelay;
@@ -16,8 +15,10 @@ import vswe.stevesfactory.network.DataWriter;
 import vswe.stevesfactory.network.PacketHandler;
 import vswe.stevesfactory.util.Utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @SideOnly(Side.CLIENT)
 public class GuiRelay extends GuiBase {
@@ -43,7 +44,7 @@ public class GuiRelay extends GuiBase {
             @Override
             public void onClick() {
                 if (relay.getPermissions().size() < TileEntityRelay.PERMISSION_MAX_LENGTH) {
-                    relay.getPermissions().add(new UserPermission(getUserName()));
+                    relay.getPermissions().add(new UserPermission(getUserId(), getUserName()));
                     addUser();
                 }
             }
@@ -310,7 +311,7 @@ public class GuiRelay extends GuiBase {
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int mX, int mY) {
         hasCachedPermission = false;
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         bindTexture(TEXTURE);
         drawTexture(0, 0, 0, 0, xSize, ySize);
@@ -339,7 +340,7 @@ public class GuiRelay extends GuiBase {
                     renderInfoBox(j, permission, x + LIST_MENU_WIDTH - (1 + j) * (INFO_SIZE + INFO_MARGIN_X), y + INFO_MARGIN_Y);
                 }
 
-                drawString(permission.getName(), x + LIST_TEXT_POS_X, y + LIST_TEXT_POS_Y, 0.7F, 0xEEEEEE);
+                drawString(permission.getUserName(), x + LIST_TEXT_POS_X, y + LIST_TEXT_POS_Y, 0.7F, 0xEEEEEE);
             }
 
             if (getPageCount() > 1) {
@@ -360,7 +361,7 @@ public class GuiRelay extends GuiBase {
 
         UserPermission info = relay.doesListRequireOp() && !isOp(player, true) ? player : selected;
         if (info != null) {
-            drawString(info.getName(), INFO_BOX_POS_X + INFO_BOX_NAME_X, INFO_BOX_POS_Y + INFO_BOX_NAME_Y, 0.7F, 0x404040);
+            drawString(info.getUserName(), INFO_BOX_POS_X + INFO_BOX_NAME_X, INFO_BOX_POS_Y + INFO_BOX_NAME_Y, 0.7F, 0x404040);
             for (int i = 0; i < 2; i++) {
                 int x = INFO_BOX_POS_X + INFO_BOX_INFO_X;
                 int y = INFO_BOX_POS_Y + INFO_BOX_INFO_Y + i * (INFO_SIZE + INFO_MARGIN_INFO_Y);
@@ -431,7 +432,7 @@ public class GuiRelay extends GuiBase {
     }
 
     private boolean isOwner(UserPermission permission, boolean viewer) {
-        return (permission != null && permission.getName().equals(relay.getOwner())) || (viewer && getUserName().equals(relay.getOwner()));
+        return (permission != null && permission.getUserId().equals(relay.getOwner())) || (viewer && getUserId().equals(relay.getOwner()));
     }
 
     private boolean isOp(UserPermission permission, boolean viewer) {
@@ -440,7 +441,7 @@ public class GuiRelay extends GuiBase {
 
 
     @Override
-    protected void mouseClicked(int mX, int mY, int b) {
+    protected void mouseClicked(int mX, int mY, int b) throws IOException {
         mX = scaleX(mX);
         mY = scaleY(mY);
 
@@ -499,8 +500,12 @@ public class GuiRelay extends GuiBase {
     private UserPermission cachedPermission;
     private boolean hasCachedPermission;
 
+    private UUID getUserId()  {
+        return Minecraft.getMinecraft().thePlayer.getUniqueID();
+    }
+
     private String getUserName()  {
-        return Utils.stripControlCodes(Minecraft.getMinecraft().thePlayer.getDisplayName());
+        return Utils.stripControlCodes(Minecraft.getMinecraft().thePlayer.getDisplayNameString());
     }
 
     private UserPermission getUserPermission() {
@@ -512,7 +517,7 @@ public class GuiRelay extends GuiBase {
         }
 
         for (UserPermission permission : relay.getPermissions()) {
-            if (permission.getName().equals(getUserName())) {
+            if (permission.getUserId().equals(getUserId())) {
                 cachedPermission = permission;
                 break;
             }
@@ -547,7 +552,7 @@ public class GuiRelay extends GuiBase {
 
     private void removeUser() {
         for (int i = 0; i < relay.getPermissions().size(); i++) {
-            if (relay.getPermissions().get(i).getName().equals(getUserName())) {
+            if (relay.getPermissions().get(i).getUserId().equals(getUserId())) {
                 removeUser(i);
                 break;
             }
@@ -566,6 +571,7 @@ public class GuiRelay extends GuiBase {
         DataWriter dw = PacketHandler.getWriterForServerPacket();
         dw.writeBoolean(true); //user data
         dw.writeBoolean(true); //added
+        dw.writeString(getUserId().toString(), DataBitHelper.UUID_LENGTH);
         dw.writeString(getUserName(), DataBitHelper.NAME_LENGTH);
         PacketHandler.sendDataToServer(dw);
     }

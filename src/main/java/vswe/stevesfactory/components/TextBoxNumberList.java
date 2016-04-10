@@ -1,8 +1,8 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.interfaces.GuiManager;
 
@@ -66,6 +66,7 @@ public class TextBoxNumberList {
             }else if(c == '-' && selectedTextBox.allowNegative()) {
                 selectedTextBox.setNumber(selectedTextBox.getNumber() * -1);
                 selectedTextBox.onNumberChanged();
+                return true;
             }else if(k == 14){
                 selectedTextBox.setNumber(selectedTextBox.getNumber() / 10);
                 selectedTextBox.onNumberChanged();

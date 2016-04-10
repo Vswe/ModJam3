@@ -1,9 +1,9 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
@@ -266,7 +266,7 @@ public class ComponentMenuVariable extends ComponentMenu {
             }
         }else{
             executed = dr.readBoolean();
-            if (!getParent().getManager().getWorldObj().isRemote) {
+            if (!getParent().getManager().getWorld().isRemote) {
                 getVariable().setExecuted(executed);
             }
         }

@@ -1,7 +1,7 @@
 package vswe.stevesfactory.components;
 
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.TileEntityInput;
 
@@ -40,8 +40,8 @@ public class TriggerHelperRedstone extends TriggerHelper {
 
         if (receivers != null) {
             ComponentMenuContainer componentMenuContainer = (ComponentMenuContainer)item.getMenus().get(containerId);
-            int[] newPower = new int[ForgeDirection.VALID_DIRECTIONS.length];
-            int[] oldPower = new int[ForgeDirection.VALID_DIRECTIONS.length];
+            int[] newPower = new int[EnumFacing.values().length];
+            int[] oldPower = new int[EnumFacing.values().length];
             if (canUseMergedDetection && componentMenuContainer.getOption() == 0) {
                 for (SlotInventoryHolder receiver : receivers) {
                     TileEntityInput input = receiver.getReceiver();

@@ -1,20 +1,24 @@
 package vswe.stevesfactory.blocks;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockPistonBase;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import vswe.stevesfactory.StevesFactoryManager;
 
 //This is indeed not a subclass to the cable, you can't relay signals through this block
@@ -22,8 +26,8 @@ public class BlockCableBreaker extends BlockContainer {
     public BlockCableBreaker() {
         super(Material.iron);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(soundTypeMetal);
-        setBlockName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_BREAKER_UNLOCALIZED_NAME);
+        setStepSound(SoundType.METAL);
+        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_BREAKER_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
 
@@ -32,76 +36,67 @@ public class BlockCableBreaker extends BlockContainer {
         return new TileEntityBreaker();
     }
 
-    @SideOnly(Side.CLIENT)
-    private IIcon doubleIIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon frontIIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon sideIIcon;
+    public static final IProperty FRONT = PropertyDirection.create("front");
+    public static final IProperty DIRECTION = PropertyDirection.create("direction");
 
-
-    @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister register) {
-        blockIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_idle");
-        doubleIIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_breaker");
-        frontIIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_breaker_front");
-        sideIIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_breaker_direction");
+    public BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, DIRECTION, FRONT);
     }
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public IIcon getIcon(int side, int meta) {
-        return side == 3 ? doubleIIcon : blockIcon;
+    public static EnumFacing getSide(int meta) {
+        return EnumFacing.getFront(meta % EnumFacing.values().length);
     }
 
-    @SideOnly(Side.CLIENT)
     @Override
-    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(FRONT, getSide(meta)).withProperty(DIRECTION, getSide(meta));
+    }
 
-        TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, x, y, z);
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return ((EnumFacing)state.getValue(FRONT)).getIndex();
+    }
 
-        if (breaker != null) {
-            int meta = breaker.getBlockMetadata() % ForgeDirection.VALID_DIRECTIONS.length;
-            int direction = breaker.getPlaceDirection();
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        TileEntityBreaker entityBreaker = (TileEntityBreaker) worldIn.getTileEntity(pos);
+        if (entityBreaker != null && entityBreaker.getPlaceDirection() != null) {
+            return state.withProperty(DIRECTION, entityBreaker.getPlaceDirection()).withProperty(FRONT, getSide(getMetaFromState(state)));
+        }
+        return state.withProperty(DIRECTION, getSide(getMetaFromState(state))).withProperty(FRONT, getSide(getMetaFromState(state)));
+    }
 
-            if (side == meta && side == direction) {
-                return doubleIIcon;
-            }else if(side == meta) {
-                return frontIIcon;
-            }else if(side == direction) {
-                return sideIIcon;
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack item) {
+        if (!world.isRemote) {
+            EnumFacing facing = BlockPistonBase.getFacingFromEntity(pos, entity);
+
+            TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, pos);
+            if (breaker != null) {
+                breaker.setPlaceDirection(facing);
+                breaker.setMetaData(facing.getIndex());
             }
         }
-
-        return blockIcon;
-    }
-
-
-
-    @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
-        int meta = BlockPistonBase.determineOrientation(world, x, y, z, entity);
-
-        TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, x, y, z);
-        if (breaker != null) {
-            breaker.setMetaData(meta);
-            breaker.setPlaceDirection(meta);
-        }
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+
         if (player.isSneaking()) {
-            side = ForgeDirection.VALID_DIRECTIONS[side].getOpposite().ordinal();
+            side = side.getOpposite();
         }
 
-        TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, x, y, z);
+        TileEntityBreaker breaker = TileEntityCluster.getTileEntity(TileEntityBreaker.class, world, pos);
         if (breaker != null && !breaker.isBlocked()) {
             breaker.setPlaceDirection(side);
             return true;
         }
-
 
         return false;
     }
