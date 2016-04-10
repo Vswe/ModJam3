@@ -1,11 +1,14 @@
 package vswe.stevesfactory.blocks;
 
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import vswe.stevesfactory.StevesFactoryManager;
 
 //This is indeed not a subclass to the cable, you can't relay signals through this block
@@ -17,21 +20,10 @@ public class BlockCableRelay extends BlockCableDirectionAdvanced {
     }
 
     @Override
-    protected String getFrontTextureName(boolean isAdvanced) {
-        return isAdvanced ? "cable_relay_advanced" : "cable_relay";
-    }
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack item) {
+        super.onBlockPlacedBy(world, pos, state, entity, item);
 
-    @Override
-    protected String getSideTextureName(boolean isAdvanced) {
-        return "cable_idle";
-    }
-
-
-    @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
-        super.onBlockPlacedBy(world, x, y, z, entity, item);
-
-        TileEntityRelay relay = TileEntityCluster.getTileEntity(TileEntityRelay.class, world, x, y, z);
+        TileEntityRelay relay = TileEntityCluster.getTileEntity(TileEntityRelay.class, world, pos);
         if (relay != null && isAdvanced(relay.getBlockMetadata()) && !world.isRemote) {
             relay.setOwner(entity);
         }
@@ -44,11 +36,11 @@ public class BlockCableRelay extends BlockCableDirectionAdvanced {
 
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float xSide, float ySide, float zSide) {
-        TileEntityRelay relay = TileEntityCluster.getTileEntity(TileEntityRelay.class, world, x, y, z);
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float xSide, float ySide, float zSide) {
+        TileEntityRelay relay = TileEntityCluster.getTileEntity(TileEntityRelay.class, world, pos);
         if (relay != null && isAdvanced(relay.getBlockMetadata())) {
             if (!world.isRemote) {
-                FMLNetworkHandler.openGui(player, StevesFactoryManager.instance, 0, world, x, y, z);
+                FMLNetworkHandler.openGui(player, StevesFactoryManager.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
             }
 
             return true;

@@ -1,9 +1,9 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.Color;
 
@@ -41,7 +41,7 @@ public enum VariableColor {
 
     @SideOnly(Side.CLIENT)
     public void applyColor() {
-        GL11.glColor4f(red, green, blue, 1F);
+        GlStateManager.color(red, green, blue, 1F);
     }
 
 

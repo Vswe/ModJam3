@@ -1,13 +1,15 @@
 package vswe.stevesfactory.blocks;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ITickable;
 
 import java.util.EnumSet;
 
 
-public abstract class TileEntityClusterElement extends TileEntity {
+public abstract class TileEntityClusterElement extends TileEntity implements ITickable {
 
     private ClusterRegistry registryElement;
     private boolean isPartOfCluster;
@@ -37,11 +39,19 @@ public abstract class TileEntityClusterElement extends TileEntity {
         }
     }
 
+    public void setState(IBlockState state) {
+        if (isPartOfCluster) {
+            this.meta = state.getBlock().getMetaFromState(state);
+        }else{
+            worldObj.setBlockState(pos, state, 2);
+        }
+    }
+
     public void setMetaData(int meta) {
         if (isPartOfCluster) {
             this.meta = meta;
         }else{
-            worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, meta, 2);
+            worldObj.setBlockState(pos, worldObj.getBlockState(pos).getBlock().getStateFromMeta(meta), 2);
         }
     }
 
@@ -55,6 +65,11 @@ public abstract class TileEntityClusterElement extends TileEntity {
     public final void readFromNBT(NBTTagCompound tagCompound) {
         super.readFromNBT(tagCompound);
         readContentFromNBT(tagCompound);
+    }
+
+    @Override
+    public void update() {
+
     }
 
     protected void readContentFromNBT(NBTTagCompound tagCompound) {}

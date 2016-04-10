@@ -105,7 +105,7 @@ public class NBTNode {
     private static NBTNode generateNodesFromTag(NBTTagCompound compound) {
         NBTNode node = new NBTNode(compound);
         node.nodes = new ArrayList<NBTNode>();
-        for (Object obj : compound.func_150296_c()) {
+        for (Object obj : compound.getKeySet()) {
             NBTBase tag = (NBTBase)obj;
 
             if (tag.getId() == END_TAG) break;
@@ -127,7 +127,7 @@ public class NBTNode {
     private static NBTNode generateNodesFromArray(NBTTagByteArray compound) {
         NBTNode node = new NBTNode(compound);
         node.nodes = new ArrayList<NBTNode>();
-        for (byte b : compound.func_150292_c()) {
+        for (byte b : compound.getByteArray()) {
             NBTNode child = new NBTNode(null);
             child.value = String.valueOf(b);
             node.nodes.add(child);
@@ -138,7 +138,7 @@ public class NBTNode {
     private static NBTNode generateNodesFromArray(NBTTagIntArray compound) {
         NBTNode node = new NBTNode(compound);
         node.nodes = new ArrayList<NBTNode>();
-        for (int n : compound.func_150302_c()) {
+        for (int n : compound.getIntArray()) {
             NBTNode child = new NBTNode(null);
             child.value = String.valueOf(n);
             node.nodes.add(child);

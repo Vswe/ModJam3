@@ -1,12 +1,12 @@
 package vswe.stevesfactory.blocks;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import vswe.stevesfactory.StevesFactoryManager;
@@ -17,7 +17,7 @@ public class BlockCableInput extends BlockContainer {
         super(Material.iron);
         setCreativeTab(ModBlocks.creativeTab);
         setStepSound(soundTypeMetal);
-        setBlockName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_INPUT_UNLOCALIZED_NAME);
+        setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_INPUT_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
 
@@ -26,33 +26,32 @@ public class BlockCableInput extends BlockContainer {
         return new TileEntityInput();
     }
 
-    @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister register) {
-        blockIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":cable_input");
+    public int getRenderType() {
+        return 3;
     }
 
     @Override
-    public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side) {
+    public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
         return true;
     }
 
     @Override
-    public void onBlockAdded(World world, int x, int y, int z) {
-        super.onBlockAdded(world, x, y, z);
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+        super.onBlockAdded(world, pos, state);
 
-        updateRedstone(world, x, y, z);
+        updateRedstone(world, pos);
     }
 
     @Override
-    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-        super.onNeighborBlockChange(world, x, y, z, block);
+    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
+        super.onNeighborBlockChange(world, pos, state, block);
 
-        updateRedstone(world, x, y, z);
+        updateRedstone(world, pos);
     }
 
-    private void updateRedstone(World world, int x, int y, int z) {
-        TileEntityInput input = TileEntityCluster.getTileEntity(TileEntityInput.class, world, x, y, z);
+    private void updateRedstone(World world, BlockPos pos) {
+        TileEntityInput input = TileEntityCluster.getTileEntity(TileEntityInput.class, world, pos);
         if (input != null) {
             input.triggerRedstone();
         }

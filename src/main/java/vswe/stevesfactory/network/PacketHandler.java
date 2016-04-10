@@ -1,13 +1,14 @@
 package vswe.stevesfactory.network;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.blocks.ITileEntityInterface;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.components.ComponentMenu;
@@ -226,13 +227,14 @@ public class PacketHandler {
     public static void sendBlockPacket(IPacketBlock block, EntityPlayer player, int id) {
         if (block instanceof TileEntity) {
             TileEntity te = (TileEntity)block;
+            BlockPos pos = te.getPos();
             boolean onServer = player == null || !player.worldObj.isRemote;
 
             DataWriter dw = new DataWriter();
             dw.writeBoolean(false); //no container
-            dw.writeData(te.xCoord, DataBitHelper.WORLD_COORDINATE);
-            dw.writeData(te.yCoord, DataBitHelper.WORLD_COORDINATE);
-            dw.writeData(te.zCoord, DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(pos.getX(), DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(pos.getY(), DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(pos.getZ(), DataBitHelper.WORLD_COORDINATE);
             int length = block.infoBitLength(onServer);
             if (length != 0) {
                 dw.writeData(id, length);
@@ -244,7 +246,7 @@ public class PacketHandler {
             }else if(player != null) {
                 dw.sendPlayerPacket((EntityPlayerMP)player);
             }else{
-                dw.sendPlayerPackets(te.xCoord + 0.5, te.yCoord, te.zCoord, BLOCK_UPDATE_RANGE, te.getWorldObj().provider.dimensionId);
+                dw.sendPlayerPackets(pos.getX() + 0.5, pos.getY(), pos.getZ(), BLOCK_UPDATE_RANGE, te.getWorld().provider.getDimensionId());
             }
 
             dw.close();

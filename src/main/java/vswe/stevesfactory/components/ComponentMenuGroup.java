@@ -102,7 +102,7 @@ public class ComponentMenuGroup extends ComponentMenu {
 
     @Override
     public void readNetworkComponent(DataReader dr) {
-        if (!getParent().getManager().getWorldObj().isRemote) {
+        if (!getParent().getManager().getWorld().isRemote) {
             int id = dr.readComponentId();
             FlowComponent component = getParent().getManager().getFlowItems().get(id);
             boolean moveCluster = dr.readBoolean();

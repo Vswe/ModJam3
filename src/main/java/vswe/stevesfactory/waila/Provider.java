@@ -1,71 +1,85 @@
 package vswe.stevesfactory.waila;
 
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import mcp.mobius.waila.api.*;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.blocks.*;
 
 import java.util.List;
 
 public class Provider implements IWailaDataProvider {
+
     @Override
     public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
         TileEntity te = accessor.getTileEntity();
         if (te != null && !isShiftDown()) {
-            TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
+            TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, te.getWorld(), te.getPos());
             if (camouflage != null ) {
-                int id = camouflage.getId(accessor.getPosition().sideHit);
-                int meta = camouflage.getMeta(accessor.getPosition().sideHit);
+                int id = camouflage.getId(accessor.getSide().getIndex());
+                int meta = camouflage.getMeta(accessor.getSide().getIndex());
 
                 if (id != 0) {
                     Block block = Block.getBlockById(id);
                     if (block != null) {
-                        return new ItemStack(block, 1, block.damageDropped(meta));
+                        return new ItemStack(block, 1, block.damageDropped(block.getStateFromMeta(meta)));
                     }
                 }
             }
         }
 
-        return new ItemStack(accessor.getBlock(), 1, accessor.getBlock().damageDropped(accessor.getMetadata()));
+        return new ItemStack(accessor.getBlock(), 1, accessor.getBlock().damageDropped(accessor.getBlock().getStateFromMeta(accessor.getMetadata())));
     }
 
     @Override
-    public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        return currenttip;
+    public List<String> getWailaHead(ItemStack itemStack, List<String> list, IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler) {
+        return list;
     }
 
     @Override
-    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        if (itemStack != null && itemStack.getItem() == accessor.getStack().getItem()) {
-            TileEntity te = accessor.getTileEntity();
+    public List<String> getWailaBody(ItemStack itemStack, List<String> list, IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler) {
+        if (itemStack != null && itemStack.getItem() == iWailaDataAccessor.getStack().getItem()) {
+            TileEntity te = iWailaDataAccessor.getTileEntity();
             if (te != null ) {
                 if (te instanceof TileEntityCluster) {
                     TileEntityCluster cluster = (TileEntityCluster)te;
 
                     for (byte type : cluster.getTypes()) {
-                        currenttip.add(ClusterRegistry.getRegistryList().get(type).getItemStack().getDisplayName());
+                        list.add(ClusterRegistry.getRegistryList().get(type).getItemStack().getDisplayName());
                     }
                 }else if(te instanceof TileEntityOutput) {
                     TileEntityOutput emitter = (TileEntityOutput)te;
 
                     if (isShiftDown()) {
-                        for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
-                            currenttip.add(getEmitterSide(emitter, i, true));
+                        for (EnumFacing side: EnumFacing.values()) {
+                            list.add(getEmitterSide(emitter, side, true));
                         }
                     }else{
-                        currenttip.add(getEmitterSide(emitter, accessor.getPosition().sideHit, false));
+                        list.add(getEmitterSide(emitter, iWailaDataAccessor.getSide(), false));
                     }
                 }
             }
         }
-        return currenttip;
+        return list;
+    }
+
+    @Override
+    public List<String> getWailaTail(ItemStack itemStack, List<String> list, IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler) {
+        return list;
+    }
+
+    @Override
+    public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
+        return tag;
     }
 
     @SideOnly(Side.CLIENT)
@@ -73,19 +87,14 @@ public class Provider implements IWailaDataProvider {
         return GuiScreen.isShiftKeyDown();
     }
 
-    private String getEmitterSide(TileEntityOutput emitter, int side, boolean full) {
+    private String getEmitterSide(TileEntityOutput emitter, EnumFacing side, boolean full) {
         String str = (emitter.hasStrongSignalAtSide(side) ? Localization.STRONG_POWER.toString() : Localization.WEAK_POWER.toString()) + ": " + emitter.getStrengthFromSide(side) + " ";
 
         if (full) {
-            str = Localization.getForgeDirectionLocalization(side) + " " + str;
+            str = Localization.getDirectionLocalization(side) + " " + str;
         }
 
         return str;
-    }
-
-    @Override
-    public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        return currenttip;
     }
 
     public static void callbackRegister(IWailaRegistrar registrar){

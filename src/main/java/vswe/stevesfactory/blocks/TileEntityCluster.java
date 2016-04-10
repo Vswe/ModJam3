@@ -1,9 +1,8 @@
 package vswe.stevesfactory.blocks;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,7 +13,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.network.*;
 
 import java.util.ArrayList;
@@ -22,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TileEntityCluster extends TileEntity implements ITileEntityInterface, IPacketBlock {
+public class TileEntityCluster extends TileEntity implements ITileEntityInterface, IPacketBlock, ITickable {
 
     private boolean requestedInfo;
     private List<TileEntityClusterElement> elements;
@@ -57,7 +61,7 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         for (byte type : types) {
             ClusterRegistry block = ClusterRegistry.getRegistryList().get(type);
             registryList.add(block);
-            TileEntityClusterElement element = (TileEntityClusterElement)block.getBlock().createNewTileEntity(getWorldObj(), 0);
+            TileEntityClusterElement element = (TileEntityClusterElement)block.getBlock().createNewTileEntity(getWorld(), 0);
             elements.add(element);
             if (element instanceof ITileEntityInterface) {
                 interfaceObject = (ITileEntityInterface)element;
@@ -67,9 +71,7 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
             for (ClusterMethodRegistration clusterMethodRegistration : element.getRegistrations()) {
                 methodRegistration.get(clusterMethodRegistration).add(new Pair(block, element));
             }
-            element.xCoord = xCoord;
-            element.yCoord = yCoord;
-            element.zCoord = zCoord;
+            element.setPos(new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()));
             element.setWorldObj(worldObj);
             element.setPartOfCluster(true);
         }
@@ -91,10 +93,10 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
 
 
     @Override
-    public void updateEntity() {
+    public void update() {
         for (TileEntityClusterElement element : elements) {
             setWorldObject(element);
-            element.updateEntity();
+            element.update();
         }
 
         if (!requestedInfo && worldObj.isRemote) {
@@ -118,24 +120,24 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         return methodRegistration.get(method);
     }
 
-    public void onBlockPlacedBy(EntityLivingBase entity, ItemStack itemStack) {
+    public void onBlockPlacedBy(IBlockState state, EntityLivingBase entity, ItemStack itemStack) {
         for (Pair blockContainer :  getRegistrations(ClusterMethodRegistration.ON_BLOCK_PLACED_BY)) {
             setWorldObject(blockContainer.te);
-            blockContainer.registry.getBlock().onBlockPlacedBy(worldObj, xCoord, yCoord, zCoord, entity, blockContainer.registry.getItemStack());
+            blockContainer.registry.getBlock().onBlockPlacedBy(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, entity, blockContainer.registry.getItemStack());
         }
     }
 
-    public void onNeighborBlockChange(Block block) {
+    public void onNeighborBlockChange(Block block, IBlockState state) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_NEIGHBOR_BLOCK_CHANGED)) {
             setWorldObject(blockContainer.te);
-            blockContainer.registry.getBlock().onNeighborBlockChange(worldObj, xCoord, yCoord, zCoord, block);
+            blockContainer.registry.getBlock().onNeighborBlockChange(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, block);
         }
     }
 
-    public boolean canConnectRedstone(int side) {
+    public boolean canConnectRedstone(EnumFacing side) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.CAN_CONNECT_REDSTONE)) {
             setWorldObject(blockContainer.te);
-            if (blockContainer.registry.getBlock().canConnectRedstone(worldObj, xCoord, yCoord, zCoord, side)) {
+            if (blockContainer.registry.getBlock().canConnectRedstone(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), side)) {
                 return true;
             }
         }
@@ -143,17 +145,17 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         return false;
     }
 
-    public void onBlockAdded() {
+    public void onBlockAdded(IBlockState state) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_BLOCK_ADDED)) {
             setWorldObject(blockContainer.te);
-            blockContainer.registry.getBlock().onBlockAdded(worldObj, xCoord, yCoord, zCoord);
+            blockContainer.registry.getBlock().onBlockAdded(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state);
         }
     }
 
-    public boolean shouldCheckWeakPower(int side) {
+    public boolean shouldCheckWeakPower(EnumFacing side) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.SHOULD_CHECK_WEAK_POWER)) {
             setWorldObject(blockContainer.te);
-            if (blockContainer.registry.getBlock().shouldCheckWeakPower(worldObj, xCoord, yCoord, zCoord, side)) {
+            if (blockContainer.registry.getBlock().shouldCheckWeakPower(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), side)) {
                 return true;
             }
         }
@@ -162,32 +164,32 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     }
 
 
-    public int isProvidingWeakPower(int side) {
+    public int isProvidingWeakPower(IBlockState state, EnumFacing side) {
         int max = 0;
 
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.IS_PROVIDING_WEAK_POWER)) {
             setWorldObject(blockContainer.te);
-            max = Math.max(max, blockContainer.registry.getBlock().isProvidingWeakPower(worldObj, xCoord, yCoord, zCoord, side));
+            max = Math.max(max, blockContainer.registry.getBlock().getStrongPower(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, side));
         }
 
         return max;
     }
 
-    public int isProvidingStrongPower(int side) {
+    public int isProvidingStrongPower(IBlockState state, EnumFacing side) {
         int max = 0;
 
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.IS_PROVIDING_STRONG_POWER)) {
             setWorldObject(blockContainer.te);
-            max = Math.max(max, blockContainer.registry.getBlock().isProvidingStrongPower(worldObj, xCoord, yCoord, zCoord, side));
+            max = Math.max(max, blockContainer.registry.getBlock().getWeakPower(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, side));
         }
 
         return max;
     }
 
-    public boolean onBlockActivated(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(EntityPlayer player, IBlockState state, EnumFacing side, float hitX, float hitY, float hitZ) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_BLOCK_ACTIVATED)) {
             setWorldObject(blockContainer.te);
-            if (blockContainer.registry.getBlock().onBlockActivated(worldObj, xCoord, yCoord, zCoord, player, side, hitX, hitY, hitZ)) {
+            if (blockContainer.registry.getBlock().onBlockActivated(worldObj, new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()), state, player, side, hitX, hitY, hitZ)) {
                 return true;
             }
         }
@@ -196,8 +198,8 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     }
 
 
-    public static <T> T getTileEntity(Class<? extends TileEntityClusterElement> clazz, IBlockAccess world, int x, int y, int z) {
-        TileEntity te = world.getTileEntity(x, y, z);
+    public static <T> T getTileEntity(Class<? extends TileEntityClusterElement> clazz, IBlockAccess world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
 
         if (te != null) {
             if (clazz.isInstance(te)) {

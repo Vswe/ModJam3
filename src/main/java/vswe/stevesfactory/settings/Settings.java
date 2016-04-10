@@ -1,8 +1,9 @@
 package vswe.stevesfactory.settings;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.state.IBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.network.DataReader;
 import vswe.stevesfactory.network.DataWriter;
@@ -152,22 +153,24 @@ public final class Settings {
     }
 
     public static boolean isLimitless(TileEntityManager manager) {
-       return ( manager.getWorldObj().getBlockMetadata(manager.xCoord, manager.yCoord, manager.zCoord) & 1) != 0;
+        IBlockState state = manager.getWorld().getBlockState(manager.getPos());
+        return (state.getBlock().getMetaFromState(state) & 1) != 0;
     }
 
     public static void setLimitless(TileEntityManager manager, boolean limitless) {
-        if (manager.getWorldObj().isRemote) {
+        if (manager.getWorld().isRemote) {
             DataWriter dw = PacketHandler.getWriterForServerActionPacket();
             dw.writeBoolean(limitless);
             PacketHandler.sendDataToServer(dw);
         }else{
-            int meta = manager.getWorldObj().getBlockMetadata(manager.xCoord, manager.yCoord, manager.zCoord);
+            IBlockState state = manager.getWorld().getBlockState(manager.getPos());
+            int meta = state.getBlock().getMetaFromState(state);
             if (limitless) {
                 meta |= 1;
             }else{
                 meta &= ~1;
             }
-            manager.getWorldObj().setBlockMetadataWithNotify(manager.xCoord, manager.yCoord, manager.zCoord, meta, 3);
+            manager.getWorld().setBlockState(manager.getPos(), state.getBlock().getStateFromMeta(meta), 3);
         }
     }
 

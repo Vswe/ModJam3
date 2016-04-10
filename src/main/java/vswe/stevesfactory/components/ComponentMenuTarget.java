@@ -1,12 +1,12 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
@@ -77,7 +77,7 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
     }
 
 
-    public static ForgeDirection[] directions = ForgeDirection.VALID_DIRECTIONS;
+    public static EnumFacing[] directions = EnumFacing.values();
 
     protected int selectedDirectionId;
     private boolean[] activatedDirections = new boolean[directions.length];
@@ -89,7 +89,7 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
     @Override
     public void draw(GuiManager gui, int mX, int mY) {
         for (int i = 0; i < directions.length; i++) {
-            ForgeDirection direction = directions[i];
+            EnumFacing direction = directions[i];
 
             int x = getDirectionX(i);
             int y = getDirectionY(i);
@@ -100,11 +100,11 @@ public abstract class ComponentMenuTarget extends ComponentMenu {
 
             gui.drawTexture(x, y, DIRECTION_SRC_X + srcDirectionX * DIRECTION_SIZE_W, DIRECTION_SRC_Y + srcDirectionY * DIRECTION_SIZE_H, DIRECTION_SIZE_W, DIRECTION_SIZE_H);
 
-            GL11.glPushMatrix();
-            GL11.glEnable(GL11.GL_BLEND);
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
             int color =  selectedDirectionId != -1 && selectedDirectionId != i ? 0x70404040 : 0x404040;
-            gui.drawString(Localization.getForgeDirectionLocalization(i).toString(), x + DIRECTION_TEXT_X, y + DIRECTION_TEXT_Y, color);
-            GL11.glPopMatrix();
+            gui.drawString(Localization.getDirectionLocalization(EnumFacing.getFront(i)).toString(), x + DIRECTION_TEXT_X, y + DIRECTION_TEXT_Y, color);
+            GlStateManager.popMatrix();
         }
 
         if (selectedDirectionId != -1) {

@@ -25,7 +25,7 @@ public class ContainerManager extends ContainerBase {
 
     @Override
     public boolean canInteractWith(EntityPlayer entityplayer) {
-        return entityplayer.getDistanceSq(manager.xCoord, manager.yCoord, manager.zCoord) <= 64;
+        return entityplayer.getDistanceSq(manager.getPos().getX(), manager.getPos().getY(), manager.getPos().getZ()) <= 64;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class ContainerManager extends ContainerBase {
             if (!hasInventoriesChanged) {
                 for (int i = 0; i < oldInventories.size(); i++) {
                     TileEntity tileEntity = manager.getConnectedInventories().get(i).getTileEntity();
-                    if (oldInventories.get(i).equals(new WorldCoordinate(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord))) {
+                    if (oldInventories.get(i).equals(new WorldCoordinate(tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ()))) {
                         hasInventoriesChanged = true;
                         break;
                     }
@@ -67,7 +67,7 @@ public class ContainerManager extends ContainerBase {
             if (hasInventoriesChanged) {
                 oldInventories.clear();
                 for (ConnectionBlock connection : manager.getConnectedInventories()) {
-                    oldInventories.add(new WorldCoordinate(connection.getTileEntity().xCoord, connection.getTileEntity().yCoord, connection.getTileEntity().zCoord));
+                    oldInventories.add(new WorldCoordinate(connection.getTileEntity().getPos().getX(), connection.getTileEntity().getPos().getY(), connection.getTileEntity().getPos().getZ()));
                 }
                 PacketHandler.sendUpdateInventoryPacket(this);
             }
@@ -75,8 +75,8 @@ public class ContainerManager extends ContainerBase {
     }
 
     @Override
-    public void addCraftingToCrafters(ICrafting player) {
-        super.addCraftingToCrafters(player);
+    public void onCraftGuiOpened(ICrafting player) {
+        super.onCraftGuiOpened(player);
 
         PacketHandler.sendAllData(this, player, manager);
         oldComponents = new ArrayList<FlowComponent>();
@@ -86,7 +86,7 @@ public class ContainerManager extends ContainerBase {
         manager.updateInventories();
         oldInventories = new ArrayList<WorldCoordinate>();
         for (ConnectionBlock connection : manager.getConnectedInventories()) {
-            oldInventories.add(new WorldCoordinate(connection.getTileEntity().xCoord, connection.getTileEntity().yCoord, connection.getTileEntity().zCoord));
+            oldInventories.add(new WorldCoordinate(connection.getTileEntity().getPos().getX(), connection.getTileEntity().getPos().getY(), connection.getTileEntity().getPos().getZ()));
         }
         oldIdIndexToRemove = manager.getRemovedIds().size();
     }

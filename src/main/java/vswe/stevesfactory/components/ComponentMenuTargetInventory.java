@@ -1,9 +1,10 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
 import vswe.stevesfactory.interfaces.GuiManager;
@@ -21,7 +22,7 @@ public class ComponentMenuTargetInventory extends ComponentMenuTarget {
         textBoxes.addTextBox(startTextBox = new TextBoxNumber(39 ,49, 2, false) {
             @Override
             public void onNumberChanged() {
-                if (selectedDirectionId != -1 && getParent().getManager().getWorldObj().isRemote) {
+                if (selectedDirectionId != -1 && getParent().getManager().getWorld().isRemote) {
                     writeData(DataTypeHeader.START_OR_TANK_DATA, getNumber());
                 }
             }
@@ -29,7 +30,7 @@ public class ComponentMenuTargetInventory extends ComponentMenuTarget {
         textBoxes.addTextBox(endTextBox = new TextBoxNumber(60 ,49, 2, false) {
             @Override
             public void onNumberChanged() {
-                if (selectedDirectionId != -1 && getParent().getManager().getWorldObj().isRemote) {
+                if (selectedDirectionId != -1 && getParent().getManager().getWorld().isRemote) {
                     writeData(DataTypeHeader.END, getNumber());
                 }
             }
@@ -165,7 +166,7 @@ public class ComponentMenuTargetInventory extends ComponentMenuTarget {
     public void addErrors(List<String> errors) {
         for (int i = 0; i < directions.length; i++) {
             if (isActive(i) && getStart(i) > getEnd(i)) {
-                errors.add(Localization.getForgeDirectionLocalization(i).toString() + " " + Localization.INVALID_RANGE.toString());
+                errors.add(Localization.getDirectionLocalization(EnumFacing.getFront(i)).toString() + " " + Localization.INVALID_RANGE.toString());
             }
         }
 

@@ -12,17 +12,6 @@ public class BlockCableIntake extends BlockCableDirectionAdvanced {
         return new TileEntityIntake();
     }
 
-
-    @Override
-    protected String getFrontTextureName(boolean isAdvanced) {
-        return isAdvanced ? "cable_intake_out_instant" : "cable_intake_out";
-    }
-
-    @Override
-    protected String getSideTextureName(boolean isAdvanced) {
-        return isAdvanced ? "cable_intake_instant" : "cable_intake";
-    }
-
     @Override
     protected Class<? extends TileEntityClusterElement> getTeClass() {
         return TileEntityIntake.class;

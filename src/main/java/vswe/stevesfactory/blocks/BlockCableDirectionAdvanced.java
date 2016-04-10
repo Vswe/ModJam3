@@ -1,20 +1,20 @@
 package vswe.stevesfactory.blocks;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import vswe.stevesfactory.StevesFactoryManager;
 
 import java.util.List;
 
@@ -27,52 +27,34 @@ public abstract class BlockCableDirectionAdvanced extends BlockContainer {
         setHardness(1.2F);
     }
 
-    @SideOnly(Side.CLIENT)
-    private IIcon activeIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon advancedActiveIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon inactiveIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon advancedInactiveIcon;
+    public static final IProperty FACING = PropertyDirection.create("facing");
+    public static final IProperty ADVANCED = PropertyBool.create("advanced");
 
-    @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister register) {
-        activeIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":" + getFrontTextureName(false));
-        advancedActiveIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":" +  getFrontTextureName(true));
-        inactiveIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":" + getSideTextureName(false));
-        advancedInactiveIcon = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":" + getSideTextureName(true));
-    }
-
-    protected abstract String getFrontTextureName(boolean isAdvanced);
-    protected abstract String getSideTextureName(boolean isAdvanced);
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public IIcon getIcon(int side, int meta) {
-        //pretend the meta is 3
-        return getIconFromSideAndMeta(side,  addAdvancedMeta(3, meta));
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
-        int meta = world.getBlockMetadata(x, y, z);
-
-        return getIconFromSideAndMeta(side, meta);
-    }
-
-    @SideOnly(Side.CLIENT)
-    private IIcon getIconFromSideAndMeta(int side, int meta) {
-        return side == (getSideMeta(meta) % ForgeDirection.VALID_DIRECTIONS.length) ? isAdvanced(meta) ? advancedActiveIcon :  activeIcon : isAdvanced(meta) ? advancedInactiveIcon : inactiveIcon;
+    protected BlockState createBlockState() {
+        return new BlockState(this, ADVANCED, FACING);
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
-        int meta = addAdvancedMeta(BlockPistonBase.determineOrientation(world, x, y, z, entity), item.getItemDamage());
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(ADVANCED, isAdvanced(meta)).withProperty(FACING, getSide(meta));
+    }
 
-        TileEntityClusterElement element = TileEntityCluster.getTileEntity(getTeClass(), world, x, y, z);
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return addAdvancedMeta(((EnumFacing) state.getValue(FACING)).getIndex(), ((Boolean) state.getValue(ADVANCED)) ? 8 : 0);
+    }
+
+    @Override
+    public int getRenderType() {
+        return 3;
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack item) {
+        int meta = addAdvancedMeta(BlockPistonBase.getFacingFromEntity(world, pos, entity).getIndex(), item.getItemDamage());
+
+        TileEntityClusterElement element = TileEntityCluster.getTileEntity(getTeClass(), world, pos);
         if (element != null) {
             element.setMetaData(meta);
         }
@@ -94,6 +76,10 @@ public abstract class BlockCableDirectionAdvanced extends BlockContainer {
         return meta & 7;
     }
 
+    public EnumFacing getSide(int meta) {
+        return EnumFacing.getFront(getSideMeta(meta));
+    }
+
     private int addAdvancedMeta(int meta, int advancedMeta) {
         return meta | (advancedMeta & 8);
     }
@@ -103,8 +89,8 @@ public abstract class BlockCableDirectionAdvanced extends BlockContainer {
     }
 
     @Override
-    public int damageDropped(int meta) {
-        return getAdvancedMeta(meta);
+    public int damageDropped(IBlockState state) {
+        return getAdvancedMeta(state.getBlock().getMetaFromState(state));
     }
 
 }

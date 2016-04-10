@@ -32,9 +32,8 @@ public enum DataBitHelper {
     WORLD_COORDINATE(32),
     GUI_BUTTON_ID(5),
 
-    MENU_FLUID_ID(10) //Actually an int, but I think 10 bits is too much anyways. If someone has over 1024 fluids I have a problem
-    ,
-    MENU_LIQUID_AMOUNT(20),
+    MENU_FLUID_ID_LENGTH(5),
+    MENU_FLUID_AMOUNT(20),
 
     MENU_SPLIT_DATA_ID(2),
 
@@ -46,6 +45,7 @@ public enum DataBitHelper {
     PULSE_TICKS(5),
 
     NAME_LENGTH(5),
+    UUID_LENGTH(6),
     PERMISSION_ID(8),
 
     COMMAND_NAME(5),

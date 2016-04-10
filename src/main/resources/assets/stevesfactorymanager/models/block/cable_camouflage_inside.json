@@ -1,0 +1,6 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "stevesfactorymanager:blocks/cable_camo_inside"
+    }
+}
