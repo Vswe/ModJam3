@@ -1,5 +1,10 @@
 Steve's Factory Manager
-=======
+=======================
+WARNING
+This is a port of Steve's Factory Manager done by gigabit101 I currently have no rights to distribute the mod.
+That said anyone who compiles the mod them self's can report any bugs to me here.
+
+
 Steve's Factory Manager is a Minecraft mod which allows you to set up systems that moves and manages items between inventories and machines.
 
 Setup Workspace
