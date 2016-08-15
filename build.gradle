@@ -37,15 +37,9 @@ group= "vswe.stevesfactory" // http://maven.apache.org/guides/mini/guide-naming-
 archivesBaseName = "StevesFactoryManager"
 
 minecraft {
-    version = "1.9-12.16.0.1854-1.9"
+    version = "1.10.2-12.18.1.2050"
     runDir = "run"
-
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20160312"
+    mappings = 'snapshot_20160810'
 }
 
 dependencies {
@@ -69,7 +63,7 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    compile 'mcp.mobius.waila:Waila:1.7.0-B2_1.9:dev'
+    compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
 }
 
 processResources
