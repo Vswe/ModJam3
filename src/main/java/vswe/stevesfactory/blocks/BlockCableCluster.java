@@ -82,7 +82,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
         super.breakBlock(world, pos, state);
 
         if (isAdvanced(state.getBlock().getMetaFromState(state))) {
-            ModBlocks.blockCable.updateInventories(world, pos, state);
+            ModBlocks.blockCable.updateInventories(world, pos);
         }
     }
 
@@ -150,18 +150,20 @@ public class BlockCableCluster extends BlockCamouflageBase {
     }
 
 
-//    @Override
-//    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
-//        TileEntityCluster cluster = getTe(world, pos);
-//
-//        if (cluster != null) {
-//            cluster.onNeighborBlockChange(world, pos, state, block);
-//        }
-//
-//        if (isAdvanced(state.getBlock().getMetaFromState(state))) {
-//            ModBlocks.blockCable.updateInventories(world, pos, state);
-//        }
-//    }
+    @Override
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+        TileEntityCluster cluster = getTe(world, pos);
+        IBlockState state = world.getBlockState(pos);
+        Block block = world.getBlockState(pos).getBlock();
+
+        if (cluster != null) {
+            cluster.onNeighborBlockChange(world, pos, state, block);
+        }
+
+        if (isAdvanced(state.getBlock().getMetaFromState(state))) {
+            ModBlocks.blockCable.updateInventories(world, pos);
+        }
+    }
 
     @Override
     public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
@@ -183,7 +185,7 @@ public class BlockCableCluster extends BlockCamouflageBase {
         }
 
         if (isAdvanced(state.getBlock().getMetaFromState(state))) {
-            ModBlocks.blockCable.updateInventories(world, pos, state);
+            ModBlocks.blockCable.updateInventories(world, pos);
         }
     }
 

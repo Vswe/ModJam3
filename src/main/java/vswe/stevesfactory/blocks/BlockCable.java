@@ -29,24 +29,23 @@ public class BlockCable extends Block {
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         super.onBlockAdded(world, pos, state);
 
-        updateInventories(world, pos, state);
+        updateInventories(world, pos);
     }
 
-//    @Override
-//    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
-//        super.onNeighborChange(world, pos, neighbor);
-//        updateInventories(world, pos, state);
-//
-//    }
+    @Override
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+        super.onNeighborChange(world, pos, neighbor);
+        updateInventories(world, pos);
+    }
 
     @Override
     public void breakBlock(World world, BlockPos pos,IBlockState state) {
         super.breakBlock(world, pos, state);
 
-        updateInventories(world, pos, state);
+        updateInventories(world, pos);
     }
 
-    public void updateInventories(World world, BlockPos pos, IBlockState state) {
+    public void updateInventories(IBlockAccess world, BlockPos pos) {
         List<WorldCoordinate> visited = new ArrayList<WorldCoordinate>();
 
         Queue<WorldCoordinate> queue = new PriorityQueue<WorldCoordinate>();

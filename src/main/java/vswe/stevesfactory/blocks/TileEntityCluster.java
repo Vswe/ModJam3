@@ -129,7 +129,7 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
         }
     }
 
-    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
+    public void onNeighborBlockChange(IBlockAccess world, BlockPos pos, IBlockState state, Block block) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_NEIGHBOR_BLOCK_CHANGED)) {
             setWorldObject(blockContainer.te);
 //            blockContainer.registry.getBlock().onNeighborBlockChange(world, pos, state, block);

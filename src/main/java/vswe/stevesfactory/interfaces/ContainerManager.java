@@ -41,7 +41,6 @@ public class ContainerManager extends ContainerBase {
                 PacketHandler.sendRemovalPacket(this, idToRemove);
             }
 
-
             for (int i = 0; i < manager.getFlowItems().size(); i++) {
                 if (i >= oldComponents.size()) {
                     PacketHandler.sendNewFlowComponent(this, manager.getFlowItems().get(i));
@@ -63,8 +62,6 @@ public class ContainerManager extends ContainerBase {
                 }
             }
 
-
-
             if (hasInventoriesChanged) {
                 oldInventories.clear();
                 for (ConnectionBlock connection : manager.getConnectedInventories()) {
@@ -75,11 +72,11 @@ public class ContainerManager extends ContainerBase {
         }
     }
 
-    //TODO fix this is bad
     @Override
-    public void updateProgressBar(int id, int data) {
-        super.updateProgressBar(id, data);
-        PacketHandler.sendAllData(this, listeners.get(id), manager);
+    public void addListener(IContainerListener listener) {
+        super.addListener(listener);
+
+        PacketHandler.sendAllData(this, listener, manager);
         oldComponents = new ArrayList<FlowComponent>();
         for (FlowComponent component : manager.getFlowItems()) {
             oldComponents.add(component.copy());
@@ -92,27 +89,7 @@ public class ContainerManager extends ContainerBase {
         oldIdIndexToRemove = manager.getRemovedIds().size();
     }
 
-//    @Override
-//    public void onCraftGuiOpened(IContainerListener player) {
-//        super.onCraftGuiOpened(player);
-//
-//        PacketHandler.sendAllData(this, player, manager);
-//        oldComponents = new ArrayList<FlowComponent>();
-//        for (FlowComponent component : manager.getFlowItems()) {
-//            oldComponents.add(component.copy());
-//        }
-//        manager.updateInventories();
-//        oldInventories = new ArrayList<WorldCoordinate>();
-//        for (ConnectionBlock connection : manager.getConnectedInventories()) {
-//            oldInventories.add(new WorldCoordinate(connection.getTileEntity().getPos().getX(), connection.getTileEntity().getPos().getY(), connection.getTileEntity().getPos().getZ()));
-//        }
-//        oldIdIndexToRemove = manager.getRemovedIds().size();
-//    }
-
-
     private List<FlowComponent> oldComponents;
     private List<WorldCoordinate> oldInventories;
     private int oldIdIndexToRemove;
-
-
 }
