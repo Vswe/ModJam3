@@ -1,6 +1,5 @@
 package vswe.stevesfactory.blocks;
 
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -19,6 +18,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import vswe.stevesfactory.GeneratedInfo;
@@ -26,10 +26,10 @@ import vswe.stevesfactory.StevesFactoryManager;
 
 public class BlockManager extends BlockContainer {
     public BlockManager() {
-        super(Material.iron);
+        super(Material.IRON);
 
         setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.MANAGER_UNLOCALIZED_NAME);
-        setStepSound(SoundType.METAL);
+        setSoundType(SoundType.METAL);
         setCreativeTab(ModBlocks.creativeTab);
         setHardness(2F);
     }
@@ -74,12 +74,11 @@ public class BlockManager extends BlockContainer {
         updateInventories(world, pos);
     }
 
-    @Override
-    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
-        super.onNeighborBlockChange(world, pos, state, block);
-
-        updateInventories(world, pos);
-    }
+//    @Override
+//    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+//        super.onNeighborChange(world, pos, neighbor);
+//        updateInventories(world, pos);
+//    }
 
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {

@@ -810,11 +810,11 @@ public class TileEntityManager extends TileEntity implements ITileEntityInterfac
         readContentFromNBT(nbtTagCompound, false);
     }
 
-    @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
-        super.writeToNBT(nbtTagCompound);
 
-        writeContentToNBT(nbtTagCompound, false);
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        writeContentToNBT(compound, false);
+        return super.writeToNBT(compound);
     }
 
     public void readContentFromNBT(NBTTagCompound nbtTagCompound, boolean pickup) {

@@ -21,9 +21,9 @@ import vswe.stevesfactory.StevesFactoryManager;
 //This is indeed not a subclass to the cable, you can't relay signals through this block
 public class BlockCableSign extends BlockContainer {
     public BlockCableSign() {
-        super(Material.iron);
+        super(Material.IRON);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(SoundType.METAL);
+        setSoundType(SoundType.METAL);
         setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_SIGN_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }

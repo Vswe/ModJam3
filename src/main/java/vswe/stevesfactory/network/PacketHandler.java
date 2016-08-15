@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,11 +18,10 @@ import vswe.stevesfactory.components.Point;
 import vswe.stevesfactory.interfaces.ContainerBase;
 import vswe.stevesfactory.interfaces.ContainerManager;
 
-
 public class PacketHandler {
     public static final double BLOCK_UPDATE_RANGE = 128;
 
-    public static void sendDataToPlayer(ICrafting crafting, DataWriter dw) {
+    public static void sendDataToPlayer(IContainerListener crafting, DataWriter dw) {
         if (crafting instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP)crafting;
 
@@ -41,7 +40,7 @@ public class PacketHandler {
     }
 
 
-    public static void sendAllData(Container container, ICrafting crafting, ITileEntityInterface te) {
+    public static void sendAllData(Container container, IContainerListener crafting, ITileEntityInterface te) {
         DataWriter dw = new DataWriter();
 
         dw.writeBoolean(true); //use container

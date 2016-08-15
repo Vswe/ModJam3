@@ -1,6 +1,5 @@
 package vswe.stevesfactory.components;
 
-
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
@@ -14,7 +13,7 @@ public final class ModItemHelper {
     private static Map<ResourceLocation, String> items;
 
     public static void init() {
-        RegistryNamespaced<ResourceLocation, Item> itemRegistry = Item.itemRegistry;
+        RegistryNamespaced<ResourceLocation, Item> itemRegistry = Item.REGISTRY;
 
         items = new HashMap<ResourceLocation, String>();
         Object[] keys = itemRegistry.getKeys().toArray();
@@ -31,8 +30,8 @@ public final class ModItemHelper {
         if (item1 == null || item2 == null) {
             return false;
         }else{
-            String mod1 = items.get(Item.itemRegistry.getNameForObject(item1));
-            String mod2 = items.get(Item.itemRegistry.getNameForObject(item2));
+            String mod1 = items.get(Item.REGISTRY.getNameForObject(item1));
+            String mod2 = items.get(Item.REGISTRY.getNameForObject(item2));
 
             return mod1 != null && mod1.equals(mod2);
         }

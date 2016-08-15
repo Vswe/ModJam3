@@ -59,7 +59,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     private static void registerBlockModel(Block block) {
-        ResourceLocation resourceLocation = Block.blockRegistry.getNameForObject(block);
+        ResourceLocation resourceLocation = Block.REGISTRY.getNameForObject(block);
 
         registerBlockModel(block, 0, resourceLocation.toString());
     }

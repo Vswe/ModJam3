@@ -132,7 +132,7 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
         for (Pair blockContainer : getRegistrations(ClusterMethodRegistration.ON_NEIGHBOR_BLOCK_CHANGED)) {
             setWorldObject(blockContainer.te);
-            blockContainer.registry.getBlock().onNeighborBlockChange(world, pos, state, block);
+//            blockContainer.registry.getBlock().onNeighborBlockChange(world, pos, state, block);
         }
     }
 
@@ -255,9 +255,7 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
     private static final String NBT_SUB_BLOCK_META = "SubMeta";
 
     @Override
-    public void writeToNBT(NBTTagCompound tagCompound) {
-        super.writeToNBT(tagCompound);
-
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         NBTTagList subList = new NBTTagList();
         for (int i = 0; i < elements.size(); i++) {
             TileEntityClusterElement element = elements.get(i);
@@ -269,9 +267,8 @@ public class TileEntityCluster extends TileEntity implements ITileEntityInterfac
 
             subList.appendTag(sub);
         }
-
-
-        tagCompound.setTag(NBT_SUB_BLOCKS, subList);
+        compound.setTag(NBT_SUB_BLOCKS, subList);
+        return super.writeToNBT(compound);
     }
 
     @Override

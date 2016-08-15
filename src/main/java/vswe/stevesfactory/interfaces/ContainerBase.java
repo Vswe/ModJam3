@@ -2,11 +2,10 @@ package vswe.stevesfactory.interfaces;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.IContainerListener;
 import vswe.stevesfactory.blocks.ITileEntityInterface;
 
 import java.util.List;
-
 
 public abstract class ContainerBase extends Container {
     private ITileEntityInterface te;
@@ -22,7 +21,7 @@ public abstract class ContainerBase extends Container {
         return te;
     }
 
-    public List<ICrafting> getCrafters() {
-        return crafters;
+    public List<IContainerListener> getCrafters() {
+        return listeners;
     }
 }

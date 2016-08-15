@@ -16,9 +16,9 @@ import vswe.stevesfactory.StevesFactoryManager;
 
 public class BlockCableInput extends BlockContainer {
     public BlockCableInput() {
-        super(Material.iron);
+        super(Material.IRON);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(SoundType.METAL);
+        setSoundType(SoundType.METAL);
         setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_INPUT_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
@@ -45,12 +45,12 @@ public class BlockCableInput extends BlockContainer {
         updateRedstone(world, pos);
     }
 
-    @Override
-    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
-        super.onNeighborBlockChange(world, pos, state, block);
-
-        updateRedstone(world, pos);
-    }
+//    @Override
+//    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
+//        super.onNeighborBlockChange(world, pos, state, block);
+//
+//        updateRedstone(world, pos);
+//    }
 
     private void updateRedstone(World world, BlockPos pos) {
         TileEntityInput input = TileEntityCluster.getTileEntity(TileEntityInput.class, world, pos);

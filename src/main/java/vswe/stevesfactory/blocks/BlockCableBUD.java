@@ -1,7 +1,5 @@
 package vswe.stevesfactory.blocks;
 
-
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -9,14 +7,15 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import vswe.stevesfactory.StevesFactoryManager;
 
 public class BlockCableBUD extends BlockContainer {
     public BlockCableBUD() {
-        super(Material.iron);
+        super(Material.IRON);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(SoundType.METAL);
+        setSoundType(SoundType.METAL);
         setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_BUD_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }
@@ -32,12 +31,10 @@ public class BlockCableBUD extends BlockContainer {
     }
 
     @Override
-    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
         TileEntityBUD bud = TileEntityCluster.getTileEntity(TileEntityBUD.class, world, pos);
         if (bud != null) {
             bud.onTrigger();
         }
     }
-
-
 }

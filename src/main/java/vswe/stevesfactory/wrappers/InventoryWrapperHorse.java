@@ -23,11 +23,11 @@ public class InventoryWrapperHorse extends InventoryWrapper {
 
         //saddle
         }else if(i == 0) {
-            return itemstack.getItem() == Items.saddle;
+            return itemstack.getItem() == Items.SADDLE;
 
         //armor
-        }else if(i == 1 && horse.getType().isHorse()) {
-            return HorseType.func_188577_b(itemstack.getItem());
+//        }else if(i == 1 && horse.getType().isHorse()) {
+//            return HorseType.(itemstack.getItem());
 
         //chest
         }else {

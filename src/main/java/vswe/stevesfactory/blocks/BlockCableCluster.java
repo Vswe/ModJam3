@@ -32,9 +32,9 @@ import java.util.List;
 public class BlockCableCluster extends BlockCamouflageBase {
 
     protected BlockCableCluster() {
-        super(Material.iron);
+        super(Material.IRON);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(SoundType.METAL);
+        setSoundType(SoundType.METAL);
         setHardness(2F);
     }
 
@@ -149,18 +149,19 @@ public class BlockCableCluster extends BlockCamouflageBase {
         }
     }
 
-    @Override
-    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
-        TileEntityCluster cluster = getTe(world, pos);
 
-        if (cluster != null) {
-            cluster.onNeighborBlockChange(world, pos, state, block);
-        }
-
-        if (isAdvanced(state.getBlock().getMetaFromState(state))) {
-            ModBlocks.blockCable.updateInventories(world, pos, state);
-        }
-    }
+//    @Override
+//    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+//        TileEntityCluster cluster = getTe(world, pos);
+//
+//        if (cluster != null) {
+//            cluster.onNeighborBlockChange(world, pos, state, block);
+//        }
+//
+//        if (isAdvanced(state.getBlock().getMetaFromState(state))) {
+//            ModBlocks.blockCable.updateInventories(world, pos, state);
+//        }
+//    }
 
     @Override
     public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {

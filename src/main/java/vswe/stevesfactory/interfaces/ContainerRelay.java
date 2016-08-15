@@ -2,14 +2,10 @@ package vswe.stevesfactory.interfaces;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ICrafting;
 import vswe.stevesfactory.blocks.TileEntityRelay;
 import vswe.stevesfactory.blocks.UserPermission;
-import vswe.stevesfactory.network.PacketHandler;
 
-import java.util.ArrayList;
 import java.util.List;
-
 
 public class ContainerRelay extends ContainerBase {
 
@@ -34,17 +30,17 @@ public class ContainerRelay extends ContainerBase {
         }
     }
 
-    @Override
-    public void onCraftGuiOpened(ICrafting player) {
-        super.onCraftGuiOpened(player);
-        PacketHandler.sendAllData(this, player, relay);
-        oldPermissions = new ArrayList<UserPermission>();
-        for (UserPermission permission : relay.getPermissions()) {
-            oldPermissions.add(permission.copy());
-        }
-        oldCreativeMode = relay.isCreativeMode();
-        oldOpList = relay.doesListRequireOp();
-    }
+//    @Override
+//    public void onCraftGuiOpened(ICrafting player) {
+//        super.onCraftGuiOpened(player);
+//        PacketHandler.sendAllData(this, player, relay);
+//        oldPermissions = new ArrayList<UserPermission>();
+//        for (UserPermission permission : relay.getPermissions()) {
+//            oldPermissions.add(permission.copy());
+//        }
+//        oldCreativeMode = relay.isCreativeMode();
+//        oldOpList = relay.doesListRequireOp();
+//    }
 
     public List<UserPermission> oldPermissions;
     public boolean oldCreativeMode;

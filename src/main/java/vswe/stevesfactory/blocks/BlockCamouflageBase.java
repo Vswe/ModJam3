@@ -1,10 +1,9 @@
 package vswe.stevesfactory.blocks;
 
-
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -15,7 +14,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
 
 public abstract class BlockCamouflageBase extends BlockContainer {
 
@@ -76,12 +74,24 @@ public abstract class BlockCamouflageBase extends BlockContainer {
         return super.collisionRayTrace(state, world, pos, start, end);
     }
 
-    @SideOnly(Side.CLIENT)
+//    @SideOnly(Side.CLIENT)
+//    @Override
+//    public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, EffectRenderer effectRenderer){
+//        TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, world, target.getBlockPos());
+//        if (camouflage != null) {
+//            if (camouflage.addBlockEffect(this, state, world, target.sideHit, effectRenderer)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
+
     @Override
-    public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, EffectRenderer effectRenderer){
-        TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, world, target.getBlockPos());
+    public boolean addHitEffects(IBlockState state, World worldObj, RayTraceResult target, ParticleManager manager) {
+        TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, worldObj, target.getBlockPos());
         if (camouflage != null) {
-            if (camouflage.addBlockEffect(this, state, world, target.sideHit, effectRenderer)) {
+            if (camouflage.addBlockEffect(this, state, worldObj, target.sideHit, manager)) {
                 return true;
             }
         }

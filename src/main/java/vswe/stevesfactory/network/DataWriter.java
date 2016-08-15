@@ -4,7 +4,7 @@ package vswe.stevesfactory.network;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
@@ -95,7 +95,7 @@ public class DataWriter {
     }
     
     void sendPlayerPackets(ContainerBase container) {
-        for (ICrafting crafting : container.getCrafters()) {
+        for (IContainerListener crafting : container.getCrafters()) {
             if (crafting instanceof EntityPlayer) {
                 EntityPlayerMP player = (EntityPlayerMP) crafting;
                 packetHandler.sendTo(createPacket(), player);

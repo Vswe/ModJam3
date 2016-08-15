@@ -12,9 +12,9 @@ import vswe.stevesfactory.StevesFactoryManager;
 
 public class BlockCableCreative extends BlockContainer {
     public BlockCableCreative() {
-        super(Material.iron);
+        super(Material.IRON);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(SoundType.METAL);
+        setSoundType(SoundType.METAL);
         setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_CREATIVE_UNLOCALIZED_NAME);
         setHardness(1.2F);
     }

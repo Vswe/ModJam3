@@ -348,7 +348,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
                    broken = true;
                    int meta = state.getBlock().getMetaFromState(state);
                    block.breakBlock(worldObj, pos, state);
-                   worldObj.playAuxSFX(2001, pos, Block.getIdFromBlock(block) + (meta << 12));
+//                   worldObj.playAuxSFX(2001, pos, Block.getIdFromBlock(block) + (meta << 12));
                    worldObj.setBlockToAir(pos);
                }
 
@@ -357,7 +357,7 @@ public class TileEntityBreaker extends TileEntityClusterElement implements IInve
     }
 
     private boolean canBreakBlock(IBlockState state, Block block, BlockPos pos) {
-        return block != null && Block.getIdFromBlock(block) != Block.getIdFromBlock(Blocks.bedrock) && block.getBlockHardness(state, worldObj, pos) >= 0;
+        return block != null && Block.getIdFromBlock(block) != Block.getIdFromBlock(Blocks.BEDROCK) && block.getBlockHardness(state, worldObj, pos) >= 0;
     }
 
     @Override

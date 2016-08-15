@@ -63,7 +63,7 @@ public class PacketEventHandler {
     @SubscribeEvent
     public void onServerPacket(final FMLNetworkEvent.ServerCustomPacketEvent event) {
         EntityPlayerMP player = ((NetHandlerPlayServer)event.getHandler()).playerEntity;
-        player.getServerForPlayer().addScheduledTask(new Runnable() {
+        player.getServerWorld().addScheduledTask(new Runnable() {
             @Override
             public void run() {
                 processServerPacket(event);

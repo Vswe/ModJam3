@@ -7,6 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import vswe.stevesfactory.StevesFactoryManager;
 
@@ -17,9 +18,9 @@ import java.util.Queue;
 
 public class BlockCable extends Block {
     public BlockCable() {
-        super(Material.iron);
+        super(Material.IRON);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(SoundType.METAL);
+        setSoundType(SoundType.METAL);
         setUnlocalizedName(StevesFactoryManager.UNLOCALIZED_START + ModBlocks.CABLE_UNLOCALIZED_NAME);
         setHardness(0.4F);
     }
@@ -31,12 +32,12 @@ public class BlockCable extends Block {
         updateInventories(world, pos, state);
     }
 
-    @Override
-    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block block) {
-        super.onNeighborBlockChange(world, pos, state, block);
-
-        updateInventories(world, pos, state);
-    }
+//    @Override
+//    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+//        super.onNeighborChange(world, pos, neighbor);
+//        updateInventories(world, pos, state);
+//
+//    }
 
     @Override
     public void breakBlock(World world, BlockPos pos,IBlockState state) {

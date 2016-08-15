@@ -3,8 +3,7 @@ package vswe.stevesfactory.blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.EffectRenderer;
-import net.minecraft.client.particle.EntityDiggingFX;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -22,7 +21,6 @@ import vswe.stevesfactory.network.*;
 
 import java.util.EnumSet;
 import java.util.Random;
-
 
 public class TileEntityCamouflage extends TileEntityClusterElement implements IPacketBlock {
 
@@ -45,7 +43,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     public int rotate = 0;
 
     @SideOnly(Side.CLIENT)
-    public boolean addBlockEffect(BlockCamouflageBase camoBlock, IBlockState state, World world, EnumFacing sideHit, EffectRenderer effectRenderer) {
+    public boolean addBlockEffect(BlockCamouflageBase camoBlock, IBlockState state, World world, EnumFacing sideHit, ParticleManager effectRenderer) {
         try {
             if (ids[sideHit.ordinal()] != 0) {
                 Block block = Block.getBlockById(ids[sideHit.ordinal()]);
@@ -79,7 +77,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
 
 
 
-                    effectRenderer.addEffect((new EntityDiggingFX.Factory().getEntityFX(0, this.worldObj, x, y, z, 0.0D, 0.0D, 0.0D, Block.getIdFromBlock(camoBlock))).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F));
+//                    effectRenderer.addEffect((new EntityDiggingFX.Factory().getEntityFX(0, this.worldObj, x, y, z, 0.0D, 0.0D, 0.0D, Block.getIdFromBlock(camoBlock))).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F));
                     return true;
                 }
             }
@@ -339,9 +337,9 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     }
 
     private void validateSide(int i) {
-        if (ids[i] < 0 || ids[i] >= Block.blockRegistry.getKeys().size()) {
-            ids[i] = 0;
-        }
+//        if (ids[i] < 0 || ids[i] >= Block.blockRegistry.getKeys().size()) {
+//            ids[i] = 0;
+//        }
     }
 
     @Override

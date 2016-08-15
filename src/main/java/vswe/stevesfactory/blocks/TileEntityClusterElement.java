@@ -8,7 +8,6 @@ import net.minecraft.util.ITickable;
 
 import java.util.EnumSet;
 
-
 public abstract class TileEntityClusterElement extends TileEntity implements ITickable {
 
     private ClusterRegistry registryElement;
@@ -56,9 +55,9 @@ public abstract class TileEntityClusterElement extends TileEntity implements ITi
     }
 
     @Override
-    public final void writeToNBT(NBTTagCompound tagCompound) {
-        super.writeToNBT(tagCompound);
-        writeContentToNBT(tagCompound);
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        writeContentToNBT(compound);
+        return super.writeToNBT(compound);
     }
 
     @Override

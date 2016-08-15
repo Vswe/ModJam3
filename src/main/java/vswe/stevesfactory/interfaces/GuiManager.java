@@ -70,8 +70,6 @@ public class GuiManager extends GuiBase {
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
 
-
-
         if (!useGreenScreen && !useBlueScreen && !usePinkScreen) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             bindTexture(BACKGROUND_1);

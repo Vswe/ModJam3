@@ -2,7 +2,7 @@ package vswe.stevesfactory.interfaces;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.tileentity.TileEntity;
 import vswe.stevesfactory.blocks.ConnectionBlock;
 import vswe.stevesfactory.blocks.TileEntityManager;
@@ -13,14 +13,15 @@ import vswe.stevesfactory.network.PacketHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class ContainerManager extends ContainerBase {
 
     private TileEntityManager manager;
+    private EntityPlayer player;
 
     public ContainerManager(TileEntityManager manager, InventoryPlayer player) {
         super(manager, player);
         this.manager = manager;
+        this.player = player.player;
     }
 
     @Override
@@ -74,11 +75,11 @@ public class ContainerManager extends ContainerBase {
         }
     }
 
+    //TODO fix this is bad
     @Override
-    public void onCraftGuiOpened(ICrafting player) {
-        super.onCraftGuiOpened(player);
-
-        PacketHandler.sendAllData(this, player, manager);
+    public void updateProgressBar(int id, int data) {
+        super.updateProgressBar(id, data);
+        PacketHandler.sendAllData(this, listeners.get(id), manager);
         oldComponents = new ArrayList<FlowComponent>();
         for (FlowComponent component : manager.getFlowItems()) {
             oldComponents.add(component.copy());
@@ -90,6 +91,23 @@ public class ContainerManager extends ContainerBase {
         }
         oldIdIndexToRemove = manager.getRemovedIds().size();
     }
+
+//    @Override
+//    public void onCraftGuiOpened(IContainerListener player) {
+//        super.onCraftGuiOpened(player);
+//
+//        PacketHandler.sendAllData(this, player, manager);
+//        oldComponents = new ArrayList<FlowComponent>();
+//        for (FlowComponent component : manager.getFlowItems()) {
+//            oldComponents.add(component.copy());
+//        }
+//        manager.updateInventories();
+//        oldInventories = new ArrayList<WorldCoordinate>();
+//        for (ConnectionBlock connection : manager.getConnectedInventories()) {
+//            oldInventories.add(new WorldCoordinate(connection.getTileEntity().getPos().getX(), connection.getTileEntity().getPos().getY(), connection.getTileEntity().getPos().getZ()));
+//        }
+//        oldIdIndexToRemove = manager.getRemovedIds().size();
+//    }
 
 
     private List<FlowComponent> oldComponents;
