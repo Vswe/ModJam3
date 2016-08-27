@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "limitless=false": {
+            "model": "stevesfactorymanager:machine_manager"
+        },
+        "limitless=true": {
+            "model": "stevesfactorymanager:machine_manager"
+        }
+    }
+}

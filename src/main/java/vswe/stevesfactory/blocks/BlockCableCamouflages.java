@@ -1,17 +1,21 @@
 package vswe.stevesfactory.blocks;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import vswe.stevesfactory.StevesFactoryManager;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
 import java.util.List;
 
@@ -20,9 +24,9 @@ public class BlockCableCamouflages extends BlockCamouflageBase {
 
 
     protected BlockCableCamouflages() {
-        super(Material.iron);
+        super(Material.IRON);
         setCreativeTab(ModBlocks.creativeTab);
-        setStepSound(soundTypeMetal);
+        setSoundType(SoundType.METAL);
         setHardness(1.2F);
     }
 
@@ -31,27 +35,42 @@ public class BlockCableCamouflages extends BlockCamouflageBase {
         return new TileEntityCamouflage();
     }
 
-    @SideOnly(Side.CLIENT)
-    private IIcon[] icons;
+    public static final UnlistedBlockPosProperty BLOCK_POS = new UnlistedBlockPosProperty("block_pos");
+    public static final IProperty CAMO_TYPE = PropertyCamouflageType.create("camo_type");
 
-    @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister register) {
-        icons = new IIcon[TileEntityCamouflage.CamouflageType.values().length];
-        for (int i = 0; i < icons.length; i++) {
-            icons[i] = register.registerIcon(StevesFactoryManager.RESOURCE_LOCATION + ":" + TileEntityCamouflage.CamouflageType.values()[i].getIcon());
+    protected BlockStateContainer createBlockState() {
+
+        IProperty [] listedProperties = new IProperty[]{CAMO_TYPE};
+        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[]{BLOCK_POS};
+        return new ExtendedBlockState(this, listedProperties, unlistedProperties);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(CAMO_TYPE, TileEntityCamouflage.CamouflageType.getCamouflageType(meta));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+
+        if (state.getValue(CAMO_TYPE) != null) {
+            return ((TileEntityCamouflage.CamouflageType)state.getValue(CAMO_TYPE)).ordinal();
         }
-    }
-    @SideOnly(Side.CLIENT)
-    @Override
-    public IIcon getIcon(int side, int meta) {
-        return getDefaultIcon(side, meta, meta);
+
+        return 0;
     }
 
-    @SideOnly(Side.CLIENT)
     @Override
-    protected IIcon getDefaultIcon(int side, int blockMeta, int camoMeta) {
-        return icons[camoMeta % icons.length];
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+
+        TileEntityCamouflage tileEntity = (TileEntityCamouflage) world.getTileEntity(pos);
+        if (state instanceof IExtendedBlockState && tileEntity != null) {
+
+            return ((IExtendedBlockState)state).withProperty(BLOCK_POS, pos);
+        }
+
+        return state;
     }
 
     @Override
@@ -66,13 +85,13 @@ public class BlockCableCamouflages extends BlockCamouflageBase {
     }
 
     @Override
-    public int damageDropped(int meta) {
-        return meta;
+    public int damageDropped(IBlockState state) {
+        return state.getBlock().getMetaFromState(state);
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
-        TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, world, x, y, z);
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack item) {
+        TileEntityCamouflage camouflage = TileEntityCluster.getTileEntity(TileEntityCamouflage.class, world, pos);
         if (camouflage != null) {
             camouflage.setMetaData(item.getItemDamage());
         }

@@ -1,33 +1,37 @@
 package vswe.stevesfactory.interfaces;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.init.Blocks;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import vswe.stevesfactory.StevesFactoryManager;
 import vswe.stevesfactory.blocks.TileEntityClusterElement;
 import vswe.stevesfactory.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
@@ -66,12 +70,13 @@ public abstract class GuiBase extends GuiAntiNEI {
     public void drawScaleFriendlyTexture(double x, double y, double srcX, double srcY, double w, double h) {
         float f = 0.00390625F;
         float f1 = 0.00390625F;
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(x + 0, y + h, (double)this.zLevel, (srcX + 0) * f, (srcY + h) * f1);
-        tessellator.addVertexWithUV(x + w, y + h, (double)this.zLevel, (srcX + w) * f, (srcY + h) * f1);
-        tessellator.addVertexWithUV(x + w, y + 0, (double)this.zLevel, (srcX + w) * f, (srcY + 0) * f1);
-        tessellator.addVertexWithUV(x + 0, y + 0, (double)this.zLevel, (srcX + 0) * f, (srcY + 0) * f1);
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer worldRenderer = tessellator.getBuffer();
+        worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        worldRenderer.pos(x + 0, y + h, (double) this.zLevel).tex((srcX + 0) * f, (srcY + h) * f1).endVertex();
+        worldRenderer.pos(x + w, y + h, (double) this.zLevel).tex((srcX + w) * f, (srcY + h) * f1).endVertex();
+        worldRenderer.pos(x + w, y + 0, (double) this.zLevel).tex((srcX + w) * f, (srcY + 0) * f1).endVertex();
+        worldRenderer.pos(x + 0, y + 0, (double) this.zLevel).tex((srcX + 0) * f, (srcY + 0) * f1).endVertex();
         tessellator.draw();
     }
 
@@ -84,23 +89,23 @@ public abstract class GuiBase extends GuiAntiNEI {
     }
 
     public void drawString(String str, int x, int y, float mult, int color) {
-        GL11.glPushMatrix();
-        GL11.glScalef(mult, mult, 1F);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(mult, mult, 1F);
         fontRendererObj.drawString(str, (int) ((x + guiLeft) / mult), (int) ((y + guiTop) / mult), color);
         bindTexture(getComponentResource());
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public void drawSplitString(String str, int x, int y, int w, float mult, int color) {
-        GL11.glPushMatrix();
-        GL11.glScalef(mult, mult, 1F);
-        fontRendererObj.drawSplitString(str, (int)((x + guiLeft) / mult), (int)((y + guiTop) / mult), (int)(w / mult), color);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(mult, mult, 1F);
+        fontRendererObj.drawSplitString(str, (int) ((x + guiLeft) / mult), (int) ((y + guiTop) / mult), (int) (w / mult), color);
         bindTexture(getComponentResource());
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public void drawString(String str, int x, int y, int color) {
@@ -179,10 +184,10 @@ public abstract class GuiBase extends GuiAntiNEI {
     }
     public void drawMouseOver(IAdvancedTooltip tooltip, int x, int y, int mX, int mY) {
         if (tooltip != null) {
-            GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+            GlStateManager.disableRescaleNormal();
             RenderHelper.disableStandardItemLighting();
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
 
 
             List<String> prefix = tooltip.getPrefix(this);
@@ -227,10 +232,10 @@ public abstract class GuiBase extends GuiAntiNEI {
 
             this.zLevel = 0.0F;
             itemRender.zLevel = 0.0F;
-            GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
             RenderHelper.enableStandardItemLighting();
-            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+            GlStateManager.enableRescaleNormal();
         }
     }
     public int getAdvancedToolTipContentStartX(IAdvancedTooltip tooltip) {
@@ -292,14 +297,12 @@ public abstract class GuiBase extends GuiAntiNEI {
                 return ((TileEntityClusterElement)te).getItemStackFromBlock();
             }
 
-            World world = te.getWorldObj();
+            World world = te.getWorld();
             Block block = te.getBlockType();
             if (world != null && block != null) {
-                int x = te.xCoord;
-                int y = te.yCoord;
-                int z = te.zCoord;
+                BlockPos pos = te.getPos();
 
-                return getItemStackFromBlock(world, x, y, z, block, world.getBlockMetadata(x, y, z));
+                return getItemStackFromBlock(world, pos, block, world.getBlockState(pos));
             }
         }
 
@@ -308,19 +311,21 @@ public abstract class GuiBase extends GuiAntiNEI {
 
     public ItemStack getItemStackFromBlock(World world, int x, int y, int z) {
         if (world != null) {
-            Block block = world.getBlock(x, y, z);
+            BlockPos pos = new BlockPos(x, y, z);
+            Block block = world.getBlockState(pos).getBlock();
             if (block != null) {
-                return getItemStackFromBlock(world, x, y, z, block, world.getBlockMetadata(x, y, z));
+                return getItemStackFromBlock(world, pos, block, world.getBlockState(pos));
             }
         }
 
         return null;
     }
 
-    private ItemStack getItemStackFromBlock(World world, int x, int y, int z, Block block, int meta) {
+    private ItemStack getItemStackFromBlock(World world, BlockPos pos, Block block, IBlockState state) {
+
         try {
             //try to get it by picking the block
-            ItemStack item = block.getPickBlock(new MovingObjectPosition(x, y, z, 1, Vec3.createVectorHelper(x, y, z)), world, x, y, z);
+            ItemStack item = block.getPickBlock(state, new RayTraceResult(RayTraceResult.Type.BLOCK, new Vec3d(pos.getX(), pos.getY(), pos.getZ()), EnumFacing.UP, pos), world, pos, FMLClientHandler.instance().getClientPlayerEntity());
             if (item != null) {
                 return item;
             }
@@ -329,7 +334,7 @@ public abstract class GuiBase extends GuiAntiNEI {
 
         try{
             //try to get it from dropped items
-            List<ItemStack> items = block.getDrops(world, x, y, z, meta, 0);
+            List<ItemStack> items = block.getDrops(world, pos, state, 0);
             if (items != null && items.size() > 0 && items.get(0) != null) {
                 return items.get(0);
             }
@@ -338,30 +343,30 @@ public abstract class GuiBase extends GuiAntiNEI {
 
 
         //get it from its id and meta
-        return  new ItemStack(block, 1, meta);
+        return new ItemStack(block, 1, block.getMetaFromState(state));
     }
 
     public void drawItemAmount(ItemStack itemstack, int x, int y) {
-        itemRender.renderItemOverlayIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
+        itemRender.renderItemOverlayIntoGUI(fontRendererObj, itemstack, x + guiLeft, y + guiTop, null);
         bindTexture(getComponentResource());
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glDisable(GL11.GL_LIGHTING);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.disableLighting();
     }
 
     public void drawItemStack(ItemStack itemstack, int x, int y) {
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
 
         RenderHelper.enableGUIStandardItemLighting();
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
-        GL11.glEnable(GL11.GL_LIGHTING);
+        GlStateManager.disableLighting();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableColorMaterial();
+        GlStateManager.enableLighting();
 
         itemRender.zLevel = 1F;
 
 
         try {
-            itemRender.renderItemIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + guiLeft, y + guiTop);
+            itemRender.renderItemIntoGUI(itemstack, x + guiLeft, y + guiTop);
         }catch (Exception ex) {
             if (itemstack.getItemDamage() != 0) {
                 ItemStack newStack = itemstack.copy();
@@ -372,11 +377,11 @@ public abstract class GuiBase extends GuiAntiNEI {
             itemRender.zLevel = 0F;
 
             bindTexture(getComponentResource());
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GL11.glEnable(GL11.GL_ALPHA_TEST);
-            GL11.glPopMatrix();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.disableLighting();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.enableAlpha();
+            GlStateManager.popMatrix();
         }
 
     }
@@ -394,25 +399,25 @@ public abstract class GuiBase extends GuiAntiNEI {
         drawCursor(x, y, z, 1F, color);
     }
     public void drawCursor(int x, int y, int z, float size, int color) {
-        GL11.glPushMatrix();
-        GL11.glTranslatef(0, 0, z);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, 0, z);
         x += guiLeft;
         y += guiTop;
-        GL11.glTranslatef(x, y, 0);
-        GL11.glScalef(size, size, 0);
-        GL11.glTranslatef(-x, -y, 0);
+        GlStateManager.translate(x, y, 0);
+        GlStateManager.scale(size, size, 0);
+        GlStateManager.translate(-x, -y, 0);
         Gui.drawRect(x, y + 1, x + 1, y + 10, color);
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
 
     public void drawLine(int x1, int y1, int x2, int y2) {
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
 
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glColor4f(0.4F, 0.4F, 0.4F, 1F);
+        GlStateManager.disableTexture2D();
+        GlStateManager.color(0.4F, 0.4F, 0.4F, 1F);
 
-        //GL11.glEnable(GL11.GL_BLEND);
+        //GlStateManager.enableBlend();
         //GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_DST_COLOR);
         //GL11.glShadeModel(GL11.GL_SMOOTH);
         //GL11.glEnable(GL11.GL_LINE_SMOOTH);
@@ -425,10 +430,10 @@ public abstract class GuiBase extends GuiAntiNEI {
         GL11.glVertex3f(guiLeft + x2, guiTop + y2, 0);
         GL11.glEnd();
 
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glColor4f(1F, 1F, 1F, 1F);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glPopMatrix();
+        GlStateManager.disableBlend();
+        GlStateManager.color(1F, 1F, 1F, 1F);
+        GlStateManager.enableTexture2D();
+        GlStateManager.popMatrix();
     }
 
 
@@ -454,23 +459,23 @@ public abstract class GuiBase extends GuiAntiNEI {
 
     private void startScaling() {
         //start scale
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
 
         float scale = getScale();
 
-        GL11.glScalef(scale, scale, 1);
-        GL11.glTranslatef(-guiLeft, -guiTop, 0.0F);
-        GL11.glTranslatef((this.width - this.xSize * scale) / (2 * scale), (this.height - this.ySize * scale) / (2 * scale), 0.0F);
+        GlStateManager.scale(scale, scale, 1);
+        GlStateManager.translate(-guiLeft, -guiTop, 0.0F);
+        GlStateManager.translate((this.width - this.xSize * scale) / (2 * scale), (this.height - this.ySize * scale) / (2 * scale), 0.0F);
     }
 
     private void stopScaling() {
         //stop scale
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     protected float getScale() {
 
-        net.minecraft.client.gui.ScaledResolution scaledresolution = new net.minecraft.client.gui.ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
+        net.minecraft.client.gui.ScaledResolution scaledresolution = new net.minecraft.client.gui.ScaledResolution(this.mc);
         float w = scaledresolution.getScaledWidth() * 0.9F;
         float h = scaledresolution.getScaledHeight() * 0.9F;
         float multX = w / xSize;
@@ -500,21 +505,25 @@ public abstract class GuiBase extends GuiAntiNEI {
         return (int)y;
     }
 
-    public void drawIcon(IIcon icon, int x, int y) {
-        drawTexturedModelRectFromIcon(guiLeft + x, guiTop + y, icon, 16, 16);
+    public void drawIcon(TextureAtlasSprite texture, int x, int y) {
+        drawTexturedModalRect(guiLeft + x, guiTop + y, texture, 16, 16);
     }
 
     public void drawFluid(Fluid fluid, int x, int y) {
 
+        if (fluid == null) {
+            return;
+        }
 
-        IIcon icon = fluid.getIcon();
+        TextureMap textureMapBlocks = mc.getTextureMapBlocks();
+        ResourceLocation fluidStill = fluid.getStill();
+        TextureAtlasSprite icon = null;
+
+        if (fluidStill != null)
+            icon = textureMapBlocks.getAtlasSprite(fluidStill.toString());
 
         if (icon == null) {
-            if (FluidRegistry.WATER.equals(fluid)) {
-                icon = Blocks.water.getIcon(0, 0);
-            }else if(FluidRegistry.LAVA.equals(fluid)) {
-                icon = Blocks.lava.getIcon(0, 0);
-            }
+            icon = textureMapBlocks.getMissingSprite();
         }
 
         if (icon != null) {
@@ -523,7 +532,7 @@ public abstract class GuiBase extends GuiAntiNEI {
 
             drawIcon(icon, x, y);
 
-            GL11.glColor4f(1F, 1F, 1F, 1F);
+            GlStateManager.color(1F, 1F, 1F, 1F);
             bindTexture(getComponentResource());
         }
     }
@@ -533,7 +542,7 @@ public abstract class GuiBase extends GuiAntiNEI {
         for (int i = 0; i < colorComponents.length; i++) {
             colorComponents[i] = ((color & (255 << (i * 8))) >> (i * 8)) / 255F;
         }
-        GL11.glColor4f(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
+        GlStateManager.color(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
     }
 
 

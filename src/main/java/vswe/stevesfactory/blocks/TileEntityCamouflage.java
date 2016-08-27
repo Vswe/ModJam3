@@ -1,26 +1,26 @@
 package vswe.stevesfactory.blocks;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.EffectRenderer;
-import net.minecraft.client.particle.EntityDiggingFX;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.components.ComponentMenuCamouflageInside;
 import vswe.stevesfactory.components.ComponentMenuCamouflageShape;
 import vswe.stevesfactory.network.*;
 
 import java.util.EnumSet;
 import java.util.Random;
-
 
 public class TileEntityCamouflage extends TileEntityClusterElement implements IPacketBlock {
 
@@ -40,42 +40,44 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     }
 
     private static final Random rand = new Random();
+    public int rotate = 0;
 
     @SideOnly(Side.CLIENT)
-    public boolean addBlockEffect(Block camoBlock, int sideHit, EffectRenderer effectRenderer) {
+    public boolean addBlockEffect(BlockCamouflageBase camoBlock, IBlockState state, World world, EnumFacing sideHit, ParticleManager effectRenderer) {
         try {
-            if (ids[sideHit] != 0) {
-                Block block = Block.getBlockById(ids[sideHit]);
+            if (ids[sideHit.ordinal()] != 0) {
+                Block block = Block.getBlockById(ids[sideHit.ordinal()]);
                 if (block != null) {
                     float f = 0.1F;
-                    double x = (double)xCoord + rand.nextDouble() * (camoBlock.getBlockBoundsMaxX() - camoBlock.getBlockBoundsMinX() - (double)(f * 2.0F)) + (double)f + camoBlock.getBlockBoundsMinX();
-                    double y = (double)yCoord + rand.nextDouble() * (camoBlock.getBlockBoundsMaxY() - camoBlock.getBlockBoundsMinY() - (double)(f * 2.0F)) + (double)f + camoBlock.getBlockBoundsMinY();
-                    double z = (double)zCoord + rand.nextDouble() * (camoBlock.getBlockBoundsMaxZ() - camoBlock.getBlockBoundsMinZ() - (double)(f * 2.0F)) + (double)f + camoBlock.getBlockBoundsMinZ();
+                    AxisAlignedBB axisalignedbb = state.getBoundingBox(world, getPos());
+                    double x = (double)getPos().getX() + rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - (double)(f * 2.0F)) + (double)f + axisalignedbb.minX;
+                    double y = (double)getPos().getY() + rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - (double)(f * 2.0F)) + (double)f + axisalignedbb.minY;
+                    double z = (double)getPos().getZ() + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - (double)(f * 2.0F)) + (double)f + axisalignedbb.minZ;
 
                     switch (sideHit) {
-                        case 0:
-                            y = (double)yCoord + camoBlock.getBlockBoundsMinY() - (double)f;
+                        case DOWN:
+                            y = (double)getPos().getY() + axisalignedbb.minY - (double)f;
                             break;
-                        case 1:
-                            y = (double)yCoord + camoBlock.getBlockBoundsMaxY() + (double)f;
+                        case UP:
+                            y = (double)getPos().getY() + axisalignedbb.maxY + (double)f;
                             break;
-                        case 2:
-                            z = (double)zCoord + camoBlock.getBlockBoundsMinZ() - (double)f;
+                        case NORTH:
+                            z = (double)getPos().getZ() + axisalignedbb.minZ - (double)f;
                             break;
-                        case 3:
-                            z = (double)zCoord + camoBlock.getBlockBoundsMaxZ() + (double)f;
+                        case SOUTH:
+                            z = (double)getPos().getZ() + axisalignedbb.maxZ + (double)f;
                             break;
-                        case 4:
-                            x = (double)xCoord + camoBlock.getBlockBoundsMinX() - (double)f;
+                        case WEST:
+                            x = (double)getPos().getX() + axisalignedbb.minX - (double)f;
                             break;
-                        case 5:
-                            x = (double)xCoord + camoBlock.getBlockBoundsMaxX() + (double)f;
+                        case EAST:
+                            x = (double)getPos().getX() + axisalignedbb.maxX + (double)f;
                             break;
                     }
 
 
 
-                    effectRenderer.addEffect((new EntityDiggingFX(this.worldObj, x, y, z, 0.0D, 0.0D, 0.0D, block, metas[sideHit])).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F));
+//                    effectRenderer.addEffect((new EntityDiggingFX.Factory().getEntityFX(0, this.worldObj, x, y, z, 0.0D, 0.0D, 0.0D, Block.getIdFromBlock(camoBlock))).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F));
                     return true;
                 }
             }
@@ -85,7 +87,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     }
 
 
-    public enum CamouflageType {
+    public enum CamouflageType implements IStringSerializable {
         NORMAL("BlockCableCamouflage", "cable_camo", false, false),
         INSIDE("BlockCableInsideCamouflage", "cable_camo_inside", true, false),
         SHAPE("BlockCableShapeCamouflage", "cable_camo_shape", true, true);
@@ -107,7 +109,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
         }
 
         public String getIcon() {
-            return icon;
+            return "stevesfactorymanager:blocks/" + icon;
         }
 
         public boolean useDoubleRendering() {
@@ -117,14 +119,29 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
         public boolean useSpecialShape() {
             return useShape;
         }
+
+        public static CamouflageType getCamouflageType(int id) {
+            CamouflageType type = values()[id % values().length];
+            return type;
+        }
+
+        @Override
+        public String getName() {
+            return icon;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
     }
 
     public CamouflageType getCamouflageType() {
         return CamouflageType.values()[ModBlocks.blockCableCamouflage.getId(getBlockMetadata())];
     }
 
-    public void setBlockBounds(BlockCamouflageBase blockCamouflageBase) {
-        blockCamouflageBase.setBlockBounds(bounds[0] / 32F, bounds[2] / 32F, bounds[4] / 32F, bounds[1] / 32F, bounds[3] / 32F, bounds[5] / 32F);
+    public AxisAlignedBB getBlockBounds() {
+        return new AxisAlignedBB(bounds[0] / 32D, bounds[2] / 32D, bounds[4] / 32D, bounds[1] / 32D, bounds[3] / 32D, bounds[5] / 32D);
     }
 
     public boolean isUseCollision() {
@@ -138,8 +155,8 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     private boolean useCollision = true;
     private boolean fullCollision = false;
     private int[] bounds = {0, 32, 0, 32, 0, 32};
-    private int[] ids = new int[ForgeDirection.VALID_DIRECTIONS.length * 2];
-    private int[] metas = new int[ForgeDirection.VALID_DIRECTIONS.length * 2];
+    private int[] ids = new int[EnumFacing.values().length * 2];
+    private int[] metas = new int[EnumFacing.values().length * 2];
 
     public void setBounds(ComponentMenuCamouflageShape menu) {
         if (getCamouflageType().useSpecialShape() && menu.shouldUpdate()) {
@@ -176,17 +193,17 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
                 setItem(item, side);
                 break;
             case ONLY_INSIDE:
-                setItemForInside(item, side + ForgeDirection.VALID_DIRECTIONS.length);
+                setItemForInside(item, side + EnumFacing.values().length);
                 break;
             case SAME:
                 setItem(item, side);
-                setItemForInside(item, side + ForgeDirection.VALID_DIRECTIONS.length);
+                setItemForInside(item, side + EnumFacing.values().length);
                 break;
             case OPPOSITE:
                 setItem(item, side);
                 int sidePairInternalId = side % 2;
                 int insideSide = side + (sidePairInternalId == 0 ? 1 : -1);
-                setItemForInside(item, insideSide + ForgeDirection.VALID_DIRECTIONS.length);
+                setItemForInside(item, insideSide + EnumFacing.values().length);
                 break;
             default:
         }
@@ -206,7 +223,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
             ids[side] = 0;
             metas[side] = 0;
         }else if(item.getItem() != null && item.getItem() instanceof ItemBlock) {
-            Block block = ((ItemBlock)item.getItem()).field_150939_a;
+            Block block = ((ItemBlock)item.getItem()).block;
             if (block != null) {
                 ids[side] = Block.getIdFromBlock(block);
                 metas[side] = item.getItem().getMetadata(item.getItemDamage());
@@ -315,14 +332,14 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
                     }
                 }
             }
-            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+            worldObj.notifyBlockUpdate(getPos(), getWorld().getBlockState(getPos()), getWorld().getBlockState(getPos()), 3);
         }
     }
 
     private void validateSide(int i) {
-        if (ids[i] < 0 || ids[i] >= Block.blockRegistry.getKeys().size()) {
-            ids[i] = 0;
-        }
+//        if (ids[i] < 0 || ids[i] >= Block.blockRegistry.getKeys().size()) {
+//            ids[i] = 0;
+//        }
     }
 
     @Override
@@ -335,7 +352,7 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     private boolean isServerDirty;
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             keepClientDataUpdated();
         }else{
@@ -347,8 +364,8 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
     }
 
     @SideOnly(Side.CLIENT)
-    private void keepClientDataUpdated() {
-        double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+    protected void keepClientDataUpdated() {
+        double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5);
 
         if (distance > Math.pow(PacketHandler.BLOCK_UPDATE_RANGE, 2)) {
             hasClientUpdatedData = false;
@@ -422,31 +439,4 @@ public class TileEntityCamouflage extends TileEntityClusterElement implements IP
         }
     }
 
-    @SideOnly(Side.CLIENT)
-    private IIcon getIcon(int side, boolean inside) {
-        if (inside) {
-            side += ForgeDirection.VALID_DIRECTIONS.length;
-        }
-
-        Block block = Block.getBlockById(ids[side]);
-        if (block != null) {
-            try {
-                IIcon icon = block.getIcon(side, metas[side]);
-                if (icon != null) {
-                    return icon;
-                }
-            }catch (Exception ignored) {}
-        }
-        return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public IIcon getIconWithDefault(IBlockAccess world, int x, int y, int z, BlockCamouflageBase block, int side, boolean inside) {
-        IIcon icon = getIcon(side, inside);
-        if (icon == null) {
-            icon = block.getDefaultIcon(side, world.getBlockMetadata(x, y, z), getBlockMetadata()); //here we actually want to fetch the meta data of the block, rather then getting the tile entity version
-        }
-
-        return icon;
-    }
 }

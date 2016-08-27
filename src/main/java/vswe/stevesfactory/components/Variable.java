@@ -2,9 +2,9 @@ package vswe.stevesfactory.components;
 
 
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import org.lwjgl.opengl.GL11;
 import vswe.stevesfactory.interfaces.GuiManager;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class Variable implements IContainerSelection {
     public void draw(GuiManager gui, int x, int y) {
         VariableColor.values()[id].applyColor();
         gui.drawTexture(x + 1, y + 1, VARIABLE_SRC_X, VARIABLE_SRC_Y, VARIABLE_SIZE, VARIABLE_SIZE);
-        GL11.glColor4f(1F, 1F, 1F, 1F);
+        GlStateManager.color(1F, 1F, 1F, 1F);
     }
 
     @Override

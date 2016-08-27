@@ -1,12 +1,12 @@
 package vswe.stevesfactory.components;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.RegistryNamespaced;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.Localization;
 import vswe.stevesfactory.interfaces.ContainerManager;
@@ -253,7 +253,7 @@ public class ComponentMenuItem extends ComponentMenuStuff {
                 }
             }
         }else{
-            Iterator itemTypeIterator = Item.itemRegistry.iterator();
+            Iterator itemTypeIterator = Item.REGISTRY.iterator();
             while (itemTypeIterator.hasNext()){
                 Item item = (Item)itemTypeIterator.next();
 

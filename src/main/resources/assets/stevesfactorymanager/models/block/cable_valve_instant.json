@@ -1,0 +1,7 @@
+{
+    "parent": "stevesfactorymanager:block/orientable_front",
+    "textures": {
+        "front": "stevesfactorymanager:blocks/cable_intake_out_instant",
+        "side": "stevesfactorymanager:blocks/cable_intake_instant"
+    }
+}

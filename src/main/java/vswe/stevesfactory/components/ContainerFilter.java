@@ -188,13 +188,13 @@ public class ContainerFilter {
                                 int value = 0;
                                 switch (j) {
                                     case 0:
-                                        value = block.getTileEntity().xCoord - manager.xCoord;
+                                        value = block.getTileEntity().getPos().getX() - manager.getPos().getX();
                                         break;
                                     case 1:
-                                        value = block.getTileEntity().yCoord - manager.yCoord;
+                                        value = block.getTileEntity().getPos().getY() - manager.getPos().getY();
                                         break;
                                     case 2:
-                                        value = block.getTileEntity().zCoord - manager.zCoord;
+                                        value = block.getTileEntity().getPos().getZ() - manager.getPos().getZ();
                                         break;
                                     case 3:
                                         value = block.getCableDistance();

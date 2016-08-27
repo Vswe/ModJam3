@@ -4,6 +4,7 @@ package vswe.stevesfactory.wrappers;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
 
 public abstract class InventoryWrapper implements IInventory {
 
@@ -29,8 +30,8 @@ public abstract class InventoryWrapper implements IInventory {
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int i) {
-        return inventory.getStackInSlotOnClosing(i);
+    public ItemStack removeStackFromSlot(int i) {
+        return inventory.removeStackFromSlot(i);
     }
 
     @Override
@@ -39,13 +40,18 @@ public abstract class InventoryWrapper implements IInventory {
     }
 
     @Override
-    public String getInventoryName() {
-        return inventory.getInventoryName();
+    public String getName() {
+        return inventory.getName();
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
-        return inventory.hasCustomInventoryName();
+    public boolean hasCustomName() {
+        return inventory.hasCustomName();
+    }
+
+    @Override
+    public ITextComponent getDisplayName() {
+        return inventory.getDisplayName();
     }
 
     @Override
@@ -64,17 +70,37 @@ public abstract class InventoryWrapper implements IInventory {
     }
 
     @Override
-    public void openInventory() {
-        inventory.openInventory();
+    public void openInventory(EntityPlayer player) {
+        inventory.openInventory(player);
     }
 
     @Override
-    public void closeInventory() {
-        inventory.closeInventory();
+    public void closeInventory(EntityPlayer player) {
+        inventory.closeInventory(player);
     }
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
        return inventory.isItemValidForSlot(i, itemstack);
+    }
+
+    @Override
+    public int getField(int id) {
+        return inventory.getField(id);
+    }
+
+    @Override
+    public void setField(int id, int value) {
+        inventory.setField(id, value);
+    }
+
+    @Override
+    public int getFieldCount() {
+        return inventory.getFieldCount();
+    }
+
+    @Override
+    public void clear() {
+        inventory.clear();
     }
 }

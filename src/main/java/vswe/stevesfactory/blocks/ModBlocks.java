@@ -1,16 +1,16 @@
 package vswe.stevesfactory.blocks;
 
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public final class ModBlocks {
 
-    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 12;
+    public static final byte NBT_CURRENT_PROTOCOL_VERSION = 13;
     public static final String NBT_PROTOCOL_VERSION = "ProtocolVersion";
 
     private static final String MANAGER_TILE_ENTITY_TAG = "TileEntityMachineManagerName";
@@ -58,7 +58,6 @@ public final class ModBlocks {
 
     private static final String CABLE_CAMOUFLAGE_TILE_ENTITY_TAG = "TileEntityCableCamouflageName";
     public static final String CABLE_CAMOUFLAGE_NAME_TAG = "BlockCableCamouflageName";
-    public static int CAMOUFLAGE_RENDER_ID;
 
     private static final String CABLE_SIGN_TILE_ENTITY_TAG = "TileEntityCableSignName";
     public static final String CABLE_SIGN_NAME_TAG = "BlockCableSignName";
@@ -162,102 +161,102 @@ public final class ModBlocks {
                 "III",
                 "IRI",
                 "SPS",
-                'R', Blocks.redstone_block,
-                'P', Blocks.piston,
-                'I', Items.iron_ingot,
-                'S', Blocks.stone
+                'R', Blocks.REDSTONE_BLOCK,
+                'P', Blocks.PISTON,
+                'I', Items.IRON_INGOT,
+                'S', Blocks.STONE
         );
 
         GameRegistry.addRecipe(new ItemStack(blockCable, 8),
                 "GPG",
                 "IRI",
                 "GPG",
-                'R', Items.redstone,
-                'G', Blocks.glass,
-                'I', Items.iron_ingot,
-                'P', Blocks.light_weighted_pressure_plate
+                'R', Items.REDSTONE,
+                'G', Blocks.GLASS,
+                'I', Items.IRON_INGOT,
+                'P', Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableRelay, 1),
                 blockCable,
-                Blocks.hopper
+                Blocks.HOPPER
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableOutput, 1),
                 blockCable,
-                Items.redstone,
-                Items.redstone,
-                Items.redstone
+                Items.REDSTONE,
+                Items.REDSTONE,
+                Items.REDSTONE
         );
 
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableInput, 1),
                 blockCable,
-                Items.redstone
+                Items.REDSTONE
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableRelay, 1, 8),
                 new ItemStack(blockCableRelay, 1, 0),
-                new ItemStack(Items.dye, 1, 4)
+                new ItemStack(Items.DYE, 1, 4)
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableIntake, 1, 0),
                 blockCable,
-                Blocks.hopper,
-                Blocks.hopper,
-                Blocks.dropper
+                Blocks.HOPPER,
+                Blocks.HOPPER,
+                Blocks.DROPPER
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableBUD, 1),
                 blockCable,
-                Items.quartz,
-                Items.quartz,
-                Items.quartz
+                Items.QUARTZ,
+                Items.QUARTZ,
+                Items.QUARTZ
         );
 
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableBreaker, 1),
                 blockCable,
-                Items.iron_pickaxe,
-                Blocks.dispenser
+                Items.IRON_PICKAXE,
+                Blocks.DISPENSER
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableIntake, 1, 8),
                 new ItemStack(blockCableIntake, 1, 0),
-                Items.gold_ingot
+                Items.GOLD_INGOT
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableCluster, 1),
                 blockCable,
-                Items.ender_pearl,
-                Items.ender_pearl,
-                Items.ender_pearl
+                Items.ENDER_PEARL,
+                Items.ENDER_PEARL,
+                Items.ENDER_PEARL
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableCamouflage, 1, 0),
                 blockCable,
-                new ItemStack(Blocks.wool, 1, 14),
-                new ItemStack(Blocks.wool, 1, 13),
-                new ItemStack(Blocks.wool, 1, 11)
+                new ItemStack(Blocks.WOOL, 1, 14),
+                new ItemStack(Blocks.WOOL, 1, 13),
+                new ItemStack(Blocks.WOOL, 1, 11)
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableCamouflage, 1, 1),
                 new ItemStack(blockCableCamouflage, 1, 0),
                 new ItemStack(blockCableCamouflage, 1, 0),
-                Blocks.iron_bars,
-                Blocks.iron_bars
+                Blocks.IRON_BARS,
+                Blocks.IRON_BARS
         );
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableCamouflage, 1, 2),
                 new ItemStack(blockCableCamouflage, 1, 1),
-                Blocks.sticky_piston
+                Blocks.STICKY_PISTON
         );
 
 
         GameRegistry.addShapelessRecipe(new ItemStack(blockCableSign, 1),
                 blockCable,
-                new ItemStack(Items.dye, 0),
-                Items.feather
+                new ItemStack(Items.DYE, 0),
+                Items.FEATHER
         );
 
         GameRegistry.addRecipe(new ClusterUpgradeRecipe());

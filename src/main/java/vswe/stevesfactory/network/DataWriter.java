@@ -1,18 +1,18 @@
 package vswe.stevesfactory.network;
 
 
-import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ICrafting;
-import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.interfaces.ContainerBase;
 import vswe.stevesfactory.settings.Settings;
+import vswe.stevesfactory.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class DataWriter {
 
     private FMLProxyPacket createPacket() {
        writeFinalBits();
-       ByteBuf buf = Unpooled.copiedBuffer(((ByteArrayOutputStream)stream).toByteArray());
+       PacketBuffer buf = new PacketBuffer(Unpooled.copiedBuffer(((ByteArrayOutputStream)stream).toByteArray()));
        return new FMLProxyPacket(buf, CHANNEL);
     }
 
@@ -95,7 +95,7 @@ public class DataWriter {
     }
     
     void sendPlayerPackets(ContainerBase container) {
-        for (ICrafting crafting : container.getCrafters()) {
+        for (IContainerListener crafting : container.getCrafters()) {
             if (crafting instanceof EntityPlayer) {
                 EntityPlayerMP player = (EntityPlayerMP) crafting;
                 packetHandler.sendTo(createPacket(), player);
@@ -122,7 +122,7 @@ public class DataWriter {
 
         if (nbtTagCompound != null) {
             try {
-                bytes = CompressedStreamTools.compress(nbtTagCompound);
+                bytes = Utils.compress(nbtTagCompound);
             }catch (IOException ex) {
                 bytes = null;
             }

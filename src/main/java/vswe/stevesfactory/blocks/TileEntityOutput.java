@@ -1,13 +1,14 @@
 package vswe.stevesfactory.blocks;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.components.ComponentMenuPulse;
 import vswe.stevesfactory.components.ComponentMenuRedstoneOutput;
 import vswe.stevesfactory.components.ComponentMenuRedstoneSidesEmitter;
@@ -28,43 +29,37 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
 
     public TileEntityOutput() {
 
-        strengths = new int[ForgeDirection.VALID_DIRECTIONS.length];
-        strong = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
+        strengths = new int[EnumFacing.values().length];
+        strong = new boolean[EnumFacing.values().length];
 
-        updatedStrength = new int[ForgeDirection.VALID_DIRECTIONS.length];
-        updatedStrong = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
+        updatedStrength = new int[EnumFacing.values().length];
+        updatedStrong = new boolean[EnumFacing.values().length];
 
-        pulseTimers = new List[ForgeDirection.VALID_DIRECTIONS.length];
+        pulseTimers = new List[EnumFacing.values().length];
         for (int i = 0; i < pulseTimers.length; i++) {
             pulseTimers[i] = new ArrayList<PulseTimer>();
         }
     }
 
-    public boolean hasStrongSignalAtSide(int side) {
-        return strong[side];
+    public boolean hasStrongSignalAtSide(EnumFacing side) {
+        return strong[side.ordinal()];
     }
 
-
-    public boolean hasStrongSignalAtOppositeSide(int side) {
-        return strong[getOpposite(side)];
+    public boolean hasStrongSignalAtOppositeSide(EnumFacing side) {
+        return strong[side.getOpposite().ordinal()];
     }
 
-    public int getStrengthFromSide(int side) {
-        return strengths[side];
+    public int getStrengthFromSide(EnumFacing side) {
+        return strengths[side.ordinal()];
     }
 
-    public int getStrengthFromOppositeSide(int side) {
-        return getStrengthFromSide(getOpposite(side));
+    public int getStrengthFromOppositeSide(EnumFacing side) {
+        return getStrengthFromSide(side.getOpposite());
     }
-
-    private int getOpposite(int side) {
-        return ForgeDirection.getOrientation(side).getOpposite().ordinal();
-    }
-
 
     public void updateState(ComponentMenuRedstoneSidesEmitter sides, ComponentMenuRedstoneOutput output, ComponentMenuPulse pulse) {
         boolean updateClient = false;
-        for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
+        for (int i = 0; i < EnumFacing.values().length; i++) {
             if (sides.isSideRequired(i)) {
                 int oldStrength = updatedStrength[i];
                 boolean oldStrong = updatedStrong[i];
@@ -85,7 +80,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
 
 
                 if (updateBlocks) {
-                    addBlockScheduledForUpdate(i);
+                    addBlockScheduledForUpdate(EnumFacing.getFront(i));
                 }
 
                 if (pulse.shouldEmitPulse()) {
@@ -123,8 +118,6 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
                     }
                 }
 
-
-
             }
         }
 
@@ -133,14 +126,13 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
         }
     }
 
-    private void addBlockScheduledForUpdate(int side) {
+    private void addBlockScheduledForUpdate(EnumFacing side) {
         hasUpdatedThisTick = true;
-        ForgeDirection direction = ForgeDirection.getOrientation(side);
-        int x = xCoord + direction.offsetX;
-        int y = yCoord + direction.offsetY;
-        int z = zCoord + direction.offsetZ;
+        int x = getPos().getX() + side.getFrontOffsetX();
+        int y = getPos().getY() + side.getFrontOffsetY();
+        int z = getPos().getZ() + side.getFrontOffsetZ();
 
-        WorldCoordinate coordinate = new WorldCoordinate(x, y, z);
+        BlockPos coordinate = new BlockPos(x, y, z);
         if (!scheduledToUpdate.contains(coordinate)) {
             scheduledToUpdate.add(coordinate);
         }
@@ -184,17 +176,17 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
     }
 
 
-    private void notifyUpdate(int x, int y, int z, boolean spread) {
-        if (worldObj.getBlock(x, y, z) != ModBlocks.blockCable && (x != xCoord || y != yCoord || z != zCoord)) {
-            worldObj.notifyBlockOfNeighborChange(x, y, z, ModBlocks.blockCableOutput);
+    private void notifyUpdate(BlockPos pos, boolean spread) {
+        if (worldObj.getBlockState(pos).getBlock() != ModBlocks.blockCable && (pos.getX() != getPos().getX() || pos.getY() != getPos().getY() || pos.getZ() != getPos().getZ())) {
+            worldObj.notifyBlockOfStateChange(pos, ModBlocks.blockCableOutput);
 
             if (spread) {
-                notifyUpdate(x - 1, y, z, false);
-                notifyUpdate(x + 1, y, z, false);
-                notifyUpdate(x,         y - 1,      z,      false);
-                notifyUpdate(x,         y + 1,      z,      false);
-                notifyUpdate(x,         y,          z - 1,  false);
-                notifyUpdate(x,         y,          z + 1,  false);
+                notifyUpdate(pos.add(-1, 0, 0),false);
+                notifyUpdate(pos.add(1, 0, 0), false);
+                notifyUpdate(pos.add(0, -1, 0),false);
+                notifyUpdate(pos.add(0, 1, 0), false);
+                notifyUpdate(pos.add(0, 0, -1),false);
+                notifyUpdate(pos.add(0, 0, 1), false);
             }
         }
     }
@@ -267,7 +259,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
     @Override
     public void writeData(DataWriter dw, EntityPlayer player, boolean onServer, int id) {
         if (onServer) {
-            for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
+            for (int i = 0; i < EnumFacing.values().length; i++) {
                 boolean isOn = updatedStrength[i] > 0;
                 dw.writeBoolean(isOn);
                 if (isOn) {
@@ -286,7 +278,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
             //respond by sending the data to the client that required it
             PacketHandler.sendBlockPacket(this, player, 0);
         }else{
-            for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
+            for (int i = 0; i < EnumFacing.values().length; i++) {
                 boolean isOn = dr.readBoolean();
                 if (isOn) {
                     strengths[i] = dr.readData(DataBitHelper.MENU_REDSTONE_ANALOG);
@@ -295,7 +287,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
                     strengths[i] = 0;
                 }
             }
-            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+            worldObj.notifyBlockUpdate(getPos(), getWorld().getBlockState(getPos()), getWorld().getBlockState(getPos()), 3);
         }
     }
 
@@ -307,10 +299,10 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
 
     private List<PulseTimer>[] pulseTimers;
     private boolean hasUpdatedThisTick;
-    private List<WorldCoordinate> scheduledToUpdate = new ArrayList<WorldCoordinate>();
+    private List<BlockPos> scheduledToUpdate = new ArrayList<BlockPos>();
 
     @Override
-    public void updateEntity() {
+    public void update() {
        if (worldObj.isRemote) {
            keepClientDataUpdated();
        }else{
@@ -318,14 +310,14 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
 
            if (hasUpdatedThisTick) {
                hasUpdatedThisTick = false;
-               List<WorldCoordinate> coordinates = new ArrayList<WorldCoordinate>(scheduledToUpdate);
+               List<BlockPos> coordinates = new ArrayList<BlockPos>(scheduledToUpdate);
                scheduledToUpdate.clear();
                for (int i = 0; i < strengths.length; i++) {
                    strengths[i] = updatedStrength[i];
                    strong[i] = updatedStrong[i];
                }
-               for (WorldCoordinate coordinate : coordinates) {
-                   notifyUpdate(coordinate.getX(), coordinate.getY(), coordinate.getZ(), true);
+               for (BlockPos coordinate : coordinates) {
+                   notifyUpdate(coordinate, true);
                }
            }
        }
@@ -334,7 +326,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
     private void updatePulses() {
         boolean updateClient = false;
 
-        for (int i = 0; i < ForgeDirection.VALID_DIRECTIONS.length; i++) {
+        for (int i = 0; i < EnumFacing.values().length; i++) {
             Iterator<PulseTimer> iterator = pulseTimers[i].iterator();
 
             while (iterator.hasNext()) {
@@ -344,7 +336,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
                     if (updatedStrength[i] != timer.strength || updatedStrong[i] == timer.strong) {
                         updatedStrength[i] = timer.strength;
                         updatedStrong[i] = timer.strong;
-                        addBlockScheduledForUpdate(i);
+                        addBlockScheduledForUpdate(EnumFacing.getFront(i));
                         updateClient = true;
                     }
                     iterator.remove();
@@ -366,7 +358,7 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
             return;
         }
 
-        double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+        double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5);
 
         if (distance > Math.pow(PacketHandler.BLOCK_UPDATE_RANGE, 2)) {
             hasUpdatedData = false;
@@ -385,6 +377,8 @@ public class TileEntityOutput extends TileEntityClusterElement implements IPacke
     protected EnumSet<ClusterMethodRegistration> getRegistrations() {
         return EnumSet.of(ClusterMethodRegistration.CAN_CONNECT_REDSTONE, ClusterMethodRegistration.SHOULD_CHECK_WEAK_POWER, ClusterMethodRegistration.IS_PROVIDING_WEAK_POWER, ClusterMethodRegistration.IS_PROVIDING_STRONG_POWER);
     }
+
+
 
     private class PulseTimer {
         private int strength;

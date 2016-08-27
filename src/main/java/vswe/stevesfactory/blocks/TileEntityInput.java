@@ -2,7 +2,8 @@ package vswe.stevesfactory.blocks;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -11,8 +12,8 @@ import java.util.List;
 
 public class TileEntityInput extends TileEntityClusterElement implements IRedstoneNode, ISystemListener, ITriggerNode {
     private List<TileEntityManager> managerList = new ArrayList<TileEntityManager>();
-    private int[] oldPowered = new int[ForgeDirection.VALID_DIRECTIONS.length];
-    private int[] isPowered = new int[ForgeDirection.VALID_DIRECTIONS.length];
+    private int[] oldPowered = new int[EnumFacing.values().length];
+    private int[] isPowered = new int[EnumFacing.values().length];
 
 
     @Override
@@ -30,8 +31,9 @@ public class TileEntityInput extends TileEntityClusterElement implements IRedsto
     public void triggerRedstone() {
         isPowered = new int[isPowered.length];
         for (int i = 0; i < isPowered.length; i++) {
-            ForgeDirection direction = ForgeDirection.VALID_DIRECTIONS[i];
-            isPowered[i] = worldObj.getIndirectPowerLevelTo(direction.offsetX + this.xCoord, direction.offsetY + this.yCoord, direction.offsetZ + this.zCoord, direction.ordinal());
+            EnumFacing direction = EnumFacing.getFront(i);
+            BlockPos pos = new BlockPos(direction.getFrontOffsetX() + this.getPos().getX(), direction.getFrontOffsetY() + this.getPos().getY(), direction.getFrontOffsetZ() + this.getPos().getZ());
+            isPowered[i] = worldObj.getRedstonePower(pos, direction);
         }
 
         for (int i = managerList.size() - 1; i >= 0; i--) {
@@ -72,10 +74,10 @@ public class TileEntityInput extends TileEntityClusterElement implements IRedsto
         nbtTagCompound.setByte(ModBlocks.NBT_PROTOCOL_VERSION, ModBlocks.NBT_CURRENT_PROTOCOL_VERSION);
 
         NBTTagList sidesTag = new NBTTagList();
-        for (int i = 0; i < isPowered.length; i++) {
+        for (int power : isPowered) {
             NBTTagCompound sideTag = new NBTTagCompound();
 
-            sideTag.setByte(NBT_POWER, (byte)isPowered[i]);
+            sideTag.setByte(NBT_POWER, (byte) power);
 
             sidesTag.appendTag(sideTag);
         }

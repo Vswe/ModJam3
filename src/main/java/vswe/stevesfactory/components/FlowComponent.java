@@ -1,12 +1,12 @@
 package vswe.stevesfactory.components;
 
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import org.lwjgl.opengl.GL11;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import vswe.stevesfactory.CollisionHelper;
 import vswe.stevesfactory.blocks.TileEntityManager;
 import vswe.stevesfactory.interfaces.ContainerManager;
@@ -214,8 +214,8 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
     @SideOnly(Side.CLIENT)
     public void draw(GuiManager gui, int mX, int mY, int zLevel) {
-        GL11.glPushMatrix();
-        GL11.glTranslatef(0, 0, zLevel);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, 0, zLevel);
 
         gui.drawTexture(x, y, isLarge ? COMPONENT_SRC_LARGE_X : COMPONENT_SRC_X, COMPONENT_SRC_Y, getComponentWidth(), getComponentHeight());
 
@@ -252,10 +252,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                 gui.drawString(menu.getName(), x + MENU_X + MENU_ITEM_TEXT_X, y + getMenuItemY(i) + MENU_ITEM_TEXT_Y, 0x404040);
 
                 if (i == openMenuId) {
-                    GL11.glPushMatrix();
-                    GL11.glTranslatef(itemX, getMenuAreaY(i), 0);
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translate(itemX, getMenuAreaY(i), 0);
                     menu.draw(gui, mX - itemX, mY - getMenuAreaY(i));
-                    GL11.glPopMatrix();
+                    GlStateManager.popMatrix();
                 }
             }
         }
@@ -304,8 +304,8 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                     int endX = otherLocation[0] + connectionWidth / 2;
                     int endY = otherLocation[1] + connectionHeight / 2;
 
-                    GL11.glPushMatrix();
-                    GL11.glTranslatef(0, 0, -zLevel);
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translate(0, 0, -zLevel);
                     List<Point> nodes = connectedConnection.getNodes();
                     for (int j = 0; j <= nodes.size(); j++) {
                         int x1, y1, x2, y2;
@@ -335,7 +335,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                         gui.drawTexture(x, y, NODE_SRC_X + srcXNode * NODE_SIZE, NODE_SRC_Y, NODE_SIZE, NODE_SIZE);
                     }
 
-                    GL11.glPopMatrix();
+                    GlStateManager.popMatrix();
                 }
             }
 
@@ -394,7 +394,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
             }
         }
 
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     private String cachedName;
@@ -453,10 +453,10 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                 ComponentMenu menu = menus.get(i);
 
                 if (menu.isVisible() && i == openMenuId) {
-                    GL11.glPushMatrix();
-                    GL11.glTranslatef(getMenuAreaX(), getMenuAreaY(i), 0);
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translate(getMenuAreaX(), getMenuAreaY(i), 0);
                     menu.drawMouseOver(gui, mX - getMenuAreaX(), mY - getMenuAreaY(i));
-                    GL11.glPopMatrix();
+                    GlStateManager.popMatrix();
                 }
             }
         }
@@ -701,7 +701,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
     }
 
     private void addConnection(int id, Connection connection) {
-        if (getManager().getWorldObj() != null && getManager().getWorldObj().isRemote) {
+        if (getManager().getWorld() != null && getManager().getWorld().isRemote) {
             DataWriter dw = PacketHandler.getWriterForServerComponentPacket(this, null);
             if (connection != null) {
                 writeConnectionData(dw, id, true, connection.getComponentId(), connection.getConnectionId());
@@ -1064,7 +1064,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
 
                 int id = dr.readData(DataBitHelper.NODE_ID);
                 int length = -1;
-                if (manager.getWorldObj().isRemote) {
+                if (manager.getWorld().isRemote) {
                     length = dr.readData(DataBitHelper.NODE_ID);
                 }
                 boolean deleted = dr.readBoolean();
@@ -1079,7 +1079,7 @@ public class FlowComponent implements IComponentNetworkReader, Comparable<FlowCo
                         Point node;
                         if (created) {
                             node = new Point();
-                            if (connection.getNodes().size() < MAX_NODES && (!manager.getWorldObj().isRemote || length > connection.getNodes().size())) {
+                            if (connection.getNodes().size() < MAX_NODES && (!manager.getWorld().isRemote || length > connection.getNodes().size())) {
                                 connection.getNodes().add(id, node);
                             }
                         }else{

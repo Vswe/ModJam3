@@ -1,11 +1,8 @@
 package vswe.stevesfactory.components;
 
-
-import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.Item;
-
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.RegistryNamespaced;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,21 +10,19 @@ import java.util.Map;
 public final class ModItemHelper {
 
 
-    private static Map<Integer, String> items;
+    private static Map<ResourceLocation, String> items;
 
     public static void init() {
-        FMLControlledNamespacedRegistry<Item> itemRegistry = GameData.getItemRegistry();
+        RegistryNamespaced<ResourceLocation, Item> itemRegistry = Item.REGISTRY;
 
-        items = new HashMap<Integer, String>();
+        items = new HashMap<ResourceLocation, String>();
         Object[] keys = itemRegistry.getKeys().toArray();
-        for (int i = 0; i < keys.length; i++) {
+        for (Object key : keys) {
+            Item item = itemRegistry.getObject((ResourceLocation) key);
+            ResourceLocation resourceLocation = item.getRegistryName();
+            String modId = resourceLocation == null ? null : resourceLocation.getResourceDomain();
 
-
-            Item item = (Item) itemRegistry.getObject(keys[i]);
-            GameRegistry.UniqueIdentifier uniqueIdentity = GameRegistry.findUniqueIdentifierFor(item);
-            String modId = uniqueIdentity == null ? null : uniqueIdentity.modId;
-
-            items.put(i, modId);
+            items.put(resourceLocation, modId);
         }
     }
 
@@ -35,8 +30,8 @@ public final class ModItemHelper {
         if (item1 == null || item2 == null) {
             return false;
         }else{
-            String mod1 = items.get(GameData.getItemRegistry().getId(item1));
-            String mod2 = items.get(GameData.getItemRegistry().getId(item2));
+            String mod1 = items.get(Item.REGISTRY.getNameForObject(item1));
+            String mod2 = items.get(Item.REGISTRY.getNameForObject(item2));
 
             return mod1 != null && mod1.equals(mod2);
         }

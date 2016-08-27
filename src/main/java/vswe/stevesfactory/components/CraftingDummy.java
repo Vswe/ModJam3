@@ -49,7 +49,7 @@ public class CraftingDummy extends InventoryCrafting
 
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int par1) {
+    public ItemStack removeStackFromSlot(int par1) {
         return null;
     }
 
@@ -83,7 +83,7 @@ public class CraftingDummy extends InventoryCrafting
         for (int i = 0; i < CraftingManager.getInstance().getRecipeList().size(); ++i) {
             IRecipe recipe = (IRecipe) CraftingManager.getInstance().getRecipeList().get(i);
 
-            if (recipe.matches(this, crafting.getParent().getManager().getWorldObj())) {
+            if (recipe.matches(this, crafting.getParent().getManager().getWorld())) {
                 return recipe;
             }
         }
@@ -94,7 +94,7 @@ public class CraftingDummy extends InventoryCrafting
     private Map<Integer, ItemStack> overrideMap;
     public boolean isItemValidForRecipe(IRecipe recipe, ItemSetting result, Map<Integer, ItemStack> overrideMap, boolean advanced) {
         this.overrideMap = overrideMap;
-        if ((advanced && getRecipe() == null) || (!advanced && !recipe.matches(this, crafting.getParent().getManager().getWorldObj()))) {
+        if ((advanced && getRecipe() == null) || (!advanced && !recipe.matches(this, crafting.getParent().getManager().getWorld()))) {
             return false;
         }
         ItemStack itemStack = recipe.getCraftingResult(this);

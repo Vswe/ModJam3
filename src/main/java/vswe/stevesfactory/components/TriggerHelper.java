@@ -1,7 +1,7 @@
 package vswe.stevesfactory.components;
 
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import vswe.stevesfactory.blocks.ConnectionBlockType;
 import vswe.stevesfactory.blocks.IRedstoneNode;
 import vswe.stevesfactory.blocks.ITriggerNode;
@@ -139,7 +139,7 @@ public abstract class TriggerHelper {
     public boolean isTriggerPowered(List<SlotInventoryHolder> receivers, FlowComponent component, boolean high) {
         ComponentMenuContainer menuContainer = (ComponentMenuContainer)component.getMenus().get(containerId);
         if (canUseMergedDetection && menuContainer.getOption() == 0) {
-            int[] currentPower =  new int[ForgeDirection.VALID_DIRECTIONS.length];
+            int[] currentPower =  new int[EnumFacing.values().length];
             for (SlotInventoryHolder receiver : receivers) {
                 IRedstoneNode node = receiver.getNode();
                 for (int i = 0; i < currentPower.length; i++) {
