@@ -28,6 +28,10 @@ gradle setupDecompWorkspace idea
 gradle setupDecompWorkspace eclipse
 ```
 
+LICENSE: 
+https://twitter.com/Steves_Carts/status/795197105849729024
+
+
 [1]:http://www.chickenbones.craftsaddle.org/Files/New_Versions/links.php
 [2]:http://www.minecraftforum.net/topic/1846244-172-
 [3]:http://www.gradle.org/
